@@ -178,7 +178,7 @@ class ContentMixin:
         :param storage_limit: Leave None for autocomplete
         :return: dict or OperationGroup
         """
-        return self.operation({
+        content = {
             'kind': 'transaction',
             'source': source,
             'fee': format_mutez(fee),
@@ -186,9 +186,13 @@ class ContentMixin:
             'gas_limit': str(gas_limit),
             'storage_limit': str(storage_limit),
             'amount': format_mutez(amount),
-            'destination': destination,
-            'parameters': parameters or {}
-        })
+            'destination': destination
+        }
+
+        if parameters is not None:
+            content['parameters'] = parameters
+
+        return self.operation(content)
 
     @inline_doc
     def origination(self, script=None, manager_pubkey='', balance=0, delegatable=None, spendable=None,
@@ -213,7 +217,7 @@ class ContentMixin:
         if spendable is None:
             spendable = script is None
 
-        return self.operation({
+        content = {
             'kind': 'origination',
             'source': source,
             'fee': format_mutez(fee),
@@ -222,10 +226,14 @@ class ContentMixin:
             'storage_limit': str(storage_limit),
             'manager_pubkey': manager_pubkey,
             'balance': format_mutez(balance),
-            'script': script or {},
             'spendable': spendable,
             'delegatable': delegatable
-        })
+        }
+
+        if script is not None:
+            content['script'] = script
+
+        return self.operation(content)
 
     @inline_doc
     def delegation(self, delegate='',

@@ -75,6 +75,18 @@ class BlockSliceQuery(RpcQuery):
         ]
         return '\n'.join(res)
 
+    def __getitem__(self, item):
+        """
+        Get block by index
+        :param item: Index inside given block range
+        :return: BlockQuery
+        """
+        start, stop = self.get_range()
+        if item >= 0:
+            return self._getitem(start + item)
+        else:
+            return self._getitem(stop + item + 1)
+
     def __call__(self) -> list:
         """
         Get block hashes (base58) for this interval
@@ -82,12 +94,12 @@ class BlockSliceQuery(RpcQuery):
         if is_bh(self._stop):
             head = self._stop
         else:
-            head = self[self._stop].hash()
+            head = self._getitem(self._stop).hash()
 
         if self._start < 0:
             length = abs(self._start)
         else:
-            header = self[self._stop].header()
+            header = self._getitem(self._stop).header()
             length = header['level'] - self._start + 1
 
         return super(BlockSliceQuery, self).__call__(length=length, head=head)
@@ -105,7 +117,7 @@ class BlockSliceQuery(RpcQuery):
                 else:
                     assert False
             else:
-                return self[x].header()['level']
+                return self._getitem(x).header()['level']
 
         return get_level(self._start), get_level(self._stop)
 
@@ -118,29 +130,45 @@ class BlockSliceQuery(RpcQuery):
         level, _ = find_state_change(
             head=head - 1,  # proposals are empty at the last block
             last=last,
-            get=lambda x: self[x].votes.proposals[proposal_id](),
+            get=lambda x: self._getitem(x).votes.proposals[proposal_id](),
             equals=lambda x, y: x == y,
             pred_value=0
         )
-        votes = self[level].operations.find_votes(proposal_id)
+        votes = self._getitem(level).operations.find_votes(proposal_id)
         assert len(votes) == 1
         return votes
 
-    def find_votes(self, proposal_id) -> Generator:
+    def find_upvotes(self, proposal_id) -> Generator:
         """
-        Find voting operations for the given proposal.
-        :param proposal_id: Proposal hash (base58)
+       Find upvoting operations for the given proposal.
+       :param proposal_id: Proposal hash (base58)
+       :return: Generator (lazy)
+       """
+        last, head = self.get_range()
+        state_changes = find_state_changes(
+            head=head - 1,  # proposals are empty at the last block
+            last=last,
+            get=lambda x: self._getitem(x).votes.proposals[proposal_id](),
+            equals=lambda x, y: x == y
+        )
+        for level, _ in state_changes:
+            for upvote in self._getitem(level).operations.find_upvotes(proposal_id):
+                yield upvote
+
+    def find_ballots(self) -> Generator:
+        """
+        Find ballot operations for the current period.
         :return: Generator (lazy)
         """
         last, head = self.get_range()
         state_changes = find_state_changes(
-                head=head - 1,  # proposals are empty at the last block
+                head=head - 1,  # ballots are empty at the last block
                 last=last,
-                get=lambda x: self[x].votes.proposals[proposal_id](),
+                get=lambda x: self._getitem(x).votes.ballots(),
                 equals=lambda x, y: x == y
         )
         for level, _ in state_changes:
-            for ballot in self[level].operations.find_votes(proposal_id):
+            for ballot in self._getitem(level).operations.find_ballots():
                 yield ballot
 
     def find_origination(self, contract_id):
@@ -150,7 +178,7 @@ class BlockSliceQuery(RpcQuery):
         """
         def get_counter(x):
             try:
-                return self[x].context.contracts[contract_id].counter()
+                return self._getitem(x).context.contracts[contract_id].counter()
             except RpcError:
                 return None
 
@@ -161,7 +189,7 @@ class BlockSliceQuery(RpcQuery):
             equals=lambda x, y: x == y,
             pred_value=None
         )
-        return self[level].operations.find_origination(contract_id)
+        return self._getitem(level).operations.find_origination(contract_id)
 
     def find_operation(self, operation_group_hash):
         """
@@ -172,7 +200,7 @@ class BlockSliceQuery(RpcQuery):
         last, head = self.get_range()
         for block_level in range(head, max(1, last - 1), -1):
             try:
-                return self[block_level].operations[operation_group_hash]()
+                return self._getitem(block_level).operations[operation_group_hash]()
             except StopIteration:
                 continue
 

@@ -53,6 +53,9 @@ tulip = RpcProvider(
     alphanet='https://rpc.tulip.tools/alphanet/',
     zeronet='https://rpc.tulip.tools/zeronet/'
 )
+letzbake = RpcProvider(
+    mainnet='https://teznode.letzbake.com:443/'
+)
 
 mainnet = tzscan.mainnet
 alphanet = cryptonomic.alphanet

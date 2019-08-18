@@ -267,16 +267,27 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
         """
         return self[3]
 
-    def find_votes(self, proposal_id) -> list:
+    def find_upvotes(self, proposal_id) -> list:
         """
-        Find operations of kind `ballot` and `proposal` for given proposal
+        Find operations of kind `proposal` for given proposal
         :param proposal_id: Proposal hash (base58)
         """
-        def is_vote(op):
+        def is_upvote(op):
             return any(map(
-                lambda x: proposal_id == x.get('proposal') or proposal_id in x.get('proposals', []),
+                lambda x: x['kind'] == 'proposal' and proposal_id in x.get('proposals', []),
                 op['contents']))
-        return list(filter(is_vote, self.votes()))
+        return list(filter(is_upvote, self.votes()))
+
+    def find_ballots(self, proposal_id=None) -> list:
+        """
+        Find operations of kind `ballot`
+        :param proposal_id: Proposal hash (optional)
+        """
+        def is_ballot(op):
+            return any(map(
+                lambda x: x['kind'] == 'ballot' and (proposal_id is None or proposal_id == x.get('proposal')),
+                op['contents']))
+        return list(filter(is_ballot, self.votes()))
 
     def find_origination(self, contract_id):
         """

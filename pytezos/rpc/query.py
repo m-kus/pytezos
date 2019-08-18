@@ -69,7 +69,7 @@ class RpcQuery(metaclass=InlineDocstring):
         self._caching = caching
         self._timeout = timeout
         self._params = params or list()
-        self.__doc__ = format_docstring(self.__class__, self._path)
+        self.__doc__ = format_docstring(self.__class__, self._path or '/')
 
     def __repr__(self):
         res = [
@@ -100,13 +100,16 @@ class RpcQuery(metaclass=InlineDocstring):
             caching=self._caching
         )
 
+    def _getitem(self, item):
+        return self._spawn_query(
+            path=self._path + '/{}',
+            params=self._params + [item]
+        )
+
     def __getattr__(self, attr):
         if not attr.startswith('_'):
             if attr in {'main', 'test', 'head', 'genesis'}:
-                return self._spawn_query(
-                    path=self._path + '/{}',
-                    params=self._params + [attr]
-                )
+                return self._getitem(attr)
             else:
                 return self._spawn_query(
                     path=f'{self._path}/{attr}',
@@ -115,10 +118,7 @@ class RpcQuery(metaclass=InlineDocstring):
         raise AttributeError(attr)
 
     def __getitem__(self, child_id):
-        return self._spawn_query(
-            path=self._path + '/{}',
-            params=self._params + [child_id]
-        )
+        return self._getitem(child_id)
 
     def _get(self, params=None):
         return self.node.get(
