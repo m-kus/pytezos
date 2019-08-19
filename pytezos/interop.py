@@ -1,4 +1,4 @@
-from os.path import isfile
+from os.path import exists, expanduser
 
 from pytezos.rpc import ShellQuery, RpcNode, mainnet, alphanet, zeronet
 from pytezos.crypto import Key
@@ -45,7 +45,7 @@ class Interop(metaclass=InlineDocstring):
         if isinstance(key, str):
             if is_key(key):
                 self.key = Key.from_encoded_key(key)
-            elif isfile(key):
+            elif exists(expanduser(key)):
                 self.key = Key.from_faucet(key)
             else:
                 self.key = Key.from_alias(key)

@@ -3,7 +3,7 @@ import pysodium
 import secp256k1
 import binascii
 import json
-import os
+from os.path import expanduser, join, abspath
 from getpass import getpass
 from fastecdsa.ecdsa import sign, verify
 from fastecdsa.keys import get_public_key
@@ -165,7 +165,7 @@ class Key(metaclass=InlineDocstring):
                 'pkh': pkh,
                 'password': passphrase
             }
-            with open(os.path.abspath(f'./{pkh}.json')) as f:
+            with open(abspath(f'./{pkh}.json')) as f:
                 f.write(json.dumps(data))
 
         return key
@@ -207,7 +207,7 @@ class Key(metaclass=InlineDocstring):
         :param path: path to the json file
         :return: Key
         """
-        with open(path, 'r') as f:
+        with open(expanduser(path), 'r') as f:
             data = json.loads(f.read())
 
         key = cls.from_mnemonic(
@@ -230,7 +230,7 @@ class Key(metaclass=InlineDocstring):
         :param tezos_client_dir: path to the tezos client directory (default is `~/.tezos-client`)
         :return: Key
         """
-        path = os.path.expanduser(os.path.join(tezos_client_dir, 'secret_keys'))
+        path = expanduser(join(tezos_client_dir, 'secret_keys'))
         with open(path, 'r') as f:
             data = json.loads(f.read())
 

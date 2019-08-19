@@ -155,7 +155,7 @@ class Proto(metaclass=InlineDocstring):
         """
         if uri.startswith('http'):
             files = url_to_files(uri)
-        elif os.path.isfile(uri):
+        elif os.path.exists(os.path.expanduser(uri)):
             files = tar_to_files(uri)
         elif os.path.isdir(uri):
             files = dir_to_files(uri)
