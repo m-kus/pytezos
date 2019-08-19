@@ -17,19 +17,14 @@ You will also probably need to install several cryptographic packets.
 
 #### Linux
 
-Use apt or your favourite package manager
+Use apt or your favourite package manager:
 ```
 $ sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev
 ```
 
 #### MacOS
 
-Install homebrew (if not yet)
-```
-$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-
-Then the following libraries
+Use homebrew:
 ```
 $ brew tap cuber/homebrew-libsecp256k1
 $ brew install libsodium libsecp256k1 gmp
@@ -37,18 +32,27 @@ $ brew install libsodium libsecp256k1 gmp
 
 #### Windows
 
-1. Download MinGW from [https://sourceforge.net/projects/mingw/](https://sourceforge.net/projects/mingw/)
-2. From "Basic Setup" choose `mingw-developer-toolkit` `mingw32-base` `mingw32-gcc-g++` `msys-base`
-3. Make sure `C:\MinGW\bin` is added to your `PATH`
-4. Download the latest libsodium-X.Y.Z-msvc.zip from [https://download.libsodium.org/libsodium/releases/](https://download.libsodium.org/libsodium/releases/).
-5. Extract the Win32/Release/v120/dynamic/libsodium.dll fromt the zip file
-6. Copy libsodium.dll to C:\Windows\System32\libsodium.dll
+The recommended way is to use WSL and then follow the instructions for Linux,
+but if you feel lucky you can try to install natively:
+
+1. Install MinGW from [https://osdn.net/projects/mingw/](https://osdn.net/projects/mingw/)
+2. Make sure `C:\MinGW\bin` is added to your `PATH`
+3. Download the latest libsodium-X.Y.Z-msvc.zip from [https://download.libsodium.org/libsodium/releases/](https://download.libsodium.org/libsodium/releases/).
+4. Extract the Win64/Release/v143/dynamic/libsodium.dll from the zip file
+5. Copy libsodium.dll to C:\Windows\System32\libsodium.dll
 
 ### Installation
 
 ```
 $ pip install pytezos
 ```
+
+#### Google Colab
+
+`````python
+>>> !apt apt install libsodium-dev libsecp256k1-dev libgmp-dev
+>>> !pip install pytezos
+`````
 
 ### Usage
 

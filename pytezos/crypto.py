@@ -165,7 +165,7 @@ class Key(metaclass=InlineDocstring):
                 'pkh': pkh,
                 'password': passphrase
             }
-            with open(abspath(f'./{pkh}.json')) as f:
+            with open(abspath(f'./{pkh}.json'), 'w+') as f:
                 f.write(json.dumps(data))
 
         return key
