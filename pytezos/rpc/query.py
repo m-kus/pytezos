@@ -43,7 +43,10 @@ def format_docstring(class_type, query_path):
 
     helpers = get_class_docstring(
         class_type=class_type,
-        attr_filter=lambda x: not x.startswith('_') and x not in properties and x.upper() not in methods
+        attr_filter=lambda x: not x.startswith('_')
+                              and x not in properties
+                              and x.upper() not in methods
+                              and x != 'path'
     )
     if helpers:
         res.append(f'Helpers\n{helpers}')
@@ -65,44 +68,45 @@ class RpcQuery(metaclass=InlineDocstring):
 
     def __init__(self, node: RpcNode, path='', caching=False, params=None, timeout=None):
         self.node = node
-        self._path = path
+        self._wild_path = path
         self._caching = caching
         self._timeout = timeout
         self._params = params or list()
-        self.__doc__ = format_docstring(self.__class__, self._path or '/')
+        self.__doc__ = format_docstring(self.__class__, self._wild_path or '/')
 
     def __repr__(self):
         res = [
             super(RpcQuery, self).__repr__(),
-            '\nPath',
-            self._query_path or "/",
+            '\nProperties',
+            f'.path  # {self.path or "/"}{" (cached)" if self._caching else ""}',
+            f'.node  # {self.node.uri} ({self.node.network})',
             self.__doc__
         ]
         return '\n'.join(res)
 
-    def _spawn_query(self, path, params):
-        child_class = self.__extensions__.get(path, RpcQuery)
+    def _spawn_query(self, wild_path, params):
+        child_class = self.__extensions__.get(wild_path, RpcQuery)
         return child_class(
-            path=path,
+            path=wild_path,
             node=self.node,
             caching=self._caching,
             params=params
         )
 
     @property
-    def _query_path(self):
-        return self._path.format(*self._params)
+    def path(self):
+        return self._wild_path.format(*self._params)
 
     def __call__(self, **params):
         return self.node.get(
-            path=self._query_path,
+            path=self.path,
             params=params,
             caching=self._caching
         )
 
     def _getitem(self, item):
         return self._spawn_query(
-            path=self._path + '/{}',
+            wild_path=self._wild_path + '/{}',
             params=self._params + [item]
         )
 
@@ -112,7 +116,7 @@ class RpcQuery(metaclass=InlineDocstring):
                 return self._getitem(attr)
             else:
                 return self._spawn_query(
-                    path=f'{self._path}/{attr}',
+                    wild_path=f'{self._wild_path}/{attr}',
                     params=self._params
                 )
         raise AttributeError(attr)
@@ -122,7 +126,7 @@ class RpcQuery(metaclass=InlineDocstring):
 
     def _get(self, params=None):
         return self.node.get(
-            path=self._query_path,
+            path=self.path,
             params=params,
             caching=self._caching,
             timeout=self._timeout
@@ -130,7 +134,7 @@ class RpcQuery(metaclass=InlineDocstring):
 
     def _post(self, json=None, params=None):
         return self.node.post(
-            path=self._query_path,
+            path=self.path,
             params=params,
             json=json,
             caching=self._caching
@@ -138,20 +142,20 @@ class RpcQuery(metaclass=InlineDocstring):
 
     def _put(self, params=None):
         return self.node.put(
-            path=self._query_path,
+            path=self.path,
             params=params
         )
 
     def _delete(self, params=None):
         return self.node.delete(
-            path=self._query_path,
+            path=self.path,
             params=params
         )
 
     @property
     def _parent(self):
-        dir_path = dirname(self._path)
+        dir_path = dirname(self._wild_path)
         return self._spawn_query(
-            path=dir_path,
+            wild_path=dir_path,
             params=self._params[:dir_path.count('{}')]
         )

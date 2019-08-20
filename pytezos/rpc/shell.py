@@ -34,7 +34,7 @@ class ShellQuery(RpcQuery, path=''):
         """
         return CyclesQuery(
             node=self.node,
-            path=self._path + '/chains/{}/blocks',
+            path=self._wild_path + '/chains/{}/blocks',
             params=self._params + ['main']
         )
 
@@ -45,7 +45,7 @@ class ShellQuery(RpcQuery, path=''):
         """
         return VotingPeriodsQuery(
             node=self.node,
-            path=self._path + '/chains/{}/blocks',
+            path=self._wild_path + '/chains/{}/blocks',
             params=self._params + ['main']
         )
 
@@ -230,7 +230,7 @@ class MonitorQuery(RpcQuery, path=['/monitor/active_chains',
     def __call__(self, *args, **kwargs):
         return ResponseGenerator(self.node.request(
             method='GET',
-            path=self._query_path,
+            path=self.path,
             params=kwargs,
             stream=True
         ))
@@ -261,7 +261,7 @@ class NetworkLogQuery(RpcQuery, path=['/network/peers/{}/log', '/network/points/
         if monitor:
             return ResponseGenerator(self.node.request(
                 method='GET',
-                path=self._query_path,
+                path=self.path,
                 stream=True
             ))
         else:

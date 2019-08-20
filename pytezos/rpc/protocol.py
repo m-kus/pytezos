@@ -46,9 +46,9 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         """
         Construct block query or get a block range.
         :param block_id: Block identity or block range
-          int -> Block level or offset from the head if negative;
-          str -> Block hash (base58) or special names (head, genesis), expressions like `head~1` etc;
-          slice [:] -> First value (start) must be int, second (stop) can be any Block ID or empty.
+          int: Block level or offset from the head if negative;
+          str: Block hash (base58) or special names (head, genesis), expressions like `head~1` etc;
+          slice [:]: First value (start) must be int, second (stop) can be any Block ID or empty.
         :return: BlockQuery or BlockSliceQuery
         """
         if isinstance(block_id, slice):
@@ -59,7 +59,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
                 start=block_id.start,
                 stop=block_id.stop,
                 node=self.node,
-                path=self._path,
+                path=self._wild_path,
                 params=self._params
             )
 
@@ -79,7 +79,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
             start=metadata['level']['level'] - metadata['level']['voting_period_position'],
             stop='head',
             node=self.node,
-            path=self._path,
+            path=self._wild_path,
             params=self._params
         )
 
@@ -94,7 +94,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
             start=metadata['level']['level'] - metadata['level']['cycle_position'],
             stop='head',
             node=self.node,
-            path=self._path,
+            path=self._wild_path,
             params=self._params
         )
 
@@ -339,7 +339,7 @@ class ProposalsQuery(RpcQuery, path='/chains/{}/blocks/{}/votes/proposals'):
         :return: ProposalQuery
         """
         return ProposalQuery(
-            path=self._path + '/{}',
+            path=self._wild_path + '/{}',
             params=self._params + [proposal_id],
             node=self.node
         )

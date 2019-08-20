@@ -63,8 +63,8 @@ Read [quick start guide](https://baking-bad.github.io/pytezos), or just enjoy su
 <pytezos.client.PyTezosClient object at 0x7f904cf339e8>
 
 Properties
-.key -> tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
-.shell -> https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
+.key  # tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
+.shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
 
 Helpers
 .account()

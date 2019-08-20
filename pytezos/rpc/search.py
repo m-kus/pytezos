@@ -241,7 +241,7 @@ class PeriodQuery(RpcQuery):
             start=start,
             stop=stop,
             node=self.node,
-            path=self._path,
+            path=self._wild_path,
             params=self._params
         )
 

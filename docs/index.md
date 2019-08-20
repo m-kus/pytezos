@@ -61,8 +61,8 @@ All active interaction with the blockchain starts with the PyTezosClient:
 <pytezos.client.PyTezosClient object at 0x7f904cf339e8>
 
 Properties
-.key -> tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
-.shell -> https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
+.key  # tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
+.shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
 
 Helpers
 .account()
@@ -104,7 +104,7 @@ Then configure the client (we can leave `shell` parameter empty, but we will set
 ```python
 >>> pytezos = pytezos.using(
 ...     key='~/Downloads/tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa.json',
-...     shell='https://rpc.tulip.tools/alphanet/')
+...     shell='alphanet')
 ```
 
 Public available RPC providers are available at `pytezos.rpc`:
@@ -141,8 +141,8 @@ and gas/storage limits.
 <pytezos.operation.group.OperationGroup object at 0x7f291b7074e0>
 
 Properties
-.key -> tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-.shell -> https://rpc.tulip.tools/alphanet/ (alphanet)
+.key  # tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
+.shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
 
 Payload
 {'branch': 'BL5UtKR4ysFLwcK2ign1h2KoZLJY88zd1vzWUZPzto9iEJqUj1d',
@@ -231,8 +231,9 @@ We can also search for operation by hash if we know exact block level or that it
 >>> pytezos.shell.blocks[580244].operations['oo3TzPdNhtz5nmE9nL2yGLqwUzSfmb1vjTpu8wFkX5CTKLV67AE']
 <pytezos.rpc.protocol.OperationQuery object at 0x7f70650925c0>
 
-Path
-/chains/main/blocks/580244/operations/3/16
+Properties
+.path  # /chains/main/blocks/580244/operations/3/16 (cached)
+.node  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
 
 ()
 The `m-th` operation in the `n-th` validation pass of the block.
@@ -396,9 +397,9 @@ We can do the same using special entrypoint `balance_of`. Let's give a look at t
 <pytezos.michelson.interface.ContractEntrypoint object at 0x7f4f0cc76e48>
 
 Properties
-.key -> tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-.shell -> https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
-.address -> KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v
+.key  # tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
+.shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
+.address  # KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v
 
 $kwargs:
 	{
@@ -424,8 +425,8 @@ Using [conseilpy](https://github.com/baking-bad/conseilpy) we can find such cont
 <pytezos.michelson.interface.ContractCall object at 0x7f4f0cc980b8>
 
 Properties
-.key -> tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-.shell -> https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
+.key  # tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
+.shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
 
 Payload
 {'branch': 'BMDPbTmdsLnD1JBurPAqiYE45UDunYTBad2UWgCtg5bgyi2UFxu',
