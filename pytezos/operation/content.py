@@ -13,6 +13,11 @@ def format_mutez(value):
     return str(value)
 
 
+def format_tez(value):
+    tez = Decimal(format_mutez(value)) / 10 ** 6
+    return tez.quantize(Decimal('0.000001'))
+
+
 class ContentMixin:
 
     def operation(self, content):

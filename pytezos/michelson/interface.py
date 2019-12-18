@@ -8,7 +8,7 @@ from pytezos.michelson.converter import convert
 from pytezos.michelson.micheline import skip_nones
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.operation.group import OperationGroup
-from pytezos.operation.content import format_mutez
+from pytezos.operation.content import format_mutez, format_tez
 from pytezos.interop import Interop
 from pytezos.tools.docstring import get_class_docstring
 
@@ -121,7 +121,7 @@ class ContractCall(Interop):
         """
         arg = micheline_to_michelson(self.parameters['value'], inline=True)
         source = self.key.public_key_hash()
-        amount = format_mutez(self.amount)
+        amount = format_tez(self.amount)
         entrypoint = self.parameters['entrypoint']
         return f'transfer {amount} from {source} to {self.address} ' \
                f'--entrypoint \'{entrypoint}\' --arg \'{arg}\''
