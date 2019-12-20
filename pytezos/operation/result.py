@@ -1,3 +1,5 @@
+import functools
+import operator
 from pytezos.rpc.errors import RpcError
 
 
@@ -50,9 +52,11 @@ class OperationResult:
 
     @staticmethod
     def errors(operation_group: dict):
-        for result in OperationResult.iter_results(operation_group):
-            if result['status'] != 'applied':
-                return result.get('errors', [])
+        all_errors = (
+            result.get("errors", []) if result["status"] != "applied" else []
+            for result in OperationResult.iter_results(operation_group)
+        )
+        return functools.reduce(operator.iconcat, all_errors, [])
 
     @staticmethod
     def originated_contracts(operation_group: dict):
