@@ -151,7 +151,7 @@ def collapse_micheline(code) -> dict:
 
         if node['prim'] in ['pair', 'or']:
             res = Nested(node['prim'], args)
-            is_struct = node['prim'] == 'pair' and (typename or fieldname)
+            is_struct = node['prim'] == 'pair' and (typename or fieldname or entry)
             if is_struct or parent_prim != node['prim']:
                 args = get_flat_nested(res)
             else:
