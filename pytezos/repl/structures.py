@@ -9,11 +9,8 @@ from pytezos.repl.types import assert_stack_type, Option, Pair, String, Bytes, L
 def do_car(ctx: Context, prim, args, annots):
     top = ctx.pop1()
     assert_stack_type(top, Pair)
-    handlers = {
-        'CAR': lambda x: x[0],
-        'CDR': lambda x: x[1]
-    }
-    res = handlers[prim](list(iter(top)))
+    idx = {'CAR': 0, 'CDR': 1}
+    res = top.get_element(idx[prim])
     ctx.push(res, annots=annots)
 
 
@@ -29,7 +26,7 @@ def do_concat(ctx: Context, prim, args, annots):
         })
         res = type(top)(val_type(top) + val_type(second))
     elif type(top) == List:
-        res_type, = top.arg_types()
+        res_type = top.val_type()
         val_type, sep = {
             String: (str, ''),
             Bytes: (bytes, b'')
@@ -50,7 +47,7 @@ def do_cons(ctx: Context, prim, args, annots):
 
 @instruction('EMPTY_BIG_MAP', args_len=2)
 def do_empty_big_map(ctx: Context, prim, args, annots):
-    res = BigMap.empty(k_type_expr=args[0], v_type_expr=args[1])
+    res = BigMap.empty(k_type_expr=args[0], v_type_expr=args[1], ctx=ctx)
     ctx.push(res, annots=annots)
 
 
@@ -71,7 +68,7 @@ def do_get(ctx: Context, prim, args, annots):
     key, container = ctx.pop2()
     assert_stack_type(container, [Map, BigMap])
     if key in container:
-        val = next(v for k, v in container if k == key)
+        val = container.find(key)
         res = Option.some(val)
     else:
         res = Option.none(container.val_type_expr())
@@ -173,12 +170,12 @@ def do_update(ctx: Context, prim, args, annots):
         if val:
             res = container.add(key)
         else:
-            res = Set.new(list(filter(lambda x: x != key, container)))
+            res = container.remove(key)
     else:
         assert_stack_type(val, Option)
         if val.is_none():
-            res = type(container).new(list(filter(lambda x: x[0] != key, container)))
+            res = container.remove(key)
         else:
-            res = container.add(key, next(iter(val)))
+            res = container.add(key, val.get_some())
 
     ctx.push(res, annots=annots)

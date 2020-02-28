@@ -56,7 +56,7 @@ def format_stderr(error):
 
 class Interpreter:
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=True):
         self.ctx = Context()
         self.parser = MichelsonParser(extra_primitives=helpers_prim)
         self.debug = debug
@@ -90,11 +90,11 @@ class Interpreter:
             int_res['stderr'] = format_stderr(e)
             int_res['stdout'] = format_stdout(self.ctx.stdout)
             self.ctx = backup
-        finally:
-            if self.debug:
-                print(int_res['stdout'])
 
-        if self.debug and int_res['result']:
-            print('RETURN: ' + pformat(int_res['result']))
+        if self.debug:
+            if int_res.get('stdout'):
+                print(int_res['stdout'])
+            if int_res.get('result'):
+                print('RETURN: ' + pformat(int_res['result']))
 
         return int_res

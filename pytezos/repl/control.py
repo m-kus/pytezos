@@ -188,7 +188,7 @@ def do_if_left(ctx: Context, prim, args, annots):
     assert_no_annots(prim, annots)
     top = ctx.pop1()  # type: Or
     assert_stack_type(top, Or)
-    ctx.push(next(iter(top)))
+    ctx.push(top.get_some())
     do_interpret(ctx, args[0 if top.is_left() else 1])
 
 
@@ -200,7 +200,7 @@ def do_if_left(ctx: Context, prim, args, annots):
     if top.is_none():
         do_interpret(ctx, args[0])
     else:
-        ctx.push(next(iter(top)))
+        ctx.push(top.get_some())
         do_interpret(ctx, args[1])
 
 
@@ -222,7 +222,7 @@ def do_loop_left(ctx: Context, prim, args, annots):
     while True:
         top = ctx.pop1()
         assert_stack_type(top, Or)
-        ctx.push(next(iter(top)))
+        ctx.push(top.get_some())
         if top.is_left():
             do_interpret(ctx, args[0])
         else:

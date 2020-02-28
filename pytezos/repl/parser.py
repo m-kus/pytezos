@@ -311,8 +311,12 @@ def parse_map(val_expr, type_args):
 
 @primitive('big_map', args_len=2)
 def parse_big_map(val_expr, type_args):
+    assert_comparable(type_args[0])
     assert_big_map_val(type_args[1])
-    return parse_map(val_expr, type_args)
+    if isinstance(val_expr, list):
+        return parse_map(val_expr, type_args)
+    else:
+        return get_int(val_expr)
 
 
 @primitive('timestamp')

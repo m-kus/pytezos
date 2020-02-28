@@ -1,10 +1,12 @@
 from datetime import datetime
+import secrets
 
 from pytezos import pytezos
+from pytezos.encoding import parse_address
 from pytezos.repl.control import instruction
 from pytezos.repl.context import Context
 from pytezos.repl.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \
-    KeyHash, Timestamp, expr_equal
+    KeyHash, Timestamp, expr_equal, Operation
 from pytezos.repl.parser import get_entry_expr
 
 MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'
@@ -59,11 +61,11 @@ def do_self(ctx: Context, prim, args, annots):
     p_type_expr = ctx.get('parameter')
     assert p_type_expr, f'parameter type is not initialized'
 
-    entrypoint = next((a for a in annots if a[0] == '%'), '%default')
-    ctx.printf(f' use {entrypoint};')
+    entry_annot = next((a for a in annots if a[0] == '%'), '%default')
+    ctx.printf(f' use {entry_annot};')
 
-    p_type_expr = get_entry_expr(p_type_expr, entrypoint)
-    res = Contract.new(SELF_ADDRESS + entrypoint, type_expr=p_type_expr)
+    p_type_expr = get_entry_expr(p_type_expr, entry_annot)
+    res = Contract.new(SELF_ADDRESS + entry_annot, type_expr=p_type_expr)
     ctx.push(res, annots=[a for a in annots if a[0] != '%'])
 
 
@@ -94,7 +96,7 @@ def do_now(ctx: Context, prim, args, annots):
     ctx.push(res, annots=annots)
 
 
-def check_contract(ctx: Context, address, type_expr):
+def check_contract(ctx: Context, address, entry_annot, type_expr):
     chain_id = ctx.get('CHAIN_ID')
     if not chain_id:
         ctx.printf(' skip check;')
@@ -104,10 +106,11 @@ def check_contract(ctx: Context, address, type_expr):
 
     try:
         ci = pytezos.using(network).contract(address)
-        if expr_equal(type_expr, ci.contract.parameter.code):
+        actual = get_entry_expr(ci.contract.parameter.code, entry_annot)
+        if expr_equal(type_expr, actual):
             return True
         else:
-            ctx.printf(' type mismatch;')
+            ctx.printf(' entry type mismatch;')
     except Exception:
         ctx.printf(' not found;')
 
@@ -118,7 +121,7 @@ def check_contract(ctx: Context, address, type_expr):
 def do_address(ctx: Context, prim, args, annots):
     top = ctx.pop1()
     assert_stack_type(top, Contract)
-    res = Address.new(str(top)[:36])
+    res = Address.new(top.get_address())
     ctx.push(res, annots=annots)
 
 
@@ -126,12 +129,16 @@ def do_address(ctx: Context, prim, args, annots):
 def do_contract(ctx: Context, prim, args, annots):
     top = ctx.pop1()
     assert_stack_type(top, Address)
-    contract = Contract.new(str(top), type_expr=args[0])
-    if check_contract(ctx, address=str(top), type_expr=args[0]):
+
+    entry_annot = next((a for a in annots if a[0] == '%'), '%default')
+    contract = Contract.new(str(top) + entry_annot, type_expr=args[0])
+
+    if check_contract(ctx, address=str(top), entry_annot=entry_annot, type_expr=args[0]):
         res = Option.some(contract)
     else:
         res = Option.none(contract.type_expr)
-    ctx.push(res, annots=annots)
+
+    ctx.push(res, annots=[a for a in annots if a[0] != '%'])
 
 
 @instruction('IMPLICIT_ACCOUNT')
@@ -142,27 +149,78 @@ def do_implicit_account(ctx: Context, prim, args, annots):
     ctx.push(res, annots=annots)
 
 
+def decrease_balance(ctx: Context, amount: Mutez):
+    balance = ctx.get('BALANCE', Mutez(0))
+    assert int(amount) <= int(balance), f'needed {int(amount)} utz, got only {int(balance)} utz'
+    ctx.set('BALANCE', Mutez(int(balance) - int(amount)))
+
+
+def generate_address():
+    return parse_address(b''.join([b'\x01', secrets.token_bytes(20), b'\x00']))
+
+
 @instruction('CREATE_CONTRACT', args_len=3)
 def do_create_contract(ctx: Context, prim, args, annots):
     delegate, amount, storage = ctx.pop3()
-    assert_stack_type(delegate, Option)
+
     assert_stack_type(amount, Mutez)
+    decrease_balance(ctx, amount)
+
+    assert_stack_type(delegate, Option)
     assert_equal_types(args[0], storage.type_expr)
 
-    internal_operation = {
+    content = {
+        'kind': 'origination',
+        'source': SELF_ADDRESS,
+        'balance': str(int(amount)),
         'script': {
-            'code': args[2],
-            'storage': storage.val_expr},
-        'balance': int(amount),
-        'delegate': str(next(iter(delegate))) if not delegate.is_none() else ''}
-    # TODO:
+            'storage': storage.val_expr,
+            'code': args[2]
+        }
+    }
+
+    if not delegate.is_none():
+        content['delegate'] = str(delegate.get_some())
+
+    contract = Contract.new(generate_address(), type_expr=args[1])
+    orig = Operation.new(content)
+    ctx.push(contract)
+    ctx.push(orig)
 
 
 @instruction('SET_DELEGATE')
 def do_set_delegate(ctx: Context, prim, args, annots):
-    pass  # TODO
+    delegate = ctx.pop1()
+    assert_stack_type(delegate, Option)
+
+    content = {
+        'kind': 'delegation',
+        'source': SELF_ADDRESS,
+        'delegate': None if delegate.is_none() else str(delegate.get_some())
+    }
+    res = Operation.new(content)
+    ctx.push(res)
 
 
 @instruction('TRANSFER_TOKENS')
 def do_transfer_tokens(ctx: Context, prim, args, annots):
-    pass  # TODO
+    param, amount, dest = ctx.pop3()
+
+    assert_stack_type(amount, Mutez)
+    decrease_balance(ctx, amount)
+
+    assert_stack_type(dest, Contract)
+    dest.assert_param_type(param)
+
+    content = {
+        'kind': 'transaction',
+        'source': SELF_ADDRESS,
+        'amount': str(int(amount)),
+        'destination': dest.get_address(),
+        'parameters': {
+            'entrypoint': dest.get_entrypoint(),
+            'value': param.val_expr
+        }
+    }
+    res = Operation.new(content)
+    ctx.push(res)

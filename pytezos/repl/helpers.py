@@ -50,11 +50,11 @@ def do_run(ctx: Context, prim, args, annots):
     ctx.printf(f' use {entrypoint};')
 
     p_type_expr = get_entry_expr(p_type_expr, entrypoint)
-    parameter = StackItem.parse(args[0], p_type_expr)
+    parameter = StackItem.parse(args[0], p_type_expr, ctx=ctx)
 
     s_type_expr = ctx.get('storage')
     assert s_type_expr, f'storage type is not initialized'
-    storage = StackItem.parse(args[1], s_type_expr)
+    storage = StackItem.parse(args[1], s_type_expr, ctx=ctx)
 
     ctx.drop_all()
     pair = Pair.new(parameter, storage)
@@ -104,3 +104,8 @@ def do_include(ctx: Context, prim, args, annots):
         code = pytezos.using(network).contract(address).contract.code
 
     do_interpret(ctx, code)
+
+
+@instruction('BIG_MAP_DIFF')
+def do_big_map_diff(ctx: Context, prim, args, annots):
+    pass
