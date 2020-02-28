@@ -7,6 +7,17 @@ import pytezos.encoding as encoding
 parsers = {}
 
 
+def primitive(prim, args_len=0):
+    def register_primitive(func):
+        parsers[prim] = (args_len, func)
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    return register_primitive
+
+
 class Unit(object):
 
     def __repr__(self):
@@ -34,17 +45,6 @@ class MichelsonRuntimeError(ValueError):
 
 class MichelsonTypeCheckError(MichelsonRuntimeError):
     pass
-
-
-def primitive(prim, args_len=0):
-    def register_primitive(func):
-        parsers[prim] = (args_len, func)
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-        return wrapper
-    return register_primitive
 
 
 def assert_type(value, exp_type):

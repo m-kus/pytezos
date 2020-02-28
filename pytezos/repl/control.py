@@ -1,5 +1,4 @@
 import functools
-from copy import deepcopy
 from pprint import pformat
 
 from pytezos.repl.context import Context
@@ -82,7 +81,7 @@ def do_drop_1(ctx: Context, prim, args, annots):
 @instruction('DUP')
 def do_dup(ctx: Context, prim, args, annots):
     top = ctx.peek()
-    ctx.push(deepcopy(top), annots=annots)
+    ctx.push(top, annots=annots)
 
 
 @instruction('SWAP')

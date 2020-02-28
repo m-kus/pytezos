@@ -1,4 +1,5 @@
 from os.path import isfile
+from pprint import pformat
 
 from pytezos import Contract, pytezos
 from pytezos.encoding import is_kt
@@ -50,15 +51,16 @@ def do_run(ctx: Context, prim, args, annots):
     ctx.printf(f' use {entrypoint};')
 
     p_type_expr = get_entry_expr(p_type_expr, entrypoint)
-    parameter = StackItem.parse(args[0], p_type_expr, ctx=ctx)
+    parameter = StackItem.parse(args[0], p_type_expr)
 
     s_type_expr = ctx.get('storage')
     assert s_type_expr, f'storage type is not initialized'
-    storage = StackItem.parse(args[1], s_type_expr, ctx=ctx)
+    storage = StackItem.parse(args[1], s_type_expr)
 
     ctx.drop_all()
     pair = Pair.new(parameter, storage)
-    ctx.push(pair, annots=annots)
+    run_input = ctx.big_maps.alloc(pair)
+    ctx.push(run_input, annots=annots)
 
     code = ctx.get('code')
     if code:
@@ -108,4 +110,4 @@ def do_include(ctx: Context, prim, args, annots):
 
 @instruction('BIG_MAP_DIFF')
 def do_big_map_diff(ctx: Context, prim, args, annots):
-    pass
+    return pformat(ctx.big_maps.diff)

@@ -5,6 +5,7 @@ from typing import List
 
 from pytezos.repl.types import StackItem, assert_stack_item
 from pytezos.michelson.converter import micheline_to_michelson
+from pytezos.repl.big_map import BigMapPool
 
 
 class Context:
@@ -12,9 +13,7 @@ class Context:
     def __init__(self, stack=None, meta=None, big_maps=None, debug=True):
         self.stack = stack or []
         self.meta = meta or {}
-        self.big_maps = big_maps or {}
-        self.big_map_id = 0
-        self.big_map_diff = []
+        self.big_maps = big_maps or BigMapPool()
         self.protected = 0
         self.exec_depth = 0
         self.debug = debug
@@ -24,19 +23,6 @@ class Context:
     def reset(self):
         self.stdout.clear()
         self.pushed = False
-
-    def alloc(self, item):
-        big_map_id = self.big_map_id
-        self.big_map_id += 1
-        if isinstance(item, StackItem):
-            self.big_maps[big_map_id] = item
-        elif isinstance(item, int):
-            assert item in self.big_maps, f'big map #{item} is not found'
-            self.big_maps[big_map_id] = deepcopy(self.big_maps[item])
-        else:
-            assert False, f'expected stack item or big map id, got {item}'
-        self._print(f' big map #{big_map_id} allocated;')
-        return big_map_id
 
     def protect(self, count: int):
         assert len(self.stack) >= count, f'got {len(self.stack)} items, wanted to protect {count}'
@@ -137,6 +123,7 @@ class Context:
     def __deepcopy__(self, memodict={}):
         ctx = Context(stack=deepcopy(self.stack),
                       meta=deepcopy(self.meta),
+                      big_maps=deepcopy(self.big_maps),
                       debug=self.debug)
         ctx.protected = self.protected
         ctx.exec_depth = self.exec_depth

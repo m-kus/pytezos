@@ -47,7 +47,7 @@ def do_cons(ctx: Context, prim, args, annots):
 
 @instruction('EMPTY_BIG_MAP', args_len=2)
 def do_empty_big_map(ctx: Context, prim, args, annots):
-    res = BigMap.empty(k_type_expr=args[0], v_type_expr=args[1], ctx=ctx)
+    res = ctx.big_maps.empty(k_type_expr=args[0], v_type_expr=args[1])
     ctx.push(res, annots=annots)
 
 
@@ -67,11 +67,20 @@ def do_empty_set(ctx: Context, prim, args, annots):
 def do_get(ctx: Context, prim, args, annots):
     key, container = ctx.pop2()
     assert_stack_type(container, [Map, BigMap])
-    if key in container:
-        val = container.find(key)
+
+    val = None
+    if type(container) == Map:
+        if key in container:
+            val = container.find(key)
+    else:
+        if ctx.big_maps.contains(container, key):
+            val = ctx.big_maps.find(container, key)
+
+    if val is not None:
         res = Option.some(val)
     else:
         res = Option.none(container.val_type_expr())
+
     ctx.push(res, annots=annots)
 
 
@@ -89,7 +98,10 @@ def do_left(ctx: Context, prim, args, annots):
 def do_mem(ctx: Context, prim, args, annots):
     key, container = ctx.pop2()
     assert_stack_type(container, [Set, Map, BigMap])
-    res = Bool(key in container)
+    if type(container) == BigMap:
+        res = Bool(ctx.big_maps.contains(container, key))
+    else:
+        res = Bool(key in container)
     ctx.push(res, annots=annots)
 
 
@@ -171,11 +183,17 @@ def do_update(ctx: Context, prim, args, annots):
             res = container.add(key)
         else:
             res = container.remove(key)
-    else:
+    elif type(container) == Map:
         assert_stack_type(val, Option)
         if val.is_none():
             res = container.remove(key)
         else:
             res = container.add(key, val.get_some())
+    else:
+        assert_stack_type(val, Option)
+        if val.is_none():
+            res = ctx.big_maps.remove(container, key)
+        else:
+            res = ctx.big_maps.add(container, key, val.get_some())
 
     ctx.push(res, annots=annots)

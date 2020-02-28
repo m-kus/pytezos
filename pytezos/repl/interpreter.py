@@ -81,20 +81,25 @@ class Interpreter:
 
             int_res['result'] = format_result(res)
             int_res['stdout'] = format_stdout(self.ctx.stdout)
+            int_res['big_map_diff'] = self.ctx.big_maps.diff
             int_res['success'] = True
             self.ctx.reset()
         except MichelsonRuntimeError as e:
-            if self.debug:
-                raise e
-
             int_res['stderr'] = format_stderr(e)
             int_res['stdout'] = format_stdout(self.ctx.stdout)
             self.ctx = backup
+
+            if self.debug:
+                if int_res.get('stdout'):
+                    print(int_res['stdout'])
+                raise e
 
         if self.debug:
             if int_res.get('stdout'):
                 print(int_res['stdout'])
             if int_res.get('result'):
                 print('RETURN: ' + pformat(int_res['result']))
+            if int_res.get('big_map_diff'):
+                print('BIG_MAP_DIFF: ' + pformat(int_res['big_map_diff']))
 
         return int_res
