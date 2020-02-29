@@ -1,3 +1,4 @@
+import json
 from pprint import pformat
 from copy import deepcopy
 
@@ -474,5 +475,5 @@ class Operation(StackItem, prim='operation'):
     @classmethod
     def new(cls, content):
         return cls(val=content,
-                   val_expr={'prim': 'Unit'},
+                   val_expr={'string': json.dumps(content)},
                    type_expr={'prim': cls.prim, 'annots': [f':{content["kind"]}']})

@@ -1,5 +1,6 @@
 from pytezos.repl.types import StackItem, Map, BigMap
 from pytezos.repl.parser import parse_prim_expr, get_int
+from pytezos.michelson.pack import get_key_hash
 
 
 class BigMapPool:
@@ -22,6 +23,13 @@ class BigMapPool:
             'key_type': type_expr['args'][0],
             'value_type': type_expr['args'][1]
         })
+
+        for elt in val_expr:
+            self._update(big_map_id=self.next_id,
+                         k_val_expr=elt['args'][0],
+                         k_type_expr=type_expr['args'][0],
+                         v_val_expr=elt['args'][1])
+
         pointer = {'int': str(self.next_id)}
         self.next_id += 1
         return pointer
@@ -39,16 +47,17 @@ class BigMapPool:
         self.next_id += 1
         return pointer
 
-    def _update(self, big_map_id, key: StackItem, val: StackItem = None):
+    def _update(self, big_map_id, k_val_expr, k_type_expr, v_val_expr=None):
         self.diff.append({
             'action': 'update',
             'big_map': str(big_map_id),
-            'key_hash': '',  # TODO
-            'key': key.val_expr,
-            'value': val.val_expr if val else None
+            'key_hash': get_key_hash(k_val_expr, k_type_expr),
+            'key': k_val_expr,
+            'value': v_val_expr
         })
 
     def alloc(self, item: StackItem):
+        # Assuming item is already type checked
         def try_alloc(val_node, type_node):
             type_prim, type_args = parse_prim_expr(type_node)
             if type_prim == 'pair':
@@ -93,12 +102,12 @@ class BigMapPool:
         big_map_id = int(big_map)
         raw_map = self._get_map(big_map_id)
         self.big_maps[big_map_id] = raw_map.add(key, val)
-        self._update(big_map_id, key, val)
+        self._update(big_map_id, key.val_expr, key.type_expr, val.val_expr)
         return big_map
 
     def remove(self, big_map: BigMap, key: StackItem) -> 'BigMap':
         big_map_id = int(big_map)
         raw_map = self._get_map(big_map_id)
         self.big_maps[big_map_id] = raw_map.remove(key)
-        self._update(big_map_id, key, val=None)
+        self._update(big_map_id, key.val_expr, key.type_expr)
         return big_map

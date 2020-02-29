@@ -288,6 +288,13 @@ def forge_array(data, len_bytes=4) -> bytes:
     return len(data).to_bytes(len_bytes, 'big') + data
 
 
+def parse_array(data, len_bytes=4):
+    assert len(data) >= len_bytes, f'not enough bytes to parse array length, wanted {len_bytes}'
+    length = int.from_bytes(data[:len_bytes], 'big')
+    assert len(data) >= len_bytes + length, f'not enough bytes to parse array body, wanted {length}'
+    return data[len_bytes:len_bytes+length], len_bytes+length
+
+
 def forge_base58(value) -> bytes:
     return base58_decode(value.encode())
 

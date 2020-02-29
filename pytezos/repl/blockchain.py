@@ -159,15 +159,17 @@ def generate_address():
     return parse_address(b''.join([b'\x01', secrets.token_bytes(20), b'\x00']))
 
 
-@instruction('CREATE_CONTRACT', args_len=3)
+@instruction('CREATE_CONTRACT', args_len=1)
 def do_create_contract(ctx: Context, prim, args, annots):
+    assert len(args[0]) == 3, 'expected { parameter ; storage ; code }'
+    parameter_type, storage_type, code = args[0]
     delegate, amount, storage = ctx.pop3()
 
     assert_stack_type(amount, Mutez)
     decrease_balance(ctx, amount)
 
     assert_stack_type(delegate, Option)
-    assert_equal_types(args[0], storage.type_expr)
+    assert_equal_types(storage_type, storage.type_expr)
 
     content = {
         'kind': 'origination',
@@ -175,14 +177,14 @@ def do_create_contract(ctx: Context, prim, args, annots):
         'balance': str(int(amount)),
         'script': {
             'storage': storage.val_expr,
-            'code': args[2]
+            'code': code
         }
     }
 
     if not delegate.is_none():
         content['delegate'] = str(delegate.get_some())
 
-    contract = Contract.new(generate_address(), type_expr=args[1])
+    contract = Contract.new(generate_address(), type_expr=parameter_type)
     orig = Operation.new(content)
     ctx.push(contract)
     ctx.push(orig)

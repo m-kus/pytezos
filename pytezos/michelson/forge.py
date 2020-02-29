@@ -1,5 +1,4 @@
-from pytezos.encoding import forge_array, forge_address, forge_public_key, forge_timestamp, forge_contract, \
-    forge_base58
+from pytezos.encoding import forge_array, parse_array
 
 prim_tags = {
     'parameter': b'\x00',
@@ -121,6 +120,7 @@ prim_tags = {
     'chain_id': b'\x74',
     'CHAIN_ID': b'\x75'
 }
+prim_int = {v[0]: k for k, v in prim_tags.items()}
 
 len_tags = [
     {
@@ -163,6 +163,26 @@ def forge_int(value: int):
 
     res[-1] &= 0b01111111
     return bytes(res)
+
+
+def parse_int(data: bytes):
+    value = 0
+    length = 1
+
+    while data[length - 1] & 0b10000000 != 0:
+        length += 1
+
+    for i in range(length - 1, 0, -1):
+        value <<= 7
+        value |= data[i] & 0b01111111
+
+    value <<= 6
+    value |= data[0] & 0b00111111
+
+    if (data[0] & 0b01000000) != 0:
+        value = -value
+
+    return value, length
 
 
 def forge_entrypoint(entrypoint):
@@ -224,60 +244,73 @@ def forge_script(script):
     return forge_array(code) + forge_array(storage)
 
 
-def prepack_micheline(val_expr, type_expr):
-    def convert(val_node, type_node):
-        prim = type_node['prim']
-        is_string = isinstance(val_node, dict) and val_node.get('string')
+def unforge_micheline(data: bytes):
+    ptr = 0
 
-        if prim in ['set', 'list']:
-            return [
-                prepack_micheline(item_node, type_node['args'][0])
-                for item_node in val_node
-            ]
-        elif prim in ['map', 'big_map']:
-            return [
-                {'prim': 'Elt',
-                 'args': [prepack_micheline(elt_node['args'][i], type_node['args'][i]) for i in [0, 1]]}
-                for elt_node in val_node
-            ]
-        elif prim == 'pair':
-            return [
-                {'prim': 'Pair',
-                 'args': [prepack_micheline(val_node['args'][i], type_node['args'][i]) for i in [0, 1]]}
-            ]
-        elif prim == 'option':
-            if val_node['prim'] == 'Some':
-                return {'prim': 'Some',
-                        'args': [prepack_micheline(val_node['args'][0], type_node['args'][0])]}
-            else:
-                return val_node
-        elif prim == 'or':
-            idx = {'Left': 0, 'Right': 1}[val_node['prim']]
-            return {'prim': val_node['prim'],
-                    'args': [prepack_micheline(val_node['args'][0], type_node['args'][idx])]}
-        elif prim == 'lambda':
-            # TODO: PUSH, SELF, CONTRACT
-            return val_node
-        elif prim == 'chain_id' and is_string:
-            return {'bytes': forge_base58(val_node['string']).hex()}
-        elif prim == 'signature' and is_string:
-            return {'bytes': forge_base58(val_node['string']).hex()}
-        elif prim == 'key_hash' and is_string:
-            return {'bytes': forge_address(val_node['string'], tz_only=True).hex()}
-        elif prim == 'key' and is_string:
-            return {'bytes': forge_public_key(val_node['string']).hex()}
-        elif prim == 'address' and is_string:
-            return {'bytes': forge_address(val_node['string']).hex()}
-        elif prim == 'contract' and is_string:
-            return {'bytes': forge_contract(val_node['string']).hex()}
-        elif prim == 'timestamp' and is_string:
-            return {'int': forge_timestamp(val_node['string'])}
+    def parse_list():
+        nonlocal ptr
+        _, offset = parse_array(data[ptr:])
+        end, res = ptr + offset, []
+        ptr += 4
+        while ptr < end:
+            res.append(parse())
+        assert ptr == end, f'out of array boundaries'
+        return res
+
+    def parse_prim_expr(args_len=0, annots=False):
+        nonlocal ptr
+        prim_tag = data[ptr]
+        ptr += 1
+        expr = {'prim': prim_int[prim_tag]}
+
+        if 0 < args_len < 3:
+            expr['args'] = [parse() for _ in range(args_len)]
+        elif args_len == 3:
+            expr['args'] = parse_list()
         else:
-            return val_node
+            assert args_len == 0, f'unexpected args len {args_len}'
 
-    return convert(val_expr, type_expr)
+        if annots:
+            value, offset = parse_array(data[ptr:])
+            ptr += offset
+            if len(value) > 0:
+                expr['annots'] = value.decode().split(' ')
 
+        return expr
 
-def pack(val_expr, type_expr):
-    data = prepack_micheline(val_expr, type_expr)
-    return b'\x05' + forge_micheline(data)
+    def parse():
+        nonlocal ptr
+        tag = data[ptr]
+        ptr += 1
+        if tag == 0:
+            value, offset = parse_int(data[ptr:])
+            ptr += offset
+            return {'int': str(value)}
+        elif tag == 1:
+            value, offset = parse_array(data[ptr:])
+            ptr += offset
+            return {'string': value.decode()}
+        elif tag == 2:
+            return parse_list()
+        elif tag == 3:
+            return parse_prim_expr(args_len=0, annots=False)
+        elif tag == 4:
+            return parse_prim_expr(args_len=0, annots=True)
+        elif tag == 5:
+            return parse_prim_expr(args_len=1, annots=False)
+        elif tag == 6:
+            return parse_prim_expr(args_len=1, annots=True)
+        elif tag == 7:
+            return parse_prim_expr(args_len=2, annots=False)
+        elif tag == 8:
+            return parse_prim_expr(args_len=2, annots=True)
+        elif tag == 9:
+            return parse_prim_expr(args_len=3, annots=True)
+        elif tag == 10:
+            value, offset = parse_array(data[ptr:])
+            ptr += offset
+            return {'bytes': value.hex()}
+        else:
+            assert False, f'unkonwn tag {tag} at position {ptr}'
+
+    return parse()

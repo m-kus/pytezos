@@ -1,4 +1,5 @@
 import functools
+import json
 from typing import Tuple, Callable
 
 from pytezos.michelson.converter import micheline_to_michelson
@@ -162,7 +163,7 @@ def assert_expr_equal(expected, actual):
 def is_comparable(type_expr):
     prim, args, _ = parse_type(type_expr)
     comparable_types = {
-        'string', 'int', 'bytes', 'nat', 'bool'
+        'string', 'int', 'bytes', 'nat', 'bool',
         'address', 'key_hash', 'mutez', 'timestamp'
     }
     if prim in comparable_types:
@@ -347,7 +348,7 @@ def parse_contract(val_expr, type_args):
 
 @primitive('operation')
 def parse_operation(val_expr, type_args):
-    assert False, 'cannot parse an operation'
+    return json.loads(get_string(val_expr))
 
 
 @primitive('key')
@@ -381,5 +382,8 @@ def parse_chain_id(val_expr, type_args):
 
 @primitive('lambda', args_len=2)
 def parse_lambda(val_expr, type_args):
-    code, = get_prim_args(val_expr, 'Lambda', args_len=1)
-    return code
+    if isinstance(val_expr, list):
+        return val_expr
+    else:
+        code, = get_prim_args(val_expr, 'Lambda', args_len=1)
+        return code

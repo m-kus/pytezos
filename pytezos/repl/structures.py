@@ -1,8 +1,9 @@
-from pytezos.michelson.forge import pack
+from pytezos.michelson.pack import pack
 from pytezos.repl.control import instruction
 from pytezos.repl.context import Context
 from pytezos.repl.types import assert_stack_type, Option, Pair, String, Bytes, List, BigMap, Map, Set, Or, Bool, Nat, \
     Unit, StackItem, dispatch_type_map
+from pytezos.michelson.pack import unpack
 
 
 @instruction(['CAR', 'CDR'])
@@ -167,8 +168,14 @@ def do_unit(ctx: Context, prim, args, annots):
 def do_unpack(ctx: Context, prim, args, annots):
     top = ctx.pop1()
     assert_stack_type(top, Bytes)
-    # TODO: unpack micheline
-    res = StackItem.parse(type_expr=args[0], val_expr=None)
+    try:
+        val_expr = unpack(data=bytes(top), type_expr=args[0])
+        item = StackItem.parse(val_expr=val_expr, type_expr=args[0])
+        res = Option.some(item)
+    except Exception as e:
+        if ctx.debug:
+            ctx.printf(f' {e};')
+        res = Option.none(args[0])
     ctx.push(res, annots=annots)
 
 
