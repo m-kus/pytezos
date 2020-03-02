@@ -1,5 +1,4 @@
 from datetime import datetime
-import secrets
 
 from pytezos import pytezos
 from pytezos.encoding import parse_address
@@ -11,7 +10,6 @@ from pytezos.repl.parser import get_entry_expr
 
 MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'
 UNIT_TYPE_EXPR = {'prim': 'unit'}
-SELF_ADDRESS = 'KT1VG2WtYdSWz5E7chTeAdDPZNy2MpP8pTfL'
 
 
 def get_network_by_chain_id(chain_id: ChainID):
@@ -65,7 +63,7 @@ def do_self(ctx: Context, prim, args, annots):
     ctx.printf(f' use {entry_annot};')
 
     p_type_expr = get_entry_expr(p_type_expr, entry_annot)
-    res = Contract.new(SELF_ADDRESS + entry_annot, type_expr=p_type_expr)
+    res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
     ctx.push(res, annots=[a for a in annots if a[0] != '%'])
 
 
@@ -155,10 +153,6 @@ def decrease_balance(ctx: Context, amount: Mutez):
     ctx.set('BALANCE', Mutez(int(balance) - int(amount)))
 
 
-def generate_address():
-    return parse_address(b''.join([b'\x01', secrets.token_bytes(20), b'\x00']))
-
-
 @instruction('CREATE_CONTRACT', args_len=1)
 def do_create_contract(ctx: Context, prim, args, annots):
     assert len(args[0]) == 3, 'expected { parameter ; storage ; code }'
@@ -173,7 +167,7 @@ def do_create_contract(ctx: Context, prim, args, annots):
 
     content = {
         'kind': 'origination',
-        'source': SELF_ADDRESS,
+        'source': ctx.dummy_gen.self,
         'balance': str(int(amount)),
         'script': {
             'storage': storage.val_expr,
@@ -184,9 +178,9 @@ def do_create_contract(ctx: Context, prim, args, annots):
     if not delegate.is_none():
         content['delegate'] = str(delegate.get_some())
 
-    contract = Contract.new(generate_address(), type_expr=parameter_type)
+    originated_address = Address.new(ctx.dummy_gen.get_fresh_address())
     orig = Operation.new(content)
-    ctx.push(contract)
+    ctx.push(originated_address)
     ctx.push(orig)
 
 
@@ -197,7 +191,7 @@ def do_set_delegate(ctx: Context, prim, args, annots):
 
     content = {
         'kind': 'delegation',
-        'source': SELF_ADDRESS,
+        'source': ctx.dummy_gen.self,
         'delegate': None if delegate.is_none() else str(delegate.get_some())
     }
     res = Operation.new(content)
@@ -216,7 +210,7 @@ def do_transfer_tokens(ctx: Context, prim, args, annots):
 
     content = {
         'kind': 'transaction',
-        'source': SELF_ADDRESS,
+        'source': ctx.dummy_gen.self,
         'amount': str(int(amount)),
         'destination': dest.get_address(),
         'parameters': {

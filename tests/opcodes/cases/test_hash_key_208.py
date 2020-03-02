@@ -4,7 +4,7 @@ from tests import abspath
 
 from pytezos.repl.interpreter import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
-from pytezos.repl.parser import parse_value
+from pytezos.repl.parser import parse_expression
 
 
 class OpcodeTesthash_key_208(TestCase):
@@ -20,7 +20,6 @@ class OpcodeTesthash_key_208(TestCase):
         res = self.i.execute('RUN "edpkuJqtDcA2m2muMxViSM47MPsGQzmyjnNTawUPqR8vZTAMcx61ES" None')
         self.assertTrue(res['success'])
         
-        type_expr = self.i.ctx.stack[0].type_expr['args'][1]
         expected_expr = michelson_to_micheline('(Some "tz1XPTDmvT3vVE5Uunngmixm7gj7zmdbPq6k")')
-        expected_val = parse_value(expected_expr, type_expr)
-        self.assertEqual(expected_val, self.i.ctx.stack[0]._val[1])
+        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
+        self.assertEqual(expected_val, res['result'][1]._val)

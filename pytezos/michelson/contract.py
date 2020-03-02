@@ -270,12 +270,12 @@ class Contract(metaclass=InlineDocstring):
     @property
     @lru_cache(maxsize=None)
     def parameter(self) -> ContractParameter:
-        return ContractParameter(self.code[0])
+        return ContractParameter(next(s for s in self.code if s['prim'] == 'parameter'))
 
     @property
     @lru_cache(maxsize=None)
     def storage(self) -> ContractStorage:
-        return ContractStorage(self.code[1])
+        return ContractStorage(next(s for s in self.code if s['prim'] == 'storage'))
 
     @property
     @lru_cache(maxsize=None)

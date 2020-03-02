@@ -1,5 +1,4 @@
 import functools
-import json
 from typing import Tuple, Callable
 
 from pytezos.michelson.converter import micheline_to_michelson
@@ -78,8 +77,7 @@ def dispatch_prim_map(val_expr, mapping: dict):
 
 def parse_core_expr(expr) -> tuple:
     assert isinstance(expr, dict), f'expected dict, got {type(expr)}'
-    assert len(expr.keys()) == 1, f'expected single key, got {len(expr.keys())}'
-    core_type = next(iter(expr))
+    core_type, value = next((k, v) for k, v in expr.items() if k[0] != '_' and k != 'annots')
     return core_type, expr[core_type]
 
 
@@ -213,10 +211,28 @@ def parse_type(type_expr) -> Tuple[str, list, Callable]:
     return prim, args, func
 
 
-def parse_value(val_expr, type_expr):
-    prim, args, func = parse_type(type_expr)
+def val_selector(val_expr, type_expr, val):
+    prim = type_expr['prim']
+    if prim == 'pair':
+        return tuple(val)
+    elif prim == 'option':
+        return tuple(val) if val is not None else None
+    elif prim == 'or':
+        return val[0]
+    elif prim == 'set':
+        return set(val)
+    elif prim == 'map':
+        return dict(val)
+    elif prim == 'big_map' and isinstance(val_expr, list):
+        return dict(val)
+    else:
+        return val
+
+
+def parse_expression(val_expr, type_expr, selector=val_selector):
+    prim, _, func = parse_type(type_expr)
     try:
-        res = func(val_expr, args)
+        res = func(val_expr, type_expr, selector)
     except AssertionError as e:
         raise MichelsonTypeCheckError.init(str(e), prim)
     except MichelsonRuntimeError as e:
@@ -226,164 +242,174 @@ def parse_value(val_expr, type_expr):
 
 
 @primitive('string')
-def parse_string(val_expr, type_args):
-    return get_string(val_expr)
+def parse_string(val_expr, type_expr, selector):
+    return selector(val_expr, type_expr, get_string(val_expr))
 
 
 @primitive('int')
-def parse_int(val_expr, type_args):
-    return get_int(val_expr)
+def parse_int(val_expr, type_expr, selector):
+    return selector(val_expr, type_expr, get_int(val_expr))
 
 
 @primitive('bytes')
-def parse_bytes(val_expr, type_args):
-    return get_bytes(val_expr)
+def parse_bytes(val_expr, type_expr, selector):
+    return selector(val_expr, type_expr, get_bytes(val_expr))
 
 
 @primitive('nat')
-def parse_nat(val_expr, type_args):
-    value = get_int(val_expr)
-    assert value >= 0, f'nat cannot be negative ({value})'
-    return value
+def parse_nat(val_expr, type_expr, selector):
+    val = get_int(val_expr)
+    assert val >= 0, f'nat cannot be negative ({val})'
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('bool')
-def parse_bool(val_expr, type_args):
-    return dispatch_prim_map(val_expr, {
+def parse_bool(val_expr, type_expr, selector):
+    val = dispatch_prim_map(val_expr, {
         ('False', 0): False,
         ('True', 0): True
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('unit')
-def parse_unit(val_expr, type_args):
+def parse_unit(val_expr, type_expr, selector):
     _ = get_prim_args(val_expr, prim='Unit', args_len=0)
-    return Unit()
+    return selector(val_expr, type_expr, Unit())
 
 
 @primitive('list', args_len=1)
-def parse_list(val_expr, type_args):
+def parse_list(val_expr, type_expr, selector):
     assert_type(val_expr, list)
-    return [parse_value(item, type_args[0]) for item in val_expr]
+    val = [parse_expression(item, type_expr['args'][0], selector) for item in val_expr]
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('pair', args_len=2)
-def parse_pair(val_expr, type_args):
+def parse_pair(val_expr, type_expr, selector):
     args = get_prim_args(val_expr, prim='Pair', args_len=2)
-    return tuple(parse_value(args[i], type_args[i]) for i in [0, 1])
+    val = [parse_expression(args[i], type_expr['args'][i], selector) for i in [0, 1]]
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('option', args_len=1)
-def parse_option(val_expr, type_args):
-    return dispatch_prim_map(val_expr, {
+def parse_option(val_expr, type_expr, selector):
+    val = dispatch_prim_map(val_expr, {
         ('None', 0): None,
-        ('Some', 1): lambda x: (parse_value(x[0], type_args[0]),)
+        ('Some', 1): lambda x: [parse_expression(x[0], type_expr['args'][0], selector)]
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('or', args_len=2)
-def parse_or(val_expr, type_args):
-    return dispatch_prim_map(val_expr, {
-        ('Left', 1): lambda x: parse_value(x[0], type_args[0]),
-        ('Right', 1): lambda x: parse_value(x[0], type_args[1])
+def parse_or(val_expr, type_expr, selector):
+    val = dispatch_prim_map(val_expr, {
+        ('Left', 1): lambda x: [parse_expression(x[0], type_expr['args'][0], selector)],
+        ('Right', 1): lambda x: [parse_expression(x[0], type_expr['args'][1], selector)]
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('set', args_len=1)
-def parse_set(val_expr, type_args):
+def parse_set(val_expr, type_expr, selector):
     assert_type(val_expr, list)
-    assert_comparable(type_args[0])
-    value = {parse_value(item, type_args[0]) for item in val_expr}
-    assert len(value) == len(val_expr), f'found duplicate elements'
-    return value
+    assert_comparable(type_expr['args'][0])
+    val = [parse_expression(item, type_expr['args'][0], selector) for item in val_expr]
+    return selector(val_expr, type_expr, val)
 
 
-def parse_elt(val_expr, type_args) -> tuple:
-    k_val_expr, v_val_expr = get_prim_args(val_expr, prim='Elt', args_len=2)
-    return parse_value(k_val_expr, type_args[0]), parse_value(v_val_expr, type_args[1])
+def parse_elt(val_expr, type_expr, selector):
+    elt_args = get_prim_args(val_expr, prim='Elt', args_len=2)
+    return [parse_expression(elt_args[i], type_expr['args'][i], selector) for i in [0, 1]]
 
 
 @primitive('map', args_len=2)
-def parse_map(val_expr, type_args):
+def parse_map(val_expr, type_expr, selector):
     assert_type(val_expr, list)
-    assert_comparable(type_args[0])
-    return dict(parse_elt(item, type_args) for item in val_expr)
+    assert_comparable(type_expr['args'][0])
+    val = [parse_elt(item, type_expr, selector) for item in val_expr]
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('big_map', args_len=2)
-def parse_big_map(val_expr, type_args):
-    assert_comparable(type_args[0])
-    assert_big_map_val(type_args[1])
+def parse_big_map(val_expr, type_expr, selector):
+    assert_comparable(type_expr['args'][0])
+    assert_big_map_val(type_expr['args'][1])
     if isinstance(val_expr, list):
-        return parse_map(val_expr, type_args)
+        return parse_map(val_expr, type_expr, selector)
     else:
-        return get_int(val_expr)
+        val = get_int(val_expr)
+        return selector(val_expr, type_expr, val)
 
 
 @primitive('timestamp')
-def parse_timestamp(val_expr, type_args):
-    return dispatch_core_map(val_expr, {'int': int, 'string': encoding.forge_timestamp})
+def parse_timestamp(val_expr, type_expr, selector):
+    val = dispatch_core_map(val_expr, {'int': int, 'string': encoding.forge_timestamp})
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('mutez')
-def parse_mutez(val_expr, type_args):
-    return parse_nat(val_expr, type_args)
+def parse_mutez(val_expr, type_expr, selector):
+    return parse_nat(val_expr, type_expr, selector)
 
 
 @primitive('address')
-def parse_address(val_expr, type_args):
-    return dispatch_core_map(val_expr, {
+def parse_address(val_expr, type_expr, selector):
+    val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_address(bytes.fromhex(x)),
         'string': lambda x: x
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('contract', args_len=1)
-def parse_contract(val_expr, type_args):
-    return dispatch_core_map(val_expr, {
+def parse_contract(val_expr, type_expr, selector):
+    val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_contract(bytes.fromhex(x)),
         'string': lambda x: x
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('operation')
-def parse_operation(val_expr, type_args):
-    return json.loads(get_string(val_expr))
+def parse_operation(val_expr, type_expr, selector):
+    val = get_string(val_expr)
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('key')
-def parse_key(val_expr, type_args):
-    return dispatch_core_map(val_expr, {
+def parse_key(val_expr, type_expr, selector):
+    val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_public_key(bytes.fromhex(x)),
         'string': lambda x: x
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('key_hash')
-def parse_key_hash(val_expr, type_args):
-    return parse_address(val_expr, type_args)
+def parse_key_hash(val_expr, type_expr, selector):
+    return parse_address(val_expr, type_expr, selector)
 
 
 @primitive('signature')
-def parse_signature(val_expr, type_args):
-    return dispatch_core_map(val_expr, {
+def parse_signature(val_expr, type_expr, selector):
+    val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_signature(bytes.fromhex(x)),
         'string': lambda x: x
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('chain_id')
-def parse_chain_id(val_expr, type_args):
-    return dispatch_core_map(val_expr, {
+def parse_chain_id(val_expr, type_expr, selector):
+    val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_chain_id(bytes.fromhex(x)),
         'string': lambda x: x
     })
+    return selector(val_expr, type_expr, val)
 
 
 @primitive('lambda', args_len=2)
-def parse_lambda(val_expr, type_args):
-    if isinstance(val_expr, list):
-        return val_expr
-    else:
-        code, = get_prim_args(val_expr, 'Lambda', args_len=1)
-        return code
+def parse_lambda(val_expr, type_expr, selector):
+    assert_type(val_expr, list)
+    return selector(val_expr, type_expr, val_expr)

@@ -1,6 +1,10 @@
-from tests.templates import opcode_test_case
-from os.path import dirname, join, exists, relpath
+import re
+
+from tests.templates import opcode_test_case, big_map_diff_test_case
+from os.path import dirname, join, exists
 from os import mkdir
+
+from pytezos.michelson.pack import get_key_hash
 
 # Merci beaucoup a @arvidnl et tout le monde
 
@@ -214,7 +218,7 @@ parameterized_data = [
     ('map_map.tz', '{ Elt "bar" 5 ; Elt "foo" 1 }', '15',
      '{ Elt "bar" 20 ; Elt "foo" 16 }'),
 
-    # Memberships in big maps TODO
+    # Memberships in big maps
     ('big_map_mem_nat.tz', '(Pair { Elt 0 1 } None)', '1',
      '(Pair 0 (Some False))'),
     ('big_map_mem_nat.tz', '(Pair {} None)', '1',
@@ -602,6 +606,117 @@ parameterized_data = [
     ('self_with_default_entrypoint.tz', 'Unit', 'Unit', 'Unit')
 ]
 
+big_map_diff_data = [
+    # FORMAT: assert_output contract_file storage input expected_result
+    #         expected_diffs
+    # Get the value stored at the given key in the big map
+    ('get_big_map_value.tz', '(Pair { Elt "hello" "hi" } None)',
+     '"hello"', '(Pair 0 (Some "hi"))',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["hello"] to "hi"']]),
+    ('get_big_map_value.tz', '(Pair { Elt "hello" "hi" } None)', '""',
+     '(Pair 0 None)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["hello"] to "hi"']]),
+    ('get_big_map_value.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } None)',
+     '"1"',
+     '(Pair 0 (Some "one"))',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "one"'],
+      ['Set map(0)["2"] to "two"']]),
+
+    # Test updating big maps
+    ('update_big_map.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } Unit)',
+     '{}', '(Pair 0 Unit)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "one"'],
+      ['Set map(0)["2"] to "two"']]),
+    ('update_big_map.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } Unit)',
+     '{ Elt "1" (Some "two") }', '(Pair 0 Unit)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "two"'],
+      ['Set map(0)["2"] to "two"']]),
+    ('update_big_map.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } Unit)',
+     '{ Elt "3" (Some "three") }', '(Pair 0 Unit)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "one"'],
+      ['Set map(0)["2"] to "two"'],
+      ['Set map(0)["3"] to "three"']]),
+    ('update_big_map.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } Unit)',
+     '{ Elt "3" None }', '(Pair 0 Unit)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "one"'],
+      ['Set map(0)["2"] to "two"'],
+      ['Unset map(0)["3"]']]),
+    ('update_big_map.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } Unit)',
+     '{ Elt "2" None }', '(Pair 0 Unit)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "one"'],
+      ['Unset map(0)["2"]']]),
+    ('update_big_map.tz',
+     '(Pair { Elt "1" "one" ; Elt "2" "two" } Unit)',
+     '{ Elt "1" (Some "two") }', '(Pair 0 Unit)',
+     [["New map(0) of type (big_map string string)"],
+      ['Set map(0)["1"] to "two"'],
+      ['Set map(0)["2"] to "two"']]),
+]
+
+big_map_magic_data = [   # test swap
+    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+     '(Left Unit)',
+     '(Left (Pair 0 1))',
+     [['New map(1) of type (big_map string string)'],
+      ['Set map(1)["1"] to "one"'],
+      ['New map(0) of type (big_map string string)'],
+      ['Set map(0)["2"] to "two"']]),
+    # test reset with new map
+    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+     '(Right (Left (Left (Pair { Elt "3" "three" } ' +
+     '{ Elt "4" "four" }))))',
+     '(Left (Pair 0 1))',
+     [['New map(1) of type (big_map string string)'],
+      ['Set map(1)["4"] to "four"'],
+      ['New map(0) of type (big_map string string)'],
+      ['Set map(0)["3"] to "three"']]),
+    # test reset to unit
+    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+     '(Right (Left (Right Unit)))',
+     '(Right Unit)',
+     []),
+    # test import to big_map
+    ('(Right Unit)',
+     '(Right (Right (Left (Pair { Pair "foo" "bar" } ' +
+     '{ Pair "gaz" "baz" }) )))',
+     '(Left (Pair 0 1))',
+     [['New map(1) of type (big_map string string)'],
+      ['Set map(1)["gaz"] to "baz"'],
+      ['New map(0) of type (big_map string string)'],
+      ['Set map(0)["foo"] to "bar"']]),
+    # test add to big_map
+    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }) )',
+     '(Right (Right (Right (Left { Pair "3" "three" }))))',
+     '(Left (Pair 0 1))',
+     [['New map(1) of type (big_map string string)'],
+      ['Set map(1)["2"] to "two"'],
+      ['New map(0) of type (big_map string string)'],
+      ['Set map(0)["1"] to "one"'],
+      ['Set map(0)["3"] to "three"']]),
+    # test remove from big_map
+    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+     '(Right (Right (Right (Right { "1" }))))',
+     '(Left (Pair 0 1))',
+     [['New map(1) of type (big_map string string)'],
+      ['Set map(1)["2"] to "two"'],
+      ['New map(0) of type (big_map string string)'],
+      ['Unset map(0)["1"]']])
+]
+
 
 def wrap(data):
     data = data.replace('\n', ' ')
@@ -609,6 +724,41 @@ def wrap(data):
         return f'({data})'
     else:
         return data
+
+
+def get_big_map_diff(events):
+    diff = []
+    for event in events:
+        res = re.findall(r'New map\((\d+)\) of type \(big_map string string\)', event[0])
+        if res:
+            diff.append({
+                'action': 'alloc',
+                'big_map': res[0][0],
+                'key_type': {'prim': 'string'},
+                'value_type': {'prim': 'string'}
+            })
+            continue
+        res = re.findall(r'Set map\((\d+)\)\["(\w+)"\] to "(\w+)"', event[0])
+        if res:
+            diff.append({
+                'action': 'update',
+                'big_map': res[0][0],
+                'key_hash': get_key_hash({'string': res[0][1]}, {'prim': 'string'}),
+                'key': {'string': res[0][1]},
+                'value': {'string': res[0][2]}
+            })
+            continue
+        res = re.findall(r'Unset map\((\d+)\)\["(\w+)"\]', event[0])
+        if res:
+            diff.append({
+                'action': 'update',
+                'big_map': res[0][0],
+                'key_hash': get_key_hash({'string': res[0][1]}, {'prim': 'string'}),
+                'key': {'string': res[0][1]}
+            })
+            continue
+        assert False, event
+    return diff
 
 
 def make_opcode_tests():
@@ -625,6 +775,33 @@ def make_opcode_tests():
             parameter=wrap(parameter),
             storage=wrap(storage),
             expected=wrap(expected)
+        )
+        with open(join(cases_dir, f'test_{case}.py'), 'w+') as f:
+            f.write(body)
+
+    for i, (filename, storage, parameter, expected, events) in enumerate(big_map_diff_data):
+        case = filename.replace(".tz", f'_{i}')
+        body = big_map_diff_test_case.format(
+            case=case,
+            filename=join('opcodes', 'contracts', filename),
+            parameter=wrap(parameter),
+            storage=wrap(storage),
+            expected=wrap(expected),
+            big_map_diff=get_big_map_diff(events)
+        )
+        with open(join(cases_dir, f'test_{case}.py'), 'w+') as f:
+            f.write(body)
+
+    for i, (storage, parameter, expected, events) in enumerate(big_map_magic_data):
+        filename = 'big_map_magic.tz'
+        case = filename.replace(".tz", f'_{i}')
+        body = big_map_diff_test_case.format(
+            case=case,
+            filename=join('opcodes', 'contracts', filename),
+            parameter=wrap(parameter),
+            storage=wrap(storage),
+            expected=wrap(expected),
+            big_map_diff=get_big_map_diff(events)
         )
         with open(join(cases_dir, f'test_{case}.py'), 'w+') as f:
             f.write(body)

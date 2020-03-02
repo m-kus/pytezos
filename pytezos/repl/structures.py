@@ -69,13 +69,10 @@ def do_get(ctx: Context, prim, args, annots):
     key, container = ctx.pop2()
     assert_stack_type(container, [Map, BigMap])
 
-    val = None
     if type(container) == Map:
-        if key in container:
-            val = container.find(key)
+        val = container.find(key)
     else:
-        if ctx.big_maps.contains(container, key):
-            val = ctx.big_maps.find(container, key)
+        val = ctx.big_maps.find(container, key)
 
     if val is not None:
         res = Option.some(val)
@@ -190,17 +187,11 @@ def do_update(ctx: Context, prim, args, annots):
             res = container.add(key)
         else:
             res = container.remove(key)
-    elif type(container) == Map:
+    else:
         assert_stack_type(val, Option)
         if val.is_none():
             res = container.remove(key)
         else:
-            res = container.add(key, val.get_some())
-    else:
-        assert_stack_type(val, Option)
-        if val.is_none():
-            res = ctx.big_maps.remove(container, key)
-        else:
-            res = ctx.big_maps.add(container, key, val.get_some())
+            res = container.update(key, val.get_some())
 
     ctx.push(res, annots=annots)

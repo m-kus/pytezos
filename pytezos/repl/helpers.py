@@ -1,14 +1,14 @@
 from os.path import isfile
-from pprint import pformat
 
 from pytezos import Contract, pytezos
 from pytezos.encoding import is_kt
+from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.repl.control import instruction, do_interpret
-from pytezos.repl.context import Context, StackItem
-from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr
-from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp
+from pytezos.repl.context import Context
+from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr, assert_expr_equal
+from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type
 
-helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE', 'DEBUG']
+helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF']
 patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
 
@@ -39,7 +39,7 @@ def do_drop_all(ctx: Context, prim, args, annots):
 
 @instruction('EXPAND', args_len=1)
 def do_expand(ctx: Context, prim, args, annots):
-    return args[0]
+    return micheline_to_michelson(args[0])
 
 
 @instruction('RUN', args_len=2)
@@ -51,22 +51,32 @@ def do_run(ctx: Context, prim, args, annots):
     ctx.printf(f' use {entrypoint};')
 
     p_type_expr = get_entry_expr(p_type_expr, entrypoint)
-    parameter = StackItem.parse(args[0], p_type_expr)
+    parameter = ctx.big_maps.pre_alloc(args[0], p_type_expr, copy=True)
 
     s_type_expr = ctx.get('storage')
     assert s_type_expr, f'storage type is not initialized'
-    storage = StackItem.parse(args[1], s_type_expr)
+    storage = ctx.big_maps.pre_alloc(args[1], s_type_expr)
 
     ctx.drop_all()
-    pair = Pair.new(parameter, storage)
-    run_input = ctx.big_maps.alloc(pair)
+    run_input = Pair.new(parameter, storage)
     ctx.push(run_input, annots=annots)
 
     code = ctx.get('code')
     if code:
         do_interpret(ctx, code)
+        output = ctx.pop1()
+        assert_stack_type(output, Pair)
 
-    return ctx.peek()
+        operations = output.get_element(0)
+        storage = output.get_element(1)
+        assert_expr_equal(s_type_expr, storage.type_expr)
+        storage, big_map_diff = ctx.big_maps.diff(storage, commit=True)
+
+        res = Pair.new(operations, storage)
+        ctx.push(res)
+        return operations, storage, big_map_diff
+    else:
+        return ctx.peek()
 
 
 @instruction('PATCH', args_len=2)
@@ -110,4 +120,6 @@ def do_include(ctx: Context, prim, args, annots):
 
 @instruction('BIG_MAP_DIFF')
 def do_big_map_diff(ctx: Context, prim, args, annots):
-    return pformat(ctx.big_maps.diff)
+    top = ctx.pop1()
+    _, big_map_diff = ctx.big_maps.diff(top)
+    return big_map_diff

@@ -90,8 +90,7 @@ def format_node(node, indent='', inline=False, is_root=False, wrapped=False):
             else:
                 return expr
         else:
-            assert len(node) == 1
-            core_type, value = next(iter(node.items()))
+            core_type, value = next((k, v) for k, v in node.items() if k[0] != '_' and k != 'annots')
             if core_type == 'int':
                 return value
             elif core_type == 'bytes':
@@ -99,9 +98,9 @@ def format_node(node, indent='', inline=False, is_root=False, wrapped=False):
             elif core_type == 'string':
                 return json.dumps(value)
             else:
-                assert False
+                assert False, f'unexpected core node {node}'
     else:
-        assert False, node
+        assert False, f'unexpected node {node}'
 
 
 def micheline_to_michelson(data, inline=False):

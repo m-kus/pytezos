@@ -3,22 +3,62 @@ from copy import deepcopy
 from pprint import pformat
 from typing import List
 
+from pytezos.crypto import blake2b
+from pytezos.encoding import base58_encode
 from pytezos.repl.types import StackItem, assert_stack_item
 from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.repl.big_map import BigMapPool
 
 
+class DummyGen:
+
+    def __init__(self):
+        self.index = 0
+        self.self = self.get_fresh_address()
+
+    def get_fresh_address(self):
+        nonce = b'\x00' * 32 + self.index.to_bytes(4, 'big')
+        nonce_hash = blake2b(data=nonce, digest_size=20).digest()
+        res = base58_encode(nonce_hash, b'KT1').decode()
+        self.index += 1
+        return res
+
+
 class Context:
 
-    def __init__(self, stack=None, meta=None, big_maps=None, debug=True):
-        self.stack = stack or []
-        self.meta = meta or {}
-        self.big_maps = big_maps or BigMapPool()
-        self.protected = 0
-        self.exec_depth = 0
-        self.debug = debug
+    def __init__(self):
+        self.stack = []
+        self.meta = {}
+        self.dummy_gen = DummyGen()
+        self.big_maps = BigMapPool()
+        self.debug = True
         self.stdout = list()
+        self.exec_depth = 0
+        self.protected = 0
         self.pushed = 0
+
+    def __deepcopy__(self, memodict={}):
+        ctx = Context()
+        ctx.stack = deepcopy(self.stack)
+        ctx.meta = deepcopy(self.meta)
+        ctx.dummy_gen = deepcopy(self.dummy_gen)
+        ctx.big_maps = deepcopy(self.big_maps)
+        ctx.debug = self.debug
+        ctx.exec_depth = self.exec_depth
+        ctx.protected = self.protected
+        ctx.pushed = self.pushed
+        return ctx
+
+    def spawn(self, stack):
+        ctx = Context()
+        ctx.stack = stack
+        ctx.meta = self.meta
+        ctx.dummy_gen = self.dummy_gen
+        ctx.big_maps = self.big_maps
+        ctx.debug = self.debug
+        ctx.stdout = self.stdout
+        ctx.exec_depth = self.exec_depth
+        return ctx
 
     def reset(self):
         self.stdout.clear()
@@ -119,12 +159,3 @@ class Context:
 
     def __repr__(self):
         return pformat(self.stack)
-
-    def __deepcopy__(self, memodict={}):
-        ctx = Context(stack=deepcopy(self.stack),
-                      meta=deepcopy(self.meta),
-                      big_maps=deepcopy(self.big_maps),
-                      debug=self.debug)
-        ctx.protected = self.protected
-        ctx.exec_depth = self.exec_depth
-        return ctx

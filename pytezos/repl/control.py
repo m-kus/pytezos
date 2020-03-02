@@ -137,7 +137,7 @@ def do_exec(ctx: Context, prim, args, annots):
     param, lmbda = ctx.pop2()
     assert_stack_type(lmbda, Lambda)
     lmbda.assert_param_type(param)
-    lmbda_ctx = Context(stack=[param], debug=ctx.debug)
+    lmbda_ctx = ctx.spawn(stack=[param])
     do_interpret(lmbda_ctx, lmbda.code)
     ret = lmbda_ctx.pop1()
     lmbda.assert_ret_type(ret)

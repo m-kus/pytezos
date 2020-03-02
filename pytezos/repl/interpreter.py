@@ -33,12 +33,7 @@ def format_result(result):
     elif isinstance(result, list):
         if len(result) > 0 and isinstance(result[0], StackItem):
             return list(map(format_stack_item, result))
-        else:
-            return micheline_to_michelson(result)
-    elif isinstance(result, dict):
-        return micheline_to_michelson(result)
-    else:
-        return result
+    return result
 
 
 def format_stderr(error):
@@ -81,7 +76,6 @@ class Interpreter:
 
             int_res['result'] = format_result(res)
             int_res['stdout'] = format_stdout(self.ctx.stdout)
-            int_res['big_map_diff'] = self.ctx.big_maps.diff
             int_res['success'] = True
             self.ctx.reset()
         except MichelsonRuntimeError as e:
@@ -99,7 +93,5 @@ class Interpreter:
                 print(int_res['stdout'])
             if int_res.get('result'):
                 print('RETURN: ' + pformat(int_res['result']))
-            if int_res.get('big_map_diff'):
-                print('BIG_MAP_DIFF: ' + pformat(int_res['big_map_diff']))
 
         return int_res
