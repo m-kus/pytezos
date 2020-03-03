@@ -86,7 +86,7 @@ class BigMapPool:
         val_expr = parse_expression(val_expr, type_expr, alloc_selector)
         return StackItem.parse(val_expr=val_expr, type_expr=type_expr)
 
-    def diff(self, storage: StackItem, commit=False):
+    def diff(self, storage: StackItem):
         res = []
         alloc_id = self.alloc_id
         pending_remove = self.pending_remove
@@ -127,12 +127,29 @@ class BigMapPool:
 
         val_expr = parse_expression(storage.val_expr, storage.type_expr, diff_selector)
         res.extend([{'action': 'remove', 'big_map': x} for x in pending_remove])
-
-        if commit:
-            self.alloc_id = alloc_id
-            self.pending_remove.clear()
-
         return StackItem.parse(val_expr, storage.type_expr), res
+
+    def commit(self, big_map_diff: list):
+        for diff in big_map_diff:
+            big_map_id = int(diff['big_map'])
+            raw_map = self.maps.get(big_map_id)
+            if diff['action'] == 'alloc':
+                assert raw_map is None, f'#{big_map_id} already allocated'
+                self.maps[big_map_id] = Map.empty(k_type_expr=diff['key_type'], v_type_expr=diff['value_type'])
+            elif diff['action'] == 'remove':
+                assert raw_map is not None, f'#{big_map_id} is not allocated'
+                del self.maps[big_map_id]
+            elif diff['action'] == 'update':
+                assert raw_map is not None, f'#{big_map_id} is not allocated'
+                key = raw_map.make_key(diff['key'])
+                if diff.get('value'):
+                    val = raw_map.make_val(diff['value'])
+                    self.maps[big_map_id] = raw_map.update(key, val)
+                else:
+                    self.maps[big_map_id] = raw_map.remove(key)
+
+        self.alloc_id = 0
+        self.pending_remove.clear()
 
     def contains(self, big_map: BigMap, key: StackItem) -> bool:
         if key in big_map:

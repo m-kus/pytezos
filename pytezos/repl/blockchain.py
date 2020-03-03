@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from pytezos import pytezos
-from pytezos.encoding import parse_address
 from pytezos.repl.control import instruction
 from pytezos.repl.context import Context
 from pytezos.repl.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \

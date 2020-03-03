@@ -372,6 +372,12 @@ class Map(StackItem, prim='map', args_len=2):
     def val_type_expr(self):
         return self.type_expr['args'][1]
 
+    def make_key(self, k_val_expr):
+        return self.parse(k_val_expr, self.type_expr['args'][0])
+
+    def make_val(self, v_val_expr):
+        return self.parse(v_val_expr, self.type_expr['args'][1])
+
 
 class BigMap(StackItem, prim='big_map', args_len=2):
 

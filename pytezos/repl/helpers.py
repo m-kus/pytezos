@@ -70,7 +70,9 @@ def do_run(ctx: Context, prim, args, annots):
         operations = output.get_element(0)
         storage = output.get_element(1)
         assert_expr_equal(s_type_expr, storage.type_expr)
-        storage, big_map_diff = ctx.big_maps.diff(storage, commit=True)
+
+        storage, big_map_diff = ctx.big_maps.diff(storage)
+        ctx.big_maps.commit(big_map_diff)
 
         res = Pair.new(operations, storage)
         ctx.push(res)
