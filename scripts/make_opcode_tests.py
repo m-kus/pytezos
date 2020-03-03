@@ -1,6 +1,6 @@
 import re
 
-from tests.templates import opcode_test_case, big_map_diff_test_case
+from tests.templates import opcode_test_case, big_map_diff_test_case, success_test_case
 from os.path import dirname, join, exists
 from os import mkdir
 
@@ -380,7 +380,7 @@ parameterized_data = [
     ('exec_concat.tz', '"?"', '"test"', '"test_abc"'),
 
     # Get the current balance of the contract
-    ('balance.tz', '111', 'Unit', '0'),
+    ('balance.tz', '111', 'Unit', '257000000'),
 
     # Test addition and subtraction on tez
     ('tez_add_sub.tz', 'None', '(Pair 2000000 1000000)',
@@ -603,7 +603,79 @@ parameterized_data = [
 
     # Test SELF
     ('self_with_entrypoint.tz', 'Unit', 'Left (Left 0)', 'Unit'),
-    ('self_with_default_entrypoint.tz', 'Unit', 'Unit', 'Unit')
+    ('self_with_default_entrypoint.tz', 'Unit', 'Unit', 'Unit'),
+
+    # Test split bytes
+    ('split_bytes.tz', '{}', '0xaabbcc', '{ 0xaa ; 0xbb ; 0xcc }'),
+    ('split_bytes.tz', '{ 0xaa ; 0xbb ; 0xcc }', '0xddeeff', '{ 0xaa ; 0xbb ; 0xcc ; 0xdd ; 0xee ; 0xff }'),
+
+    # Build list
+    ('build_list.tz', '{}', '0', '{ 0 }'),
+    ('build_list.tz', '{}', '3', '{ 0 ; 1 ; 2 ; 3 }'),
+    ('build_list.tz', '{}', '10',
+     '{ 0 ; 1 ; 2 ; 3 ; 4 ; 5 ; 6 ; 7 ; 8 ; 9 ; 10 }'),
+
+    # Find maximum int in list -- returns None if not found
+    ('max_in_list.tz', 'None', '{}', 'None'),
+    ('max_in_list.tz', 'None', '{ 1 }', '(Some 1)'),
+    ('max_in_list.tz', 'None', '{ -1 }', '(Some -1)'),
+    ('max_in_list.tz', 'None', '{ 10 ; -1 ; -20 ; 100 ; 0 }',
+     '(Some 100)'),
+    ('max_in_list.tz', 'None', '{ 10 ; -1 ; -20 ; 100 ; 0 }',
+     '(Some 100)'),
+    ('max_in_list.tz', 'None', '{ -10 ; -1 ; -20 ; -100 }',
+     '(Some -1)'),
+
+    # Test comparisons on tez { EQ ; GT ; LT ; GE ; LE }
+    ('macro_compare.tz', '{}', '(Pair 1000000 2000000)',
+     '{ False ; False ; True ; False ; True }'),
+    ('macro_compare.tz', '{}', '(Pair 2000000 1000000)',
+     '{ False ; True ; False ; True ; False }'),
+    ('macro_compare.tz', '{}', '(Pair 2370000 2370000)',
+     '{ True ; False ; False ; True ; True }'),
+
+    # Test ASSERT
+    ('assert.tz', 'Unit', 'True', 'Unit'),
+
+    # ASSERT_{OP}
+    ('assert_eq.tz', 'Unit', '(Pair -1 -1)', 'Unit'),
+    ('assert_eq.tz', 'Unit', '(Pair -1 -1)', 'Unit'),
+    ('assert_neq.tz', 'Unit', '(Pair 0 -1)', 'Unit'),
+    ('assert_lt.tz', 'Unit', '(Pair -1 0)', 'Unit'),
+    ('assert_le.tz', 'Unit', '(Pair 0 0)', 'Unit'),
+    ('assert_le.tz', 'Unit', '(Pair -1 0)', 'Unit'),
+    ('assert_gt.tz', 'Unit', '(Pair 0 -1)', 'Unit'),
+    ('assert_ge.tz', 'Unit', '(Pair 0 0)', 'Unit'),
+    ('assert_ge.tz', 'Unit', '(Pair 0 -1)', 'Unit'),
+
+    # ASSERT_CMP{OP}
+    ('assert_cmpeq.tz', 'Unit', '(Pair -1 -1)', 'Unit'),
+    ('assert_cmpneq.tz', 'Unit', '(Pair 0 -1)', 'Unit'),
+    ('assert_cmplt.tz', 'Unit', '(Pair -1 0)', 'Unit'),
+    ('assert_cmple.tz', 'Unit', '(Pair -1 0)', 'Unit'),
+    ('assert_cmple.tz', 'Unit', '(Pair 0 0)', 'Unit'),
+    ('assert_cmpgt.tz', 'Unit', '(Pair 0 -1)', 'Unit'),
+    ('assert_cmpge.tz', 'Unit', '(Pair 0 -1)', 'Unit'),
+    ('assert_cmpge.tz', 'Unit', '(Pair 0 0)', 'Unit'),
+
+    # Tests the SET_CAR and SET_CDR instructions
+    ('set_caddaadr.tz',
+     '(Pair (Pair 1 (Pair 2 (Pair (Pair (Pair 3 0) 4) 5))) 6)',
+     '3000000',
+     '(Pair (Pair 1 (Pair 2 (Pair (Pair (Pair 3 3000000) 4) 5))) 6)'),
+    ('map_caddaadr.tz',
+     '(Pair (Pair 1 (Pair 2 (Pair (Pair (Pair 3 0) 4) 5))) 6)', 'Unit',
+     '(Pair (Pair 1 (Pair 2 (Pair (Pair (Pair 3 1000000) 4) 5))) 6)'),
+
+    # Test comparisons on bytes { EQ ; GT ; LT ; GE ; LE }
+    ('compare_bytes.tz', '{}', '(Pair 0x33 0x34)',
+     '{ False ; False ; True ; False ; True }'),
+    ('compare_bytes.tz', '{}', '(Pair 0x33 0x33aa)',
+     '{ False ; False ; True ; False ; True }'),
+    ('compare_bytes.tz', '{}', '(Pair 0x33 0x33)',
+     '{ True ; False ; False ; True ; True }'),
+    ('compare_bytes.tz', '{}', '(Pair 0x34 0x33)',
+     '{ False ; True ; False ; True ; False }'),
 ]
 
 big_map_diff_data = [
@@ -665,10 +737,9 @@ big_map_diff_data = [
      [["New map(0) of type (big_map string string)"],
       ['Set map(0)["1"] to "two"'],
       ['Set map(0)["2"] to "two"']]),
-]
-
-big_map_magic_data = [   # test swap
-    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+    # test swap
+    ('big_map_magic.tz',
+     '(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
      '(Left Unit)',
      '(Left (Pair 0 1))',
      [['New map(1) of type (big_map string string)'],
@@ -676,7 +747,8 @@ big_map_magic_data = [   # test swap
       ['New map(0) of type (big_map string string)'],
       ['Set map(0)["2"] to "two"']]),
     # test reset with new map
-    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+    ('big_map_magic.tz',
+     '(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
      '(Right (Left (Left (Pair { Elt "3" "three" } ' +
      '{ Elt "4" "four" }))))',
      '(Left (Pair 0 1))',
@@ -685,12 +757,14 @@ big_map_magic_data = [   # test swap
       ['New map(0) of type (big_map string string)'],
       ['Set map(0)["3"] to "three"']]),
     # test reset to unit
-    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+    ('big_map_magic.tz',
+     '(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
      '(Right (Left (Right Unit)))',
      '(Right Unit)',
      []),
     # test import to big_map
-    ('(Right Unit)',
+    ('big_map_magic.tz',
+     '(Right Unit)',
      '(Right (Right (Left (Pair { Pair "foo" "bar" } ' +
      '{ Pair "gaz" "baz" }) )))',
      '(Left (Pair 0 1))',
@@ -699,7 +773,8 @@ big_map_magic_data = [   # test swap
       ['New map(0) of type (big_map string string)'],
       ['Set map(0)["foo"] to "bar"']]),
     # test add to big_map
-    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }) )',
+    ('big_map_magic.tz',
+     '(Left (Pair { Elt "1" "one" } { Elt "2" "two" }) )',
      '(Right (Right (Right (Left { Pair "3" "three" }))))',
      '(Left (Pair 0 1))',
      [['New map(1) of type (big_map string string)'],
@@ -708,7 +783,8 @@ big_map_magic_data = [   # test swap
       ['Set map(0)["1"] to "one"'],
       ['Set map(0)["3"] to "three"']]),
     # test remove from big_map
-    ('(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
+    ('big_map_magic.tz',
+     '(Left (Pair { Elt "1" "one" } { Elt "2" "two" }))',
      '(Right (Right (Right (Right { "1" }))))',
      '(Left (Pair 0 1))',
      [['New map(1) of type (big_map string string)'],
@@ -716,6 +792,65 @@ big_map_magic_data = [   # test swap
       ['New map(0) of type (big_map string string)'],
       ['Unset map(0)["1"]']])
 ]
+
+success_data = [
+    ('packunpack.tz',
+     'Unit',
+     '(Pair (Pair (Pair "toto" {3;7;9;1}) {1;2;3}) ' +
+     '0x05070707070100000004746f746f020000000800030' +
+     '007000900010200000006000100020003)',
+     True),
+    ('packunpack.tz',
+     'Unit',
+     '(Pair (Pair (Pair "toto" {3;7;9;1}) {1;2;3}) ' +
+     '0x05070707070100000004746f746f020000000800030' +
+     '0070009000102000000060001000200030004)',
+     False),
+    ('check_signature.tz',
+     '(Pair "edsigu3QszDjUpeqYqbvhyRxMpVFamEnvm9FYnt7YiiNt9nmjYfh8ZTbsybZ5WnBkhA7zfHsRVyuTnRsGLR6fNHt1Up1FxgyRtF" ' +
+     '"hello")',
+     '"edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav"',
+     True),
+    ('check_signature.tz',
+     '(Pair "edsigu3QszDjUpeqYqbvhyRxMpVFamEnvm9FYnt7YiiNt9nmjYfh8ZTbsybZ5WnBkhA7zfHsRVyuTnRsGLR6fNHt1Up1FxgyRtF" ' +
+     '"abcd")',
+     '"edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav"',
+     False),
+    ('shifts.tz', 'None', '(Left (Pair 1 257))', False),
+    ('shifts.tz', 'None', '(Left (Pair 123 257))', False),
+    ('shifts.tz', 'None', '(Right (Pair 1 257))', False),
+    ('shifts.tz', 'None', '(Right (Pair 123 257))', False),
+    ('mul_overflow.tz', 'Unit', 'Left Unit', False),
+    ('mul_overflow.tz', 'Unit', 'Right Unit', False),
+    ('assert.tz', 'Unit', 'False', False),
+    ('assert_eq.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_eq.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_neq.tz', 'Unit', '(Pair -1 -1)', False),
+    ('assert_lt.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_lt.tz', 'Unit', '(Pair 0 0)', False),
+    ('assert_le.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_gt.tz', 'Unit', '(Pair -1 0)', False),
+    ('assert_gt.tz', 'Unit', '(Pair 0 0)', False),
+    ('assert_ge.tz', 'Unit', '(Pair -1 0)', False),
+    ('assert_cmpeq.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_cmpneq.tz', 'Unit', '(Pair -1 -1)', False),
+    ('assert_cmplt.tz', 'Unit', '(Pair 0 0)', False),
+    ('assert_cmplt.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_cmple.tz', 'Unit', '(Pair 0 -1)', False),
+    ('assert_cmpgt.tz', 'Unit', '(Pair 0 0)', False),
+    ('assert_cmpgt.tz', 'Unit', '(Pair -1 0)', False),
+    ('assert_cmpge.tz', 'Unit', '(Pair -1 0)', False),
+]
+
+slices_data = [
+    ('(Pair 0xe009ab79e8b84ef0e55c43a9a857214d8761e67b75ba63500a5694fb2ffe174acc2de22d01ccb7259342437f05e1987949f0ad82e9f32e9a0b79cb252d7f7b8236ad728893f4e7150742eefdbeda254970f9fcd92c6228c178e1a923e5600758eb83f2a05edd0be7625657901f2ba81eaf145d003dbef78e33f43a32a3788bdf0501000000085341554349535345 "p2sigsceCzcDw2AeYDzUonj4JT341WC9Px4wdhHBxbZcG1FhfqFVuG7f2fGCzrEHSAZgrsrQWpxduDPk9qZRgrpzwJnSHC3gZJ")', False),
+    ('(Pair 0xeaa9ab79e8b84ef0e55c43a9a857214d8761e67b75ba63500a5694fb2ffe174acc2de22d01ccb7259342437f05e1987949f0ad82e9f32e9a0b79cb252d7f7b8236ad728893f4e7150742eefdbeda254970f9fcd92c6228c178e1a923e5600758eb83f2a05edd0be7625657901f2ba81eaf145d003dbef78e33f43a32a3788bdf0501000000085341554349535345 "spsig1PPUFZucuAQybs5wsqsNQ68QNgFaBnVKMFaoZZfi1BtNnuCAWnmL9wVy5HfHkR6AeodjVGxpBVVSYcJKyMURn6K1yknYLm")', False),
+    ('(Pair 0xe009ab79e8b84ef0e55c43a9a857214d8761e67b75ba63500a5694fb2ffe174acc2deaad01ccb7259342437f05e1987949f0ad82e9f32e9a0b79cb252d7f7b8236ad728893f4e7150742eefdbeda254970f9fcd92c6228c178e1a923e5600758eb83f2a05edd0be7625657901f2ba81eaf145d003dbef78e33f43a32a3788bdf0501000000085341554349535345 "spsig1PPUFZucuAQybs5wsqsNQ68QNgFaBnVKMFaoZZfi1BtNnuCAWnmL9wVy5HfHkR6AeodjVGxpBVVSYcJKyMURn6K1yknYLm")', False),
+    ('(Pair 0xe009ab79e8b84ef0e55c43a9a857214d8761e67b75ba63500a5694fb2ffe174acc2de22d01ccb7259342437f05e1987949f0ad82e9f32e9a0b79cb252d7f7b8236ad728893f4e7150733eefdbeda254970f9fcd92c6228c178e1a923e5600758eb83f2a05edd0be7625657901f2ba81eaf145d003dbef78e33f43a32a3788bdf0501000000085341554349535345 "spsig1PPUFZucuAQybs5wsqsNQ68QNgFaBnVKMFaoZZfi1BtNnuCAWnmL9wVy5HfHkR6AeodjVGxpBVVSYcJKyMURn6K1yknYLm")', False),
+    ('(Pair 0xe009ab79e8b84ef0 "spsig1PPUFZucuAQybs5wsqsNQ68QNgFaBnVKMFaoZZfi1BtNnuCAWnmL9wVy5HfHkR6AeodjVGxpBVVSYcJKyMURn6K1yknYLm")', False),
+    ('(Pair 0xe009ab79e8b84ef0e55c43a9a857214d8761e67b75ba63500a5694fb2ffe174acc2de22d01ccb7259342437f05e1987949f0ad82e9f32e9a0b79cb252d7f7b8236ad728893f4e7150742eefdbeda254970f9fcd92c6228c178e1a923e5600758eb83f2a05edd0be7625657901f2ba81eaf145d003dbef78e33f43a32a3788bdf0501000000085341554349535345 "spsig1PPUFZucuAQybs5wsqsNQ68QNgFaBnVKMFaoZZfi1BtNnuCAWnmL9wVy5HfHkR6AeodjVGxpBVVSYcJKyMURn6K1yknYLm")', True)
+]
+slices_storage = '"sppk7dBPqMPjDjXgKbb5f7V3PuKUrA4Zuwc3c3H7XqQerqPUWbK7Hna"'
 
 
 def wrap(data):
@@ -792,16 +927,27 @@ def make_opcode_tests():
         with open(join(cases_dir, f'test_{case}.py'), 'w+') as f:
             f.write(body)
 
-    for i, (storage, parameter, expected, events) in enumerate(big_map_magic_data):
-        filename = 'big_map_magic.tz'
+    for i, (filename, storage, parameter, expected) in enumerate(success_data):
         case = filename.replace(".tz", f'_{i}')
-        body = big_map_diff_test_case.format(
+        body = success_test_case.format(
             case=case,
             filename=join('opcodes', 'contracts', filename),
             parameter=wrap(parameter),
             storage=wrap(storage),
-            expected=wrap(expected),
-            big_map_diff=get_big_map_diff(events)
+            expected=expected,
+        )
+        with open(join(cases_dir, f'test_{case}.py'), 'w+') as f:
+            f.write(body)
+
+    for i, (parameter, expected) in enumerate(slices_data):
+        filename = 'slices.tz'
+        case = filename.replace(".tz", f'_{i}')
+        body = success_test_case.format(
+            case=case,
+            filename=join('opcodes', 'contracts', filename),
+            parameter=wrap(parameter),
+            storage=wrap(slices_storage),
+            expected=expected,
         )
         with open(join(cases_dir, f'test_{case}.py'), 'w+') as f:
             f.write(body)

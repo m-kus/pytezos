@@ -8,7 +8,7 @@ from pytezos.repl.context import Context
 from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr, assert_expr_equal
 from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type
 
-helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF']
+helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF', 'COMMIT']
 patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
 
@@ -122,6 +122,15 @@ def do_include(ctx: Context, prim, args, annots):
 
 @instruction('BIG_MAP_DIFF')
 def do_big_map_diff(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
+    top = ctx.peek()
     _, big_map_diff = ctx.big_maps.diff(top)
+    return big_map_diff
+
+
+@instruction('COMMIT')
+def do_commit(ctx: Context, prim, args, annots):
+    top = ctx.pop1()
+    res, big_map_diff = ctx.big_maps.diff(top)
+    ctx.big_maps.commit(big_map_diff)
+    ctx.push(res, annots=annots)
     return big_map_diff

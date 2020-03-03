@@ -100,6 +100,7 @@ def do_lsl(ctx: Context, prim, args, annots):
     a, b = ctx.pop2()
     assert_stack_type(a, Nat)
     assert_stack_type(b, Nat)
+    assert int(b) < 257, f'shift overflow {int(b)}, should not exceed 256'
     handlers = {
         'LSL': lambda x: x[0] << x[1],
         'LSR': lambda x: x[0] >> x[1]

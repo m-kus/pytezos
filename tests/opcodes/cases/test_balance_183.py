@@ -20,6 +20,6 @@ class OpcodeTestbalance_183(TestCase):
         res = self.i.execute('RUN Unit 111')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('0')
+        expected_expr = michelson_to_micheline('257000000')
         expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
         self.assertEqual(expected_val, res['result'][1]._val)

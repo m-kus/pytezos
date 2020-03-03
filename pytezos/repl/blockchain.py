@@ -7,6 +7,7 @@ from pytezos.repl.types import assert_stack_type, Mutez, ChainID, Address, Contr
     KeyHash, Timestamp, expr_equal, Operation
 from pytezos.repl.parser import get_entry_expr
 
+INITIAL_BALANCE = 257000000
 MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'
 UNIT_TYPE_EXPR = {'prim': 'unit'}
 
@@ -43,7 +44,10 @@ def do_amount(ctx: Context, prim, args, annots):
 
 @instruction('BALANCE')
 def do_balance(ctx: Context, prim, args, annots):
-    res = ctx.get('BALANCE', Mutez(0))
+    res = ctx.get('BALANCE')
+    if res is None:
+        res = Mutez(INITIAL_BALANCE)
+        ctx.set('BALANCE', res)
     ctx.push(res, annots=annots)
 
 

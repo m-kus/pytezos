@@ -122,6 +122,7 @@ class Context:
 
     def drop_all(self):
         self.stack.clear()
+        self.protected = 0
         self._print(f' drop all;')
 
     def dump(self, count: int):

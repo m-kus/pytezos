@@ -431,7 +431,11 @@ class Timestamp(Int, prim='timestamp'):
 
 
 class Mutez(Nat, prim='mutez'):
-    pass
+
+    def __init__(self, val=0, val_expr=None, type_expr=None, **kwargs):
+        assert_type(val, int)
+        assert val.bit_length() <= 63, f'mutez overflow, got {val.bit_length()} bits, should not exceed 63'
+        super(Mutez, self).__init__(val=val, val_expr=val_expr, type_expr=type_expr)
 
 
 class Address(String, prim='address'):

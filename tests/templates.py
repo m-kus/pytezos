@@ -175,3 +175,26 @@ class OpcodeTest{case}(TestCase):
         big_map_diff = {big_map_diff}
         self.assertCountEqual(big_map_diff, res['result'][2])
 """
+
+success_test_case = """from unittest import TestCase
+
+from tests import abspath
+
+from pytezos.repl.interpreter import Interpreter
+from pytezos.michelson.converter import michelson_to_micheline
+from pytezos.repl.parser import parse_expression
+
+
+class OpcodeTest{case}(TestCase):
+
+    def setUp(self):
+        self.maxDiff = None
+        self.i = Interpreter(debug=False)  # disable exceptions
+
+    def test_opcode_{case}(self):
+        res = self.i.execute(f'INCLUDE "{{abspath("{filename}")}}"')
+        self.assertTrue(res['success'])
+
+        res = self.i.execute('RUN {parameter} {storage}')
+        self.assertEqual({expected}, res['success'])
+"""

@@ -2,19 +2,18 @@ from unittest import TestCase
 
 from tests import abspath
 
-#from pytezos import pytezos, Contract
 from pytezos.repl.interpreter import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
 from pytezos.repl.parser import parse_expression
 
 
-class OpcodeTestbig_map_magic_1(TestCase):
+class OpcodeTestbig_map_magic_10(TestCase):
 
     def setUp(self):
         self.maxDiff = None
         self.i = Interpreter(debug=True)
 
-    def test_opcode_big_map_magic_1(self):
+    def test_opcode_big_map_magic_10(self):
         res = self.i.execute(f'INCLUDE "{abspath("opcodes/contracts/big_map_magic.tz")}"')
         self.assertTrue(res['success'])
 

@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from tests import abspath
 
-#from pytezos import pytezos, Contract
 from pytezos.repl.interpreter import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
 from pytezos.repl.parser import parse_expression
