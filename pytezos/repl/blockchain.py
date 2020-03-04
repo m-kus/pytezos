@@ -39,16 +39,21 @@ def do_parameter(ctx: Context, prim, args, annots):
 @instruction('AMOUNT')
 def do_amount(ctx: Context, prim, args, annots):
     res = ctx.get('AMOUNT', Mutez(0))
-    ctx.push(res, annots=annots)
+    ctx.push(res, annots=['@amount'])
 
 
-@instruction('BALANCE')
-def do_balance(ctx: Context, prim, args, annots):
+def get_balance(ctx: Context):
     res = ctx.get('BALANCE')
     if res is None:
         res = Mutez(INITIAL_BALANCE)
         ctx.set('BALANCE', res)
-    ctx.push(res, annots=annots)
+    return res
+
+
+@instruction('BALANCE')
+def do_balance(ctx: Context, prim, args, annots):
+    res = get_balance(ctx)
+    ctx.push(res, annots=['@balance'])
 
 
 @instruction('CHAIN_ID')
@@ -67,21 +72,21 @@ def do_self(ctx: Context, prim, args, annots):
 
     p_type_expr = get_entry_expr(p_type_expr, entry_annot)
     res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
-    ctx.push(res, annots=[a for a in annots if a[0] != '%'])
+    ctx.push(res, annots=['@self'])
 
 
 @instruction('SENDER')
 def do_sender(ctx: Context, prim, args, annots):
     res = ctx.get('SENDER')
     assert res, f'SENDER is not initialized'
-    ctx.push(res, annots=annots)
+    ctx.push(res, annots=['@sender'])
 
 
 @instruction('SOURCE')
 def do_source(ctx: Context, prim, args, annots):
     res = ctx.get('SOURCE')
     assert res, f'SOURCE is not initialized'
-    ctx.push(res, annots=annots)
+    ctx.push(res, annots=['@source'])
 
 
 @instruction('NOW')
@@ -94,7 +99,7 @@ def do_now(ctx: Context, prim, args, annots):
         else:
             now = int(datetime.utcnow().timestamp())
         res = Timestamp(now)
-    ctx.push(res, annots=annots)
+    ctx.push(res, annots=['@now'])
 
 
 def check_contract(ctx: Context, address, entry_annot, type_expr):
@@ -123,6 +128,8 @@ def do_address(ctx: Context, prim, args, annots):
     top = ctx.pop1()
     assert_stack_type(top, Contract)
     res = Address.new(top.get_address())
+    if top.name:
+        annots.append(f'@{top.name}.address')
     ctx.push(res, annots=annots)
 
 
@@ -139,6 +146,8 @@ def do_contract(ctx: Context, prim, args, annots):
     else:
         res = Option.none(contract.type_expr)
 
+    if top.name:
+        annots.append(f'@{top.name}.contract')
     ctx.push(res, annots=[a for a in annots if a[0] != '%'])
 
 
@@ -151,7 +160,7 @@ def do_implicit_account(ctx: Context, prim, args, annots):
 
 
 def decrease_balance(ctx: Context, amount: Mutez):
-    balance = ctx.get('BALANCE', Mutez(0))
+    balance = get_balance(ctx)
     assert int(amount) <= int(balance), f'needed {int(amount)} utz, got only {int(balance)} utz'
     ctx.set('BALANCE', Mutez(int(balance) - int(amount)))
 

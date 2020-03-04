@@ -29,6 +29,14 @@ def assert_equal_types(a, b):
     assert type(a) == type(b), f'different types {type(a).__name__} and {type(b).__name__}'
 
 
+def get_name(annots: list, prefix, default=None):
+    if isinstance(annots, list):
+        res = next((x[1:] for x in annots if x.startswith(prefix)), None)
+        if res is not None:
+            return res
+    return default
+
+
 class StackItem:
     prim = ''
     __cls__ = {}
@@ -37,7 +45,7 @@ class StackItem:
         self._val = val
         self.val_expr = val_expr
         self.type_expr = type_expr
-        self.val_annot = kwargs.get('val_annot')
+        self.name = kwargs.get('name')
 
     @staticmethod
     def _get_type(type_expr):
@@ -48,12 +56,15 @@ class StackItem:
         return item_cls
 
     @classmethod
-    def init(cls, val_expr, type_expr):
-        return cls(val=parse_expression(val_expr, type_expr), val_expr=val_expr, type_expr=type_expr)
+    def init(cls, val_expr, type_expr, **kwargs):
+        return cls(val=parse_expression(val_expr, type_expr),
+                   val_expr=val_expr,
+                   type_expr=type_expr,
+                   **kwargs)
 
     @staticmethod
-    def parse(val_expr, type_expr):
-        return StackItem._get_type(type_expr).init(val_expr, type_expr)
+    def parse(val_expr, type_expr, **kwargs):
+        return StackItem._get_type(type_expr).init(val_expr, type_expr, **kwargs)
 
     @classmethod
     def __init_subclass__(cls, prim='', args_len=0, **kwargs):
@@ -96,13 +107,13 @@ class StackItem:
         return len(self._val)
 
     def __repr__(self):
-        return pformat(self._val, compact=True)
+        return pformat(self._val, compact=True, width=60)
 
     def _modify(self, cache_val=False, **kwargs):
         param = dict(
             val_expr=kwargs.get('val_expr', deepcopy(self.val_expr)),
             type_expr=kwargs.get('type_expr', deepcopy(self.type_expr)),
-            val_annot=kwargs.get('val_annot', self.val_annot)
+            name=kwargs.get('name', self.name)
         )
         if 'val' in kwargs or cache_val:
             param['val'] = kwargs.get('val', deepcopy(self._val))
@@ -114,8 +125,7 @@ class StackItem:
         return self._modify(cache_val=True)
 
     def rename(self, annots: list):
-        return self._modify(cache_val=True,
-                            val_annot=next(filter(lambda x: x.startswith('@'), annots or []), None))
+        return self._modify(cache_val=True, name=get_name(annots, '@'))
 
 
 class String(StackItem, prim='string'):
@@ -226,8 +236,15 @@ class Pair(StackItem, prim='pair', args_len=2):
                         type_expr={'prim': cls.prim, 'args': [left.type_expr, right.type_expr]})
 
     def get_element(self, idx: int):
+        assert idx in [0, 1], f'unexpected element index {idx}'
+        type_expr = self.type_expr['args'][idx]
+        inferred_name = get_name(type_expr.get('annots'), '%', default=['car', 'cdr'][idx])
+        if self.name:
+            inferred_name = f'{self.name}.{inferred_name}'
+
         return self.parse(val_expr=self.val_expr['args'][idx],
-                          type_expr=self.type_expr['args'][idx])
+                          type_expr=type_expr,
+                          name=inferred_name)
 
 
 class Option(StackItem, prim='option', args_len=1):
@@ -535,10 +552,23 @@ class Operation(StackItem, prim='operation'):
 
     @staticmethod
     def format_content(content):
-        return str(content)
+        if content['kind'] == 'transaction':
+            if content['destination'].startswith('tz'):
+                return f'<send {content["amount"]} to {content["destination"]}>'
+            else:
+                return f'<call {content["destination"]}%{content["parameters"]["entrypoint"]}>'
+        elif content['kind'] == 'origination':
+            return f'<originate contract>'
+        elif content['kind'] == 'delegation':
+            if content.get('delegate'):
+                return f'<delegate to {content["delegate"]}>'
+            else:
+                return f'<unset delegate>'
+        else:
+            assert False, f'unexpected content {pformat(content, compact=True)}'
 
     @classmethod
     def new(cls, content):
         return cls(val=cls.format_content(content),
-                   val_expr={'string': cls.format_content(content), '_content': content},
+                   val_expr={'string': str(content), '_content': content},
                    type_expr={'prim': cls.prim, 'annots': [f':{content["kind"]}']})

@@ -6,9 +6,10 @@ from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.repl.control import instruction, do_interpret
 from pytezos.repl.context import Context
 from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr, assert_expr_equal
-from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type
+from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List
 
-helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF', 'COMMIT']
+helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH',
+                'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF', 'BEGIN', 'COMMIT']
 patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
 
@@ -42,8 +43,8 @@ def do_expand(ctx: Context, prim, args, annots):
     return micheline_to_michelson(args[0])
 
 
-@instruction('RUN', args_len=2)
-def do_run(ctx: Context, prim, args, annots):
+@instruction('BEGIN', args_len=2)
+def do_begin(ctx: Context, prim, args, annots):
     p_type_expr = ctx.get('parameter')
     assert p_type_expr, f'parameter type is not initialized'
 
@@ -61,24 +62,40 @@ def do_run(ctx: Context, prim, args, annots):
     run_input = Pair.new(parameter, storage)
     ctx.push(run_input, annots=annots)
 
+
+@instruction('COMMIT')
+def do_commit(ctx: Context, prim, args, annots):
+    debug, ctx.debug = ctx.debug, False
+
+    output = ctx.pop1()
+    assert_stack_type(output, Pair)
+
+    operations = output.get_element(0)
+    assert_stack_type(operations, List)
+
+    s_type_expr = ctx.get('storage')
+    assert s_type_expr, f'storage type is not initialized'
+    storage = output.get_element(1)
+    assert_expr_equal(s_type_expr, storage.type_expr)
+
+    storage, big_map_diff = ctx.big_maps.diff(storage)
+    ctx.big_maps.commit(big_map_diff)
+
+    res = Pair.new(operations, storage)
+    ctx.push(res)
+    ctx.debug = debug
+    return operations, storage, big_map_diff
+
+
+@instruction('RUN', args_len=2)
+def do_run(ctx: Context, prim, args, annots):
+    do_begin(ctx, prim, args, annots)
+
     code = ctx.get('code')
-    if code:
-        do_interpret(ctx, code)
-        output = ctx.pop1()
-        assert_stack_type(output, Pair)
+    assert code, f'code is not initialized'
 
-        operations = output.get_element(0)
-        storage = output.get_element(1)
-        assert_expr_equal(s_type_expr, storage.type_expr)
-
-        storage, big_map_diff = ctx.big_maps.diff(storage)
-        ctx.big_maps.commit(big_map_diff)
-
-        res = Pair.new(operations, storage)
-        ctx.push(res)
-        return operations, storage, big_map_diff
-    else:
-        return ctx.peek()
+    do_interpret(ctx, code)
+    return do_commit(ctx, prim, args=[], annots=[])
 
 
 @instruction('PATCH', args_len=2)
@@ -124,13 +141,4 @@ def do_include(ctx: Context, prim, args, annots):
 def do_big_map_diff(ctx: Context, prim, args, annots):
     top = ctx.peek()
     _, big_map_diff = ctx.big_maps.diff(top)
-    return big_map_diff
-
-
-@instruction('COMMIT')
-def do_commit(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    res, big_map_diff = ctx.big_maps.diff(top)
-    ctx.big_maps.commit(big_map_diff)
-    ctx.push(res, annots=annots)
     return big_map_diff

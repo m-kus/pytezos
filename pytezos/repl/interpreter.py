@@ -12,11 +12,11 @@ from pytezos.repl.blockchain import *
 
 def format_stack_item(item: StackItem):
     row = {
-        'value_expression': micheline_to_michelson(item.val_expr),
-        'type_expression': micheline_to_michelson(item.type_expr)
+        'value': micheline_to_michelson(item.val_expr),
+        'type': micheline_to_michelson(item.type_expr)
     }
-    if item.val_annot is not None:
-        row['value_annotation'] = item.val_annot
+    if item.name is not None:
+        row['name'] = item.name
     return row
 
 

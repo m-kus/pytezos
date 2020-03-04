@@ -99,6 +99,26 @@ https://medium.com/tezoscommons/preparing-for-the-tezos-hackathon-with-baking-ba
 * Introducing integration testing engine  
 https://medium.com/tezoscommons/testing-michelson-contracts-with-pytezos-513718499e93
 
+### Additional materials
+
+* Interacting with FA1.2 contract by TQTezos
+https://assets.tqtezos.com/token-contracts/1-fa12-lorentz#interactusingpytezos
+* Deploying a contract by Vadim Manaenko
+https://blog.aira.life/tezos-dont-forget-the-mother-console-fd2001261e50
+
+### Michelson test samples
+
+* In this repo
+https://github.com/baking-bad/pytezos/tree/master/examples
+* Atomex (atomic swaps aka cross-chain transactions)
+https://github.com/atomex-me/atomex-michelson/blob/master/tests/test_atomex.py
+* Atomex for FA1.2 (includes cross-contract interaction and views)
+https://github.com/atomex-me/atomex-fa12-ligo/tree/master/tests
+* MultiAsset implementation tests (in a sandbox environment)
+https://github.com/tqtezos/smart-contracts/tree/master/multi_asset/tezos_mac_tests
+
+### Contact
+If you have any questions, please write to our telegram chat: https://t.me/baking_bad_chat
 
 ### About
 The project was initially started by Arthur Breitman, now it's maintained by Baking Bad team.

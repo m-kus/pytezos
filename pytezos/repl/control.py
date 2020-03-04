@@ -261,13 +261,14 @@ def do_map(ctx: Context, prim, args, annots):
 def do_map(ctx: Context, prim, args, annots):
     assert_no_annots(prim, annots)
     container = ctx.pop1()
+    inferred_annots = [f'@{container.name}.elt'] if container.name else None
     if type(container) in [List, Set]:
         for item in container:
-            ctx.push(item)
+            ctx.push(item, annots=inferred_annots)
             do_interpret(ctx, args[0])
     elif type(container) == Map:
         for key, val in container:
-            ctx.push(Pair.new(key, val))
+            ctx.push(Pair.new(key, val), annots=inferred_annots)
             do_interpret(ctx, args[0])
     else:
         assert False, f'unexpected type {type(container)}'
