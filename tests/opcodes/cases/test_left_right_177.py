@@ -20,6 +20,6 @@ class OpcodeTestleft_right_177(TestCase):
         res = self.i.execute('RUN (Left True) (Left "X")')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('(Right True)')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('(Right True)')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)

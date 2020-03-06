@@ -1,5 +1,6 @@
 from pprint import pformat
 from copy import deepcopy
+import yaml
 
 from pytezos.michelson.pack import get_key_hash
 from pytezos.michelson.converter import micheline_to_michelson
@@ -16,7 +17,7 @@ def assert_stack_type(item: 'StackItem', item_type):
     if not isinstance(item_type, list):
         item_type = [item_type]
     expected = ' or '.join(map(lambda x: x.__name__, item_type))
-    assert type(item) in item_type, f'expected {expected}, got {type(item).__name__}: {item}'
+    assert type(item) in item_type, f'expected {expected}, got {type(item).__name__}'
 
 
 def dispatch_type_map(a, b, mapping):
@@ -31,9 +32,7 @@ def assert_equal_types(a, b):
 
 def get_name(annots: list, prefix, default=None):
     if isinstance(annots, list):
-        res = next((x[1:] for x in annots if x.startswith(prefix)), None)
-        if res is not None:
-            return res
+        return next((x[1:] for x in annots if x.startswith(prefix)), default)
     return default
 
 
@@ -107,7 +106,7 @@ class StackItem:
         return len(self._val)
 
     def __repr__(self):
-        return pformat(self._val, compact=True, width=60)
+        return str(self._val)
 
     def _modify(self, cache_val=False, **kwargs):
         param = dict(
@@ -125,7 +124,7 @@ class StackItem:
         return self._modify(cache_val=True)
 
     def rename(self, annots: list):
-        return self._modify(cache_val=True, name=get_name(annots, '@'))
+        return self._modify(cache_val=True, name=get_name(annots, prefix='@'))
 
 
 class String(StackItem, prim='string'):
@@ -134,7 +133,8 @@ class String(StackItem, prim='string'):
         assert isinstance(val, str)
         super(String, self).__init__(val=val if val_expr is None else parse_expression(val_expr, type_expr),
                                      val_expr=val_expr or {'string': val},
-                                     type_expr=type_expr or {'prim': self.prim})
+                                     type_expr=type_expr or {'prim': self.prim},
+                                     **kwargs)
 
     def __getitem__(self, item):
         assert_type(item, slice)
@@ -148,7 +148,8 @@ class Int(StackItem, prim='int'):
         assert isinstance(val, int)
         super(Int, self).__init__(val=val if val_expr is None else parse_expression(val_expr, type_expr),
                                   val_expr=val_expr or {'int': str(val)},
-                                  type_expr=type_expr or {'prim': self.prim})
+                                  type_expr=type_expr or {'prim': self.prim},
+                                  **kwargs)
 
 
 class Bytes(StackItem, prim='bytes'):
@@ -157,7 +158,8 @@ class Bytes(StackItem, prim='bytes'):
         assert_type(val, bytes)
         super(Bytes, self).__init__(val=val if val_expr is None else parse_expression(val_expr, type_expr),
                                     val_expr=val_expr or {'bytes': val.hex()},
-                                    type_expr=type_expr or {'prim': self.prim})
+                                    type_expr=type_expr or {'prim': self.prim},
+                                    **kwargs)
 
     def __getitem__(self, item):
         assert_type(item, slice)
@@ -172,7 +174,7 @@ class Nat(Int, prim='nat'):
     def __init__(self, val=0, val_expr=None, type_expr=None, **kwargs):
         assert_type(val, int)
         assert val >= 0, 'expected non-negative val'
-        super(Nat, self).__init__(val=val, val_expr=val_expr, type_expr=type_expr)
+        super(Nat, self).__init__(val=val, val_expr=val_expr, type_expr=type_expr, **kwargs)
 
 
 class Bool(StackItem, prim='bool'):
@@ -181,7 +183,8 @@ class Bool(StackItem, prim='bool'):
         assert_type(val, bool)
         super(Bool, self).__init__(val=val if val_expr is None else parse_expression(val_expr, type_expr),
                                    val_expr=val_expr or {'prim': str(val)},
-                                   type_expr=type_expr or {'prim': self.prim})
+                                   type_expr=type_expr or {'prim': self.prim},
+                                   **kwargs)
 
 
 class Unit(StackItem, prim='unit'):
@@ -189,7 +192,8 @@ class Unit(StackItem, prim='unit'):
     def __init__(self, val=UnitNone(), val_expr=None, type_expr=None, **kwargs):
         super(Unit, self).__init__(val=val if val_expr is None else parse_expression(val_expr, type_expr),
                                    val_expr=val_expr or {'prim': 'Unit'},
-                                   type_expr=type_expr or {'prim': self.prim})
+                                   type_expr=type_expr or {'prim': self.prim},
+                                   **kwargs)
 
 
 class List(StackItem, prim='list', args_len=1):
@@ -452,7 +456,7 @@ class Mutez(Nat, prim='mutez'):
     def __init__(self, val=0, val_expr=None, type_expr=None, **kwargs):
         assert_type(val, int)
         assert val.bit_length() <= 63, f'mutez overflow, got {val.bit_length()} bits, should not exceed 63'
-        super(Mutez, self).__init__(val=val, val_expr=val_expr, type_expr=type_expr)
+        super(Mutez, self).__init__(val=val, val_expr=val_expr, type_expr=type_expr, **kwargs)
 
 
 class Address(String, prim='address'):
@@ -510,7 +514,7 @@ class ChainID(String, prim='chain_id'):
 
     def __init__(self, val, val_expr=None, type_expr=None, **kwargs):
         assert is_chain_id(val), f'expected chain_id, got {val}'
-        super(ChainID, self).__init__(val, val_expr=val_expr, type_expr=type_expr)
+        super(ChainID, self).__init__(val, val_expr=val_expr, type_expr=type_expr, **kwargs)
 
 
 class Lambda(StackItem, prim='lambda', args_len=2):
@@ -558,7 +562,7 @@ class Operation(StackItem, prim='operation'):
             else:
                 return f'<call {content["destination"]}%{content["parameters"]["entrypoint"]}>'
         elif content['kind'] == 'origination':
-            return f'<originate contract>'
+            return f'<originate {content["originated_contract"]}>'
         elif content['kind'] == 'delegation':
             if content.get('delegate'):
                 return f'<delegate to {content["delegate"]}>'
@@ -570,5 +574,5 @@ class Operation(StackItem, prim='operation'):
     @classmethod
     def new(cls, content):
         return cls(val=cls.format_content(content),
-                   val_expr={'string': str(content), '_content': content},
-                   type_expr={'prim': cls.prim, 'annots': [f':{content["kind"]}']})
+                   val_expr={'string': cls.format_content(content), '_content': content},
+                   type_expr={'prim': cls.prim})

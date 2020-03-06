@@ -20,6 +20,6 @@ class OpcodeTestget_map_value_170(TestCase):
         res = self.i.execute('RUN "hello" (Pair None { Elt "hello" "hi" })')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('(Pair (Some "hi") { Elt "hello" "hi" })')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('(Pair (Some "hi") { Elt "hello" "hi" })')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)

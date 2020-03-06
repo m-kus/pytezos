@@ -20,6 +20,6 @@ class OpcodeTestlist_id_map_92(TestCase):
         res = self.i.execute('RUN { "1" ; "2" ; "3" } {""}')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('{ "1" ; "2" ; "3" }')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('{ "1" ; "2" ; "3" }')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)

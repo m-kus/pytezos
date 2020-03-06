@@ -1,3 +1,4 @@
+import yaml
 from copy import deepcopy
 from pprint import pformat
 
@@ -10,14 +11,72 @@ from pytezos.repl.structures import *
 from pytezos.repl.blockchain import *
 
 
+def get_content(item: Operation):
+    content = item.val_expr.get('_content')
+    if content:
+        return format_content(content)
+    return {}
+
+
 def format_stack_item(item: StackItem):
-    row = {
-        'value': micheline_to_michelson(item.val_expr),
-        'type': micheline_to_michelson(item.type_expr)
-    }
+    row = {}
+    if isinstance(item, Operation):
+        row['value'] = yaml.dump(get_content(item)).rstrip('\n')
+    elif isinstance(item, List) and item.val_type() == Operation:
+        row['value'] = yaml.dump([get_content(x) for x in item.val_expr]).rstrip('\n')
+    else:
+        row['value'] = micheline_to_michelson(item.val_expr)
+
+    row['type'] = micheline_to_michelson(item.type_expr)
     if item.name is not None:
-        row['name'] = item.name
+        row['name'] = f'@{item.name}'
+
     return row
+
+
+def format_diff(diff: dict):
+    if diff['action'] == 'alloc':
+        return {'big_map': diff['big_map'],
+                'action': diff['action'],
+                'key': micheline_to_michelson(diff['key_type']),
+                'value': micheline_to_michelson(diff['value_type'])}
+    elif diff['action'] == 'update':
+        return {'big_map': diff['big_map'],
+                'action': diff['action'],
+                'key': micheline_to_michelson(diff['key']),
+                'value': micheline_to_michelson(diff['value']) if diff.get('value') else 'null'}
+    elif diff['action'] == 'copy':
+        return {'destination_big_map': diff['big_map'],
+                'action': diff['action'],
+                'value': diff['source_big_map']}
+    elif diff['action'] == 'remove':
+        return {'big_map': diff['big_map'],
+                'action': diff['action']}
+    else:
+        assert False, diff['action']
+
+
+def format_content(content):
+    if content['kind'] == 'transaction':
+        return {'kind': content['kind'],
+                'target': content['destination'],
+                'amount': content['amount'],
+                'entrypoint': content['parameters']['entrypoint'],
+                'parameters': micheline_to_michelson(content['parameters']['value'])}
+    elif content['kind'] == 'origination':
+        res = {'kind': content['kind'],
+               'target': content['originated_contract'],
+               'amount': content['balance'],
+               'storage': micheline_to_michelson(content['script']['storage']),
+               'code': micheline_to_michelson(content['script']['code'])}
+        if content.get('delegate'):
+            res['delegate'] = content['delegate']
+        return res
+    elif content['kind'] == 'delegation':
+        return {'kind': content['kind'],
+                'target': content['delegate']}
+    else:
+        assert False, content['kind']
 
 
 def format_stdout(items):
@@ -28,12 +87,22 @@ def format_stdout(items):
 def format_result(result):
     if result is None:
         return None
-    elif isinstance(result, StackItem):
-        return [format_stack_item(result)]
-    elif isinstance(result, list):
-        if len(result) > 0 and isinstance(result[0], StackItem):
-            return list(map(format_stack_item, result))
-    return result
+    kind = result['kind']
+    if kind == 'message':
+        return result
+    elif kind == 'big_map_diff':
+        return {'value': list(map(format_diff, result['big_map_diff'])), **result}
+    elif kind == 'code':
+        return {'value': micheline_to_michelson(result['code']), **result}
+    elif kind == 'stack':
+        return {'value': list(map(format_stack_item, result['stack'])), **result}
+    elif kind == 'output':
+        operations = [format_content(x.get('_content')) for x in result['operations'].val_expr]
+        storage = [format_stack_item(result['storage'])]
+        big_map_diff = list(map(format_diff, result['big_map_diff']))
+        return {'value': (operations, storage, big_map_diff), **result}
+    else:
+        assert False, kind
 
 
 def format_stderr(error):
@@ -72,7 +141,7 @@ class Interpreter:
         try:
             res = do_interpret(self.ctx, code_expr)
             if res is None and self.ctx.pushed:
-                res = self.ctx.dump(count=1)
+                res = {'kind': 'stack', 'stack': self.ctx.dump(count=1)}
 
             int_res['result'] = format_result(res)
             int_res['stdout'] = format_stdout(self.ctx.stdout)
@@ -92,6 +161,6 @@ class Interpreter:
             if int_res.get('stdout'):
                 print(int_res['stdout'])
             if int_res.get('result'):
-                print('RETURN: ' + pformat(int_res['result']))
+                print('RESULT: ' + pformat(int_res['result']))
 
         return int_res

@@ -66,7 +66,7 @@ def get_prim_args(val_expr, prim, args_len: int):
 
 def dispatch_prim_map(val_expr, mapping: dict):
     p, args = parse_prim_expr(val_expr)
-    expected = ' or '.join(map(lambda x: f'{x[0]} ({x[1]} args)', mapping))
+    expected = ' or '.join(map(lambda x: f'{x[0]} ({x[1]} args)', mapping.items()))
     assert (p, len(args)) in mapping, f'expected {expected}, got {p} ({len(args)} args)'
     res = mapping[(p, len(args))]
     if callable(res):
@@ -107,7 +107,7 @@ def get_int(val_expr):
 
 
 def get_bool(val_expr):
-    return dispatch_prim_map(val_expr, {'True': True, 'False': False})
+    return dispatch_prim_map(val_expr, {('True', 0): True, ('False', 0): False})
 
 
 def get_bytes(val_expr):
@@ -373,8 +373,7 @@ def parse_contract(val_expr, type_expr, selector):
 
 @primitive('operation')
 def parse_operation(val_expr, type_expr, selector):
-    val = get_string(val_expr)
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, get_string(val_expr))
 
 
 @primitive('key')

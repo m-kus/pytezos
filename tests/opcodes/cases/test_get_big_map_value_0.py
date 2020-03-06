@@ -20,9 +20,9 @@ class OpcodeTestget_big_map_value_0(TestCase):
         res = self.i.execute('RUN "hello" (Pair { Elt "hello" "hi" } None)')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('(Pair 0 (Some "hi"))')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('(Pair 0 (Some "hi"))')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)
         
         big_map_diff = [{'action': 'alloc', 'big_map': '0', 'key_type': {'prim': 'string'}, 'value_type': {'prim': 'string'}}, {'action': 'update', 'big_map': '0', 'key_hash': 'exprtsjEVVZk3Gm82U9wEs8kvwRiQwUT7zipJwvCeFMNsApe2tQ15s', 'key': {'string': 'hello'}, 'value': {'string': 'hi'}}]
-        self.assertCountEqual(big_map_diff, res['result'][2])
+        self.assertCountEqual(big_map_diff, res['result']['big_map_diff'])

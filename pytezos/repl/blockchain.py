@@ -161,8 +161,9 @@ def do_implicit_account(ctx: Context, prim, args, annots):
 
 def decrease_balance(ctx: Context, amount: Mutez):
     balance = get_balance(ctx)
-    assert int(amount) <= int(balance), f'needed {int(amount)} utz, got only {int(balance)} utz'
-    ctx.set('BALANCE', Mutez(int(balance) - int(amount)))
+    if int(balance) > 0:
+        assert int(amount) <= int(balance), f'needed {int(amount)} utz, got only {int(balance)} utz'
+        ctx.set('BALANCE', Mutez(int(balance) - int(amount)))
 
 
 @instruction('CREATE_CONTRACT', args_len=1)
@@ -177,6 +178,7 @@ def do_create_contract(ctx: Context, prim, args, annots):
     assert_stack_type(delegate, Option)
     assert_equal_types(storage_type, storage.type_expr)
 
+    originated_address = Address.new(ctx.dummy_gen.get_fresh_address())
     content = {
         'kind': 'origination',
         'source': ctx.dummy_gen.self,
@@ -184,13 +186,13 @@ def do_create_contract(ctx: Context, prim, args, annots):
         'script': {
             'storage': storage.val_expr,
             'code': code
-        }
+        },
+        'originated_contract': str(originated_address)
     }
 
     if not delegate.is_none():
         content['delegate'] = str(delegate.get_some())
 
-    originated_address = Address.new(ctx.dummy_gen.get_fresh_address())
     orig = Operation.new(content)
     ctx.push(originated_address)
     ctx.push(orig)

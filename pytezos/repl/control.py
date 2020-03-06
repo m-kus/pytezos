@@ -75,7 +75,7 @@ def do_drop(ctx: Context, prim, args, annots):
 
 @instruction('DROP')
 def do_drop_1(ctx: Context, prim, args, annots):
-    return do_drop(ctx, prim, [{'int': '1'}], annots)
+    do_drop(ctx, prim, [{'int': '1'}], annots)
 
 
 @instruction('DUP')
@@ -123,7 +123,7 @@ def do_dip(ctx: Context, prim, args, annots):
 
 @instruction('DIP', args_len=1)
 def do_dip_1(ctx: Context, prim, args, annots):
-    return do_dip(ctx, prim, [{'int': '1'}, args[0]], annots)
+    do_dip(ctx, prim, [{'int': '1'}, args[0]], annots)
 
 
 @instruction('LAMBDA', args_len=3)

@@ -20,9 +20,9 @@ class OpcodeTestbig_map_magic_10(TestCase):
         res = self.i.execute('RUN (Right (Left (Left (Pair { Elt "3" "three" } { Elt "4" "four" })))) (Left (Pair { Elt "1" "one" } { Elt "2" "two" }))')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('(Left (Pair 0 1))')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('(Left (Pair 0 1))')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)
         
         big_map_diff = [{'action': 'alloc', 'big_map': '1', 'key_type': {'prim': 'string'}, 'value_type': {'prim': 'string'}}, {'action': 'update', 'big_map': '1', 'key_hash': 'exprttiwE7dpYJ8Xjp28uMZzcC3Bwh4xAEF7GT7FutVwVoskMZYExx', 'key': {'string': '4'}, 'value': {'string': 'four'}}, {'action': 'alloc', 'big_map': '0', 'key_type': {'prim': 'string'}, 'value_type': {'prim': 'string'}}, {'action': 'update', 'big_map': '0', 'key_hash': 'exprtzN2y9qBiaf7A14AbS1SveJWXpMdJQztXFgiGzG5yu43tem2he', 'key': {'string': '3'}, 'value': {'string': 'three'}}]
-        self.assertCountEqual(big_map_diff, res['result'][2])
+        self.assertCountEqual(big_map_diff, res['result']['big_map_diff'])

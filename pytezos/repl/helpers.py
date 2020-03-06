@@ -2,11 +2,10 @@ from os.path import isfile
 
 from pytezos import Contract, pytezos
 from pytezos.encoding import is_kt
-from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.repl.control import instruction, do_interpret
 from pytezos.repl.context import Context
 from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr, assert_expr_equal
-from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List
+from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List, Operation
 
 helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH',
                 'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF', 'BEGIN', 'COMMIT']
@@ -15,17 +14,21 @@ patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
 @instruction('DUMP', args_len=1)
 def do_dump(ctx: Context, prim, args, annots):
-    return ctx.dump(count=get_int(args[0]))
+    res = ctx.dump(count=get_int(args[0]))
+    if res:
+        return {'kind': 'stack', 'stack': res}
+    else:
+        return {'kind': 'message', 'value': 'stack is empty'}
 
 
 @instruction('DUMP')
-def do_dump(ctx: Context, prim, args, annots):
-    return ctx.dump(count=len(ctx))
+def do_dump_all(ctx: Context, prim, args, annots):
+    return do_dump(ctx, prim, args=[{'int': str(len(ctx))}], annots=annots)
 
 
 @instruction('PRINT', args_len=1)
 def do_print(ctx: Context, prim, args, annots):
-    ctx.printf(template=f' {get_string(args[0])};')
+    ctx.printf(template=get_string(args[0]))
 
 
 @instruction('DEBUG', args_len=1)
@@ -40,7 +43,7 @@ def do_drop_all(ctx: Context, prim, args, annots):
 
 @instruction('EXPAND', args_len=1)
 def do_expand(ctx: Context, prim, args, annots):
-    return micheline_to_michelson(args[0])
+    return {'kind': 'code', 'code': args[0]}
 
 
 @instruction('BEGIN', args_len=2)
@@ -49,7 +52,7 @@ def do_begin(ctx: Context, prim, args, annots):
     assert p_type_expr, f'parameter type is not initialized'
 
     entrypoint = next((a for a in annots if a[0] == '%'), '%default')
-    ctx.printf(f' use {entrypoint};')
+    ctx.print(f' use {entrypoint};')
 
     p_type_expr = get_entry_expr(p_type_expr, entrypoint)
     parameter = ctx.big_maps.pre_alloc(args[0], p_type_expr, copy=True)
@@ -72,6 +75,7 @@ def do_commit(ctx: Context, prim, args, annots):
 
     operations = output.get_element(0)
     assert_stack_type(operations, List)
+    assert operations.val_type() == Operation, f'expected list of operations'
 
     s_type_expr = ctx.get('storage')
     assert s_type_expr, f'storage type is not initialized'
@@ -84,7 +88,10 @@ def do_commit(ctx: Context, prim, args, annots):
     res = Pair.new(operations, storage)
     ctx.push(res)
     ctx.debug = debug
-    return operations, storage, big_map_diff
+    return {'kind': 'output',
+            'operations': operations,
+            'storage': storage,
+            'big_map_diff': big_map_diff}
 
 
 @instruction('RUN', args_len=2)
@@ -141,4 +148,4 @@ def do_include(ctx: Context, prim, args, annots):
 def do_big_map_diff(ctx: Context, prim, args, annots):
     top = ctx.peek()
     _, big_map_diff = ctx.big_maps.diff(top)
-    return big_map_diff
+    return {'kind': 'big_map_diff', 'big_map_diff': big_map_diff}

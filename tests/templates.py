@@ -141,9 +141,9 @@ class OpcodeTest{case}(TestCase):
         res = self.i.execute('RUN {parameter} {storage}')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('{expected}')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('{expected}')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)
 """
 
 big_map_diff_test_case = """from unittest import TestCase
@@ -168,12 +168,12 @@ class OpcodeTest{case}(TestCase):
         res = self.i.execute('RUN {parameter} {storage}')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('{expected}')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('{expected}')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)
         
         big_map_diff = {big_map_diff}
-        self.assertCountEqual(big_map_diff, res['result'][2])
+        self.assertCountEqual(big_map_diff, res['result']['big_map_diff'])
 """
 
 success_test_case = """from unittest import TestCase

@@ -61,24 +61,24 @@ class Context:
         return ctx
 
     def reset(self):
-        self.stdout.clear()
+        self.stdout = []
         self.pushed = False
 
     def protect(self, count: int):
         assert len(self.stack) >= count, f'got {len(self.stack)} items, wanted to protect {count}'
         self.protected += count
-        self._print(f' protect {count} item(s);')
+        self.print(f' protect {count} item(s);')
 
     def restore(self, count: int):
         assert self.protected >= count, f'wanted to restore {count}, only {self.protected} protected'
-        self._print(f' restore {count} item(s);')
+        self.print(f' restore {count} item(s);')
         self.protected -= count
 
     def push(self, item: StackItem, annots=None):
         assert_stack_item(item)
         self.stack.insert(self.protected, item.rename(annots))
         self.pushed = True
-        self._print(f' push {repr(item)};')
+        self.print(f' push {repr(item)};')
 
     def peek(self):
         assert len(self.stack) > 0, 'stack is empty'
@@ -92,7 +92,7 @@ class Context:
             body = ', '.join(map(repr, res))  # TODO: restrict line length
         else:
             body = f'{count} items'
-        self._print(f' pop {body};')
+        self.print(f' pop {body};')
         return res
 
     def pop1(self):
@@ -114,25 +114,24 @@ class Context:
             val = micheline_to_michelson(value, inline=True)
         else:
             val = repr(value)
-        self._print(f' set {key}={val};')
+        self.print(f' set {key}={val};')
 
     def unset(self, key):
-        del self.meta[key]
-        self._print(f' unset {key};')
+        if key in self.meta:
+            del self.meta[key]
+            self.print(f' unset {key};')
 
     def drop_all(self):
         self.stack.clear()
         self.protected = 0
-        self._print(f' drop all;')
+        self.print(f' drop all;')
 
     def dump(self, count: int):
         if len(self.stack) > 0:
             count = min(count, len(self.stack))
             return self.stack[:count]
-        else:
-            return 'stack is empty'
 
-    def _print(self, message):
+    def print(self, message):
         if self.debug:
             self.stdout.append(message)
 
@@ -143,13 +142,14 @@ class Context:
             return repr(self.stack[i])
 
         message = re.sub(r'\{(\d+)\}', format_stack_item, template)
-        self.stdout.append(message)
+        indent = '  ' * (self.exec_depth - 1)
+        self.stdout.append(f'\n{indent}PRINT: {message};')
 
     def begin(self, prim=None):
         self.pushed = False
         if prim:
             indent = '  ' * self.exec_depth
-            self._print(f'\n{indent}{prim}:')
+            self.print(f'\n{indent}{prim}:')
         self.exec_depth += 1
 
     def end(self):

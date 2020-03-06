@@ -20,6 +20,6 @@ class OpcodeTestbig_map_mem_nat_117(TestCase):
         res = self.i.execute('RUN 2 (Pair { Elt 1 4 ; Elt 2 11 } None)')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('(Pair 0 (Some True))')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('(Pair 0 (Some True))')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)

@@ -20,6 +20,6 @@ class OpcodeTestmacro_compare_271(TestCase):
         res = self.i.execute('RUN (Pair 2370000 2370000) {}')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('{ True ; False ; False ; True ; True }')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('{ True ; False ; False ; True ; True }')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)

@@ -20,6 +20,6 @@ class OpcodeTestdig_eq_251(TestCase):
         res = self.i.execute('RUN (Pair 17 (Pair 16 (Pair 15 (Pair 14 (Pair 13 (Pair 12 (Pair 11 (Pair 10 (Pair 9 (Pair 8 (Pair 7 (Pair 6 (Pair 5 (Pair 4 (Pair 3 (Pair 2 1)))))))))))))))) Unit')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('Unit')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('Unit')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)

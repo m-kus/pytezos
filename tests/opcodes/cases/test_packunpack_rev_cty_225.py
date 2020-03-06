@@ -20,6 +20,6 @@ class OpcodeTestpackunpack_rev_cty_225(TestCase):
         res = self.i.execute('RUN (Pair "edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" (Pair Unit (Pair "edsigthTzJ8X7MPmNeEwybRAvdxS1pupqcM5Mk4uCuyZAe7uEk68YpuGDeViW8wSXMrCi5CwoNgqs8V2w8ayB5dMJzrYCHhD8C7" (Pair None (Pair {  }  (Pair {  }  (Pair (Pair 40 -10) (Pair (Right "2019-09-09T08:35:33Z") (Pair {  }  { DUP ; DROP ; PACK } ))))))))) Unit')
         self.assertTrue(res['success'])
         
-        expected_expr = michelson_to_micheline('Unit')
-        expected_val = parse_expression(expected_expr, res['result'][1].type_expr)
-        self.assertEqual(expected_val, res['result'][1]._val)
+        exp_val_expr = michelson_to_micheline('Unit')
+        exp_val = parse_expression(exp_val_expr, res['result']['storage'].type_expr)
+        self.assertEqual(exp_val, res['result']['storage']._val)
