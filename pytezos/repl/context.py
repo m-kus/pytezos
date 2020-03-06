@@ -110,11 +110,10 @@ class Context:
 
     def set(self, key, value):
         self.meta[key] = value
-        if key in ['parameter', 'storage', 'code']:
-            val = micheline_to_michelson(value, inline=True)
+        if key in ['parameter', 'storage', 'code', 'Current']:
+            self.print('\n' + micheline_to_michelson({"prim": key, "args": [value]}))
         else:
-            val = repr(value)
-        self.print(f' set {key}={val};')
+            self.print(f' set {key}={repr(value)};')
 
     def unset(self, key):
         if key in self.meta:
@@ -147,7 +146,7 @@ class Context:
 
     def begin(self, prim=None):
         self.pushed = False
-        if prim:
+        if prim and prim not in ['parameter', 'storage', 'code', 'DUMP']:
             indent = '  ' * self.exec_depth
             self.print(f'\n{indent}{prim}:')
         self.exec_depth += 1

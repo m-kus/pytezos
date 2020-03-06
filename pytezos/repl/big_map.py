@@ -1,5 +1,7 @@
 from typing import Dict
+from simplejson import JSONDecodeError
 
+from pytezos import pytezos
 from pytezos.repl.types import StackItem, Map, BigMap
 from pytezos.repl.parser import parse_expression, assert_expr_equal, get_int, assert_comparable, assert_big_map_val
 from pytezos.michelson.pack import get_key_hash
@@ -28,6 +30,12 @@ class BigMapPool:
         self.alloc_id = 0
         self.maybe_remove = set()
 
+    def reset(self):
+        self.maps.clear()
+        self.tmp_id = -1
+        self.alloc_id = 0
+        self.maybe_remove.clear()
+
     def empty(self, k_type_expr, v_type_expr) -> BigMap:
         assert_comparable(k_type_expr)
         assert_big_map_val(v_type_expr)
@@ -43,26 +51,30 @@ class BigMapPool:
         self.tmp_id -= 1
         return res
 
-    def _check_allocated(self, val_expr, type_expr):
+    def _check_allocated(self, val_expr, type_expr, network=None):
         big_map_id = get_int(val_expr)
-        assert big_map_id >= 0, f'expected an allocated big map'
-        assert big_map_id in self.maps, f'big map #{big_map_id} is not found'
-        big_map = self.maps[big_map_id]
-        _ = [assert_expr_equal(type_expr['args'][i], big_map.type_expr['args'][i]) for i in [0, 1]]
-        return big_map_id
+        assert big_map_id >= 0, f'expected an allocated big map (>=0), got {big_map_id}'
+        if big_map_id in self.maps:
+            big_map = self.maps[big_map_id]
+            _ = [assert_expr_equal(type_expr['args'][i], big_map.type_expr['args'][i]) for i in [0, 1]]
+            return big_map_id, {'_diff': {}}
+        else:
+            assert network, f'big map #{big_map_id} is not allocated'
+            self.alloc_id = max(self.alloc_id, big_map_id + 1)
+            return big_map_id, {'_diff': {}, '_network': network}
 
-    def _pre_copy(self, val_expr, type_expr):
-        big_map_id = self._check_allocated(val_expr, type_expr)
-        res = {'int': str(self.tmp_id), '_diff': {}, '_copy': big_map_id}
+    def _pre_copy(self, val_expr, type_expr, network=None):
+        big_map_id, kw = self._check_allocated(val_expr, type_expr, network)
+        res = {'int': str(self.tmp_id), '_copy': big_map_id, **kw}
         self.tmp_id -= 1
         return res
 
-    def _pre_remove(self, val_expr, type_expr):
-        big_map_id = self._check_allocated(val_expr, type_expr)
+    def _pre_remove(self, val_expr, type_expr, network=None):
+        big_map_id, kw = self._check_allocated(val_expr, type_expr, network)
         self.maybe_remove.add(big_map_id)
-        return {'int': str(big_map_id), '_diff': {}}
+        return {'int': str(big_map_id), **kw}
 
-    def pre_alloc(self, val_expr, type_expr, copy=False):
+    def pre_alloc(self, val_expr, type_expr, copy=False, network=None):
         def alloc_selector(val_node, type_node, res):
             prim = type_node['prim']
             if prim in ['list', 'set']:
@@ -77,10 +89,9 @@ class BigMapPool:
                 if isinstance(val_node, list):
                     return self._pre_alloc(val_node, type_node)
                 elif copy:
-                    return self._pre_copy(val_node, type_node)
+                    return self._pre_copy(val_node, type_node, network=network)
                 else:
-                    # TODO: if CHAIN_ID is initialized, we should be able to query real blockchain data
-                    return self._pre_remove(val_node, type_node)
+                    return self._pre_remove(val_node, type_node, network=network)
 
             return val_node
 
@@ -153,15 +164,35 @@ class BigMapPool:
             self.alloc_id = max([int(x['big_map']) for x in big_map_diff]) + 1
         self.maybe_remove.clear()
 
+    def _get_big_map_val(self, big_map: BigMap, key: StackItem):
+        key_hash = get_key_hash(key.val_expr, key.type_expr)
+        network = big_map.val_expr['_network']
+        try:
+            res = pytezos.using(network).shell.head.context.big_maps[int(big_map)][key_hash]()
+        except JSONDecodeError:
+            res = None
+        return res
+
     def contains(self, big_map: BigMap, key: StackItem) -> bool:
         if key in big_map:
             return big_map.find(key) is not None
         if int(big_map) >= 0:
-            return key in self.maps[int(big_map)]
+            if big_map.val_expr.get('_network'):
+                v_val_expr = self._get_big_map_val(big_map, key)
+                return v_val_expr is not None
+            else:
+                assert int(big_map) in self.maps, f'#{int(big_map)} is not allocated'
+                return key in self.maps[int(big_map)]
         return False
 
     def find(self, big_map: BigMap, key: StackItem) -> 'StackItem':
         if key in big_map:
             return big_map.find(key)
         if int(big_map) >= 0:
-            return self.maps[int(big_map)].find(key)
+            if big_map.val_expr.get('_network'):
+                v_val_expr = self._get_big_map_val(big_map, key)
+                if v_val_expr:
+                    return StackItem.parse(val_expr=v_val_expr, type_expr=big_map.type_expr['args'][1])
+            else:
+                assert int(big_map) in self.maps, f'#{int(big_map)} is not allocated'
+                return self.maps[int(big_map)].find(key)

@@ -7,9 +7,14 @@ from pytezos.repl.context import Context
 from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr, assert_expr_equal
 from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List, Operation
 
-helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH',
-                'INCLUDE', 'DEBUG', 'BIG_MAP_DIFF', 'BEGIN', 'COMMIT']
+networks = ['mainnet', 'zeronet', 'babylonnet', 'carthagenet']
+helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE',
+                'DEBUG', 'BIG_MAP_DIFF', 'BEGIN', 'COMMIT', 'RESET', 'STORAGE']
 patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
+
+
+def is_prim(val_expr, prim):
+    return isinstance(val_expr, dict) and val_expr.get('prim') == prim
 
 
 @instruction('DUMP', args_len=1)
@@ -54,12 +59,17 @@ def do_begin(ctx: Context, prim, args, annots):
     entrypoint = next((a for a in annots if a[0] == '%'), '%default')
     ctx.print(f' use {entrypoint};')
 
+    network = ctx.get('NETWORK')
+    if network:
+        ctx.print(f' use {network};')
+
     p_type_expr = get_entry_expr(p_type_expr, entrypoint)
-    parameter = ctx.big_maps.pre_alloc(args[0], p_type_expr, copy=True)
+    parameter = ctx.big_maps.pre_alloc(args[0], p_type_expr, copy=True, network=network)
 
     s_type_expr = ctx.get('storage')
     assert s_type_expr, f'storage type is not initialized'
-    storage = ctx.big_maps.pre_alloc(args[1], s_type_expr)
+    s_val_expr = ctx.get('STORAGE') if is_prim(args[1], 'STORAGE') else args[1]
+    storage = ctx.big_maps.pre_alloc(s_val_expr, s_type_expr, network=network)
 
     ctx.drop_all()
     run_input = Pair.new(parameter, storage)
@@ -136,10 +146,13 @@ def do_include(ctx: Context, prim, args, annots):
     if isfile(path):
         code = Contract.from_file(path).code
     else:
-        parts = path.split('%')
-        address, network = parts[0], parts[1] if len(parts) > 1 else 'mainnet'
+        parts = path.split(':')
+        network = parts[0] if len(parts) > 1 else ctx.get('NETWORK', 'mainnet')
+        address = parts[1] if len(parts) > 1 else parts[0]
         assert is_kt(address), f'expected filename or KT address (with network), got {path}'
         code = pytezos.using(network).contract(address).contract.code
+        storage = pytezos.using(network).shell.contracts[address].storage()
+        ctx.set('STORAGE', storage)
 
     do_interpret(ctx, code)
 
@@ -149,3 +162,22 @@ def do_big_map_diff(ctx: Context, prim, args, annots):
     top = ctx.peek()
     _, big_map_diff = ctx.big_maps.diff(top)
     return {'kind': 'big_map_diff', 'big_map_diff': big_map_diff}
+
+
+@instruction('RESET')
+def do_reset_none(ctx: Context, prim, args, annots):
+    ctx.unset('NETWORK')
+    ctx.unset('CHAIN_ID')
+    ctx.big_maps.reset()
+    ctx.drop_all()
+
+
+@instruction('RESET', args_len=1)
+def do_reset(ctx: Context, prim, args, annots):
+    network = get_string(args[0])
+    assert network in networks, f'expected on of {", ".join(networks)}, got {network}'
+    ctx.set('NETWORK', network)
+    chain_id = ChainID(pytezos.using(network).shell.chains.main.chain_id())
+    ctx.set('CHAIN_ID', chain_id)
+    ctx.big_maps.reset()
+    ctx.drop_all()

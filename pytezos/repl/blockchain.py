@@ -12,15 +12,6 @@ MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'
 UNIT_TYPE_EXPR = {'prim': 'unit'}
 
 
-def get_network_by_chain_id(chain_id: ChainID):
-    networks = {
-        MAINNET_CHAIN_ID: 'mainnet'
-    }
-    key = str(chain_id)
-    assert key in networks, f'unknown chain_id {key}'
-    return networks[key]
-
-
 @instruction('parameter', args_len=1)
 def do_parameter(ctx: Context, prim, args, annots):
     ctx.set('parameter', args[0])
@@ -59,7 +50,7 @@ def do_balance(ctx: Context, prim, args, annots):
 @instruction('CHAIN_ID')
 def do_chain_id(ctx: Context, prim, args, annots):
     res = ctx.get('CHAIN_ID', ChainID(MAINNET_CHAIN_ID))
-    ctx.push(res, annots=annots)
+    ctx.push(res, annots=[f'@{ctx.get("NETWORK", "mainnet")}'])
 
 
 @instruction('SELF')
@@ -68,7 +59,7 @@ def do_self(ctx: Context, prim, args, annots):
     assert p_type_expr, f'parameter type is not initialized'
 
     entry_annot = next((a for a in annots if a[0] == '%'), '%default')
-    ctx.printf(f' use {entry_annot};')
+    ctx.print(f' use {entry_annot};')
 
     p_type_expr = get_entry_expr(p_type_expr, entry_annot)
     res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
@@ -93,9 +84,9 @@ def do_source(ctx: Context, prim, args, annots):
 def do_now(ctx: Context, prim, args, annots):
     res = ctx.get('NOW')
     if not res:
-        chain_id = ctx.get('CHAIN_ID')
-        if chain_id:
-            now = pytezos.using(get_network_by_chain_id(chain_id)).now()
+        network = ctx.get('NETWORK')
+        if network:
+            now = pytezos.using(network).now()
         else:
             now = int(datetime.utcnow().timestamp())
         res = Timestamp(now)
@@ -103,22 +94,19 @@ def do_now(ctx: Context, prim, args, annots):
 
 
 def check_contract(ctx: Context, address, entry_annot, type_expr):
-    chain_id = ctx.get('CHAIN_ID')
-    if not chain_id:
-        ctx.printf(' skip check;')
+    network = ctx.get('NETWORK')
+    if not network:
+        ctx.print(' skip check;')
         return True
-
-    network = get_network_by_chain_id(chain_id)
-
     try:
         ci = pytezos.using(network).contract(address)
         actual = get_entry_expr(ci.contract.parameter.code, entry_annot)
         if expr_equal(type_expr, actual):
             return True
         else:
-            ctx.printf(' entry type mismatch;')
+            ctx.print(' entry type mismatch;')
     except Exception:
-        ctx.printf(' not found;')
+        ctx.print(' not found;')
 
     return False
 

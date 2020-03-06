@@ -170,8 +170,7 @@ def do_unpack(ctx: Context, prim, args, annots):
         item = StackItem.parse(val_expr=val_expr, type_expr=args[0])
         res = Option.some(item)
     except Exception as e:
-        if ctx.debug:
-            ctx.printf(f' {e};')
+        ctx.print(f' {e};')
         res = Option.none(args[0])
     ctx.push(res, annots=annots)
 
