@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytezos"
-version = "2.3.2"
+version = "2.3.3"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]
@@ -27,6 +27,7 @@ ply = "*"
 simplejson = "*"
 mnemonic = "*"
 fire = "*"
+pyyaml = "*"
 pysodium = "^0.7.1"
 secp256k1 = "^0.13.2"
 fastecdsa = "^1.7.1"
