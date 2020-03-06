@@ -149,7 +149,7 @@ class BigMapPool:
                 else:
                     self.maps[big_map_id] = raw_map.remove(key)
 
-        self.alloc_id = 0
+        self.alloc_id = max([int(x['big_map']) for x in big_map_diff]) + 1
         self.maybe_remove.clear()
 
     def contains(self, big_map: BigMap, key: StackItem) -> bool:
