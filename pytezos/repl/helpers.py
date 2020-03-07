@@ -57,11 +57,11 @@ def do_begin(ctx: Context, prim, args, annots):
     assert p_type_expr, f'parameter type is not initialized'
 
     entrypoint = next((a for a in annots if a[0] == '%'), '%default')
-    ctx.print(f' use {entrypoint};')
+    ctx.print(f'use {entrypoint}')
 
     network = ctx.get('NETWORK')
     if network:
-        ctx.print(f' use {network};')
+        ctx.print(f'use {network}')
 
     p_type_expr = get_entry_expr(p_type_expr, entrypoint)
     parameter = ctx.big_maps.pre_alloc(args[0], p_type_expr, copy=True, network=network)

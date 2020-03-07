@@ -80,8 +80,39 @@ def format_content(content):
 
 
 def format_stdout(items):
-    res = ''.join(items).lstrip('\n')
-    return res if any(map(lambda x: x in res, ['\n', 'PRINT'])) else ''
+    newline = True
+    depth = 0
+    res = []
+
+    def break_line():
+        nonlocal newline
+        nonlocal res
+        if not newline:
+            res.append('\n')
+            newline = True
+
+    for item in items:
+        if item['action'] == 'begin':
+            break_line()
+            if item['prim'] not in ['parameter', 'storage', 'code', 'STORAGE', 'DUMP']:
+                res.extend(['  ' * depth, item['prim'], ':'])
+                depth += 1
+                newline = False
+        elif item['action'] == 'end':
+            depth -= 1
+            break_line()
+        elif item['action'] in ['message', 'event']:
+            res.append('  ' * depth if newline else ' ')
+            res.extend([item['text'], ';'])
+            newline = False
+        else:
+            assert False, item['action']
+
+    res = ''.join(res).strip('\n')
+    if '\n' not in res and all(map(lambda x: x['action'] != 'message', items)):
+        return ''
+
+    return res
 
 
 def format_result(result):

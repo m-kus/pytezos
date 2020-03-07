@@ -33,7 +33,6 @@ class Context:
         self.big_maps = BigMapPool()
         self.debug = True
         self.stdout = list()
-        self.exec_depth = 0
         self.protected = 0
         self.pushed = 0
 
@@ -44,7 +43,6 @@ class Context:
         ctx.dummy_gen = deepcopy(self.dummy_gen)
         ctx.big_maps = deepcopy(self.big_maps)
         ctx.debug = self.debug
-        ctx.exec_depth = self.exec_depth
         ctx.protected = self.protected
         ctx.pushed = self.pushed
         return ctx
@@ -57,7 +55,6 @@ class Context:
         ctx.big_maps = self.big_maps
         ctx.debug = self.debug
         ctx.stdout = self.stdout
-        ctx.exec_depth = self.exec_depth
         return ctx
 
     def reset(self):
@@ -67,18 +64,18 @@ class Context:
     def protect(self, count: int):
         assert len(self.stack) >= count, f'got {len(self.stack)} items, wanted to protect {count}'
         self.protected += count
-        self.print(f' protect {count} item(s);')
+        self.print(f'protect {count} item(s)')
 
     def restore(self, count: int):
         assert self.protected >= count, f'wanted to restore {count}, only {self.protected} protected'
-        self.print(f' restore {count} item(s);')
+        self.print(f'restore {count} item(s)')
         self.protected -= count
 
     def push(self, item: StackItem, annots=None):
         assert_stack_item(item)
         self.stack.insert(self.protected, item.rename(annots))
         self.pushed = True
-        self.print(f' push {repr(item)};')
+        self.print(f'push {repr(item)}')
 
     def peek(self):
         assert len(self.stack) > 0, 'stack is empty'
@@ -92,7 +89,7 @@ class Context:
             body = ', '.join(map(repr, res))  # TODO: restrict line length
         else:
             body = f'{count} items'
-        self.print(f' pop {body};')
+        self.print(f'pop {body}')
         return res
 
     def pop1(self):
@@ -111,19 +108,19 @@ class Context:
     def set(self, key, value):
         self.meta[key] = value
         if key in ['parameter', 'storage', 'code', 'STORAGE']:
-            self.print('\n' + micheline_to_michelson({"prim": key, "args": [value]}))
+            self.print(micheline_to_michelson({"prim": key, "args": [value]}))
         else:
-            self.print(f' set {key}={repr(value)};')
+            self.print(f'set {key}={repr(value)}')
 
     def unset(self, key):
         if key in self.meta:
             del self.meta[key]
-            self.print(f' unset {key};')
+            self.print(f'unset {key}')
 
     def drop_all(self):
         self.stack.clear()
         self.protected = 0
-        self.print(f' drop all;')
+        self.print(f'drop all')
 
     def dump(self, count: int):
         if len(self.stack) > 0:
@@ -132,7 +129,7 @@ class Context:
 
     def print(self, message):
         if self.debug:
-            self.stdout.append(message)
+            self.stdout.append({'action': 'event', 'text': message})
 
     def printf(self, template: str):
         def format_stack_item(match):
@@ -141,18 +138,16 @@ class Context:
             return repr(self.stack[i])
 
         message = re.sub(r'\{(\d+)\}', format_stack_item, template)
-        indent = '  ' * (self.exec_depth - 1)
-        self.stdout.append(f'\n{indent}PRINT: {message};')
+        self.stdout.append({'action': 'message', 'text': message})
 
     def begin(self, prim=None):
         self.pushed = False
-        if prim and prim not in ['parameter', 'storage', 'code', 'DUMP']:
-            indent = '  ' * self.exec_depth
-            self.print(f'\n{indent}{prim}:')
-        self.exec_depth += 1
+        if self.debug:
+            self.stdout.append({'action': 'begin', 'prim': prim})
 
     def end(self):
-        self.exec_depth -= 1
+        if self.debug:
+            self.stdout.append({'action': 'end'})
 
     def __len__(self) -> int:
         return len(self.stack)

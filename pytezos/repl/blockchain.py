@@ -59,7 +59,7 @@ def do_self(ctx: Context, prim, args, annots):
     assert p_type_expr, f'parameter type is not initialized'
 
     entry_annot = next((a for a in annots if a[0] == '%'), '%default')
-    ctx.print(f' use {entry_annot};')
+    ctx.print(f'use {entry_annot}')
 
     p_type_expr = get_entry_expr(p_type_expr, entry_annot)
     res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
@@ -96,7 +96,7 @@ def do_now(ctx: Context, prim, args, annots):
 def check_contract(ctx: Context, address, entry_annot, type_expr):
     network = ctx.get('NETWORK')
     if not network:
-        ctx.print(' skip check;')
+        ctx.print('skip check')
         return True
     try:
         ci = pytezos.using(network).contract(address)
@@ -104,9 +104,9 @@ def check_contract(ctx: Context, address, entry_annot, type_expr):
         if expr_equal(type_expr, actual):
             return True
         else:
-            ctx.print(' entry type mismatch;')
+            ctx.print('entry type mismatch')
     except Exception:
-        ctx.print(' not found;')
+        ctx.print('not found')
 
     return False
 
