@@ -225,6 +225,9 @@ def build_maps(metadata: dict):
             parse_node(node['args'][0], join(json_path, '{}'))
 
         elif node['prim'] in ['map', 'big_map']:
+            key_node = metadata[bin_path + '0']
+            if key_node['prim'] == 'pair':
+                bin_types[bin_path + '0'] = 'keypair'
             parse_node(node['args'][1], join(json_path, '{}'))
 
         elif node['prim'] == 'or':
@@ -257,10 +260,10 @@ def build_maps(metadata: dict):
 
 def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
     def flatten_args(args):
-        assert isinstance(args, list) or isinstance(args, tuple), f'iterable expected, got {args}'
+        assert isinstance(args, list), f'iterable expected, got {args}'
         res = list()
         for arg in args:
-            if isinstance(arg, list) or isinstance(arg, tuple):
+            if isinstance(arg, list):
                 res.extend(flatten_args(arg))
             else:
                 res.append(arg)
@@ -273,6 +276,10 @@ def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
         elif bin_type == 'big_map' and isinstance(val_node, list):
             return dict(val)
         elif bin_type == 'pair':
+            return flatten_args(val)
+        elif bin_type == 'tuple':
+            return flatten_args(val)
+        elif bin_type == 'keypair':
             return tuple(flatten_args(val))
         elif bin_type == 'or':
             arg_path = type_path + {'Left': '0', 'Right': '1'}[val_node['prim']]
@@ -280,8 +287,6 @@ def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
             return {schema.bin_names[arg_path]: val[0]} if is_leaf else val[0]
         elif bin_type == 'router':
             return val[0]
-        elif bin_type == 'tuple':
-            return tuple(flatten_args(val))
         elif bin_type == 'namedtuple':
             names = list(map(lambda x: schema.bin_names[x], schema.metadata[type_path]['args']))
             return dict(zip(names, flatten_args(val)))
@@ -310,7 +315,7 @@ def parse_json(data, schema: Schema, json_root='/'):
                 return
 
     def parse_comparable(key, bin_path, index):
-        if schema.bin_types[bin_path] == 'pair':
+        if schema.bin_types[bin_path] == 'keypair':
             assert isinstance(key, tuple), f'tuple expected, got {key}'
             for i, arg_path in enumerate(schema.metadata[bin_path]['args']):
                 assert i < len(key), f'not enough elements in tuple {key}'
@@ -375,7 +380,7 @@ def make_micheline(bin_values: dict, bin_types: dict, bin_root='0', binary=False
     def encode_node(bin_path, index='0'):
         bin_type = bin_types[bin_path]
 
-        if bin_type in ['pair', 'tuple', 'namedtuple']:
+        if bin_type in ['pair', 'tuple', 'keypair', 'namedtuple']:
             return dict(
                 prim='Pair',
                 args=list(map(lambda x: encode_node(bin_path + x, index), '01'))

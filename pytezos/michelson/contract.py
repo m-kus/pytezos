@@ -56,18 +56,20 @@ class ContractParameter(metaclass=InlineDocstring):
 
             return decode_micheline(val_expr=data, type_expr=self.code, schema=self.schema)
 
-    def encode(self, data):
+    def encode(self, data, entrypoint=None):
         """
         Convert Python object to Micheline expression using internal schema.
         :param data: Python object
+        :param entrypoint: Force entrypoint
         :return: object
         """
-        if isinstance(data, dict) and len(data) == 1:
-            entrypoint = next(iter(data))
-            if not any(map(lambda x: x.get('fieldname') == entrypoint, self.schema.metadata.values())):
-                entrypoint = 'default'  # prevent auto-generated entrypoint names, like `rrrllll`
-        else:
-            entrypoint = 'default'
+        if entrypoint is None:
+            if isinstance(data, dict) and len(data) == 1:
+                entrypoint = next(iter(data))
+                if not any(map(lambda x: x.get('fieldname') == entrypoint, self.schema.metadata.values())):
+                    entrypoint = 'default'  # prevent auto-generated entrypoint names, like `entrypoint_1`
+            else:
+                entrypoint = 'default'
 
         if entrypoint == 'default':
             value = encode_micheline(data, self.schema)

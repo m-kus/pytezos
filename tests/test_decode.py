@@ -94,5 +94,5 @@ class TestEncoding(TestCase):
         parameter = ContractParameter(michelson_to_micheline(type_expr))
         source = michelson_to_micheline(val_expr)
         decoded = parameter.decode(source)
-        encoded = parameter.encode(decoded)
-        self.assertEqual(source, encoded)
+        encoded = parameter.encode(decoded, entrypoint='default')
+        self.assertEqual(source, encoded['value'])
