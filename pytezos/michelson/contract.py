@@ -41,16 +41,20 @@ class ContractParameter(metaclass=InlineDocstring):
         """
         if isinstance(data, dict) and set(data.keys()) == {'entrypoint', 'value'}:
             if data['entrypoint'] not in {'root', 'default'}:
-                res = decode_micheline(data['value'], self.schema,
+                res = decode_micheline(val_expr=data['value'],
+                                       type_expr=self.code,
+                                       schema=self.schema,
                                        root=self._get_entry_root(data['entrypoint']))
                 return {data['entrypoint']: res}
             else:
-                return decode_micheline(data['value'], self.schema)  # TODO: default subpath (see BCD issue)
+                return decode_micheline(val_expr=data['value'],
+                                        type_expr=self.code,
+                                        schema=self.schema)  # TODO: default subpath (see BCD issue)
         else:
             if isinstance(data, str):
                 data = michelson_to_micheline(data)
 
-            return decode_micheline(data, self.schema)
+            return decode_micheline(val_expr=data, type_expr=self.code, schema=self.schema)
 
     def encode(self, data):
         """
@@ -80,7 +84,7 @@ class ContractParameter(metaclass=InlineDocstring):
         """
         if self.schema.metadata['0']['prim'] == 'or':
             entries = [
-                (basename(self.schema.bin_to_json[bin_path]), bin_path)
+                (self.schema.bin_names[bin_path], bin_path)
                 for bin_path in self.schema.metadata['0']['args']
             ]
         else:
@@ -121,7 +125,9 @@ class ContractStorage(metaclass=InlineDocstring):
         """
         if isinstance(data, str):
             data = michelson_to_micheline(data)
-        return decode_micheline(data, self.schema)
+        return decode_micheline(val_expr=data,
+                                type_expr=self.code,
+                                schema=self.schema)
 
     def encode(self, data):
         """
@@ -149,12 +155,12 @@ class ContractStorage(metaclass=InlineDocstring):
     def _locate_big_map(self, big_map_id=None):
         if big_map_id is None:
             # Default Big Map location (prior to Babylon https://blog.nomadic-labs.com/michelson-updates-in-005.html)
-            return self.schema.bin_types['000'], '001', self.schema.bin_to_json['00']
+            return self.schema.bin_types['000'], '001', ''
         else:
             assert self.big_map_schema, "Please call `big_map_init` first"
             bin_path = self.big_map_schema.id_to_bin[int(big_map_id)]
-            json_path = self.schema.bin_to_json[bin_path]
-            return self.schema.bin_types[bin_path + '0'], bin_path + '1', json_path
+            name = self.schema.bin_names[bin_path]
+            return self.schema.bin_types[bin_path + '0'], bin_path + '1', name
 
     def big_map_id(self, big_map_path) -> int:
         assert self.big_map_schema, "Please call `big_map_init` first"
@@ -201,7 +207,10 @@ class ContractStorage(metaclass=InlineDocstring):
         :return: object
         """
         _, value_root, _ = self._locate_big_map(big_map_id)
-        return decode_micheline(value, self.schema, root=value_root)
+        return decode_micheline(val_expr=value,
+                                type_expr=self.code,
+                                schema=self.schema,
+                                root=value_root)
 
     def big_map_diff_decode(self, diff: list) -> dict:
         """
@@ -219,13 +228,19 @@ class ContractStorage(metaclass=InlineDocstring):
                 continue
 
             big_map_id = item.get('big_map')
-            key_prim, value_root, big_map_path = self._locate_big_map(big_map_id)
+            key_prim, value_root, name = self._locate_big_map(big_map_id)
 
             key = decode_literal(item['key'], key_prim)
-            value = decode_micheline(item['value'], self.schema, root=value_root) if item.get('value') else None
+            if item.get('value'):
+                value = decode_micheline(val_expr=item['value'],
+                                         type_expr=self.code,
+                                         schema=self.schema,
+                                         root=value_root)
+            else:
+                value = None
 
             if big_map_id and not self._is_old_style_big_map():
-                res[big_map_path.lstrip('/')][key] = value
+                res[name][key] = value
             else:
                 res[key] = value  # Backward compatibility
 

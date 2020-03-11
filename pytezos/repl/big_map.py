@@ -75,7 +75,7 @@ class BigMapPool:
         return {'int': str(big_map_id), **kw}
 
     def pre_alloc(self, val_expr, type_expr, copy=False, network=None):
-        def alloc_selector(val_node, type_node, res):
+        def alloc_selector(val_node, type_node, res, type_path):
             prim = type_node['prim']
             if prim in ['list', 'set']:
                 return res
@@ -103,7 +103,7 @@ class BigMapPool:
         alloc_id = self.alloc_id
         maybe_remove = self.maybe_remove
 
-        def diff_selector(val_node, type_node, val):
+        def diff_selector(val_node, type_node, val, type_path):
             nonlocal res, alloc_id, maybe_remove
             prim = type_node['prim']
             if prim in ['list', 'set']:

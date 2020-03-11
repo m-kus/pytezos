@@ -26,7 +26,7 @@ def generate_docstring(schema: Schema, title, root='0'):
         return schema.metadata[bin_path]
 
     def get_name(bin_path):
-        return basename(schema.bin_to_json[bin_path])
+        return schema.bin_names[bin_path]
 
     def get_type(bin_path):
         default = get_name(bin_path[:-1]) + '_item'
@@ -74,6 +74,10 @@ def generate_docstring(schema: Schema, title, root='0'):
             values = map(decode_node, node['args'])
             res = f'[ {" , ".join(values)} ]'
 
+        elif bin_type == 'pair':
+            values = map(decode_node, node['args'])
+            res = f'( {" , ".join(values)} )'
+
         elif bin_type in {'set', 'list'}:
             value = decode_node(node['args'][0], is_element=True)
             res = f'[ {value} , ... ]'
@@ -105,6 +109,7 @@ def generate_docstring(schema: Schema, title, root='0'):
                 if bin_path == root:
                     res = domain_types[node["prim"]]
                 else:
+                    assert node['prim'] in domain_types, f'not a domain type {node["prim"]}'
                     known_types.add(node['prim'])
 
         if bin_path == root:

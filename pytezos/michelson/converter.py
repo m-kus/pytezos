@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from pytezos.michelson.micheline import Schema, collapse_micheline, build_maps, parse_micheline, make_json, \
+from pytezos.michelson.micheline import Schema, collapse_micheline, build_maps, parse_micheline, \
     parse_json, make_micheline, is_micheline, michelson_to_micheline, BigMapSchema
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.docstring import generate_docstring
@@ -15,8 +15,8 @@ def build_schema(code) -> Schema:
     Creates internal structures necessary for decoding/encoding micheline:
     `metadata` -> micheline tree with collapsed `pair`, `or`, and `option` nodes
     `bin_types` -> maps binary path to primitive
-    `bin_to_json` -> binary path to json path mapping
-    `json_to_bin` -> reversed `bin_to_json`
+    `bin_names` -> binary path to key name mapping
+    `json_to_bin` -> json path to binary path mapping
     :param code: parameter or storage section of smart contract source code (in micheline)
     :return: Schema
     """
@@ -28,20 +28,20 @@ def build_schema(code) -> Schema:
         raise MichelineSchemaError(f'Failed to build schema', e.args)
 
 
-def decode_micheline(data, schema: Schema, root='0'):
+def decode_micheline(val_expr, type_expr, schema: Schema, root='0'):
     """
     Converts Micheline data into Python object
-    :param data: Micheline expression
+    :param val_expr: Micheline value expression
+    :param type_expr: Michelson type expression
     :param schema: schema built for particular contract/section
     :param root: which binary node to take as root, used to decode BigMap values/diffs
     :return: Object
     """
     try:
-        json_values = parse_micheline(data, schema.bin_to_json, schema.bin_types, root)
-        return make_json(json_values)
+        return parse_micheline(val_expr, type_expr, schema, root)
     except (KeyError, IndexError, TypeError) as e:
         print(generate_docstring(schema, 'schema'))
-        pprint(data, compact=True)
+        pprint(val_expr, compact=True)
         raise MichelineSchemaError(f'Failed to decode micheline expression', e.args)
 
 
@@ -55,8 +55,8 @@ def encode_micheline(data, schema: Schema, root='0', binary=False):
     :return: Micheline expression
     """
     try:
-        json_root = schema.bin_to_json[root]
-        bin_values = parse_json(data, schema.json_to_bin, schema.bin_types, json_root)
+        json_root = next((k for k, v in schema.json_to_bin.items() if v == root), '/')
+        bin_values = parse_json(data, schema, json_root)
         return make_micheline(bin_values, schema.bin_types, root, binary)
     except (KeyError, IndexError, TypeError) as e:
         print(generate_docstring(schema, 'schema'))
@@ -85,8 +85,7 @@ def convert(source, schema: Schema = None, output='micheline', inline=False):
     if output == 'michelson':
         return micheline_to_michelson(source, inline)
     elif output == 'object':
-        assert schema
-        return decode_micheline(source, schema)
+        assert False, f'not supported'
     elif output == 'micheline':
         return source
     else:

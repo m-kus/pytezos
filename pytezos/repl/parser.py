@@ -1,7 +1,7 @@
 import functools
 from typing import Tuple, Callable
 
-from pytezos.michelson.converter import micheline_to_michelson
+from pytezos.michelson.formatter import micheline_to_michelson
 import pytezos.encoding as encoding
 
 parsers = {}
@@ -229,10 +229,10 @@ def val_selector(val_expr, type_expr, val):
         return val
 
 
-def parse_expression(val_expr, type_expr, selector=val_selector):
+def parse_expression(val_expr, type_expr, selector=val_selector, type_path='0'):
     prim, _, func = parse_type(type_expr)
     try:
-        res = func(val_expr, type_expr, selector)
+        res = func(val_expr, type_expr, selector, type_path)
     except AssertionError as e:
         raise MichelsonTypeCheckError.init(str(e), prim)
     except MichelsonRuntimeError as e:
@@ -242,173 +242,173 @@ def parse_expression(val_expr, type_expr, selector=val_selector):
 
 
 @primitive('string')
-def parse_string(val_expr, type_expr, selector):
-    return selector(val_expr, type_expr, get_string(val_expr))
+def parse_string(val_expr, type_expr, selector, type_path):
+    return selector(val_expr, type_expr, get_string(val_expr), type_path)
 
 
 @primitive('int')
-def parse_int(val_expr, type_expr, selector):
-    return selector(val_expr, type_expr, get_int(val_expr))
+def parse_int(val_expr, type_expr, selector, type_path):
+    return selector(val_expr, type_expr, get_int(val_expr), type_path)
 
 
 @primitive('bytes')
-def parse_bytes(val_expr, type_expr, selector):
-    return selector(val_expr, type_expr, get_bytes(val_expr))
+def parse_bytes(val_expr, type_expr, selector, type_path):
+    return selector(val_expr, type_expr, get_bytes(val_expr), type_path)
 
 
 @primitive('nat')
-def parse_nat(val_expr, type_expr, selector):
+def parse_nat(val_expr, type_expr, selector, type_path):
     val = get_int(val_expr)
     assert val >= 0, f'nat cannot be negative ({val})'
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('bool')
-def parse_bool(val_expr, type_expr, selector):
+def parse_bool(val_expr, type_expr, selector, type_path):
     val = dispatch_prim_map(val_expr, {
         ('False', 0): False,
         ('True', 0): True
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('unit')
-def parse_unit(val_expr, type_expr, selector):
+def parse_unit(val_expr, type_expr, selector, type_path):
     _ = get_prim_args(val_expr, prim='Unit', args_len=0)
-    return selector(val_expr, type_expr, Unit())
+    return selector(val_expr, type_expr, Unit(), type_path)
 
 
 @primitive('list', args_len=1)
-def parse_list(val_expr, type_expr, selector):
+def parse_list(val_expr, type_expr, selector, type_path):
     assert_type(val_expr, list)
-    val = [parse_expression(item, type_expr['args'][0], selector) for item in val_expr]
-    return selector(val_expr, type_expr, val)
+    val = [parse_expression(item, type_expr['args'][0], selector, type_path + '0') for item in val_expr]
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('pair', args_len=2)
-def parse_pair(val_expr, type_expr, selector):
+def parse_pair(val_expr, type_expr, selector, type_path):
     args = get_prim_args(val_expr, prim='Pair', args_len=2)
-    val = [parse_expression(args[i], type_expr['args'][i], selector) for i in [0, 1]]
-    return selector(val_expr, type_expr, val)
+    val = [parse_expression(args[i], type_expr['args'][i], selector, type_path + str(i)) for i in [0, 1]]
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('option', args_len=1)
-def parse_option(val_expr, type_expr, selector):
+def parse_option(val_expr, type_expr, selector, type_path):
     val = dispatch_prim_map(val_expr, {
         ('None', 0): None,
-        ('Some', 1): lambda x: [parse_expression(x[0], type_expr['args'][0], selector)]
+        ('Some', 1): lambda x: [parse_expression(x[0], type_expr['args'][0], selector, type_path + '0')]
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('or', args_len=2)
-def parse_or(val_expr, type_expr, selector):
+def parse_or(val_expr, type_expr, selector, type_path):
     val = dispatch_prim_map(val_expr, {
-        ('Left', 1): lambda x: [parse_expression(x[0], type_expr['args'][0], selector)],
-        ('Right', 1): lambda x: [parse_expression(x[0], type_expr['args'][1], selector)]
+        ('Left', 1): lambda x: [parse_expression(x[0], type_expr['args'][0], selector, type_path + '0')],
+        ('Right', 1): lambda x: [parse_expression(x[0], type_expr['args'][1], selector, type_path + '1')]
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('set', args_len=1)
-def parse_set(val_expr, type_expr, selector):
+def parse_set(val_expr, type_expr, selector, type_path):
     assert_type(val_expr, list)
     assert_comparable(type_expr['args'][0])
-    val = [parse_expression(item, type_expr['args'][0], selector) for item in val_expr]
-    return selector(val_expr, type_expr, val)
+    val = [parse_expression(item, type_expr['args'][0], selector, type_path + '0') for item in val_expr]
+    return selector(val_expr, type_expr, val, type_path)
 
 
-def parse_elt(val_expr, type_expr, selector):
+def parse_elt(val_expr, type_expr, selector, type_path):
     elt_args = get_prim_args(val_expr, prim='Elt', args_len=2)
-    return [parse_expression(elt_args[i], type_expr['args'][i], selector) for i in [0, 1]]
+    return [parse_expression(elt_args[i], type_expr['args'][i], selector, type_path + str(i)) for i in [0, 1]]
 
 
 @primitive('map', args_len=2)
-def parse_map(val_expr, type_expr, selector):
+def parse_map(val_expr, type_expr, selector, type_path):
     assert_type(val_expr, list)
     assert_comparable(type_expr['args'][0])
-    val = [parse_elt(item, type_expr, selector) for item in val_expr]
-    return selector(val_expr, type_expr, val)
+    val = [parse_elt(item, type_expr, selector, type_path) for item in val_expr]
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('big_map', args_len=2)
-def parse_big_map(val_expr, type_expr, selector):
+def parse_big_map(val_expr, type_expr, selector, type_path):
     assert_comparable(type_expr['args'][0])
     assert_big_map_val(type_expr['args'][1])
     if isinstance(val_expr, list):
-        return parse_map(val_expr, type_expr, selector)
+        return parse_map(val_expr, type_expr, selector, type_path)
     else:
         val = get_int(val_expr)
-        return selector(val_expr, type_expr, val)
+        return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('timestamp')
-def parse_timestamp(val_expr, type_expr, selector):
+def parse_timestamp(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {'int': int, 'string': encoding.forge_timestamp})
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('mutez')
-def parse_mutez(val_expr, type_expr, selector):
-    return parse_nat(val_expr, type_expr, selector)
+def parse_mutez(val_expr, type_expr, selector, type_path):
+    return parse_nat(val_expr, type_expr, selector, type_path)
 
 
 @primitive('address')
-def parse_address(val_expr, type_expr, selector):
+def parse_address(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_address(bytes.fromhex(x)),
         'string': lambda x: x
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('contract', args_len=1)
-def parse_contract(val_expr, type_expr, selector):
+def parse_contract(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_contract(bytes.fromhex(x)),
         'string': lambda x: x
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('operation')
-def parse_operation(val_expr, type_expr, selector):
-    return selector(val_expr, type_expr, get_string(val_expr))
+def parse_operation(val_expr, type_expr, selector, type_path):
+    return selector(val_expr, type_expr, get_string(val_expr), type_path)
 
 
 @primitive('key')
-def parse_key(val_expr, type_expr, selector):
+def parse_key(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_public_key(bytes.fromhex(x)),
         'string': lambda x: x
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('key_hash')
-def parse_key_hash(val_expr, type_expr, selector):
-    return parse_address(val_expr, type_expr, selector)
+def parse_key_hash(val_expr, type_expr, selector, type_path):
+    return parse_address(val_expr, type_expr, selector, type_path)
 
 
 @primitive('signature')
-def parse_signature(val_expr, type_expr, selector):
+def parse_signature(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_signature(bytes.fromhex(x)),
         'string': lambda x: x
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('chain_id')
-def parse_chain_id(val_expr, type_expr, selector):
+def parse_chain_id(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {
         'bytes': lambda x: encoding.parse_chain_id(bytes.fromhex(x)),
         'string': lambda x: x
     })
-    return selector(val_expr, type_expr, val)
+    return selector(val_expr, type_expr, val, type_path)
 
 
 @primitive('lambda', args_len=2)
-def parse_lambda(val_expr, type_expr, selector):
+def parse_lambda(val_expr, type_expr, selector, type_path):
     assert_type(val_expr, list)
-    return selector(val_expr, type_expr, val_expr)
+    return selector(val_expr, type_expr, val_expr, type_path)
