@@ -6,7 +6,7 @@ from pytezos.crypto import blake2b_32
 from pytezos.encoding import base58_encode
 from pytezos.tools.docstring import get_class_docstring, InlineDocstring
 from pytezos.michelson.docstring import generate_docstring
-from pytezos.michelson.micheline import encode_literal, decode_literal, make_default, michelson_to_micheline
+from pytezos.michelson.micheline import make_default, michelson_to_micheline
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.converter import build_schema, decode_micheline, encode_micheline, build_big_map_schema
 
@@ -157,12 +157,12 @@ class ContractStorage(metaclass=InlineDocstring):
     def _locate_big_map(self, big_map_id=None):
         if big_map_id is None:
             # Default Big Map location (prior to Babylon https://blog.nomadic-labs.com/michelson-updates-in-005.html)
-            return self.schema.bin_types['000'], '001', ''
+            return '000', '001', ''
         else:
             assert self.big_map_schema, "Please call `big_map_init` first"
             bin_path = self.big_map_schema.id_to_bin[int(big_map_id)]
             name = self.schema.bin_names[bin_path]
-            return self.schema.bin_types[bin_path + '0'], bin_path + '1', name
+            return bin_path + '0', bin_path + '1', name
 
     def big_map_id(self, big_map_path) -> int:
         assert self.big_map_schema, "Please call `big_map_init` first"
@@ -178,14 +178,13 @@ class ContractStorage(metaclass=InlineDocstring):
         Construct a query for big_map_get request
         :param path: BigMap key, string, int, or hex-string
         (since Babylon you can have more than one BigMap at arbitrary position)
-        :param storage:
         :return: dict
         """
         key = basename(path)
         big_map_path = dirname(path)
         big_map_id = self.big_map_id(join('/', big_map_path)) if big_map_path else None
-        key_prim, _, _ = self._locate_big_map(big_map_id)
-        encoded_key = encode_literal(key, key_prim)
+        key_root, _, _ = self._locate_big_map(big_map_id)
+        encoded_key = encode_micheline(data=key, schema=self.schema, root=key_root)
 
         if big_map_id:
             query = dict(
@@ -195,7 +194,7 @@ class ContractStorage(metaclass=InlineDocstring):
         else:
             query = dict(
                 key=encoded_key,
-                type={'prim': key_prim}
+                type={'prim': self.schema.metadata[key_root]['prim']}
             )
 
         return query
@@ -230,9 +229,12 @@ class ContractStorage(metaclass=InlineDocstring):
                 continue
 
             big_map_id = item.get('big_map')
-            key_prim, value_root, name = self._locate_big_map(big_map_id)
+            key_root, value_root, name = self._locate_big_map(big_map_id)
 
-            key = decode_literal(item['key'], key_prim)
+            key = decode_micheline(val_expr=item['key'],
+                                   type_expr=self.code,
+                                   schema=self.schema,
+                                   root=key_root)
             if item.get('value'):
                 value = decode_micheline(val_expr=item['value'],
                                          type_expr=self.code,
@@ -255,12 +257,18 @@ class ContractStorage(metaclass=InlineDocstring):
         :param big_map: { $key: $micheline, ... }
         :return: [{"key": $micheline, "value": $micheline}, ... ]
         """
-        key_prim, value_root, _ = self._locate_big_map()
+        key_root, value_root, _ = self._locate_big_map()
 
         def make_item(x):
-            key = encode_literal(x[0], key_prim, binary=True)
+            key = encode_micheline(data=x[0],
+                                   schema=self.schema,
+                                   root=key_root,
+                                   binary=True)
             if x[1] is not None:
-                value = encode_micheline(x[1], self.schema, root=value_root, binary=True)
+                value = encode_micheline(data=x[1],
+                                         schema=self.schema,
+                                         root=value_root,
+                                         binary=True)
             else:
                 value = None
             return {"key": key, "value": value}

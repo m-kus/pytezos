@@ -20,7 +20,7 @@ class BigMapCodingTestonhqUr(TestCase):
             dict(key=item['key'], value=item.get('value'))
             for item in big_map_diff
         ]
-        
+
         big_map = storage.big_map_diff_decode(expected)
         actual = storage.big_map_diff_encode(big_map)
         self.assertEqual(expected, actual)

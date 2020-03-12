@@ -26,7 +26,10 @@ def generate_docstring(schema: Schema, title, root='0'):
         return schema.metadata[bin_path]
 
     def get_name(bin_path):
-        return schema.bin_names[bin_path]
+        name = schema.bin_names.get(bin_path)
+        if not name:
+            name = next((basename(k) for k, v in schema.json_to_bin.items() if v == bin_path), bin_path)
+        return name
 
     def get_type(bin_path):
         default = get_name(bin_path[:-1]) + '_item'

@@ -211,7 +211,7 @@ def parse_type(type_expr) -> Tuple[str, list, Callable]:
     return prim, args, func
 
 
-def val_selector(val_expr, type_expr, val):
+def val_selector(val_expr, type_expr, val, type_path):
     prim = type_expr['prim']
     if prim == 'pair':
         return tuple(val)

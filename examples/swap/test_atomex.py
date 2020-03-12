@@ -1,4 +1,3 @@
-import sys
 from os.path import dirname, join
 from unittest import TestCase
 from decimal import Decimal

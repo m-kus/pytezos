@@ -1,6 +1,5 @@
 from pprint import pformat
 from copy import deepcopy
-import yaml
 
 from pytezos.michelson.pack import get_key_hash
 from pytezos.michelson.converter import micheline_to_michelson

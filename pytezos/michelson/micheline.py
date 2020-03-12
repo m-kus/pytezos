@@ -1,20 +1,17 @@
 from typing import Dict
 from datetime import datetime
-from os.path import join, dirname, basename
+from os.path import join
 from decimal import Decimal
 from collections import namedtuple, defaultdict
 from functools import lru_cache
 
-from pytezos.encoding import parse_address, parse_public_key, forge_public_key, forge_address
-from pytezos.michelson.forge import prim_tags
+from pytezos.encoding import forge_public_key, forge_address
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.grammar import MichelsonParser
 from pytezos.repl.parser import parse_expression
 
 Nested = namedtuple('Nested', ['prim', 'args'])
 Schema = namedtuple('Schema', ['metadata', 'bin_types', 'bin_names', 'json_to_bin'])
-BigMapSchema = namedtuple('BigMapSchema', ['bin_to_id', 'id_to_bin'])
-meaningful_types = ['key', 'key_hash', 'signature', 'timestamp', 'address']
 
 
 @lru_cache(maxsize=None)
@@ -22,74 +19,8 @@ def michelson_parser():
     return MichelsonParser()
 
 
-class TypedDict(dict):
-    __key_type__ = str
-
-    def __getitem__(self, item):
-        return super(TypedDict, self).__getitem__(self.__key_type__(item))
-
-    def __setitem__(self, key, value):
-        return super(TypedDict, self).__setitem__(self.__key_type__(key), value)
-
-    @staticmethod
-    def make(key_type):
-        return type(f'{key_type.__name__.capitalize()}Dict', (TypedDict,), {'__key_type__': key_type})
-
-
 def skip_nones(**kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if v is not None}
-
-
-def is_micheline(value):
-    if isinstance(value, list):
-        def get_prim(x):
-            return x.get('prim') if isinstance(x, dict) else None
-        return set(map(get_prim, value)) == {'parameter', 'storage', 'code'}
-    elif isinstance(value, dict):
-        primitives = list(prim_tags.keys())
-        return any(map(lambda x: x in value, ['prim', 'args', 'annots', *primitives]))
-    else:
-        return False
-
-
-def decode_literal(node, prim):
-    core_type, value = next(iter(node.items()))
-    if prim in ['int', 'nat']:
-        return int(value)
-    elif prim == 'timestamp':
-        if core_type == 'int':
-            return int(value)
-        else:
-            return value
-    elif prim == 'mutez':
-        return Decimal(value) / 10 ** 6
-    elif prim == 'bool':
-        return value == 'True'
-    elif prim in ['address', 'key_hash', 'contract']:
-        if core_type == 'bytes':
-            return parse_address(bytes.fromhex(value))
-        else:
-            return value
-    elif prim == 'key':
-        if core_type == 'bytes':
-            return parse_public_key(bytes.fromhex(value))
-        else:
-            return value
-    return value
-
-
-def decode_comparable(node, bin_types: dict, bin_path):
-    if bin_types[bin_path] in ['tuple', 'namedtuple', 'pair']:
-        res = list()
-        for idx in [0, 1]:
-            arg = decode_comparable(node['args'][idx], bin_types, bin_path + str(idx))
-            if isinstance(arg, tuple):
-                res.extend(list(arg))
-            else:
-                res.append(arg)
-        return tuple(res)
-    else:
-        return decode_literal(node, bin_types[bin_path])
 
 
 def encode_literal(value, prim, binary=False):
@@ -109,16 +40,15 @@ def encode_literal(value, prim, binary=False):
         core_type = 'prim'
         value = 'True' if value else 'False'
     elif prim == 'bytes':
+        core_type = 'bytes'
         if isinstance(value, bytes):
             value = value.hex()
+    elif prim == 'key' and binary:
         core_type = 'bytes'
-    elif binary:
-        if prim == 'key':
-            value = forge_public_key(value).hex()
-            core_type = 'bytes'
-        elif prim in ['address', 'contract', 'key_hash']:
-            value = forge_address(value, tz_only=prim == 'key_hash').hex()
-            core_type = 'bytes'
+        value = forge_public_key(value).hex()
+    elif prim in ['address', 'contract', 'key_hash'] and binary:
+        core_type = 'bytes'
+        value = forge_address(value, tz_only=prim == 'key_hash').hex()
 
     return {core_type: str(value)}
 
@@ -139,7 +69,7 @@ def collapse_micheline(code) -> dict:
     def get_annotation(x, prefix, default=None):
         return next((a[1:] for a in x.get('annots', []) if a[0] == prefix), default)
 
-    def parse_node(node, path='0', parent_prim=None, entry=None):
+    def parse_node(node, path='0', parent_prim=None, inherited_name=None):
         if node['prim'] in ['storage', 'parameter']:
             return parse_node(node['args'][0])
 
@@ -150,7 +80,7 @@ def collapse_micheline(code) -> dict:
             prim=node['prim'],
             typename=typename,
             fieldname=fieldname,
-            entry=entry
+            inherited_name=inherited_name
         )
 
         if node['prim'] == 'option':
@@ -158,7 +88,7 @@ def collapse_micheline(code) -> dict:
                 node=node['args'][0],
                 path=path + '0',
                 parent_prim=parent_prim,
-                entry=fieldname
+                inherited_name=fieldname
             )
         elif node['prim'] in ['lambda', 'contract']:
             metadata[path]['parameter'] = micheline_to_michelson(node['args'][0], inline=True)
@@ -171,7 +101,7 @@ def collapse_micheline(code) -> dict:
 
         if node['prim'] in ['pair', 'or']:
             res = Nested(node['prim'], args)
-            is_struct = node['prim'] == 'pair' and (typename or fieldname or entry)
+            is_struct = node['prim'] == 'pair' and (typename or fieldname or inherited_name)
             if is_struct or parent_prim != node['prim']:
                 args = get_flat_nested(res)
             else:
@@ -198,7 +128,7 @@ def build_maps(metadata: dict):
         names = []
         for i, arg_path in enumerate(node['args']):
             arg = metadata[arg_path]
-            name = arg.get('entry', arg.get('fieldname', arg.get('typename')))
+            name = arg.get('inherited_name', arg.get('fieldname', arg.get('typename')))
             if name:
                 name = name.replace('_Liq_entry_', '')
             else:
@@ -210,7 +140,7 @@ def build_maps(metadata: dict):
         names, unnamed = [], True
         for i, arg_path in enumerate(node['args']):
             arg = metadata[arg_path]
-            name = arg.get('typename', arg.get('fieldname', arg.get('entry')))
+            name = arg.get('typename', arg.get('fieldname', arg.get('inherited_name')))
             if name:
                 unnamed = False
             else:
@@ -236,7 +166,7 @@ def build_maps(metadata: dict):
             if all(map(is_unit, node['args'])):
                 bin_types[bin_path] = 'enum'
                 for i, arg_path in enumerate(node['args']):
-                    parse_node(arg_path, join(json_path, bin_types[arg_path]))
+                    parse_node(arg_path, join(json_path, names[i]))
                     bin_types[arg_path] = names[i]
                     bin_names[arg_path] = names[i]
             else:
@@ -281,29 +211,29 @@ def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
             return flatten_args(val)
         elif bin_type == 'keypair':
             return tuple(flatten_args(val))
-        elif bin_type == 'or':
+        elif bin_type in ['or', 'router', 'enum']:
             arg_path = type_path + {'Left': '0', 'Right': '1'}[val_node['prim']]
             is_leaf = schema.metadata[arg_path]['prim'] != 'or'
-            return {schema.bin_names[arg_path]: val[0]} if is_leaf else val[0]
-        elif bin_type == 'router':
-            return val[0]
+            res = {schema.bin_names[arg_path]: val[0]} if is_leaf else val[0]
+            return next(iter(res)) if bin_type == 'enum' else res
         elif bin_type == 'namedtuple':
             names = list(map(lambda x: schema.bin_names[x], schema.metadata[type_path]['args']))
             return dict(zip(names, flatten_args(val)))
-        elif bin_type == 'enum':
-            return next(iter(val[0]))
         elif bin_type == 'unit':
             return None
         else:
             return val
 
-    if type_expr['prim'] in ['storage', 'parameters']:
+    if type_expr['prim'] in ['storage', 'parameter']:
         type_expr = type_expr['args'][0]
+
+    for idx in bin_root[1:]:
+        type_expr = type_expr['args'][int(idx)]
 
     return parse_expression(val_expr, type_expr, decode_selector, bin_root)
 
 
-def parse_json(data, schema: Schema, json_root='/'):
+def parse_json(data, schema: Schema, bin_root='0'):
     bin_values = defaultdict(dict)  # type: Dict[str, dict]
 
     def parse_entry(bin_path, index):
@@ -323,7 +253,7 @@ def parse_json(data, schema: Schema, json_root='/'):
         else:
             bin_values[bin_path][index] = key
 
-    def parse_node(node, json_path='/', index='0'):
+    def parse_node(node, json_path, index='0'):
         bin_path = schema.json_to_bin[json_path]
         bin_type = schema.bin_types[bin_path]
 
@@ -364,7 +294,11 @@ def parse_json(data, schema: Schema, json_root='/'):
                 bin_values[bin_path][index] = node
                 parse_entry(bin_path, index)
 
-    parse_node(data, json_path=json_root)
+    json_root = next((k for k, v in schema.json_to_bin.items() if v == bin_root), None)
+    if json_root:
+        parse_node(data, json_root)
+    else:
+        parse_comparable(data, bin_root, index='0')
     return dict(bin_values)
 
 

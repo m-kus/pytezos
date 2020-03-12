@@ -79,7 +79,7 @@ parameter_data = [(
 )]
 
 
-class TestEncoding(TestCase):
+class TestComparable(TestCase):
 
     @parameterized.expand(storage_data)
     def test_storage_decode(self, val_expr, type_expr):

@@ -1,9 +1,13 @@
 from pprint import pprint
+from collections import namedtuple
 
+from pytezos.michelson.forge import prim_tags
 from pytezos.michelson.micheline import Schema, collapse_micheline, build_maps, parse_micheline, \
-    parse_json, make_micheline, is_micheline, michelson_to_micheline, BigMapSchema
+    parse_json, make_micheline, michelson_to_micheline
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.docstring import generate_docstring
+
+BigMapSchema = namedtuple('BigMapSchema', ['bin_to_id', 'id_to_bin'])
 
 
 class MichelineSchemaError(ValueError):
@@ -32,7 +36,7 @@ def decode_micheline(val_expr, type_expr, schema: Schema, root='0'):
     """
     Converts Micheline data into Python object
     :param val_expr: Micheline value expression
-    :param type_expr: Michelson type expression
+    :param type_expr: Michelson type expression for the entire type
     :param schema: schema built for particular contract/section
     :param root: which binary node to take as root, used to decode BigMap values/diffs
     :return: Object
@@ -55,8 +59,7 @@ def encode_micheline(data, schema: Schema, root='0', binary=False):
     :return: Micheline expression
     """
     try:
-        json_root = next((k for k, v in schema.json_to_bin.items() if v == root), '/')
-        bin_values = parse_json(data, schema, json_root)
+        bin_values = parse_json(data, schema, root)
         return make_micheline(bin_values, schema.bin_types, root, binary)
     except (KeyError, IndexError, TypeError) as e:
         print(generate_docstring(schema, 'schema'))
@@ -110,3 +113,15 @@ def build_big_map_schema(data, schema: Schema) -> BigMapSchema:
             bin_to_id[bin_path], id_to_bin[big_map_id] = big_map_id, bin_path
 
     return BigMapSchema(bin_to_id, id_to_bin)
+
+
+def is_micheline(value):
+    if isinstance(value, list):
+        def get_prim(x):
+            return x.get('prim') if isinstance(x, dict) else None
+        return set(map(get_prim, value)) == {'parameter', 'storage', 'code'}
+    elif isinstance(value, dict):
+        primitives = list(prim_tags.keys())
+        return any(map(lambda x: x in value, ['prim', 'args', 'annots', *primitives]))
+    else:
+        return False
