@@ -155,14 +155,17 @@ class ContractStorage(metaclass=InlineDocstring):
         self.big_map_schema = build_big_map_schema(data, self.schema)
 
     def _locate_big_map(self, big_map_id=None):
+        def get_json_path(bp):
+            return next((k.lstrip('/') for k, v in self.schema.json_to_bin.items() if v == bp),
+                        self.schema.bin_names[bin_path])
+
         if big_map_id is None:
             # Default Big Map location (prior to Babylon https://blog.nomadic-labs.com/michelson-updates-in-005.html)
-            return '000', '001', ''
+            return '000', '001', get_json_path('00')
         else:
             assert self.big_map_schema, "Please call `big_map_init` first"
             bin_path = self.big_map_schema.id_to_bin[int(big_map_id)]
-            name = self.schema.bin_names[bin_path]
-            return bin_path + '0', bin_path + '1', name
+            return bin_path + '0', bin_path + '1', get_json_path(bin_path)
 
     def big_map_id(self, big_map_path) -> int:
         assert self.big_map_schema, "Please call `big_map_init` first"
@@ -229,7 +232,7 @@ class ContractStorage(metaclass=InlineDocstring):
                 continue
 
             big_map_id = item.get('big_map')
-            key_root, value_root, name = self._locate_big_map(big_map_id)
+            key_root, value_root, json_path = self._locate_big_map(big_map_id)
 
             key = decode_micheline(val_expr=item['key'],
                                    type_expr=self.code,
@@ -244,7 +247,7 @@ class ContractStorage(metaclass=InlineDocstring):
                 value = None
 
             if big_map_id and not self._is_old_style_big_map():
-                res[name][key] = value
+                res[json_path][key] = value
             else:
                 res[key] = value  # Backward compatibility
 

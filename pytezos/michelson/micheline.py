@@ -5,7 +5,7 @@ from decimal import Decimal
 from collections import namedtuple, defaultdict
 from functools import lru_cache
 
-from pytezos.encoding import forge_public_key, forge_address
+from pytezos.encoding import forge_public_key, forge_address, forge_base58
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.grammar import MichelsonParser
 from pytezos.repl.parser import parse_expression, dispatch_core_map
@@ -29,7 +29,7 @@ def skip_nones(**kwargs) -> dict:
 
 def encode_literal(value, prim, binary=False):
     core_type = 'string'
-    if prim in ['int', 'nat']:
+    if prim in ['int', 'nat', 'big_map']:
         core_type = 'int'
     elif prim == 'timestamp':
         if isinstance(value, int):
@@ -53,6 +53,9 @@ def encode_literal(value, prim, binary=False):
     elif prim in ['address', 'contract', 'key_hash'] and binary:
         core_type = 'bytes'
         value = forge_address(value, tz_only=prim == 'key_hash').hex()
+    elif prim == 'chain_id':  # and binary ?
+        core_type = 'bytes'
+        value = forge_base58(value).hex()
 
     return {core_type: str(value)}
 
@@ -150,6 +153,9 @@ def build_maps(metadata: dict):
             else:
                 name = f'@{arg["prim"]}_{i}'
             names.append(name)
+
+        if list(set(names)) != names:
+            unnamed = True
         return names, unnamed
 
     def parse_node(bin_path='0', json_path='/'):
@@ -207,7 +213,7 @@ def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
         if bin_type == 'map':
             return dict(val)
         elif bin_type == 'big_map':
-            return dict(val) if isinstance(val_node, list) else {}
+            return dict(val) if isinstance(val_node, list) else val
         elif bin_type == 'option':
             return val[0] if val is not None else None
         elif bin_type == 'pair':
@@ -272,9 +278,12 @@ def parse_json(data, schema: Schema, bin_root='0'):
         bin_path = schema.json_to_bin[json_path]
         bin_type = schema.bin_types[bin_path]
 
+        if bin_path == '0' and bin_type == 'option':
+            bin_path, bin_type = '00', schema.bin_types['00']
+
         if isinstance(node, dict):
             if bin_type in ['map', 'big_map']:
-                bin_values[bin_path][index] = len(node)
+                bin_values[bin_path][index] = str(len(node))
                 parse_entry(bin_path, index)
                 for i, (key, value) in enumerate(node.items()):
                     parse_comparable(key, bin_path=bin_path + '0', index=f'{index}:{i}')
@@ -288,7 +297,7 @@ def parse_json(data, schema: Schema, bin_root='0'):
 
         elif isinstance(node, list):
             if bin_type in ['list', 'set']:
-                bin_values[bin_path][index] = len(node)
+                bin_values[bin_path][index] = str(len(node))
                 parse_entry(bin_path, index)
                 for i, value in enumerate(node):
                     parse_node(value, json_path=join(json_path, '{}'), index=f'{index}:{i}')
@@ -319,12 +328,12 @@ def parse_json(data, schema: Schema, bin_root='0'):
 
 def make_micheline(bin_values: dict, bin_types: dict, bin_root='0', binary=False):
 
-    def get_length(bin_path, index):
+    def try_get_value(bin_path, index):
         try:
-            length = bin_values[bin_path][index]
+            value = bin_values[bin_path][index]
         except KeyError:
-            length = 0  # TODO: make sure there is an option ahead
-        return length
+            value = None  # TODO: make sure there is an option ahead
+        return value
 
     def encode_node(bin_path, index='0'):
         bin_type = bin_types[bin_path]
@@ -335,20 +344,24 @@ def make_micheline(bin_values: dict, bin_types: dict, bin_root='0', binary=False
                 args=list(map(lambda x: encode_node(bin_path + x, index), '01'))
             )
         elif bin_type in ['map', 'big_map']:
-            length = get_length(bin_path, index)
-            return [
-                dict(
-                    prim='Elt',
-                    args=[encode_node(bin_path + '0', f'{index}:{i}'),
-                          encode_node(bin_path + '1', f'{index}:{i}')]
-                )
-                for i in range(length)
-            ]
+            value = try_get_value(bin_path, index)
+            if isinstance(value, int):
+                assert bin_type == 'big_map'
+                return encode_literal(value, bin_type)
+            else:
+                return [
+                    dict(
+                        prim='Elt',
+                        args=[encode_node(bin_path + '0', f'{index}:{i}'),
+                              encode_node(bin_path + '1', f'{index}:{i}')]
+                    )
+                    for i in range(int(value or '0'))
+                ]
         elif bin_type in ['set', 'list']:
-            length = get_length(bin_path, index)
+            value = try_get_value(bin_path, index)
             return [
                 encode_node(bin_path + '0', f'{index}:{i}')
-                for i in range(length)
+                for i in range(int(value or '0'))
             ]
         elif bin_type in ['or', 'router', 'enum']:
             entry = bin_values[bin_path][index]

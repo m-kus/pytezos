@@ -1,0 +1,1 @@
+{"balance":"0","script":{"code":[{"prim":"parameter","args":[{"prim":"mutez"}]},{"prim":"storage","args":[{"prim":"bytes"}]},{"prim":"code","args":[[{"prim":"CAR"},{"prim":"PACK"},{"prim":"BLAKE2B"},{"prim":"NIL","args":[{"prim":"operation"}]},{"prim":"PAIR"}]]}],"storage":{"bytes":"b34844ae3380c587940a6fcf255add1a135fc4ea84fbf6c6718a132a9890b7f6"}}}
