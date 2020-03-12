@@ -154,7 +154,7 @@ def build_maps(metadata: dict):
                 name = f'@{arg["prim"]}_{i}'
             names.append(name)
 
-        if list(set(names)) != names:
+        if len(set(names)) < len(names):
             unnamed = True
         return names, unnamed
 
@@ -293,7 +293,7 @@ def parse_json(data, schema: Schema, bin_root='0'):
                 for key, value in node.items():
                     parse_node(value, json_path=join(json_path, key), index=index)
             else:
-                assert False, (node, json_path)
+                assert False, (node, bin_type)
 
         elif isinstance(node, list):
             if bin_type in ['list', 'set']:
@@ -328,68 +328,59 @@ def parse_json(data, schema: Schema, bin_root='0'):
 
 def make_micheline(bin_values: dict, bin_types: dict, bin_root='0', binary=False):
 
-    def try_get_value(bin_path, index):
-        try:
-            value = bin_values[bin_path][index]
-        except KeyError:
-            value = None  # TODO: make sure there is an option ahead
-        return value
-
     def encode_node(bin_path, index='0'):
         bin_type = bin_types[bin_path]
+        value = bin_values[bin_path][index] if bin_path in bin_values else None
+        is_optional = len(bin_path) > 1 and bin_types[bin_path[:-1]] == 'option'
+
+        if is_optional and not any(filter(
+                lambda x: x.startswith(bin_path) and bin_values[x][index] is not None, bin_values)):
+            # TODO: unit???
+            return dict(prim='None')
+
+        if bin_type == 'option':
+            return encode_node(bin_path + '0', index)
 
         if bin_type in ['pair', 'tuple', 'keypair', 'namedtuple']:
-            return dict(
+            assert value is None
+            res = dict(
                 prim='Pair',
                 args=list(map(lambda x: encode_node(bin_path + x, index), '01'))
             )
         elif bin_type in ['map', 'big_map']:
-            value = try_get_value(bin_path, index)
+            assert value is not None
             if isinstance(value, int):
                 assert bin_type == 'big_map'
-                return encode_literal(value, bin_type)
+                res = encode_literal(value, bin_type)
             else:
-                return [
-                    dict(
-                        prim='Elt',
-                        args=[encode_node(bin_path + '0', f'{index}:{i}'),
-                              encode_node(bin_path + '1', f'{index}:{i}')]
-                    )
-                    for i in range(int(value or '0'))
-                ]
+                res = [dict(prim='Elt',
+                            args=[encode_node(bin_path + '0', f'{index}:{i}'),
+                                  encode_node(bin_path + '1', f'{index}:{i}')])
+                       for i in range(int(value or '0'))]
         elif bin_type in ['set', 'list']:
-            value = try_get_value(bin_path, index)
-            return [
-                encode_node(bin_path + '0', f'{index}:{i}')
-                for i in range(int(value or '0'))
-            ]
+            assert value is not None
+            res = [encode_node(bin_path + '0', f'{index}:{i}')
+                   for i in range(int(value or '0'))]
         elif bin_type in ['or', 'router', 'enum']:
-            entry = bin_values[bin_path][index]
-            return dict(
-                prim={'0': 'Left', '1': 'Right'}[entry],
-                args=[encode_node(bin_path + entry, index)]
-            )
-        elif bin_type == 'option':
-            try:
-                value = encode_node(bin_path + '0', index)
-                if value:
-                    return dict(prim='Some', args=[value])
-                else:
-                    return dict(prim='None')
-            except KeyError:
-                return dict(prim='None')
+            assert value is not None
+            res = dict(prim={'0': 'Left', '1': 'Right'}[value],
+                       args=[encode_node(bin_path + value, index)])
         elif bin_type == 'lambda':
-            return michelson_to_micheline(bin_values[bin_path][index])
+            assert value is not None
+            res = michelson_to_micheline(bin_values[bin_path][index])
         elif bin_type == 'unit':
-            return dict(prim='Unit')
+            res = dict(prim='Unit')
         else:
-            value = bin_values[bin_path][index]
+            assert value is not None
             if value == bin_type:
-                return dict(prim='Unit')
-            elif value is None:
-                return None
+                res = dict(prim='Unit')
             else:
-                return encode_literal(value, bin_type, binary)
+                res = encode_literal(value, bin_type, binary)
+
+        if is_optional:
+            return dict(prim='Some', args=[res])
+        else:
+            return res
 
     return encode_node(bin_root)
 

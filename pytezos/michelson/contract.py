@@ -157,7 +157,7 @@ class ContractStorage(metaclass=InlineDocstring):
     def _locate_big_map(self, big_map_id=None):
         def get_json_path(bp):
             return next((k.lstrip('/') for k, v in self.schema.json_to_bin.items() if v == bp),
-                        self.schema.bin_names[bin_path])
+                        self.schema.bin_names[bp])
 
         if big_map_id is None:
             # Default Big Map location (prior to Babylon https://blog.nomadic-labs.com/michelson-updates-in-005.html)
