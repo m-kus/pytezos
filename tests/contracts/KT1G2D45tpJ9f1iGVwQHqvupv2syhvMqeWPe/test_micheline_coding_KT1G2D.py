@@ -23,13 +23,6 @@ class MichelineCodingTestKT1G2D(TestCase):
         actual = encode_micheline(decoded, self.schema['storage'])
         self.assertEqual(expected, actual)
 
-    def test_micheline_inverse_parameter_onyWYA(self):
-        expected = get_data(
-            path='contracts/KT1G2D45tpJ9f1iGVwQHqvupv2syhvMqeWPe/parameter_onyWYA.json')
-        decoded = decode_micheline(expected, self.code[0], self.schema['parameter'])
-        actual = encode_micheline(decoded, self.schema['parameter'])
-        self.assertEqual(expected, actual)
-
     def test_micheline_inverse_parameter_onydWh(self):
         expected = get_data(
             path='contracts/KT1G2D45tpJ9f1iGVwQHqvupv2syhvMqeWPe/parameter_onydWh.json')

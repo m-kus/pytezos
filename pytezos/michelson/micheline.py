@@ -8,7 +8,7 @@ from functools import lru_cache
 from pytezos.encoding import forge_public_key, forge_address
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.grammar import MichelsonParser
-from pytezos.repl.parser import parse_expression, get_prim_args
+from pytezos.repl.parser import parse_expression, dispatch_core_map
 
 Nested = namedtuple('Nested', ['prim', 'args'])
 Schema = namedtuple('Schema', ['metadata', 'bin_types', 'bin_names', 'json_to_bin'])
@@ -206,8 +206,8 @@ def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
         bin_type = schema.bin_types[type_path]
         if bin_type == 'map':
             return dict(val)
-        elif bin_type == 'big_map' and isinstance(val_node, list):
-            return dict(val)
+        elif bin_type == 'big_map':
+            return dict(val) if isinstance(val_node, list) else {}
         elif bin_type == 'option':
             return val[0] if val is not None else None
         elif bin_type == 'pair':
@@ -221,11 +221,21 @@ def parse_micheline(val_expr, type_expr, schema: Schema, bin_root='0'):
             return dict(zip(names, flatten_pair(val)))
         elif bin_type in ['or', 'router', 'enum']:
             arg_path = type_path + {'Left': '0', 'Right': '1'}[val_node['prim']]
+            if schema.bin_types[arg_path] == 'option':
+                arg_path += '0'
             is_leaf = schema.metadata[arg_path]['prim'] != 'or'
             res = {schema.bin_names[arg_path]: val[0]} if is_leaf else val[0]
             return next(iter(res)) if bin_type == 'enum' else res
         elif bin_type == 'unit':
             return None
+        elif bin_type == 'lambda':
+            return micheline_to_michelson(val)
+        elif bin_type == 'timestamp':
+            return dispatch_core_map(val_node, {'string': str, 'int': int})
+        elif bin_type == 'bytes':
+            return val.hex()
+        elif bin_type == 'mutez':
+            return Decimal(val) / 10 ** 6
         else:
             return val
 
