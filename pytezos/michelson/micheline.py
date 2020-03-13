@@ -148,14 +148,11 @@ def build_maps(metadata: dict):
         for i, arg_path in enumerate(node['args']):
             arg = metadata[arg_path]
             name = arg.get('typename', arg.get('fieldname', arg.get('inherited_name')))
-            if name:
+            if name and name not in names:
                 unnamed = False
             else:
-                name = f'@{arg["prim"]}_{i}'
+                name = f'{arg["prim"]}_{i}'
             names.append(name)
-
-        if len(set(names)) < len(names):
-            unnamed = True
         return names, unnamed
 
     def parse_node(bin_path='0', json_path='/'):
