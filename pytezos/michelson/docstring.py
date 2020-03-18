@@ -77,7 +77,7 @@ def generate_docstring(schema: Schema, title, root='0'):
             values = map(decode_node, node['args'])
             res = f'[ {" , ".join(values)} ]'
 
-        elif bin_type == 'keypair':
+        elif bin_type in {'keypair', 'pair'}:
             values = map(decode_node, node['args'])
             res = f'( {" , ".join(values)} )'
 
