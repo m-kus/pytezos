@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pytezos import pytezos
+from pytezos.interop import Interop
 from pytezos.repl.control import instruction
 from pytezos.repl.context import Context
 from pytezos.repl.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \
@@ -69,14 +69,14 @@ def do_self(ctx: Context, prim, args, annots):
 @instruction('SENDER')
 def do_sender(ctx: Context, prim, args, annots):
     res = ctx.get('SENDER')
-    assert res, f'SENDER is not initialized'
+    assert res is not None, f'SENDER is not initialized'
     ctx.push(res, annots=['@sender'])
 
 
 @instruction('SOURCE')
 def do_source(ctx: Context, prim, args, annots):
     res = ctx.get('SOURCE')
-    assert res, f'SOURCE is not initialized'
+    assert res is not None, f'SOURCE is not initialized'
     ctx.push(res, annots=['@source'])
 
 
@@ -86,7 +86,12 @@ def do_now(ctx: Context, prim, args, annots):
     if not res:
         network = ctx.get('NETWORK')
         if network:
-            now = pytezos.using(network).now()
+            interop = Interop().using(network)
+            constants = interop.shell.block.context.constants()  # cached
+            ts = interop.shell.head.header()['timestamp']
+            dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
+            first_delay = constants['time_between_blocks'][0]
+            return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
         else:
             now = int(datetime.utcnow().timestamp())
         res = Timestamp(now)
@@ -99,8 +104,9 @@ def check_contract(ctx: Context, address, entry_annot, type_expr):
         ctx.print('skip check')
         return True
     try:
-        ci = pytezos.using(network).contract(address)
-        actual, _ = get_entry_expr(ci.contract.parameter.code, entry_annot)
+        script = Interop().using(network).shell.contracts[address].script()
+        p_type_expr = next(s for s in script['code'] if s['prim'] == 'parameter')
+        actual, _ = get_entry_expr(p_type_expr, entry_annot)
         if expr_equal(type_expr, actual):
             return True
         else:

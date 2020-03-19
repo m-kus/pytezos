@@ -1,7 +1,7 @@
 from typing import Dict
 from simplejson import JSONDecodeError
 
-from pytezos import pytezos
+from pytezos.interop import Interop
 from pytezos.repl.types import StackItem, Map, BigMap
 from pytezos.repl.parser import parse_expression, assert_expr_equal, get_int, assert_comparable, assert_big_map_val
 from pytezos.michelson.pack import get_key_hash
@@ -168,7 +168,7 @@ class BigMapPool:
         key_hash = get_key_hash(key.val_expr, key.type_expr)
         network = big_map.val_expr['_network']
         try:
-            res = pytezos.using(network).shell.head.context.big_maps[int(big_map)][key_hash]()
+            res = Interop().using(network).shell.head.context.big_maps[int(big_map)][key_hash]()
         except JSONDecodeError:
             res = None
         return res
