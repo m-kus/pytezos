@@ -83,7 +83,7 @@ def do_source(ctx: Context, prim, args, annots):
 @instruction('NOW')
 def do_now(ctx: Context, prim, args, annots):
     res = ctx.get('NOW')
-    if not res:
+    if res is None:
         network = ctx.get('NETWORK')
         if network:
             interop = Interop().using(network)
