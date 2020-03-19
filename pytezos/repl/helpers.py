@@ -4,7 +4,7 @@ from pytezos import Contract, pytezos
 from pytezos.encoding import is_kt
 from pytezos.repl.control import instruction, do_interpret
 from pytezos.repl.context import Context
-from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, get_entry_expr, assert_expr_equal
+from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, restore_entry_expr, assert_expr_equal
 from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List, Operation
 
 networks = ['mainnet', 'zeronet', 'babylonnet', 'carthagenet']
@@ -63,8 +63,8 @@ def do_begin(ctx: Context, prim, args, annots):
     if network:
         ctx.print(f'use {network}')
 
-    p_type_expr = get_entry_expr(p_type_expr, entrypoint)
-    parameter = ctx.big_maps.pre_alloc(args[0], p_type_expr, copy=True, network=network)
+    p_val_expr = restore_entry_expr(val_expr=args[0], type_expr=p_type_expr, field_annot=entrypoint)
+    parameter = ctx.big_maps.pre_alloc(p_val_expr, p_type_expr, copy=True, network=network)
 
     s_type_expr = ctx.get('storage')
     assert s_type_expr, f'storage type is not initialized'

@@ -114,23 +114,33 @@ def get_bytes(val_expr):
     return bytes.fromhex(get_core_val(val_expr, core_type='bytes'))
 
 
-def get_entry_expr(expr, field_annot):
-    def _get(node):
+def get_entry_expr(type_expr, field_annot):
+    def _get(node, path):
         assert_type(node, dict)
         if field_annot in node.get('annots', []):
-            return node
+            return node, path
 
-        for arg in node.get('args', []):
-            res = _get(arg)
+        for i, arg in enumerate(node.get('args', [])):
+            res = _get(arg, path + str(i))
             if res:
                 return res
 
-    entry = _get(expr)
+    entry = _get(type_expr, '')
     if not entry and field_annot == '%default':
-        entry = expr
+        entry_type, entry_path = type_expr, ''
+    else:
+        entry_type, entry_path = entry
 
-    assert entry, f'entrypoint `{field_annot[1:]}` was not found'
-    return entry
+    assert entry_type, f'entrypoint `{field_annot[1:]}` was not found'
+    return entry_type, entry_path
+
+
+def restore_entry_expr(val_expr, type_expr, field_annot):
+    _, entry_path = get_entry_expr(type_expr, field_annot)
+    for idx in reversed(entry_path):
+        val_expr = {'prim': 'Left' if idx == '0' else 'Right',
+                    'args': [val_expr]}
+    return val_expr
 
 
 def expr_equal(a, b):

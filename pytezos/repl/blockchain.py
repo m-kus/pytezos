@@ -61,7 +61,7 @@ def do_self(ctx: Context, prim, args, annots):
     entry_annot = next((a for a in annots if a[0] == '%'), '%default')
     ctx.print(f'use {entry_annot}')
 
-    p_type_expr = get_entry_expr(p_type_expr, entry_annot)
+    p_type_expr, _ = get_entry_expr(p_type_expr, entry_annot)
     res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
     ctx.push(res, annots=['@self'])
 
@@ -100,7 +100,7 @@ def check_contract(ctx: Context, address, entry_annot, type_expr):
         return True
     try:
         ci = pytezos.using(network).contract(address)
-        actual = get_entry_expr(ci.contract.parameter.code, entry_annot)
+        actual, _ = get_entry_expr(ci.contract.parameter.code, entry_annot)
         if expr_equal(type_expr, actual):
             return True
         else:

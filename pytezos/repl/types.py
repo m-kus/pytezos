@@ -201,6 +201,10 @@ class List(StackItem, prim='list', args_len=1):
         for item in self.val_expr:
             yield self.parse(val_expr=item, type_expr=self.type_expr['args'][0])
 
+    def __getitem__(self, item):
+        assert_type(item, int)
+        return self.parse(val_expr=self.val_expr[item], type_expr=self.type_expr['args'][0])
+
     def prepend(self, item: StackItem) -> 'List':
         self.assert_val_type(item)
         return self._modify(val_expr=[item.val_expr] + self.val_expr)
@@ -575,3 +579,7 @@ class Operation(StackItem, prim='operation'):
         return cls(val=cls.format_content(content),
                    val_expr={'string': cls.format_content(content), '_content': content},
                    type_expr={'prim': cls.prim})
+
+    @property
+    def content(self):
+        return self.val_expr.get('_content')

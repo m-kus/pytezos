@@ -71,10 +71,12 @@ class ContractParameter(metaclass=InlineDocstring):
             else:
                 entrypoint = 'default'
 
-        if entrypoint == 'default':
-            value = encode_micheline(data, self.schema)
+            if entrypoint == 'default':
+                value = encode_micheline(data, self.schema)
+            else:
+                value = encode_micheline(data[entrypoint], self.schema, root=self._get_entry_root(entrypoint))
         else:
-            value = encode_micheline(data[entrypoint], self.schema, root=self._get_entry_root(entrypoint))
+            value = encode_micheline(data, self.schema, root=self._get_entry_root(entrypoint))
 
         return dict(entrypoint=entrypoint, value=value)
 
