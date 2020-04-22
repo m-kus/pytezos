@@ -63,7 +63,8 @@ class ShellQuery(RpcQuery, path=''):
     def mempool(self):
         return self.chains.main.mempool
 
-    def wait_next_block(self, block_hash=None, block_time=60):
+    def wait_next_block(self):
+        block_time = int(self.block.context.constants()["time_between_blocks"][0])
         header = self.head.header()
         if block_hash is None:
             block_hash = header['hash']
