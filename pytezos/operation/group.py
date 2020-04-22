@@ -101,7 +101,7 @@ class OperationGroup(Interop, ContentMixin):
         replace_map = {
             'pkh': source,
             'source': source,
-            'delegate': source,
+            'delegate': source,  # self registration
             'counter': lambda x: str(next(counter)),
             'secret': lambda x: self.key.activation_code,
             'period': lambda x: str(self.shell.head.voting_period()),

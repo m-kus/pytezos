@@ -5,6 +5,10 @@ import os
 tests_dir = os.path.dirname(__file__)
 
 
+def abspath(path):
+    return os.path.join(tests_dir, path)
+
+
 def relpath(path):
     return os.path.relpath(path, start=tests_dir)
 

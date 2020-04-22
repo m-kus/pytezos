@@ -125,7 +125,7 @@ class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operatio
                         return {**make_operation_result(status=status), **operation}
                 elif isinstance(operation, list):
                     if operation[0] == item:
-                        errors = operation[1].pop('error', default=[])
+                        errors = operation[1].pop1('error', default=[])
                         return {**make_operation_result(status=status, errors=errors), **operation[1]}
                 else:
                     assert False, operation

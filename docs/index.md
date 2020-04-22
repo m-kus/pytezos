@@ -40,13 +40,13 @@ but if you feel lucky you can try to install natively:
 
 In console:
 ```
-$ pip install pytezos[crypto]
+$ pip install pytezos
 ```
 
 In Google Colab notebook:
 ```python
 >>> !apt install libsodium-dev libsecp256k1-dev libgmp-dev
->>> !pip install pytezos[crypto]
+>>> !pip install pytezos
 [RESTART RUNTIME]
 ```
 
@@ -111,14 +111,14 @@ Then configure the client (we can leave `shell` parameter empty, but we will set
 
 Public available RPC providers are available at `pytezos.rpc`:
 ```python
->>> from pytezos.rpc import tulip
->>> tulip
+>>> from pytezos.rpc import tzkt
+>>> tzkt
 <pytezos.rpc.RpcProvider object at 0x7f6f56ad77b8>
 
 Networks
-.mainnet  # https://rpc.tulip.tools/mainnet/
-.alphanet  # https://rpc.tulip.tools/alphanet/
-.zeronet  # https://rpc.tulip.tools/zeronet/
+.mainnet  # https://rpc.tzkt.io/mainnet/
+.alphanet  # https://rpc.tzkt.io/alphanet/
+.zeronet  # https://rpc.tzkt.io/zeronet/
 ```
 
 ### Sandboxed mode

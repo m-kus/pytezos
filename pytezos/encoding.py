@@ -1,4 +1,6 @@
 import base58
+import calendar
+from datetime import datetime
 
 
 def tb(l):
@@ -170,6 +172,14 @@ def is_key(v) -> bool:
     return True
 
 
+def is_chain_id(v) -> bool:
+    try:
+        _validate(v, prefixes=[b'Net'])
+    except (ValueError, TypeError):
+        return False
+    return True
+
+
 def forge_nat(value) -> bytes:
     """
     Encode a number using LEB128 encoding (Zarith)
@@ -220,6 +230,14 @@ def parse_public_key(data: bytes):
     return base58_encode(data[1:], key_prefix[data[:1]]).decode()
 
 
+def parse_chain_id(data: bytes):
+    return base58_encode(data, b'Net').decode()
+
+
+def parse_signature(data: bytes):
+    return base58_encode(data, b'sig').decode()
+
+
 def forge_address(value, tz_only=False) -> bytes:
     prefix = value[:3]
     address = base58.b58decode_check(value)[3:]
@@ -255,6 +273,13 @@ def parse_address(data: bytes):
         return base58_encode(data[1:], tz_prefixes[b'\x00' + data[:1]]).decode()
 
 
+def parse_contract(data: bytes):
+    res = parse_address(data[:22])
+    if len(data) > 22:
+        res += f'%{data[22:].decode()}'
+    return res
+
+
 def forge_bool(value) -> bytes:
     return b'\xff' if value else b'\x00'
 
@@ -263,5 +288,27 @@ def forge_array(data, len_bytes=4) -> bytes:
     return len(data).to_bytes(len_bytes, 'big') + data
 
 
+def parse_array(data, len_bytes=4):
+    assert len(data) >= len_bytes, f'not enough bytes to parse array length, wanted {len_bytes}'
+    length = int.from_bytes(data[:len_bytes], 'big')
+    assert len(data) >= len_bytes + length, f'not enough bytes to parse array body, wanted {length}'
+    return data[len_bytes:len_bytes+length], len_bytes+length
+
+
 def forge_base58(value) -> bytes:
     return base58_decode(value.encode())
+
+
+def forge_timestamp(value) -> int:
+    assert isinstance(value, str)
+    dt = datetime.strptime(value, '%Y-%m-%dT%H:%M:%SZ')
+    return calendar.timegm(dt.utctimetuple())
+
+
+def forge_contract(value) -> bytes:
+    parts = value.split('%')
+    address, entrypoint = (parts[0], parts[1]) if len(parts) == 2 else (parts[0], 'default')
+    res = forge_address(address)
+    if entrypoint != 'default':
+        res += entrypoint.encode()
+    return res

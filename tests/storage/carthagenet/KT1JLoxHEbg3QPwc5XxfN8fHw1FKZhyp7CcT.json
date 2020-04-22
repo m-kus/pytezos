@@ -1,0 +1,1 @@
+{"balance":"1000000","script":{"code":[{"prim":"parameter","args":[{"prim":"string"}]},{"prim":"storage","args":[{"prim":"string"}]},{"prim":"code","args":[[{"prim":"CAR"},{"prim":"PUSH","args":[{"prim":"string"},{"string":"Hello "}]},{"prim":"CONCAT"},{"prim":"NIL","args":[{"prim":"operation"}]},{"prim":"PAIR"}]]}],"storage":{"string":"world"}}}

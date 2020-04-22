@@ -1,16 +1,25 @@
-import fire
-from os.path import abspath
 from glob import glob
+from os.path import abspath, dirname, join
 from pprint import pprint
+import fire
 
 from pytezos import pytezos, Contract, RpcError
-from pytezos.operation.result import OperationResult
 from pytezos.michelson.docstring import generate_docstring
+from pytezos.operation.result import OperationResult
 from pytezos.tools.github import create_deployment, create_deployment_status
+
+kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
+kernel_json = {
+    "argv": ['pytezos', 'kernel', 'run', "-file", "{connection_file}"],
+    "display_name": "Michelson",
+    "language": "michelson",
+    "codemirror_mode": "michelson"
+}
 
 
 def make_bcd_link(network, address):
     net = {
+        'carthagenet': 'carthage',
         'babylonnet': 'babylon',
         'sandboxnet': 'sandbox',
         'mainnet': 'main',
@@ -25,7 +34,7 @@ def get_contract(path):
         assert len(files) == 1
         contract = Contract.from_file(abspath(files[0]))
 
-    elif any(map(lambda x: path.startswith(x), ['zeronet', 'babylonnet', 'mainnet'])):
+    elif any(map(lambda x: path.startswith(x), ['zeronet', 'babylonnet', 'mainnet', 'carthagenet'])):
         network, address = path.split(':')
         ptz = pytezos.using(shell=network)
         script = ptz.shell.contracts[address].script()
@@ -63,7 +72,7 @@ class PyTezosCli:
         else:
             assert False, action
 
-    def activate(self, path, network='babylonnet'):
+    def activate(self, path, network='carthagenet'):
         """
         Activates and reveals key from the faucet file
         :param path: Path to the .json file downloaded from https://faucet.tzalpha.net/
@@ -97,7 +106,7 @@ class PyTezosCli:
         else:
             print(f'Your key {ptz.key.public_key_hash()} is now active and revealed')
 
-    def deploy(self, path, storage=None, network='babylonnet', key=None,
+    def deploy(self, path, storage=None, network='carthagenet', key=None,
                github_repo_slug=None, github_oauth_token=None, dry_run=False):
         """
         Deploy contract to the specified network

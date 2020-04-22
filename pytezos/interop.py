@@ -1,11 +1,11 @@
 from os.path import exists, expanduser
 
-from pytezos.rpc import ShellQuery, RpcNode, mainnet, babylonnet, zeronet, localhost, pool
+from pytezos.rpc import ShellQuery, RpcNode, mainnet, babylonnet, carthagenet, zeronet, localhost, pool
 from pytezos.crypto import Key, is_installed
 from pytezos.encoding import is_key, is_pkh
 from pytezos.tools.docstring import InlineDocstring
 
-default_shell = 'babylonnet'
+default_shell = 'carthagenet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
 default_key_hash = 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa'
 
@@ -59,6 +59,7 @@ class Interop(metaclass=InlineDocstring):
             networks = {
                 'mainnet': mainnet,
                 'babylonnet': babylonnet,
+                'carthagenet': carthagenet,
                 'zeronet': zeronet,
                 'sandboxnet': localhost.sandboxnet,
                 'mainnet-pool': pool.mainnet

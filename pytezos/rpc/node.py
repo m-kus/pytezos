@@ -1,5 +1,5 @@
 import requests
-from json import JSONDecodeError
+from simplejson import JSONDecodeError
 from hashlib import sha1
 from urllib.parse import urlencode
 from pprint import pformat

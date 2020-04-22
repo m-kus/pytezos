@@ -33,6 +33,7 @@ localhost = RpcProvider(
 tzkt = RpcProvider(
     mainnet='https://rpc.tzkt.io/mainnet/',
     babylonnet='https://rpc.tzkt.io/babylonnet/',
+    carthagenet='https://rpc.tzkt.io/carthagenet/',
     zeronet='https://rpc.tzkt.io/zeronet/'
 )
 pool = RpcProvider(
@@ -48,9 +49,14 @@ pool = RpcProvider(
     babylonnet=[
         'https://rpc.tzkt.io/babylonnet/',
         'https://tezos-dev.cryptonomic-infra.tech/',
+    ],
+    carthagenet=[
+        'https://rpc.tzkt.io/carthagenet/',
+        'https://carthagenet.tezos.org.ua/',
     ]
 )
 
 mainnet = tzkt.mainnet
 babylonnet = tzkt.babylonnet
+carthagenet = tzkt.carthagenet
 zeronet = tzkt.zeronet

@@ -1,4 +1,3 @@
-import sys
 from os.path import dirname, join
 from unittest import TestCase
 from decimal import Decimal
@@ -42,7 +41,8 @@ class AtomexContractTest(TestCase):
             }
         }
         self.assertDictEqual(big_map_diff, res.big_map_diff)
-        self.assertEqual(empty_storage, res.storage)
+        self.assertIsInstance(res.storage[0], int)
+        self.assertIsNone(res.storage[1])
         self.assertEqual([], res.operations)
 
     def test_initiate_proxy(self):
@@ -68,7 +68,8 @@ class AtomexContractTest(TestCase):
             }
         }
         self.assertDictEqual(big_map_diff, res.big_map_diff)
-        self.assertEqual(empty_storage, res.storage)
+        self.assertIsInstance(res.storage[0], int)
+        self.assertIsNone(res.storage[1])
         self.assertEqual([], res.operations)
 
     def test_initiate_same_secret(self):

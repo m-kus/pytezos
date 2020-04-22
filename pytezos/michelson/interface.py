@@ -11,6 +11,7 @@ from pytezos.operation.group import OperationGroup
 from pytezos.operation.content import format_mutez, format_tez
 from pytezos.interop import Interop
 from pytezos.tools.docstring import get_class_docstring
+from pytezos.repl.interpreter import Interpreter
 
 
 class ContractCallResult(OperationResult):
@@ -48,6 +49,15 @@ class ContractCallResult(OperationResult):
             storage=contract.storage.decode(code_run['storage']),
             big_map_diff=contract.storage.big_map_diff_decode(code_run.get('big_map_diff', [])),
             operations=code_run.get('operations', [])
+        )
+
+    @classmethod
+    def from_repl_result(cls, res: dict, parameters, contract: Contract):
+        return cls(
+            parameters=contract.parameter.decode(parameters),
+            storage=contract.storage.decode(res['result']['storage'].val_expr),
+            big_map_diff=contract.storage.big_map_diff_decode(res['result']['big_map_diff']),
+            operations=[x.content for x in res['result']['operations']]
         )
 
 
@@ -125,6 +135,41 @@ class ContractCall(Interop):
         entrypoint = self.parameters['entrypoint']
         return f'transfer {amount} from {source} to {self.address} ' \
                f'--entrypoint \'{entrypoint}\' --arg \'{arg}\''
+
+    def interpret(self, storage, source=None, sender=None, amount=None, balance=None, chain_id=None, now=None):
+        """
+        Run code in the builtin REPL (WARNING! Not recommended for critical tasks)
+        :param storage: Python object
+        :param source: patch SOURCE
+        :param sender: patch SENDER
+        :param amount: patch AMOUNT
+        :param balance: patch BALANCE
+        :param chain_id: patch CHAIN_ID
+        :param now: patch NOW
+        :return: ContractCallResult
+        """
+        i = Interpreter()
+        i.execute(self.contract.text)
+
+        patch_map = {
+            'SOURCE': source,
+            'SENDER': sender,
+            'AMOUNT': amount,
+            'BALANCE': balance,
+            'CHAIN_ID': chain_id,
+            'NOW': now
+        }
+        for instr, value in patch_map.items():
+            if value is not None:
+                value = f'"{value}"' if isinstance(value, str) else value
+                i.execute(f'PATCH {instr} {value}')
+
+        s_expr = micheline_to_michelson(self.contract.storage.encode(storage), inline=True)
+        p_expr = micheline_to_michelson(self.parameters['value'], inline=True)
+        res = i.execute(f'RUN %{self.parameters["entrypoint"]} ({p_expr}) ({s_expr})')
+
+        return ContractCallResult.from_repl_result(
+            res, parameters=self.parameters, contract=self.contract)
 
     def result(self, storage=None, source=None, sender=None, gas_limit=None):
         """

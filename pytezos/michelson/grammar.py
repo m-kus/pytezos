@@ -1,6 +1,5 @@
 # Inspired by https://github.com/jansorg/tezos-intellij/blob/master/grammar/michelson.bnf
-
-from ply.lex import Lexer, lex
+from ply.lex import Lexer, lex, LexToken
 from ply.yacc import yacc
 import re
 import json
@@ -9,7 +8,13 @@ from pytezos.michelson.macros import expand_macro
 
 
 class MichelsonParserError(ValueError):
-    pass
+
+    def __init__(self, token: LexToken, message=None):
+        message = message or f'failed to parse expression {token}'
+        super(MichelsonParserError, self).__init__(message)
+        self.message = message
+        self.line = token.lineno
+        self.pos = token.lexpos
 
 
 class Sequence(list):
@@ -21,9 +26,9 @@ class SimpleMichelsonLexer(Lexer):
               'LEFT_CURLY', 'RIGHT_CURLY', 'LEFT_PAREN', 'RIGHT_PAREN', 'SEMI')
 
     t_INT = r'-?[0-9]+'
-    t_BYTE = r'0x[A-Fa-f0-9]+'
+    t_BYTE = r'0x[A-Fa-f0-9]*'
     t_STR = r'\"(\\.|[^\"])*\"'
-    t_ANNOT = r'[:@%]+([_a-zA-Z][_0-9a-zA-Z\.]*)?'
+    t_ANNOT = r'[:@%]+([_0-9a-zA-Z\.]*)?'  # r'[:@%]+([_a-zA-Z][_0-9a-zA-Z\.]*)?'
     t_PRIM = r'[A-Za-z][A-Za-z0-9_]+'
     t_LEFT_CURLY = r'\{'
     t_RIGHT_CURLY = r'\}'
@@ -55,6 +60,18 @@ class MichelsonParser(object):
         '''
         p[0] = p[1]
 
+    def p_instr_int(self, p):
+        '''instr : INT'''
+        p[0] = {'int': p[1]}
+
+    def p_instr_byte(self, p):
+        '''instr : BYTE'''
+        p[0] = {'bytes': p[1][2:]}  # strip 0x prefix
+
+    def p_instr_str(self, p):
+        '''instr : STR'''
+        p[0] = {'string': json.loads(p[1])}
+
     def p_instr_list(self, p):
         '''instr : instr SEMI instr'''
         p[0] = list()
@@ -74,11 +91,15 @@ class MichelsonParser(object):
 
     def p_expr(self, p):
         '''expr : PRIM annots args'''
-        expr = expand_macro(
-            prim=p[1],
-            annots=p[2] or [],
-            args=p[3] or []
-        )
+        try:
+            expr = expand_macro(
+                prim=p[1],
+                annots=p[2] or [],
+                args=p[3] or [],
+                extra=self.extra
+            )
+        except AssertionError as e:
+            raise MichelsonParserError(p.slice[1], str(e))
         p[0] = Sequence(expr) if isinstance(expr, list) else expr
 
     def p_annots(self, p):
@@ -151,13 +172,14 @@ class MichelsonParser(object):
     def p_error(self, p):
         raise MichelsonParserError(p)
 
-    def __init__(self, debug=False, write_tables=False):
+    def __init__(self, debug=False, write_tables=False, extra_primitives=None):
         self.lexer = SimpleMichelsonLexer()
         self.parser = yacc(
             module=self,
             debug=debug,
             write_tables=write_tables,
         )
+        self.extra = extra_primitives
 
     def parse(self, code):
         return self.parser.parse(code)
