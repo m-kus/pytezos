@@ -4,8 +4,7 @@ FROM python:3-alpine
 ARG version
 
 RUN apk update \
-	&& apk --no-cache add --virtual \
-		build-deps \
+	&& apk --no-cache add --virtual build-deps \
 		build-base \
 		autoconf \
 		automake \
