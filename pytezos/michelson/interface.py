@@ -182,7 +182,7 @@ class ContractCall(Interop):
         :return: ContractCallResult
         """
         chain_id = self.shell.chains.main.chain_id()
-        if storage is not None:
+        if storage is not None or source or sender or gas_limit:
             query = skip_nones(
                 script=self.contract.code,
                 storage=self.contract.storage.encode(storage),
@@ -192,7 +192,7 @@ class ContractCall(Interop):
                 chain_id=chain_id,
                 source=sender,
                 payer=source,
-                gas=gas_limit
+                gas=str(gas_limit) if gas_limit is not None else None
             )
             code_run_res = self.shell.head.helpers.scripts.run_code.post(query)
             return ContractCallResult.from_code_run(
