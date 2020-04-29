@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from pytezos import ContractInterface
+from pytezos.michelson.contract import ContractStorage
 from pytezos.michelson.converter import michelson_to_micheline
 
 code = """
@@ -130,3 +131,14 @@ class TestBmdQuery(TestCase):
         query = ci.contract.storage.big_map_query('big_map_0/tz1bHzftcTKZMTZgLLtnrXydCm6UEqf4ivca')
         self.assertEqual(
             {'big_map_id': 17, 'script_expr': 'expruGu4fvT7wyJYm2Rdz7jssqBZyoSmi3kub6Us3guARnzR9HBQCe'}, query)
+
+    def test_bmd_decode_bin_path_0(self):
+        cs = ContractStorage(michelson_to_micheline("storage (big_map address nat)"))
+        cs.big_map_init({'int': 42})
+        res = cs.big_map_diff_decode([{
+            'action': 'update',
+            'big_map': '42',
+            'key': {'string': 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'},
+            'value': {'int': '100500'}
+        }])
+        self.assertDictEqual({'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN': 100500}, res)
