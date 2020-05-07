@@ -1,7 +1,7 @@
 from os.path import dirname, join
 from unittest import TestCase
 
-from pytezos import pytezos, ContractInterface
+from pytezos import ContractInterface
 
 
 class TestBuiltin(TestCase):
@@ -13,4 +13,9 @@ class TestBuiltin(TestCase):
 
     def test_call_option_none(self):
         res = self.ci.callAnotherContract(None).interpret(storage=None)
-        self.assertEqual(0, res.operations)
+        self.assertEqual(0, len(res.operations))
+
+    def test_call_option_some(self):
+        res = self.ci.callAnotherContract('KT1VG2WtYdSWz5E7chTeAdDPZNy2MpP8pTfL').interpret(storage=None)
+        print(self.ci.contract.parameter)
+        self.assertEqual(1, len(res.operations))

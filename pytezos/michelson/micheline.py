@@ -275,9 +275,6 @@ def parse_json(data, schema: Schema, bin_root='0'):
         bin_path = schema.json_to_bin[json_path]
         bin_type = schema.bin_types[bin_path]
 
-        if bin_path == '0' and bin_type == 'option':
-            bin_path, bin_type = '00', schema.bin_types['00']
-
         if isinstance(node, dict):
             if bin_type in ['map', 'big_map']:
                 bin_values[bin_path][index] = str(len(node))
@@ -315,11 +312,15 @@ def parse_json(data, schema: Schema, bin_root='0'):
                 bin_values[bin_path][index] = node
                 parse_entry(bin_path, index)
 
+    if schema.bin_types[bin_root] == 'option':
+        bin_root += '0'
+
     json_root = next((k for k, v in schema.json_to_bin.items() if v == bin_root), None)
     if json_root:
         parse_node(data, json_root)
     else:
         parse_comparable(data, bin_root, index='0')
+
     return dict(bin_values)
 
 
@@ -328,9 +329,9 @@ def make_micheline(bin_values: dict, bin_types: dict, bin_root='0', binary=False
     def encode_node(bin_path, index='0'):
         bin_type = bin_types[bin_path]
         value = bin_values[bin_path][index] if bin_path in bin_values else None
-        is_optional = len(bin_path) > 1 and bin_types[bin_path[:-1]] == 'option'
+        optional = len(bin_path) > 1 and bin_types[bin_path[:-1]] == 'option'
 
-        if is_optional and not any(filter(
+        if optional and not any(filter(
                 lambda x: x.startswith(bin_path) and bin_values[x][index] is not None, bin_values)):
             # TODO: unit???
             return dict(prim='None')
@@ -374,7 +375,7 @@ def make_micheline(bin_values: dict, bin_types: dict, bin_root='0', binary=False
             else:
                 res = encode_literal(value, bin_type, binary)
 
-        if is_optional:
+        if optional:
             return dict(prim='Some', args=[res])
         else:
             return res
@@ -421,3 +422,7 @@ def michelson_to_micheline(data, parser=None):
     if data[0] == '(' and data[-1] == ')':
         data = data[1:-1]
     return parser.parse(data)
+
+
+def is_optional(schema, bin_path):
+    return len(bin_path) > 1 and schema.bin_types[bin_path[:-1]] == 'option'

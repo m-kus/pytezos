@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytezos"
-version = "2.4.8"
+version = "2.4.9"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]

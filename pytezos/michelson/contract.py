@@ -2,14 +2,12 @@ from functools import lru_cache
 from collections import defaultdict
 from os.path import basename, exists, expanduser, dirname, join
 
-from pytezos.crypto import blake2b_32
-from pytezos.encoding import base58_encode
 from pytezos.tools.docstring import get_class_docstring, InlineDocstring
 from pytezos.michelson.docstring import generate_docstring
-from pytezos.michelson.micheline import make_default, michelson_to_micheline
+from pytezos.michelson.micheline import make_default, michelson_to_micheline, is_optional
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.converter import build_schema, decode_micheline, encode_micheline, build_big_map_schema
-from pytezos.michelson.pack import get_key_hash, get_sub_expr
+from pytezos.michelson.pack import get_key_hash
 
 
 class ContractParameter(metaclass=InlineDocstring):
@@ -32,7 +30,10 @@ class ContractParameter(metaclass=InlineDocstring):
         if entrypoint in {'default', 'root'}:
             return '0'
         else:
-            return self.schema.json_to_bin[f'/{entrypoint}']
+            bin_path = self.schema.json_to_bin[f'/{entrypoint}']
+            if is_optional(self.schema, bin_path):
+                bin_path = bin_path[:-1]
+            return bin_path
 
     def decode(self, data):
         """

@@ -1,6 +1,6 @@
 from os.path import basename
 
-from pytezos.michelson.micheline import Schema
+from pytezos.michelson.micheline import Schema, is_optional
 
 core_types = ['string', 'int', 'bool']
 domain_types = {
@@ -38,9 +38,6 @@ def generate_docstring(schema: Schema, title, root='0'):
     def get_comment(bin_path):
         node = schema.metadata[bin_path]
         return node.get('typename', node.get('fieldname'))
-
-    def is_optional(bin_path):
-        return len(bin_path) > 1 and schema.bin_types[bin_path[:-1]] == 'option'
 
     def decode_node(bin_path, is_element=False, is_entry=False):
         node = get_node(bin_path)
@@ -96,9 +93,6 @@ def generate_docstring(schema: Schema, title, root='0'):
             if res not in core_types:
                 res = f'${res}'
 
-            if is_optional(bin_path):
-                res = f'{res}?'
-
             if is_entry:
                 comment = get_comment(bin_path)
                 if comment:
@@ -107,6 +101,9 @@ def generate_docstring(schema: Schema, title, root='0'):
             if node['prim'] in ['contract', 'lambda']:
                 parameter = schema.metadata[bin_path]['parameter']
                 res = f'{res} ({parameter})'
+
+            if is_optional(schema, bin_path):
+                res = f'None || {res}'
 
             if node['prim'] not in core_types:
                 if bin_path == root:
