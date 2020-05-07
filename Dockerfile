@@ -1,17 +1,23 @@
-FROM python:3-alpine AS build
+ARG POETRY=1.0.5
+ARG PENDULUM=2.1.0
+ARG PYTEST=5.4
 
+FROM python:3-alpine AS build
+ARG POETRY
 COPY . /pytezos
 RUN apk update \
 	&& apk --no-cache add --virtual build-deps \
 	    build-base \
 		libffi-dev \
 		libressl-dev \
-	&& pip3 install poetry==1.0.5 \
+	&& pip3 install poetry==$POETRY \
 	&& cd /pytezos && poetry build
 
 
 FROM python:3-alpine
-
+ARG POETRY
+ARG PENDULUM
+ARG PYTEST
 COPY --from=build /pytezos/dist/*.whl /tmp/pytezos/
 RUN apk update \
 	&& apk --no-cache add --virtual build-deps \
@@ -39,8 +45,8 @@ RUN apk update \
 	&& ./configure \
 	&& make install \
 	&& cd / && rm -rf /tmp/secp256k1 \
-	&& pip3 install --no-cache-dir poetry==1.0.5 \
-	&& pip3 install --no-build-isolation --no-cache-dir pendulum==2.1.0 \
+	&& pip3 install --no-cache-dir poetry==$POETRY pytest~=$PYTEST \
+	&& pip3 install --no-build-isolation --no-cache-dir pendulum==$PENDULUM \
 	&& pip3 install --no-cache-dir /tmp/pytezos/*.whl && rm -rf /tmp/pytezos \
 	&& pip3 uninstall --yes poetry \
 	&& rm -rf ~/.cache/pip && apk del py-pip \
