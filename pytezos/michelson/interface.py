@@ -335,7 +335,9 @@ class ContractInterface(Interop):
     def big_map_get(self, path, block_id='head'):
         """
         Get BigMap entry as Python object by plain key and block height
-        :param path: Json path to the key (or just key to access default BigMap location)
+        :param path: Json path to the key (or just key to access default BigMap location).
+            Use `/` to separate nodes and `:` to separate tuple args.
+            In any other case you'd need to escape those symbols.
         :param block_id: Block height / hash / offset to use, default is `head`
         :return: object
         """

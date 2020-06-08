@@ -88,8 +88,8 @@ def do_dup(ctx: Context, prim, args, annots):
 def do_swap(ctx: Context, prim, args, annots):
     assert_no_annots(prim, annots)
     a, b = ctx.pop2()
-    ctx.push(a)
-    ctx.push(b)
+    ctx.push(a, move=True)
+    ctx.push(b, move=True)
 
 
 @instruction('DIG', args_len=1)
@@ -99,7 +99,7 @@ def do_dig(ctx: Context, prim, args, annots):
     ctx.protect(index)
     res = ctx.pop1()
     ctx.restore(index)
-    ctx.push(res)
+    ctx.push(res, move=True)
 
 
 @instruction('DUG', args_len=1)
@@ -108,7 +108,7 @@ def do_dug(ctx: Context, prim, args, annots):
     index = get_int(args[0])
     res = ctx.pop1()
     ctx.protect(index)
-    ctx.push(res)
+    ctx.push(res, move=True)
     ctx.restore(index)
 
 

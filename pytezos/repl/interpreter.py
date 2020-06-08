@@ -11,8 +11,8 @@ from pytezos.repl.structures import *
 from pytezos.repl.blockchain import *
 
 
-def get_content(item: Operation):
-    content = item.val_expr.get('_content')
+def get_content(obj: dict):
+    content = obj.get('_content')
     if content:
         return format_content(content)
     return {}
@@ -21,7 +21,7 @@ def get_content(item: Operation):
 def format_stack_item(item: StackItem):
     row = {}
     if isinstance(item, Operation):
-        row['value'] = yaml.dump(get_content(item)).rstrip('\n')
+        row['value'] = yaml.dump(get_content(item.val_expr)).rstrip('\n')
     elif isinstance(item, List) and item.val_type() == Operation:
         row['value'] = yaml.dump([get_content(x) for x in item.val_expr]).rstrip('\n')
     else:

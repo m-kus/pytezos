@@ -99,18 +99,21 @@ def build_big_map_schema(data, schema: Schema) -> BigMapSchema:
     bin_to_id = dict()
     id_to_bin = dict()
 
-    def get_big_map_id(node, path):
+    def scan_big_map_ids(node, path):
         if len(path) == 0:
             assert node.get('int'), (node, path)
-            return int(node['int'])
+            yield int(node['int'])
+        elif isinstance(node, list):
+            for item in node:
+                yield from scan_big_map_ids(item, path)
         else:
             assert node.get('args'), (node, path)
-            return get_big_map_id(node['args'][int(path[0])], path[1:])
+            yield from scan_big_map_ids(node['args'][int(path[0])], path[1:])
 
     for bin_path, prim in schema.bin_types.items():
         if prim == 'big_map':
-            big_map_id = get_big_map_id(data, bin_path[1:])
-            bin_to_id[bin_path], id_to_bin[big_map_id] = big_map_id, bin_path
+            for big_map_id in scan_big_map_ids(data, bin_path[1:]):
+                bin_to_id[bin_path], id_to_bin[big_map_id] = big_map_id, bin_path
 
     return BigMapSchema(bin_to_id, id_to_bin)
 

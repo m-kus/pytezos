@@ -71,9 +71,9 @@ class Context:
         self.print(f'restore {count} item(s)')
         self.protected -= count
 
-    def push(self, item: StackItem, annots=None):
+    def push(self, item: StackItem, annots=None, move=False):
         assert_stack_item(item)
-        self.stack.insert(self.protected, item.rename(annots))
+        self.stack.insert(self.protected, item if move else item.rename(annots))
         self.pushed = True
         self.print(f'push {repr(item)}')
 

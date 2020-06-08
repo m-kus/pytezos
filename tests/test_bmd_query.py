@@ -122,6 +122,13 @@ code { { { DUP ; CAR ; DIP { CDR } } } ;
 """
 storage = "Pair 17 (Pair 0x0000176e8f231f39c20a1cbd1ce3cee7806abf52914e (Pair 1500000 500000))"
 
+key_pair_storage = """
+storage (pair (nat %total) 
+              (map %chapters (pair string nat) 
+                             (big_map %balances (address nat) 
+                                                nat)))
+"""
+
 
 class TestBmdQuery(TestCase):
 
@@ -142,3 +149,9 @@ class TestBmdQuery(TestCase):
             'value': {'int': '100500'}
         }])
         self.assertDictEqual({'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN': 100500}, res)
+
+    def test_bmd_nested_tuples(self):
+        cs = ContractStorage(michelson_to_micheline(key_pair_storage))
+        cs.big_map_init(michelson_to_micheline("""
+            Pair 100 { Elt (Pair "main" 0) 42 }
+        """))
