@@ -22,7 +22,7 @@ install:
 
 script:
   - poetry run pytest tests/
-  - poetry run pytest examples/
+#  - poetry run pytest examples/
 
 before_deploy:
   - poetry config http-basic.pypi __token__ $PYPI_TOKEN
