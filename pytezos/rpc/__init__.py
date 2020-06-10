@@ -28,13 +28,19 @@ class RpcProvider:
 
 
 localhost = RpcProvider(
-    sandboxnet='http://127.0.0.1:8732/'
+    sandboxnet='http://127.0.0.1:8732/',
+    bbbox='http://flextesa:20000'
 )
 tzkt = RpcProvider(
     mainnet='https://rpc.tzkt.io/mainnet/',
     babylonnet='https://rpc.tzkt.io/babylonnet/',
     carthagenet='https://rpc.tzkt.io/carthagenet/',
     zeronet='https://rpc.tzkt.io/zeronet/'
+)
+giganode = RpcProvider(
+    mainnet='https://mainnet-tezos.giganode.io/',
+    carthagenet='https://testnet-tezos.giganode.io/',
+    labnet='https://labnet-tezos.giganode.io/'
 )
 pool = RpcProvider(
     klass=RpcMultiNode,
@@ -60,3 +66,4 @@ mainnet = tzkt.mainnet
 babylonnet = tzkt.babylonnet
 carthagenet = tzkt.carthagenet
 zeronet = tzkt.zeronet
+labnet = giganode.labnet

@@ -1,6 +1,6 @@
 from os.path import exists, expanduser
 
-from pytezos.rpc import ShellQuery, RpcNode, mainnet, babylonnet, carthagenet, zeronet, localhost, pool
+from pytezos.rpc import ShellQuery, RpcNode, mainnet, babylonnet, carthagenet, zeronet, localhost, labnet, pool
 from pytezos.crypto import Key, is_installed
 from pytezos.encoding import is_key, is_pkh
 from pytezos.tools.docstring import InlineDocstring
@@ -8,6 +8,9 @@ from pytezos.tools.docstring import InlineDocstring
 default_shell = 'carthagenet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
 default_key_hash = 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa'
+
+alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
+alice_key_hash = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
 
 
 class KeyHash(Key):
@@ -62,6 +65,8 @@ class Interop(metaclass=InlineDocstring):
                 'carthagenet': carthagenet,
                 'zeronet': zeronet,
                 'sandboxnet': localhost.sandboxnet,
+                'bbbox': localhost.bbbox,
+                'labnet': labnet,
                 'mainnet-pool': pool.mainnet
             }
             if shell in networks:
@@ -77,7 +82,12 @@ class Interop(metaclass=InlineDocstring):
             key = default_key if is_installed() else default_key_hash
 
         if isinstance(key, str):
-            if is_key(key):
+            keys = {
+                'alice': alice_key
+            }
+            if key in keys:
+                self.key = keys[key]
+            elif is_key(key):
                 self.key = Key.from_encoded_key(key)
             elif is_pkh(key):
                 self.key = KeyHash(key)
