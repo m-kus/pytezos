@@ -142,7 +142,7 @@ def do_slice(ctx: Context, prim, args, annots):
     offset, length, s = ctx.pop3()
     assert_stack_type(s, [String, Bytes])
     offset, length = int(offset), int(length)
-    if offset + length < len(s):
+    if len(s) > 0 and offset + length <= len(s):
         res = Option.some(s[offset:offset+length])
     else:
         res = Option.none(type(s)().type_expr)
