@@ -171,7 +171,7 @@ class ContentMixin:
     def transaction(self, destination, amount=0, parameters=None,
                     source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
         """
-        Transfer tezzies to a given address (implicit or originated).
+        Transfer tez to a given address (implicit or originated).
         If the receiver is a smart contract, then optional parameters may be passed.
         :param source: Address from which funds will be sent, leave None to use signatory address
         :param destination: Address
