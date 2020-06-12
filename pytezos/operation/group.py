@@ -59,6 +59,7 @@ class OperationGroup(Interop, ContentMixin):
     def json_payload(self) -> dict:
         """
         Get json payload used for preapply.
+
         :return: dic
         """
         return {
@@ -71,6 +72,7 @@ class OperationGroup(Interop, ContentMixin):
     def binary_payload(self) -> bytes:
         """
         Get binary payload used for injection/hash calculation.
+
         :return: bytes
         """
         if not self.signature:
@@ -81,6 +83,7 @@ class OperationGroup(Interop, ContentMixin):
     def operation(self, content):
         """
         Create new operation group with extra content added.
+
         :param content: Kind-specific operation body
         :return: OperationGroup
         """
@@ -90,6 +93,7 @@ class OperationGroup(Interop, ContentMixin):
         """
         Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
+
         :return: OperationGroup
         """
         chain_id = self.chain_id or self.shell.chains.main.chain_id()
@@ -129,6 +133,7 @@ class OperationGroup(Interop, ContentMixin):
     def run(self):
         """
         Simulate operation without signature checks.
+
         :return: RPC response
         """
         return self.shell.head.helpers.scripts.run_operation.post({
@@ -142,7 +147,8 @@ class OperationGroup(Interop, ContentMixin):
 
     def forge(self, validate=True):
         """
-        Convert json representation of the operation group into bytes
+        Convert json representation of the operation group into bytes.
+
         :param validate: Forge remotely also and compare results, default is True
         :return: Hex string
         """
@@ -162,6 +168,7 @@ class OperationGroup(Interop, ContentMixin):
     def autofill(self, gas_reserve=100):
         """
         Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
+
         :param gas_reserve: Add a safe reserve for gas limit (default is 100)
         :return: OperationGroup
         """
@@ -192,6 +199,7 @@ class OperationGroup(Interop, ContentMixin):
     def sign(self):
         """
         Sign the operation group with the key specified by `using`.
+
         :return: OperationGroup
         """
         validation_pass = validation_passes[self.contents[0]['kind']]
@@ -212,6 +220,7 @@ class OperationGroup(Interop, ContentMixin):
     def hash(self):
         """
         Calculate the Base58 encoded operation group hash.
+
         :return: str
         """
         hash_digest = blake2b_32(self.binary_payload()).digest()
@@ -220,6 +229,7 @@ class OperationGroup(Interop, ContentMixin):
     def preapply(self):
         """
         Preapply signed operation group.
+
         :return: RPC response
         """
         if not self.signature:
@@ -231,6 +241,7 @@ class OperationGroup(Interop, ContentMixin):
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
         """
         Inject signed operation group.
+
         :param _async: do not wait for operation inclusion (default is True)
         :param preapply:
         :param check_result:
@@ -269,7 +280,8 @@ class OperationGroup(Interop, ContentMixin):
 
     def result(self):
         """
-        Parse preapply result
+        Parse preapply result.
+
         :return: OperationResult
         """
         return OperationResult.from_operation_group(self.preapply())

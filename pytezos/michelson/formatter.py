@@ -6,6 +6,11 @@ line_size = 100
 
 
 def format_timestamp(timestamp: int) -> str:
+    """
+    Format unix timestamp.
+
+    :param timestamp: Unix timestamp (seconds)
+    """
     dt = datetime.utcfromtimestamp(timestamp)
     return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -103,13 +108,13 @@ def format_node(node, indent='', inline=False, is_root=False, wrapped=False):
         assert False, f'unexpected node {node}'
 
 
-def micheline_to_michelson(data, inline=False, wrap=False):
+def micheline_to_michelson(data, inline=False, wrap=False) -> str:
     """
-    Converts micheline expression into formatted Michelson source
+    Converts micheline expression into formatted Michelson source.
+
     :param data: Micheline expression
     :param inline: produce single line, used for tezos-client arguments (False by default)
     :param wrap: ensure expression is wrapped in brackets
-    :return: string
     """
     try:
         res = format_node(data, inline=inline, is_root=True)

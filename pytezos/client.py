@@ -31,11 +31,12 @@ class PyTezosClient(Interop, ContentMixin):
         """
         Create new operation group (multiple contents).
         You can leave all fields empty in order to create an empty operation group.
+
         :param protocol: Leave None for autocomplete, otherwise you know what to do
         :param branch: Leave None for autocomplete
         :param contents: List of operation contents (optional)
         :param signature: Can be set later
-        :return: OperationGroup
+        :rtype: OperationGroup
         """
         return OperationGroup(
             protocol=protocol,
@@ -48,9 +49,10 @@ class PyTezosClient(Interop, ContentMixin):
 
     def operation(self, content: dict) -> OperationGroup:
         """
-        Create an operation group with single content
+        Create an operation group with single content.
+
         :param content: Operation body (depending on `kind`)
-        :return: OperationGroup
+        :rtype: OperationGroup
         """
         return OperationGroup(
             contents=[content],
@@ -60,9 +62,9 @@ class PyTezosClient(Interop, ContentMixin):
 
     def account(self, account_id=None) -> dict:
         """
-        Shortcut for RPC contract request
+        Shortcut for RPC contract request.
+
         :param account_id: tz/KT address, leave None to show info about current key
-        :return: dict
         """
         address = account_id or self.key.public_key_hash()
         return self.shell.contracts[address]()
@@ -72,8 +74,7 @@ class PyTezosClient(Interop, ContentMixin):
 
     def now(self) -> int:
         """
-        Timestamp of the current head (UTC)
-        :return: int
+        Timestamp of the current head (UTC).
         """
         constants = self.shell.block.context.constants()  # cached
         ts = self.shell.head.header()['timestamp']
@@ -93,16 +94,18 @@ class PyTezosClient(Interop, ContentMixin):
     def contract(self, contract_id) -> ContractInterface:
         """
         Get a high-level interface for a given smart contract id.
+
         :param contract_id: KT address of a smart contract
-        :return: ContractInterface
+        :rtype: ContractInterface
         """
         return self._get_contract_interface(contract_id)
 
     def nft_app(self, contract_id) -> ContractInterface:
         """
         Get a high-level NFT interface for a given smart contract id.
+
         Read more at https://nft.stove-labs.com/
         :param contract_id: KT address of a smart contract
-        :return: ContractInterface
+        :rtype: ContractInterface
         """
         return self._get_contract_interface(contract_id, factory=NonFungibleTokenImpl)

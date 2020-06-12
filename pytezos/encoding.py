@@ -83,6 +83,12 @@ def scrub_input(v) -> bytes:
 
 
 def base58_decode(v: bytes) -> bytes:
+    """
+    Decode data using Base58 with checksum + validate binary prefix against known kinds and cut in the end.
+
+    :param v: Array of bytes (use string.encode())
+    :return: bytes
+    """
     try:
         prefix_len = next(
             len(encoding[2])
@@ -96,6 +102,13 @@ def base58_decode(v: bytes) -> bytes:
 
 
 def base58_encode(v: bytes, prefix: bytes) -> bytes:
+    """
+    Encode data using Base58 with checksum and add an according binary prefix in the end.
+
+    :param v: Array of bytes
+    :param prefix: Human-readable prefix (use b'') e.g. b'tz', b'KT', etc
+    :return: bytes (use string.decode())
+    """
     try:
         encoding = next(
             encoding
@@ -117,10 +130,22 @@ def _validate(v, prefixes: list):
 
 
 def validate_pkh(v):
+    """
+    Ensure parameter is a public key hash (starts with b'tz1', b'tz2', b'tz3')
+
+    :param v: string or bytes
+    :raises ValueError: if parameter is not a public key hash
+    """
     return _validate(v, prefixes=[b'tz1', b'tz2', b'tz3'])
 
 
 def validate_sig(v):
+    """
+    Ensure parameter is a signature (starts with b'edsig', b'spsig', b'p2sig', b'sig')
+
+    :param v: string or bytes
+    :raises ValueError: if parameter is not a signature
+    """
     return _validate(v, prefixes=[b'edsig', b'spsig', b'p2sig', b'sig'])
 
 
@@ -182,7 +207,8 @@ def is_chain_id(v) -> bool:
 
 def forge_nat(value) -> bytes:
     """
-    Encode a number using LEB128 encoding (Zarith)
+    Encode a number using LEB128 encoding (Zarith).
+
     :param int value: the value to encode
     :return: encoded value
     :rtype: bytes

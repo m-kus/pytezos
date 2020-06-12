@@ -7,7 +7,15 @@ minimal_nanotez_per_byte = 1
 minimal_nanotez_per_gas_unit = .1
 
 
-def calculate_fee(content, consumed_gas, extra_size, reserve=10):
+def calculate_fee(content: dict, consumed_gas: int, extra_size: int, reserve=10) -> int:
+    """
+    Calculate minimal fee.
+
+    :param content: operation content {..., "kind": "transaction", ... }
+    :param consumed_gas:
+    :param extra_size:
+    :param reserve:
+    """
     size = len(forge_operation(content)) + extra_size
     fee = minimal_fees \
         + minimal_nanotez_per_byte * size \

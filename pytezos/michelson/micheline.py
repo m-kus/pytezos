@@ -412,7 +412,8 @@ def make_default(bin_types: dict, root='0'):
 
 def michelson_to_micheline(data, parser=None):
     """
-    Converts michelson source text into Micheline expression
+    Converts michelson source text into Micheline expression.
+
     :param data: Michelson string
     :param parser: custom Michelson parser
     :return: Micheline expression

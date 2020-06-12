@@ -150,7 +150,12 @@ reserved_entries = {
 }
 
 
-def forge_int(value: int):
+def forge_int(value: int) -> bytes:
+    """
+    Encode signed unbounded integer into the byte form.
+
+    :param value: signed unbounded integer
+    """
     res = bytearray()
     i = abs(value)
 
@@ -165,7 +170,13 @@ def forge_int(value: int):
     return bytes(res)
 
 
-def parse_int(data: bytes):
+def parse_int(data: bytes) -> (int, int):
+    """
+    Decode signed unbounded integer from bytes.
+
+    :param data: Encoded integer
+    :return: tuple(parsed integer, length in bytes)
+    """
     value = 0
     length = 1
 
@@ -185,14 +196,24 @@ def parse_int(data: bytes):
     return value, length
 
 
-def forge_entrypoint(entrypoint):
+def forge_entrypoint(entrypoint) -> bytes:
+    """
+    Encode Michelson contract entrypoint into the byte form.
+
+    :param entrypoint: string
+    """
     if entrypoint in reserved_entries:
         return reserved_entries[entrypoint]
     else:
         return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
 
 
-def forge_micheline(data):
+def forge_micheline(data) -> bytes:
+    """
+    Encode a Micheline expression into the byte form.
+
+    :param data: Micheline expression
+    """
     res = []
 
     if isinstance(data, list):
@@ -238,13 +259,24 @@ def forge_micheline(data):
     return b''.join(res)
 
 
-def forge_script(script):
+def forge_script(script) -> bytes:
+    """
+    Encode an origination script into the byte form.
+
+    :param script: {"code": "$Micheline_expression", "storage": "$Micheline_expression"}
+    """
     code = forge_micheline(script['code'])
     storage = forge_micheline(script['storage'])
     return forge_array(code) + forge_array(storage)
 
 
 def unforge_micheline(data: bytes):
+    """
+    Parse Micheline expression from its encoded form (but do not UNPACK).
+
+    :param data: Encoded Micheline expression
+    :return: Object
+    """
     ptr = 0
 
     def parse_list():

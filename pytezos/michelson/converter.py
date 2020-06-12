@@ -21,8 +21,9 @@ def build_schema(code) -> Schema:
     `bin_types` -> maps binary path to primitive
     `bin_names` -> binary path to key name mapping
     `json_to_bin` -> json path to binary path mapping
+
     :param code: parameter or storage section of smart contract source code (in micheline)
-    :return: Schema
+    :rtype: Schema
     """
     try:
         metadata = collapse_micheline(code)
@@ -34,7 +35,8 @@ def build_schema(code) -> Schema:
 
 def decode_micheline(val_expr, type_expr, schema: Schema, root='0'):
     """
-    Converts Micheline data into Python object
+    Converts Micheline data into Python object.
+
     :param val_expr: Micheline value expression
     :param type_expr: Michelson type expression for the entire type
     :param schema: schema built for particular contract/section
@@ -51,7 +53,8 @@ def decode_micheline(val_expr, type_expr, schema: Schema, root='0'):
 
 def encode_micheline(data, schema: Schema, root='0', binary=False):
     """
-    Converts Python object into Micheline expression
+    Converts Python object into Micheline expression.
+
     :param data: Python object
     :param schema: schema built for particular contract/section
     :param root: which binary node to take as root, used to encode BigMap values
@@ -69,7 +72,8 @@ def encode_micheline(data, schema: Schema, root='0', binary=False):
 
 def convert(source, schema: Schema = None, output='micheline', inline=False):
     """
-    Convert data between different representations (DO NOT USE FOR STORAGE/PARAMETER, can be ambiguous)
+    Convert data between different representations (DO NOT USE FOR STORAGE/PARAMETER, can be ambiguous).
+
     :param source: Data, can be one of Michelson (string), Micheline expression, object
     :param schema: Needed if decoding/encoding objects (optional)
     :param output: Output format, one of 'micheline' (default), 'michelson', 'object'
@@ -96,6 +100,14 @@ def convert(source, schema: Schema = None, output='micheline', inline=False):
 
 
 def build_big_map_schema(data, schema: Schema) -> BigMapSchema:
+    """
+    Generate Big_map schema from the contract storage
+
+    :param data: Raw storage (Micheline expression)
+    :param schema: Storage schema
+    :return: Mappings: Big_map id to JSON path and vice versa
+    :rtype: BigMapSchema
+    """
     bin_to_id = dict()
     id_to_bin = dict()
 
@@ -118,7 +130,13 @@ def build_big_map_schema(data, schema: Schema) -> BigMapSchema:
     return BigMapSchema(bin_to_id, id_to_bin)
 
 
-def is_micheline(value):
+def is_micheline(value) -> bool:
+    """
+    Check if value is a Micheline expression (using heuristics, so not 100% accurate).
+
+    :param value: Object
+    :rtype: bool
+    """
     if isinstance(value, list):
         def get_prim(x):
             return x.get('prim') if isinstance(x, dict) else None

@@ -52,6 +52,9 @@ class SimpleMichelsonLexer(Lexer):
 
 
 class MichelsonParser(object):
+    """
+    Customizable Michelson parser
+    """
     tokens = SimpleMichelsonLexer.tokens
 
     def p_instr(self, p):
@@ -173,6 +176,13 @@ class MichelsonParser(object):
         raise MichelsonParserError(p)
 
     def __init__(self, debug=False, write_tables=False, extra_primitives=None):
+        """
+        Initialize Michelson parser
+
+        :param debug: Verbose output
+        :param write_tables: Store PLY output
+        :param extra_primitives: List of words to be ignored
+        """
         self.lexer = SimpleMichelsonLexer()
         self.parser = yacc(
             module=self,
@@ -182,4 +192,10 @@ class MichelsonParser(object):
         self.extra = extra_primitives
 
     def parse(self, code):
+        """
+        Parse Michelson source.
+
+        :param code: Michelson source
+        :return: Micheline expression
+        """
         return self.parser.parse(code)

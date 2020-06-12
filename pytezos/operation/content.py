@@ -3,7 +3,13 @@ from decimal import Decimal
 from pytezos.tools.docstring import inline_doc
 
 
-def format_mutez(value):
+def format_mutez(value) -> str:
+    """
+    Format amount in mutez (10^-6).
+
+    :param value: can be None (==0), Decimal (treated as tez), int (treated as mutez)
+    :return: amount in mutez, stringified
+    """
     if value is None:
         value = 0
     elif isinstance(value, Decimal):
@@ -13,20 +19,29 @@ def format_mutez(value):
     return str(value)
 
 
-def format_tez(value):
+def format_tez(value) -> Decimal:
+    """
+    Format amount in tez.
+
+    :param value: can be None (==0), Decimal (treated as tez), int (treated as mutez)
+    :rtype: Decimal
+    """
     tez = Decimal(format_mutez(value)) / 10 ** 6
     return tez.quantize(Decimal('0.000001'))
 
 
 class ContentMixin:
-
+    """
+    Helper mixin for spawning operations.
+    """
     def operation(self, content):
         return content
 
     @inline_doc
     def endorsement(self, level: int):
         """
-        Endorse a block
+        Endorse a block.
+
         :param level: Endorsed level
         :return: dict or OperationGroup
         """
@@ -40,6 +55,7 @@ class ContentMixin:
         """
         Reveal the nonce committed operation in the previous cycle.
         More info https://tezos.stackexchange.com/questions/567/what-are-nonce-revelations
+
         :param level: When nonce hash was committed
         :param nonce: Hex string
         :return: dict or OperationGroup
@@ -54,6 +70,7 @@ class ContentMixin:
     def double_endorsement_evidence(self, op1: dict, op2: dict):
         """
         Provide evidence of double endorsement (endorsing two different blocks at the same block height).
+
         :param op1: Inline endorsement {
             "branch": $block_hash,
             "operations": {
@@ -75,6 +92,7 @@ class ContentMixin:
     def double_baking_evidence(self, bh1, bh2):
         """
         Provide evidence of double baking (two different blocks at the same height).
+
         :param bh1: First block hash
         :param bh2: Second block hash
         :return: dict or OperationGroup
@@ -90,6 +108,7 @@ class ContentMixin:
         """
         Activate recommended allocations for contributions to the TF fundraiser.
         More info https://activate.tezos.com/
+
         :param activation_code: Secret code from pdf, leave empty for autocomplete
         :param pkh: Public key hash, leave empty for autocomplete
         :return: dict or OperationGroup
@@ -107,6 +126,7 @@ class ContentMixin:
         Submit and/or upvote proposals to amend the protocol.
         Can only be submitted during a proposal period.
         More info https://tezos.gitlab.io/master/whitedoc/voting.html
+
         :param proposals: List of proposal hashes or single proposal hash
         :param source: Public key hash (of the signatory), leave None for autocomplete
         :param period: Number of the current voting period, leave 0 for autocomplete
@@ -129,6 +149,7 @@ class ContentMixin:
         Vote for a proposal in a given voting period.
         Can only be submitted during Testing_vote or Promotion_vote periods, and only once per period.
         More info https://tezos.gitlab.io/master/whitedoc/voting.html
+
         :param proposal: Hash of the proposal
         :param ballot: 'Yay', 'Nay' or 'Pass'
         :param source: Public key hash (of the signatory), leave None for autocomplete
@@ -148,6 +169,7 @@ class ContentMixin:
                source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
         """
         Reveal the public key associated with a tz address.
+
         :param public_key: Public key to reveal, Base58 encoded
         :param source: Public key hash of the key revealed, leave None to use signatory address
         :param counter: Current account counter, leave None for autocomplete
@@ -173,6 +195,7 @@ class ContentMixin:
         """
         Transfer tez to a given address (implicit or originated).
         If the receiver is a smart contract, then optional parameters may be passed.
+
         :param source: Address from which funds will be sent, leave None to use signatory address
         :param destination: Address
         :param amount: Amount to send in microtez (int) or tez (Decimal) (optional)
@@ -204,6 +227,7 @@ class ContentMixin:
                     source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
         """
         Deploy smart contract (scriptless KT accounts are not used for delegation since Babylon)
+
         :param script: {"code": $Micheline, "storage": $Micheline}
         :param balance: Amount transferred on the balance, WARNING: there is no default way to withdraw funds.
         More info: https://tezos.stackexchange.com/questions/1315/can-i-withdraw-funds-from-an-empty-smart-contract
@@ -236,6 +260,7 @@ class ContentMixin:
                    source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
         """
         Delegate funds or register yourself as a delegate.
+
         :param delegate: tz address of delegate, leave None to register yourself as a delegate
         :param source: Address from which funds will be delegated, leave None to use signatory address
         :param counter: Current account counter, leave None for autocomplete
