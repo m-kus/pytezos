@@ -151,7 +151,8 @@ def format_stderr(error):
 
 class Interpreter:
     """
-
+    Michelson interpreter reimplemented in Python.
+    Based on the following reference: https://michelson.nomadic-labs.com/
     """
 
     def __init__(self, debug=True):
@@ -161,9 +162,10 @@ class Interpreter:
 
     def execute(self, code):
         """
+        Execute Michelson instructions (note that stack is not cleared after execution).
 
-        :param code:
-        :return:
+        :param code: Michelson source (any valid Michelson expression or special helpers)
+        :return: {"success": True|False, "stdout": "", "stderr": {}, "result": {"value": "", ...}}
         """
         int_res = {'success': False}
 

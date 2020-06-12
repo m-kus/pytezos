@@ -12,6 +12,10 @@ from pytezos.standards.non_fungible_token import NonFungibleTokenImpl
 
 
 class PyTezosClient(Interop, ContentMixin):
+    """
+    Entry point for a developer, start your script with:
+    `from pytezos import pytezos`
+    """
 
     def __repr__(self):
         res = [

@@ -19,10 +19,16 @@ class ShellQuery(RpcQuery, path=''):
 
     @property
     def blocks(self):
+        """
+        Shortcut for `chains.main.blocks`
+        """
         return self.chains.main.blocks
 
     @property
     def head(self):
+        """
+        Shortcut for `blocks.head`
+        """
         return self.blocks.head
 
     @property
@@ -57,13 +63,24 @@ class ShellQuery(RpcQuery, path=''):
 
     @property
     def contracts(self):
+        """
+        Shortcut for `head.context.contracts`
+        """
         return self.head.context.contracts
 
     @property
     def mempool(self):
+        """
+        Shortcut for `chains.main.mempool`
+        """
         return self.chains.main.mempool
 
     def wait_next_block(self, block_hash=None):
+        """
+        Wait until next block is finalized.
+
+        :param block_hash: Current block hash (optional). If not set, current head is used.
+        """
         block_time = int(self.block.context.constants()["time_between_blocks"][0])
         header = self.head.header()
         if block_hash is None:
@@ -88,7 +105,7 @@ class ChainQuery(RpcQuery, path='/chains/{}'):
 
     def watermark(self):
         """
-        Chain watermark, hex encoded
+        Chain watermark, hex encoded.
         """
         data = self.chain_id()
         return hexlify(base58_decode(data.encode())).decode()
@@ -105,6 +122,7 @@ class MempoolQuery(RpcQuery, path='/chains/{}/mempool'):
     def post(self, configuration):
         """
         Set operation filter rules.
+
         :param configuration: a JSON dictionary, known keys are `minimal_fees`, `minimal_nanotez_per_gas_unit`,
         `minimal_nanotez_per_byte`
         """
@@ -116,6 +134,7 @@ class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operatio
     def __getitem__(self, item):
         """
         Search for operation in node's mempool by hash.
+
         :param item: operation group hash (base58)
         """
         operations_dict = self()
@@ -145,6 +164,7 @@ class DescribeQuery(RpcQuery, path='/describe'):
     def __call__(self, recurse=True):
         """
         Get RPCs documentation and input/output schema.
+
         :param recurse: Show information for child elements, default is True.
         In some cases doesn't work without this flag.
         """
@@ -166,6 +186,7 @@ class BlockInjectionQuery(RpcQuery, path='/injection/block'):
         Inject a block in the node and broadcast it.
         The `operations` embedded in `blockHeader` might be pre-validated using a contextual RPCs from the latest block
         (e.g. '/blocks/head/context/preapply').
+
         :param block: Json input:
         {
             "data": <hex-encoded block header>,
@@ -197,6 +218,7 @@ class OperationInjectionQuery(RpcQuery, path='/injection/operation'):
         Inject an operation in node and broadcast it.
         The `signedOperationContents` should be constructed using a contextual RPCs from the latest block
         and signed by the client.
+
         :param operation: Hex-encoded operation data or bytes
         :param _async: By default, the RPC will wait for the operation to be (pre-)validated before answering,
         set True if you don't want to.
@@ -220,6 +242,7 @@ class ProtocolInjectionQuery(RpcQuery, path='/injection/protocol'):
     def post(self, protocol, _async=False, force=False):
         """
         Inject a protocol in node.
+
         :param protocol: Json input:
         {
             "expected_env_version": <integer>,

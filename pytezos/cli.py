@@ -50,6 +50,8 @@ class PyTezosCli:
 
     def storage(self, action, path=None):
         """
+        Manage contract storage.
+
         :param action: One of `schema`, `default`
         :param path: Path to the .tz file, or the following uri: <network>:<KT-address>
         """
@@ -63,6 +65,8 @@ class PyTezosCli:
 
     def parameter(self, action, path=None):
         """
+        Manage contract parameter.
+
         :param action: One of `schema`
         :param path: Path to the .tz file, or the following uri: <network>:<KT-address>
         """

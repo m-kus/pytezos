@@ -47,7 +47,8 @@ class ForgeProtocolDataQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/forge/
 
     def post(self, protocol_data):
         """
-        Forge the protocol-specific part of a block header
+        Forge the protocol-specific part of a block header.
+
         :param protocol_data: Json input:
         {
             "priority": <integer>,
@@ -109,7 +110,8 @@ class ParseOperationsQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/parse/op
 
     def post(self, operations):
         """
-        Extracts contents and signatures from the forged and optionally signed operations (bulk)
+        Extracts contents and signatures from the forged and optionally signed operations (bulk).
+
         :param operations: Json input:
         {
             "operations": [ {
@@ -129,6 +131,7 @@ class PreapplyBlockQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/preapply/b
         """
         Simulate the validation of a block that would contain the given operations
         and return the resulting fitness and context hash.
+
         :param block: Json input:
         {
             "protocol_data": {
@@ -160,6 +163,7 @@ class PreapplyOperationsQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/preap
     def post(self, operations):
         """
         Simulate the validation of operation(s).
+
         :param operations: Json input:
         [{
             "protocol": "Pt24m4xiPbLDhVgVfABUjirbmda3yohdN82Sp9FeuAXJ4eV9otd",
@@ -176,7 +180,8 @@ class ScriptsEntrypoint(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/ent
 
     def post(self, script, entrypoint=None):
         """
-        Return the type of the given entrypoint
+        Return the type of the given entrypoint.
+
         :param script: Micheline expression
         :param entrypoint: Name of the entrypoint (leave None if there's only one)
         """
@@ -191,7 +196,8 @@ class ScriptsEntrypoints(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/en
 
     def post(self, script):
         """
-        Return the list of entrypoints of the given script
+        Return the list of entrypoints of the given script.
+
         :param script: Micheline expression
         """
         return self._post({'script': script})
@@ -202,6 +208,7 @@ class ScriptsPackDataQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/
     def post(self, expression):
         """
         Computes the serialized version of some data expression using the same algorithm as script instruction PACK.
+
         :param expression: Json input:
         {
             "data": <michelson expression>,
@@ -218,6 +225,7 @@ class ScriptsRunCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/r
     def post(self, invocation):
         """
         Run a piece of code in the current context.
+
         :param invocation: Json input:
         {
             "script": <michelson expression>,
@@ -238,6 +246,7 @@ class ScriptsRunOperationQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scri
     def post(self, operation):
         """
         Run an operation without signature checks.
+
         :param operation: Json input:
         {
             "branch": <block_hash>,
@@ -253,7 +262,8 @@ class ScriptsTraceCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts
 
     def post(self, invocation):
         """
-        Run a piece of code in the current context, keeping a trace
+        Run a piece of code in the current context, keeping a trace.
+
         :param invocation: Json input:
         {
             "script": <michelson expression>,
@@ -273,7 +283,8 @@ class ScriptsTypecheckCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scr
 
     def post(self, expression):
         """
-        Check that some data expression is well formed and of a given type in the current context
+        Check that some data expression is well formed and of a given type in the current context.
+
         :param expression: Json input:
         {
             "data": <michelson expression>,

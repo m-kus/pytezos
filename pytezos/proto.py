@@ -149,7 +149,8 @@ class Proto(metaclass=InlineDocstring):
     @classmethod
     def from_uri(cls, uri):
         """
-        Loads protocol implementation from various sources and converts it to the RPC-like format
+        Loads protocol implementation from various sources and converts it to the RPC-like format.
+
         :param uri: link/path to a tar archive or path to a folder with extracted contents
         :return: Protocol instance
         """
@@ -166,7 +167,8 @@ class Proto(metaclass=InlineDocstring):
 
     def index(self) -> dict:
         """
-        Generates TEZOS_PROTOCOL file
+        Generates TEZOS_PROTOCOL file.
+
         :return: dict with protocol hash and modules
         """
         data = {
@@ -177,7 +179,8 @@ class Proto(metaclass=InlineDocstring):
 
     def export_tar(self, output_path=None):
         """
-        Creates a tarball and dumps to a file or returns bytes
+        Creates a tarball and dumps to a file or returns bytes.
+
         :param output_path: Path to the tarball [optional]. You can add .bz2 or .gz extension to make it compressed
         :return: bytes if path is None or nothing
         """
@@ -188,6 +191,7 @@ class Proto(metaclass=InlineDocstring):
     def export_html(self, output_path=None):
         """
         Generates github-like side-by-side diff viewe, powered by diff2html.js
+
         :param output_path: will write to this file if specified
         :return: html string if path is not specified
         """
@@ -196,7 +200,8 @@ class Proto(metaclass=InlineDocstring):
 
     def diff(self, proto, context_size=3):
         """
-        Calculates file diff between two protocol versions
+        Calculates file diff between two protocol versions.
+
         :param proto: an instance of Protocol
         :param context_size: number of context lines before and after the change
         :return: patch in proto format
@@ -218,7 +223,8 @@ class Proto(metaclass=InlineDocstring):
 
     def patch(self, patch):
         """
-        Applies unified diff and returns full-fledged protocol
+        Applies unified diff and returns full-fledged protocol.
+
         :param patch: an instance of Protocol containing diff of files
         :return: Protocol instance
         """

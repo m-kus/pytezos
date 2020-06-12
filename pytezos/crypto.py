@@ -94,6 +94,7 @@ class Key(metaclass=InlineDocstring):
     def from_secret_exponent(cls, secret_exponent: bytes, curve=b'ed', activation_code=None):
         """
         Creates a key object from a secret exponent.
+
         :param secret_exponent: secret exponent or seed
         :param curve: b'sp' for Secp251k1, b'p2' for P256/Secp256r1, b'ed' for Ed25519 (default)
         :param activation_code: secret for initializing account balance
@@ -122,6 +123,7 @@ class Key(metaclass=InlineDocstring):
     def from_public_point(cls, public_point: bytes, curve=b'ed'):
         """
         Creates a key object from a public elliptic point.
+
         :param public_point: elliptic point in the compressed format (see https://tezos.stackexchange.com/a/623/309)
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
         """
@@ -131,6 +133,7 @@ class Key(metaclass=InlineDocstring):
     def from_encoded_key(cls, key, passphrase=''):
         """
         Creates a key object from a base58 encoded key.
+
         :param key: a public or secret key in base58 encoding
         :param passphrase: the passphrase used if the key provided is an encrypted private key
         """
@@ -173,7 +176,8 @@ class Key(metaclass=InlineDocstring):
     @classmethod
     def generate(cls, passphrase='', curve=b'ed', strength=128, language='english', export=True):
         """
-        Generates new key
+        Generates new key.
+
         :param passphrase: optional password
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
         :param strength: mnemonic strength, default is 128
@@ -200,12 +204,14 @@ class Key(metaclass=InlineDocstring):
     def from_mnemonic(cls, mnemonic, passphrase='', email='', validate=True, curve=b'ed', activation_code=None):
         """
         Creates a key object from a bip39 mnemonic.
+
         :param mnemonic: a 15 word bip39 english mnemonic
         :param passphrase: a mnemonic password or a fundraiser key
         :param email: email used if a fundraiser key is passed
         :param validate: whether to check mnemonic or not
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
         :param activation_code: secret for initializing account balance
+        :rtype: Key
         """
         if isinstance(mnemonic, list):
             mnemonic = ' '.join(mnemonic)
@@ -230,8 +236,9 @@ class Key(metaclass=InlineDocstring):
     def from_faucet(cls, path):
         """
         Import key from a faucet file: https://faucet.tzalpha.net/
+
         :param path: path to the json file
-        :return: Key
+        :rtype: Key
         """
         with open(expanduser(path), 'r') as f:
             data = json.loads(f.read())
@@ -250,11 +257,12 @@ class Key(metaclass=InlineDocstring):
     @classmethod
     def from_alias(cls, alias, passphrase='', tezos_client_dir='~/.tezos-client'):
         """
-        Import secret key from tezos-client keychain
+        Import secret key from tezos-client keychain.
+
         :param alias: key alias
         :param passphrase: if key is encrypted (optional)
         :param tezos_client_dir: path to the tezos client directory (default is `~/.tezos-client`)
-        :return: Key
+        :rtype: Key
         """
         path = expanduser(join(tezos_client_dir, 'secret_keys'))
         with open(path, 'r') as f:
@@ -275,14 +283,16 @@ class Key(metaclass=InlineDocstring):
 
     def public_key(self):
         """
-        Creates base58 encoded public key representation
+        Creates base58 encoded public key representation.
+
         :return: the public key associated with the private key
         """
         return base58_encode(self.public_point, self.curve + b'pk').decode()
 
     def secret_key(self, passphrase=None, ed25519_seed=True):
         """
-        Creates base58 encoded private key representation
+        Creates base58 encoded private key representation.
+
         :param passphrase: encryption phrase for the private key
         :param ed25519_seed: encode seed rather than full key for ed25519 curve (True by default)
         :return: the secret key associated with this key, if available
@@ -319,6 +329,7 @@ class Key(metaclass=InlineDocstring):
     def public_key_hash(self):
         """
         Creates base58 encoded public key hash for this key.
+
         :return: the public key hash for this key
         """
         pkh = blake2b(data=self.public_point, digest_size=20).digest()
@@ -327,7 +338,8 @@ class Key(metaclass=InlineDocstring):
 
     def sign(self, message, generic=False):
         """
-        Sign a raw sequence of bytes
+        Sign a raw sequence of bytes.
+
         :param message: sequence of bytes, raw format or hexadecimal notation
         :param generic: do not specify elliptic curve if set to True
         :return: signature in base58 encoding
@@ -362,7 +374,8 @@ class Key(metaclass=InlineDocstring):
 
     def verify(self, signature, message):
         """
-        Verify signature, raise exception if it is not valid
+        Verify signature, raise exception if it is not valid.
+
         :param message: sequance of bytes, raw format or hexadecimal notation
         :param signature: a signature in base58 encoding
         """

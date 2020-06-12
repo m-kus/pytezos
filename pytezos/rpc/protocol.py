@@ -27,11 +27,12 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         Lists known heads of the blockchain sorted with decreasing fitness.
         Optional arguments allows to returns the list of predecessors for known heads
         or the list of predecessors for a given list of blocks.
+
         :param length: The requested number of predecessors to returns (per requested head).
         :param head: An empty argument requests blocks from the current heads.
         A non empty list allow to request specific fragment of the chain.
         :param min_date: When `min_date` is provided, heads with a timestamp before `min_date` are filtered out
-        :return: list[list[str]]
+        :rtype: list[list[str]]
         """
         if isinstance(head, str) and not is_bh(head):
             head = self.__getitem__(head).calculate_hash()
@@ -45,11 +46,12 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
     def __getitem__(self, block_id):
         """
         Construct block query or get a block range.
+
         :param block_id: Block identity or block range
           int: Block level or offset from the head if negative;
           str: Block hash (base58) or special names (head, genesis), expressions like `head~1` etc;
           slice [:]: First value (start) must be int, second (stop) can be any Block ID or empty.
-        :return: BlockQuery or BlockSliceQuery
+        :rtype: BlockQuery or BlockSliceQuery
         """
         if isinstance(block_id, slice):
             if not isinstance(block_id.start, int):
@@ -72,7 +74,8 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
     def current_voting_period(self):
         """
         Get block range for the current voting period.
-        :return: BlockSliceQuery
+
+        :rtype: BlockSliceQuery
         """
         metadata = self.head.metadata()
         return BlockSliceQuery(
@@ -87,7 +90,8 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
     def current_cycle(self):
         """
         Get block range for the current cycle.
-        :return: BlockSliceQuery
+
+        :rtype: BlockSliceQuery
         """
         metadata = self.head.metadata()
         return BlockSliceQuery(
@@ -109,7 +113,8 @@ class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
     def predecessor(self):
         """
         Query previous block.
-        :return: BlockQuery
+
+        :rtype: BlockQuery
         """
         return self._parent[self.header()['predecessor']]
 
@@ -117,11 +122,12 @@ class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
     def baker(self):
         """
         Query block producer (baker).
-        :return: ContractQuery
+
+        :rtype: ContractQuery
         """
         return self.context.contracts[self.metadata()['baker']]
 
-    def voting_period(self):
+    def voting_period(self) -> int:
         """
         Get voting period for this block from metadata.
         """
@@ -164,7 +170,8 @@ class ContractQuery(RpcQuery, path='/chains/{}/blocks/{}/context/contracts/{}'):
 
     def code(self):
         """
-        Get contract code
+        Get contract code.
+
         :return: Micheline expression
         """
         return self().get('script', {}).get('code')
@@ -175,6 +182,7 @@ class BigMapGetQuery(RpcQuery, path='/chains/{}/blocks/{}/context/contracts/{}/b
     def post(self, query: dict):
         """
         Access the value associated with a key in the big map storage of the michelson.
+
         :param query: {
             key: { $key_type : <key> },
             type: { "prim" : $key_prim }
@@ -195,6 +203,7 @@ class ContextRawBytesQuery(RpcQuery, path='/chains/{}/blocks/{}/context/raw/byte
     def __call__(self, depth=1) -> dict:
         """
         Return the raw context.
+
         :param depth: Context is a tree structure, default depth is 1
         """
         return super(ContextRawBytesQuery, self).__call__(depth=depth)
@@ -220,7 +229,8 @@ class EndorsingPower(RpcQuery, path='/chains/{}/blocks/{}/endorsing_power'):
 
     def post(self, endorsement_operation):
         """
-        Get the endorsing power of an endorsement operation, that is, the number of slots that the op has
+        Get the endorsing power of an endorsement operation, that is, the number of slots that the op has.
+
         :param endorsement_operation:
         { "branch": $block_hash,
         "contents": [ $operation.alpha.contents ... ],
@@ -233,9 +243,10 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
 
     def __getitem__(self, item):
         """
-        Find operation by hash
+        Find operation by hash.
+
         :param item: Operation group hash (base58)
-        :return: OperationQuery
+        :rtype: OperationQuery
         """
         if isinstance(item, tuple):
             return self[item[0]][item[1]]
@@ -257,16 +268,18 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
     @property
     def endorsements(self):
         """
-        Operations with content of type: `endorsement`
-        :return: OperationListQuery
+        Operations with content of type: `endorsement`.
+
+        :rtype: OperationListQuery
         """
         return self[0]
 
     @property
     def votes(self):
         """
-        Operations with content of type: `proposal`, `ballot`
-        :return: OperationListQuery
+        Operations with content of type: `proposal`, `ballot`.
+
+        :rtype: OperationListQuery
         """
         return self[1]
 
@@ -274,23 +287,27 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
     def anonymous(self):
         """
         Operations with content of type: `seed_nonce_revelation`, `double_endorsement_evidence`,
-            `double_baking_evidence`, `activate_account`
-        :return: OperationListQuery
+            `double_baking_evidence`, `activate_account`.
+
+        :rtype: OperationListQuery
         """
         return self[2]
 
     @property
     def managers(self):
         """
-        Operations with content of type: `reveal`, `transaction`, `origination`, `delegation`
-        :return: OperationListQuery
+        Operations with content of type: `reveal`, `transaction`, `origination`, `delegation`.
+
+        :rtype: OperationListQuery
         """
         return self[3]
 
     def find_upvotes(self, proposal_id) -> list:
         """
-        Find operations of kind `proposal` for given proposal
+        Find operations of kind `proposal` for given proposal.
+
         :param proposal_id: Proposal hash (base58)
+        :return: list of operation contents
         """
         def is_upvote(op):
             return any(map(
@@ -300,8 +317,10 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
 
     def find_ballots(self, proposal_id=None) -> list:
         """
-        Find operations of kind `ballot`
+        Find operations of kind `ballot`.
+
         :param proposal_id: Proposal hash (optional)
+        :return: list of operation contents
         """
         def is_ballot(op):
             return any(map(
@@ -312,7 +331,9 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
     def find_origination(self, contract_id):
         """
         Find origination of the contract.
+
         :param contract_id: Contract ID (KT-address)
+        :return: operation content
         """
         def is_origination(op):
             def is_it(x):
@@ -354,9 +375,10 @@ class ProposalsQuery(RpcQuery, path='/chains/{}/blocks/{}/votes/proposals'):
 
     def __getitem__(self, proposal_id) -> ProposalQuery:
         """
-        Roll count for the selected proposal
+        Roll count for the selected proposal.
+
         :param proposal_id: Base58-encoded proposal ID
-        :return: ProposalQuery
+        :rtype: ProposalQuery
         """
         return ProposalQuery(
             path=self._wild_path + '/{}',

@@ -244,12 +244,15 @@ def val_selector(val_expr, type_expr, val, type_path):
 
 def parse_expression(val_expr, type_expr, selector=val_selector, type_path='0'):
     """
+    Run an extensible parser for Micheline expressions.
+    This function will just do the type checking for you,
+    if you want to build a response you'd need to define a selector.
 
-    :param val_expr:
-    :param type_expr:
-    :param selector:
-    :param type_path:
-    :return:
+    :param val_expr: value expression (Micheline)
+    :param type_expr: corresponding type expression (Micheline)
+    :param selector: function selector(val_expr, type_expr, val, type_path).
+    Default selector (val_selector) converts Micheline to Python objects
+    :param type_path: starting binary path (default is '0')
     """
     prim, _, func = parse_type(type_expr)
     try:
