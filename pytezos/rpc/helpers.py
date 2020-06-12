@@ -8,6 +8,7 @@ class BakingRightsQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/baking_righ
         Retrieves the list of delegates allowed to bake a block.
         By default, it gives the best baking priorities for bakers that have at least one opportunity
         below the 64th priority for the next block.
+
         :param level: Specify the (valid) level in the past or future at which the baking rights have to be returned.
         :param cycle: Specify the (valid) levels in the past or future at which the baking rights have to be returned.
         :param delegate: Restrict the results to the given delegates.
@@ -62,7 +63,8 @@ class ForgeBlockHeaderQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/forge_b
 
     def post(self, block_header):
         """
-        Forge block header
+        Forge block header.
+
         :param block_header: Json input:
         {
             "level": <integer>,
@@ -85,6 +87,7 @@ class ParseBlockQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/parse/block')
     def post(self, block_header):
         """
         Retrieves protocol-specific part of a block header and signature.
+
         :param block_header: Json input:
         {
             "level": <integer>,

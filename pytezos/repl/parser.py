@@ -243,6 +243,14 @@ def val_selector(val_expr, type_expr, val, type_path):
 
 
 def parse_expression(val_expr, type_expr, selector=val_selector, type_path='0'):
+    """
+
+    :param val_expr:
+    :param type_expr:
+    :param selector:
+    :param type_path:
+    :return:
+    """
     prim, _, func = parse_type(type_expr)
     try:
         res = func(val_expr, type_expr, selector, type_path)

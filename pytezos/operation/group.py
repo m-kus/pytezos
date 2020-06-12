@@ -3,7 +3,7 @@ from pprint import pformat
 from pytezos.crypto import blake2b_32
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.forge import forge_operation_group
-from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit, burn_cap
+from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.encoding import forge_base58, base58_encode
@@ -26,6 +26,10 @@ validation_passes = {
 
 
 class OperationGroup(Interop, ContentMixin):
+    """
+    Operation group representation handling contents (single or multiple), signature, other fields,
+    and also useful helpers for filling with precise fees, signing, forging, and injecting.
+    """
 
     def __init__(self, contents=None, protocol=None, chain_id=None, branch=None, signature=None, shell=None, key=None):
         super(OperationGroup, self).__init__(shell=shell, key=key)
@@ -58,9 +62,7 @@ class OperationGroup(Interop, ContentMixin):
 
     def json_payload(self) -> dict:
         """
-        Get json payload used for preapply.
-
-        :return: dic
+        Get json payload used for the preapply.
         """
         return {
             'protocol': self.protocol,
@@ -72,8 +74,6 @@ class OperationGroup(Interop, ContentMixin):
     def binary_payload(self) -> bytes:
         """
         Get binary payload used for injection/hash calculation.
-
-        :return: bytes
         """
         if not self.signature:
             raise ValueError('Not signed')
@@ -85,7 +85,7 @@ class OperationGroup(Interop, ContentMixin):
         Create new operation group with extra content added.
 
         :param content: Kind-specific operation body
-        :return: OperationGroup
+        :rtype: OperationGroup
         """
         return self._spawn(contents=self.contents + [content])
 
@@ -94,7 +94,7 @@ class OperationGroup(Interop, ContentMixin):
         Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
-        :return: OperationGroup
+        :rtype: OperationGroup
         """
         chain_id = self.chain_id or self.shell.chains.main.chain_id()
         branch = self.branch or self.shell.head.predecessor.hash()
@@ -134,7 +134,7 @@ class OperationGroup(Interop, ContentMixin):
         """
         Simulate operation without signature checks.
 
-        :return: RPC response
+        :return: RPC response from `run_operation`
         """
         return self.shell.head.helpers.scripts.run_operation.post({
             'operation': {
@@ -170,7 +170,7 @@ class OperationGroup(Interop, ContentMixin):
         Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
         :param gas_reserve: Add a safe reserve for gas limit (default is 100)
-        :return: OperationGroup
+        :rtype: OperationGroup
         """
         opg = self.fill()
         opg_with_metadata = opg.run()
@@ -183,10 +183,11 @@ class OperationGroup(Interop, ContentMixin):
             if validation_passes[content['kind']] == 3:
                 consumed_gas = OperationResult.consumed_gas(content) + gas_reserve
                 paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
+                burned = OperationResult.burned(content)
                 fee = calculate_fee(content, consumed_gas, extra_size)
                 content.update(
                     gas_limit=str(consumed_gas + gas_reserve),
-                    storage_limit=str(paid_storage_size_diff + burn_cap(content)),
+                    storage_limit=str(paid_storage_size_diff + burned),
                     fee=str(fee)
                 )
 
@@ -200,7 +201,7 @@ class OperationGroup(Interop, ContentMixin):
         """
         Sign the operation group with the key specified by `using`.
 
-        :return: OperationGroup
+        :rtype: OperationGroup
         """
         validation_pass = validation_passes[self.contents[0]['kind']]
         if any(map(lambda x: validation_passes[x['kind']] != validation_pass, self.contents)):
@@ -217,11 +218,9 @@ class OperationGroup(Interop, ContentMixin):
 
         return self._spawn(signature=signature)
 
-    def hash(self):
+    def hash(self) -> str:
         """
         Calculate the Base58 encoded operation group hash.
-
-        :return: str
         """
         hash_digest = blake2b_32(self.binary_payload()).digest()
         return base58_encode(hash_digest, b'o').decode()
@@ -230,7 +229,7 @@ class OperationGroup(Interop, ContentMixin):
         """
         Preapply signed operation group.
 
-        :return: RPC response
+        :return: RPC response from `preapply`
         """
         if not self.signature:
             raise ValueError('Not signed')
@@ -240,12 +239,13 @@ class OperationGroup(Interop, ContentMixin):
 
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
         """
-        Inject signed operation group.
+        Inject the signed operation group.
 
         :param _async: do not wait for operation inclusion (default is True)
-        :param preapply:
-        :param check_result:
-        :param num_blocks_wait:
+        :param preapply: do a preapply before injection
+        :param check_result: raise RpcError in case operation is refused
+        :param num_blocks_wait: number of blocks to wait for injection
+        :return: operation group with metadata (raw RPC response)
         """
         if preapply:
             opg_with_metadata = self.preapply()
@@ -280,8 +280,8 @@ class OperationGroup(Interop, ContentMixin):
 
     def result(self):
         """
-        Parse preapply result.
+        Parse the preapply result.
 
-        :return: OperationResult
+        :rtype: OperationResult
         """
         return OperationResult.from_operation_group(self.preapply())

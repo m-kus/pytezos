@@ -2,8 +2,6 @@ from pytezos.encoding import forge_address, forge_bool, forge_nat, forge_array, 
     forge_base58
 from pytezos.michelson.forge import forge_entrypoint, forge_micheline, forge_script
 
-# TODO: https://tezos.gitlab.io/master/protocols/005_PsBABY5H.html#changes-to-the-binary-format-of-operations
-
 operation_tags = {
     'endorsement': 0,
     'proposal': 5,
@@ -19,7 +17,12 @@ operation_tags = {
 }
 
 
-def forge_operation(content):
+def forge_operation(content) -> bytes:
+    """
+    Forge operation content (locally).
+
+    :param content: {.., "kind": "transaction", ...}
+    """
     encode_content = {
         'activate_account': forge_activate_account,
         'reveal': forge_reveal,
@@ -35,6 +38,11 @@ def forge_operation(content):
 
 
 def forge_operation_group(operation_group):
+    """
+    Forge operation group (locally).
+
+    :param operation_group: {"branch": "B...", "contents": [], ...}
+    """
     res = forge_base58(operation_group['branch'])
     res += b''.join(map(forge_operation, operation_group['contents']))
     return res

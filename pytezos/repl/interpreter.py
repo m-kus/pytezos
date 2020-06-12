@@ -150,6 +150,9 @@ def format_stderr(error):
 
 
 class Interpreter:
+    """
+
+    """
 
     def __init__(self, debug=True):
         self.ctx = Context()
@@ -157,6 +160,11 @@ class Interpreter:
         self.debug = debug
 
     def execute(self, code):
+        """
+
+        :param code:
+        :return:
+        """
         int_res = {'success': False}
 
         try:
