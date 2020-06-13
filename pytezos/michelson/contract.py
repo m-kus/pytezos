@@ -11,8 +11,7 @@ from pytezos.michelson.pack import get_key_hash
 
 
 class ContractParameter(metaclass=InlineDocstring):
-    """
-    Encapsulates the `parameter` section of a Michelson script.
+    """ Encapsulates the `parameter` section of a Michelson script.
     """
 
     def __init__(self, section):
@@ -39,11 +38,10 @@ class ContractParameter(metaclass=InlineDocstring):
             return bin_path
 
     def decode(self, data):
-        """
-        Convert Micheline data into Python object using internal schema.
+        """ Convert Micheline data into Python object using internal schema.
 
         :param data: Micheline expression or Michelson string or {entrypoint: "string", value: "expression"}
-        :return: object
+        :returns: Python object
         """
         if isinstance(data, dict) and set(data.keys()) == {'entrypoint', 'value'}:
             if data['entrypoint'] not in {'root', 'default'}:
@@ -63,12 +61,11 @@ class ContractParameter(metaclass=InlineDocstring):
             return decode_micheline(val_expr=data, type_expr=self.code, schema=self.schema)
 
     def encode(self, data, entrypoint=None):
-        """
-        Convert Python object to Micheline expression using internal schema.
+        """ Convert Python object to Micheline expression using internal schema.
 
         :param data: Python object
         :param entrypoint: Force entrypoint
-        :return: object
+        :returns: object
         """
         if entrypoint is None:
             if isinstance(data, dict) and len(data) == 1:
@@ -88,11 +85,10 @@ class ContractParameter(metaclass=InlineDocstring):
         return dict(entrypoint=entrypoint, value=value)
 
     def entries(self, default='call'):
-        """
-        Get list of entrypoints: names and docstrings.
+        """ Get list of entrypoints: names and docstrings.
 
         :param default: Name of the single entrypoint
-        :return: [("name", "docstring"), ...]
+        :returns: [("name", "docstring"), ...]
         """
         if self.schema.metadata['0']['prim'] == 'or':
             entries = [
@@ -113,8 +109,7 @@ class ContractParameter(metaclass=InlineDocstring):
 
 
 class ContractStorage(metaclass=InlineDocstring):
-    """
-    Encapsulates the `storage` section of a Michelson script.
+    """ Encapsulates the `storage` section of a Michelson script.
     """
 
     def __init__(self, section):
@@ -133,11 +128,10 @@ class ContractStorage(metaclass=InlineDocstring):
         return '\n'.join(res)
 
     def decode(self, data):
-        """
-        Convert Micheline data into Python object using internal schema.
+        """ Convert Micheline data into Python object using internal schema.
 
         :param data: Micheline expression or Michelson string
-        :return: object
+        :returns: object
         """
         if isinstance(data, str):
             data = michelson_to_micheline(data)
@@ -146,26 +140,23 @@ class ContractStorage(metaclass=InlineDocstring):
                                 schema=self.schema)
 
     def encode(self, data):
-        """
-        Convert Python object to Micheline expression using internal schema.
+        """ Convert Python object to Micheline expression using internal schema.
 
         :param data: Python object
-        :return: object
+        :returns: object
         """
         return encode_micheline(data, self.schema)
 
     def default(self, root='0'):
-        """
-        Try to generate empty storage, returns Micheline expression.
+        """ Try to generate empty storage, returns Micheline expression.
 
         :param root: binary path to start from, default is '0'
-        :return: object
+        :returns: object
         """
         return make_default(self.schema.bin_types, root)
 
     def big_map_init(self, data):
-        """
-        Initialize big_map_id <-> JSON path mapping (since Babylon).
+        """ Initialize big_map_id <-> JSON path mapping (since Babylon).
 
         :param data: Micheline expression (raw contract storage)
         """
@@ -185,8 +176,7 @@ class ContractStorage(metaclass=InlineDocstring):
             return bin_path + '0', bin_path + '1', get_json_path(bin_path)
 
     def big_map_id(self, big_map_path) -> int:
-        """
-        Get Big_map id by JSON path
+        """ Get Big_map id by JSON path
 
         :param big_map_path: JSON path
         :rtype: int
@@ -200,8 +190,7 @@ class ContractStorage(metaclass=InlineDocstring):
                and next(iter(self.big_map_schema.bin_to_id)) == '00'
 
     def big_map_query(self, path):
-        """
-        Construct a query for big_map_get request.
+        """ Construct a query for big_map_get request.
 
         :param path: BigMap key, string, int, or hex-string
         (since Babylon you can have more than one BigMap at arbitrary position)
@@ -226,13 +215,12 @@ class ContractStorage(metaclass=InlineDocstring):
         return query
 
     def big_map_decode(self, value, big_map_id=None):
-        """
-        Convert big_map_get result into a Python object.
+        """ Convert big_map_get result into a Python object.
 
         :param value: Micheline expression for a BigMap entry
         (since Babylon you can have more than one BigMap at arbitrary position)
         :param big_map_id: BigMap pointer (integer)
-        :return: object
+        :returns: object
         """
         _, value_root, _ = self._locate_big_map(big_map_id)
         return decode_micheline(val_expr=value,
@@ -241,11 +229,10 @@ class ContractStorage(metaclass=InlineDocstring):
                                 root=value_root)
 
     def big_map_diff_decode(self, diff: list) -> dict:
-        """
-        Convert big_map_diff from operation_result section into Python objects.
+        """ Convert big_map_diff from operation_result section into Python objects.
 
         :param diff: [{"key": $micheline, "value": $micheline}, ...]
-        :return: {"path/to/big/map": {"key": "value"}} for Babylon; {"key": "value"} for old contracts
+        :returns: {"path/to/big/map": {"key": "value"}} for Babylon; {"key": "value"} for old contracts
         """
         if not isinstance(diff, list):
             return {}
@@ -280,11 +267,10 @@ class ContractStorage(metaclass=InlineDocstring):
 
     # DEPRECATED (For old contracts only)
     def big_map_diff_encode(self, big_map: dict) -> list:
-        """
-        Convert Python representation of BigMap (dict) into big_map_diff.
+        """ Convert Python representation of BigMap (dict) into big_map_diff.
 
         :param big_map: { $key: $micheline, ... }
-        :return: [{"key": $micheline, "value": $micheline}, ... ]
+        :returns: [{"key": $micheline, "value": $micheline}, ... ]
         """
         key_root, value_root, _ = self._locate_big_map()
 
@@ -306,8 +292,7 @@ class ContractStorage(metaclass=InlineDocstring):
 
 
 class Contract(metaclass=InlineDocstring):
-    """
-    Represents a Michelson script.
+    """ Represents a Michelson script.
     """
 
     def __init__(self, code: list):
@@ -327,8 +312,7 @@ class Contract(metaclass=InlineDocstring):
     @property
     @lru_cache(maxsize=None)
     def parameter(self) -> ContractParameter:
-        """
-        Returns `parameter` section wrapper.
+        """ Returns `parameter` section wrapper.
 
         :rtype: ContractParameter
         """
@@ -337,8 +321,7 @@ class Contract(metaclass=InlineDocstring):
     @property
     @lru_cache(maxsize=None)
     def storage(self) -> ContractStorage:
-        """
-        Returns `storage` section wrapper.
+        """ Returns `storage` section wrapper.
 
         :rtype: ContractStorage
         """
@@ -347,15 +330,13 @@ class Contract(metaclass=InlineDocstring):
     @property
     @lru_cache(maxsize=None)
     def text(self):
-        """
-        Get Michelson formatted code.
+        """ Get Michelson formatted code.
         """
         return micheline_to_michelson(self.code)
 
     @classmethod
     def from_micheline(cls, code):
-        """
-        Create contract from micheline expression.
+        """ Create contract from micheline expression.
 
         :param code: [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
         :rtype: Contract
@@ -364,8 +345,7 @@ class Contract(metaclass=InlineDocstring):
 
     @classmethod
     def from_michelson(cls, text):
-        """
-        Create contract from michelson source code.
+        """ Create contract from michelson source code.
 
         :param text: Michelson source code.
         :rtype: Contract
@@ -374,8 +354,7 @@ class Contract(metaclass=InlineDocstring):
 
     @classmethod
     def from_file(cls, path):
-        """
-        Create contract from michelson source code stored in file.
+        """ Create contract from michelson source code stored in file.
 
         :param path: Path to the `.tz` file
         :rtype: Contract
@@ -384,8 +363,7 @@ class Contract(metaclass=InlineDocstring):
             return cls.from_michelson(f.read())
 
     def save_file(self, path, overwrite=False):
-        """
-        Save Michelson code to file.
+        """ Save Michelson code to file.
 
         :param path: Output path
         :param overwrite: Default is False
@@ -397,15 +375,13 @@ class Contract(metaclass=InlineDocstring):
         with open(path, 'w+') as f:
             f.write(self.text)
 
-    def script(self, storage=None, original=True):
-        """
-        Generate script for contract origination.
+    def script(self, storage=None, original=True) -> dict:
+        """ Generate script for contract origination.
 
         :param storage: Python object, leave None to generate empty
         :param original: Keep the original code (initialized), which is default.
         Otherwise factory-specific changes may applied, e.g. different annotations
-        :return: {"code": $Micheline, "storage": $Micheline}
-        :rtype: dict
+        :returns: {"code": $Micheline, "storage": $Micheline}
         """
         if storage is None:
             storage = self.storage.default()

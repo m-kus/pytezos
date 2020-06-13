@@ -123,8 +123,7 @@ class BlockSliceQuery(RpcQuery):
         return get_level(self._start), get_level(self._stop)
 
     def find_proposal_injection(self, proposal_id):
-        """
-        Find proposal injection.
+        """ Find proposal injection.
 
         :param proposal_id: Proposal hash (base58)
         """
@@ -141,12 +140,11 @@ class BlockSliceQuery(RpcQuery):
         return votes
 
     def find_upvotes(self, proposal_id) -> Generator:
-        """
-       Find upvoting operations for the given proposal.
+        """ Find upvoting operations for the given proposal.
 
-       :param proposal_id: Proposal hash (base58)
-       :return: Generator (lazy)
-       """
+        :param proposal_id: Proposal hash (base58)
+        :returns: Generator (lazy)
+        """
         last, head = self.get_range()
         state_changes = find_state_changes(
             head=head - 1,  # proposals are empty at the last block

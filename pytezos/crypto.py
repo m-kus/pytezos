@@ -44,6 +44,8 @@ def is_installed():
 
 
 def blake2b_32(v=b''):
+    """ Get a BLAKE2B hash of bytes
+    """
     return blake2b(scrub_input(v), digest_size=32)
 
 
@@ -66,8 +68,7 @@ def validate_mnemonic(mnemonic, language='english'):
 
 
 class Key(metaclass=InlineDocstring):
-    """
-    Represents a public or secret key for Tezos. Ed25519, Secp256k1 and P256
+    """ Represents a public or secret key for Tezos. Ed25519, Secp256k1 and P256
     are supported.
     """
     def __init__(self, public_point, secret_exponent=None, curve=b'ed', activation_code=None):
@@ -92,8 +93,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_secret_exponent(cls, secret_exponent: bytes, curve=b'ed', activation_code=None):
-        """
-        Creates a key object from a secret exponent.
+        """ Creates a key object from a secret exponent.
 
         :param secret_exponent: secret exponent or seed
         :param curve: b'sp' for Secp251k1, b'p2' for P256/Secp256r1, b'ed' for Ed25519 (default)
@@ -121,8 +121,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_public_point(cls, public_point: bytes, curve=b'ed'):
-        """
-        Creates a key object from a public elliptic point.
+        """ Creates a key object from a public elliptic point.
 
         :param public_point: elliptic point in the compressed format (see https://tezos.stackexchange.com/a/623/309)
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
@@ -131,8 +130,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_encoded_key(cls, key, passphrase=''):
-        """
-        Creates a key object from a base58 encoded key.
+        """ Creates a key object from a base58 encoded key.
 
         :param key: a public or secret key in base58 encoding
         :param passphrase: the passphrase used if the key provided is an encrypted private key

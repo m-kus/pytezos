@@ -134,7 +134,7 @@ class OperationGroup(Interop, ContentMixin):
         """
         Simulate operation without signature checks.
 
-        :return: RPC response from `run_operation`
+        :returns: RPC response from `run_operation`
         """
         return self.shell.head.helpers.scripts.run_operation.post({
             'operation': {
@@ -146,11 +146,10 @@ class OperationGroup(Interop, ContentMixin):
         })
 
     def forge(self, validate=True):
-        """
-        Convert json representation of the operation group into bytes.
+        """ Convert json representation of the operation group into bytes.
 
         :param validate: Forge remotely also and compare results, default is True
-        :return: Hex string
+        :returns: Hex string
         """
         payload = {
             'branch': self.branch,
