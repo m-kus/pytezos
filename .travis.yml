@@ -25,6 +25,7 @@ script:
 #  - poetry run pytest examples/
 
 before_deploy:
+  - make docs
   - poetry config http-basic.pypi __token__ $PYPI_TOKEN
   - poetry build
   - export VERSION=$(cat pyproject.toml | awk '$1 ~ /^version/ {print $3}' | sed 's/"//g')
