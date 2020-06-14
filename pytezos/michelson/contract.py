@@ -192,7 +192,7 @@ class ContractStorage(metaclass=InlineDocstring):
     def big_map_query(self, path):
         """ Construct a query for big_map_get request.
 
-        :param path: BigMap key, string, int, or hex-string
+        :param path: BigMap key, string, int, or hex-string \
         (since Babylon you can have more than one BigMap at arbitrary position)
         :rtype: dict
         """
@@ -217,7 +217,7 @@ class ContractStorage(metaclass=InlineDocstring):
     def big_map_decode(self, value, big_map_id=None):
         """ Convert big_map_get result into a Python object.
 
-        :param value: Micheline expression for a BigMap entry
+        :param value: Micheline expression for a BigMap entry \
         (since Babylon you can have more than one BigMap at arbitrary position)
         :param big_map_id: BigMap pointer (integer)
         :returns: object
@@ -379,7 +379,7 @@ class Contract(metaclass=InlineDocstring):
         """ Generate script for contract origination.
 
         :param storage: Python object, leave None to generate empty
-        :param original: Keep the original code (initialized), which is default.
+        :param original: Keep the original code (initialized), which is default. \
         Otherwise factory-specific changes may applied, e.g. different annotations
         :returns: {"code": $Micheline, "storage": $Micheline}
         """

@@ -35,8 +35,14 @@ before_deploy:
   - git push https://${GH_TOKEN}@github.com/baking-bad/pytezos.git $TAG -f
 
 deploy:
-  provider: script
-  script: poetry publish
-  skip_cleanup: true
-  on:
-    branch: master
+  - provider: script
+    script: poetry publish
+    skip_cleanup: true
+    on:
+      branch: master
+  - provider: pages
+    skip_cleanup: true
+    local_dir: docs/build
+    github_token: $GH_TOKEN
+    on:
+      branch: master

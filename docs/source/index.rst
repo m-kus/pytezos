@@ -7,15 +7,21 @@ Welcome to PyTezos documentation!
 ===================================
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents:
+   :maxdepth: 2
+   :caption: Contents
 
    quick_start
    integration_tests
    pytezos_cli
    high_level
+   crypto
+   operation_groups
+   rpc_queries
    script_wrappers
-   code_and_types
+   pack
+   code
+   repl
+   inspect_proposals
 
 Indices and tables
 ==================

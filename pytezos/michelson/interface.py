@@ -15,14 +15,12 @@ from pytezos.repl.interpreter import Interpreter
 
 
 class ContractCallResult(OperationResult):
-    """
-    Encapsulates the result of a contract invocation.
+    """ Encapsulates the result of a contract invocation.
     """
 
     @classmethod
     def from_contract_call(cls, operation_group: dict, address, contract: Contract) -> list:
-        """
-        Get a list of results from an operation group content with metadata.
+        """ Get a list of results from an operation group content with metadata.
 
         :param operation_group: {..., "contents": [{..., kind: "transaction", ...}]}
         :param address: address of the invoked contract
@@ -54,8 +52,7 @@ class ContractCallResult(OperationResult):
 
     @classmethod
     def from_code_run(cls, code_run: dict, parameters, contract: Contract):
-        """
-        Parse a result of `run_code` execution.
+        """ Parse a result of `run_code` execution.
 
         :param code_run: RPC response (json)
         :param parameters: Micheline expression
@@ -72,13 +69,12 @@ class ContractCallResult(OperationResult):
 
     @classmethod
     def from_repl_result(cls, res: dict, parameters, contract: Contract):
-        """
-        Parse an output of the builtin interpreter.
+        """ Parse an output of the builtin interpreter.
 
         :param res: Interpreter output
         :param parameters: Micheline expression
         :param contract: invoked contract
-        :return: ContractCallResult
+        :returns: ContractCallResult
         """
         contract.storage.big_map_init(res['result']['storage'].val_expr)
         return cls(
@@ -90,8 +86,7 @@ class ContractCallResult(OperationResult):
 
 
 class ContractCall(Interop):
-    """
-    Proxy class encapsulating a contract call: contract type scheme, contract address, parameters, and amount
+    """ Proxy class encapsulating a contract call: contract type scheme, contract address, parameters, and amount
     """
 
     def __init__(self, parameters,
@@ -130,8 +125,7 @@ class ContractCall(Interop):
         return '\n'.join(res)
 
     def with_amount(self, amount):
-        """
-        Send funds to the contract too.
+        """ Send funds to the contract too.
 
         :param amount: amount in microtez (int) or tez (Decimal)
         :rtype: ContractCall
@@ -140,8 +134,7 @@ class ContractCall(Interop):
 
     @property
     def operation_group(self) -> OperationGroup:
-        """
-        Show generated operation group.
+        """ Show generated operation group.
 
         :rtype: OperationGroup
         """
@@ -152,14 +145,12 @@ class ContractCall(Interop):
             .fill()
 
     def inject(self):
-        """
-        Autofill, sign and inject resulting operation group.
+        """ Autofill, sign and inject resulting operation group.
         """
         return self.operation_group.autofill().sign().inject()
 
     def cmdline(self):
-        """
-        Generate command line for tezos client.
+        """ Generate command line for tezos client.
         """
         arg = micheline_to_michelson(self.parameters['value'], inline=True)
         source = self.key.public_key_hash()
@@ -169,8 +160,7 @@ class ContractCall(Interop):
                f'--entrypoint \'{entrypoint}\' --arg \'{arg}\''
 
     def interpret(self, storage, source=None, sender=None, amount=None, balance=None, chain_id=None, now=None):
-        """
-        Run code in the builtin REPL (WARNING! Not recommended for critical tasks).
+        """ Run code in the builtin REPL (WARNING! Not recommended for critical tasks).
 
         :param storage: Python object
         :param source: patch SOURCE
@@ -214,12 +204,11 @@ class ContractCall(Interop):
             res, parameters=self.parameters, contract=self.contract)
 
     def result(self, storage=None, source=None, sender=None, gas_limit=None):
-        """
-        Simulate operation and parse the result.
+        """ Simulate operation and parse the result.
 
         :param storage: Python object only. If storage is specified, `run_code` is called instead of `run_operation`.
         :param source: Can be specified for unit testing purposes
-        :param sender: Can be specified for unit testing purposes,
+        :param sender: Can be specified for unit testing purposes, \
         see https://tezos.gitlab.io/whitedoc/michelson.html#operations-on-contracts for the difference
         :param gas_limit: Specify gas limit (default is gas hard limit)
         :rtype: ContractCallResult
@@ -247,10 +236,9 @@ class ContractCall(Interop):
             return res[0] if res else None
 
     def view(self):
-        """
-        Get return value of a view method.
+        """ Get return value of a view method.
 
-        :return: object
+        :returns: object
         """
         opg_with_metadata = self.operation_group.fill().run()
         view_operation = OperationResult.get_contents(opg_with_metadata, source=self.address)[0]
@@ -259,8 +247,7 @@ class ContractCall(Interop):
 
 
 class ContractEntrypoint(Interop):
-    """
-    Proxy class for spawning ContractCall instances.
+    """ Proxy class for spawning ContractCall instances.
     """
 
     def __init__(self, name, address=None, contract: Contract = None, factory=Contract, shell=None, key=None):
@@ -292,6 +279,12 @@ class ContractEntrypoint(Interop):
         return '\n'.join(res)
 
     def __call__(self, *args, **kwargs):
+        """ Spawn a contract call proxy initialized with the entrypoint name
+
+        :param args: entrypoint args
+        :param kwargs: entrypoint key-value args
+        :rtype: ContractCall
+        """
         if args:
             if len(args) == 1:
                 (data, is_single) = (args[0], True)
@@ -316,8 +309,7 @@ class ContractEntrypoint(Interop):
 
 
 class ContractInterface(Interop):
-    """
-    Proxy class for interacting with a contract.
+    """ Proxy class for interacting with a contract.
     """
     __default_entry__ = 'call'
 
@@ -365,8 +357,7 @@ class ContractInterface(Interop):
 
     @classmethod
     def create_from(cls, source, shell=None, factory=Contract):
-        """
-        Initialize from contract code.
+        """ Initialize from contract code.
 
         :param source: Michelson code
         :param shell: A `Shell` instance (optional)
@@ -381,14 +372,13 @@ class ContractInterface(Interop):
         return ContractInterface(contract=contract, shell=shell)
 
     def big_map_get(self, path, block_id='head'):
-        """
-        Get BigMap entry as Python object by plain key and block height.
+        """ Get BigMap entry as Python object by plain key and block height.
 
-        :param path: Json path to the key (or just key to access default BigMap location).
-            Use `/` to separate nodes and `:` to separate tuple args.
+        :param path: Json path to the key (or just key to access default BigMap location). \
+            Use `/` to separate nodes and `:` to separate tuple args. \
             In any other case you'd need to escape those symbols.
         :param block_id: Block height / hash / offset to use, default is `head`
-        :return: object
+        :returns: object
         """
         if not self.contract.storage.big_map_schema:
             storage = self.shell.blocks[block_id].context.contracts[self.address].storage()
@@ -402,18 +392,16 @@ class ContractInterface(Interop):
         return self.contract.storage.big_map_decode(value, query.get('big_map_id'))
 
     def storage(self, block_id='head'):
-        """
-        Get storage as Pythons object at specified block height.
+        """ Get storage as Pythons object at specified block height.
 
         :param block_id: Block height / hash / offset to use, default is `head`
-        :return: object
+        :returns: object
         """
         storage = self.shell.blocks[block_id].context.contracts[self.address].storage()
         return self.contract.storage.decode(storage)
 
     def operation_result(self, operation_group: dict) -> List[ContractCallResult]:
-        """
-        Get operation parameters, storage and big_map_diff as Python objects.
+        """ Get operation parameters, storage and big_map_diff as Python objects.
         Can locate operation inside operation groups with multiple contents and/or internal operations.
 
         :param operation_group: {'branch', 'protocol', 'contents', 'signature'}
@@ -423,7 +411,6 @@ class ContractInterface(Interop):
             operation_group, address=self.address, contract=self.contract)
 
     def manager(self):
-        """
-        Get contract manager address (tz).
+        """ Get contract manager address (tz).
         """
         return self.shell.block.context.contracts[self.address].manager()

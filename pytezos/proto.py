@@ -148,11 +148,10 @@ class Proto(metaclass=InlineDocstring):
 
     @classmethod
     def from_uri(cls, uri):
-        """
-        Loads protocol implementation from various sources and converts it to the RPC-like format.
+        """ Loads protocol implementation from various sources and converts it to the RPC-like format.
 
         :param uri: link/path to a tar archive or path to a folder with extracted contents
-        :return: Protocol instance
+        :returns: Protocol instance
         """
         if uri.startswith('http'):
             files = url_to_files(uri)
@@ -166,10 +165,9 @@ class Proto(metaclass=InlineDocstring):
         return Proto(files_to_proto(files))
 
     def index(self) -> dict:
-        """
-        Generates TEZOS_PROTOCOL file.
+        """ Generates TEZOS_PROTOCOL file.
 
-        :return: dict with protocol hash and modules
+        :returns: dict with protocol hash and modules
         """
         data = {
             'hash': self.hash(),
@@ -178,33 +176,30 @@ class Proto(metaclass=InlineDocstring):
         return data
 
     def export_tar(self, output_path=None):
-        """
-        Creates a tarball and dumps to a file or returns bytes.
+        """ Creates a tarball and dumps to a file or returns bytes.
 
         :param output_path: Path to the tarball [optional]. You can add .bz2 or .gz extension to make it compressed
-        :return: bytes if path is None or nothing
+        :returns: bytes if path is None or nothing
         """
         files = proto_to_files(self._proto)
         files.append(('TEZOS_PROTOCOL', json.dumps(self.index())))
         return files_to_tar(files, output_path)
 
     def export_html(self, output_path=None):
-        """
-        Generates github-like side-by-side diff viewe, powered by diff2html.js
+        """ Generates github-like side-by-side diff viewe, powered by diff2html.js
 
         :param output_path: will write to this file if specified
-        :return: html string if path is not specified
+        :returns: html string if path is not specified
         """
         diffs = [text for filename, text in self if text]
         return generate_unidiff_html(diffs, output_path=output_path)
 
     def diff(self, proto, context_size=3):
-        """
-        Calculates file diff between two protocol versions.
+        """ Calculates file diff between two protocol versions.
 
         :param proto: an instance of Protocol
         :param context_size: number of context lines before and after the change
-        :return: patch in proto format
+        :returns: patch in proto format
         """
         files = list()
         yours = dict(iter(self))
@@ -222,11 +217,10 @@ class Proto(metaclass=InlineDocstring):
         return Proto(files_to_proto(files))
 
     def patch(self, patch):
-        """
-        Applies unified diff and returns full-fledged protocol.
+        """ Applies unified diff and returns full-fledged protocol.
 
         :param patch: an instance of Protocol containing diff of files
-        :return: Protocol instance
+        :returns: Protocol instance
         """
         files = list()
         yours = dict(iter(self))

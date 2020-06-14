@@ -6,8 +6,7 @@ line_size = 100
 
 
 def format_timestamp(timestamp: int) -> str:
-    """
-    Format unix timestamp.
+    """ Format unix timestamp.
 
     :param timestamp: Unix timestamp (seconds)
     """
@@ -109,8 +108,7 @@ def format_node(node, indent='', inline=False, is_root=False, wrapped=False):
 
 
 def micheline_to_michelson(data, inline=False, wrap=False) -> str:
-    """
-    Converts micheline expression into formatted Michelson source.
+    """ Converts micheline expression into formatted Michelson source.
 
     :param data: Micheline expression
     :param inline: produce single line, used for tezos-client arguments (False by default)

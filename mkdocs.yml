@@ -1,5 +1,0 @@
-site_name: PyTezos
-nav:
-    - Quick start: index.md
-    - Developer guide: guide.md
-theme: readthedocs

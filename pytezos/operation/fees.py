@@ -8,8 +8,7 @@ minimal_nanotez_per_gas_unit = .1
 
 
 def calculate_fee(content: dict, consumed_gas: int, extra_size: int, reserve=10) -> int:
-    """
-    Calculate minimal required operation fee.
+    """ Calculate minimal required operation fee.
 
     :param content: operation content {..., "kind": "transaction", ... }
     :param consumed_gas: amount of gas consumed during the simulation (dry-run)
@@ -24,8 +23,7 @@ def calculate_fee(content: dict, consumed_gas: int, extra_size: int, reserve=10)
 
 
 def default_fee(content) -> int:
-    """
-    Take hard gas limit instead of precise amount (no simulation) and calculate fee.
+    """ Take hard gas limit instead of precise amount (no simulation) and calculate fee.
 
     :param content: operation content {..., "kind": "transaction", ... }
     """
@@ -37,8 +35,7 @@ def default_fee(content) -> int:
 
 
 def default_gas_limit(content) -> int:
-    """
-    Get default gas limit by operation kind.
+    """ Get default gas limit by operation kind.
 
     :param content: operation content {..., "kind": "transaction", ... }
     """
@@ -52,8 +49,7 @@ def default_gas_limit(content) -> int:
 
 
 def default_storage_limit(content):
-    """
-    Get default storage limit by operation kind.
+    """ Get default storage limit by operation kind.
 
     :param content: operation content {..., "kind": "transaction", ... }
     """

@@ -22,7 +22,7 @@ def format_docstring(class_type, query_path):
                 docstring = f'\n{rpc_doc[method]["descr"]}\n'
                 for arg in rpc_doc[method]['args']:
                     docstring += f':param {arg["name"]}: {arg["descr"]}\n'
-                docstring += f':return: {rpc_doc[method]["ret"]}\n'
+                docstring += f':returns: {rpc_doc[method]["ret"]}\n'
 
             res.append(f'{func}{docstring}')
 
@@ -30,7 +30,7 @@ def format_docstring(class_type, query_path):
         docstring = get_attr_docstring(class_type, '__getitem__')
         if not docstring:
             item = rpc_doc["item"]
-            docstring = f'\n:param {item["name"]}: {item["descr"]}\n:return: Child element\n'
+            docstring = f'\n:param {item["name"]}: {item["descr"]}\n:returns: Child element\n'
 
         res.append(f'[]{docstring}')
 

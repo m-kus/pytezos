@@ -18,8 +18,7 @@ operation_tags = {
 
 
 def forge_operation(content) -> bytes:
-    """
-    Forge operation content (locally).
+    """ Forge operation content (locally).
 
     :param content: {.., "kind": "transaction", ...}
     """
@@ -38,8 +37,7 @@ def forge_operation(content) -> bytes:
 
 
 def forge_operation_group(operation_group):
-    """
-    Forge operation group (locally).
+    """ Forge operation group (locally).
 
     :param operation_group: {"branch": "B...", "contents": [], ...}
     """

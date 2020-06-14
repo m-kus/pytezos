@@ -76,8 +76,7 @@ class BlockSliceQuery(RpcQuery):
         return '\n'.join(res)
 
     def __getitem__(self, item):
-        """
-        Get block by index.
+        """ Get block by index.
 
         :param item: Index inside given block range
         :rtype: BlockQuery
@@ -89,8 +88,7 @@ class BlockSliceQuery(RpcQuery):
             return self._getitem(stop + item + 1)
 
     def __call__(self) -> list:
-        """
-        Get block hashes (base58) for this interval.
+        """ Get block hashes (base58) for this interval.
         """
         if is_bh(self._stop):
             head = self._stop
@@ -106,8 +104,7 @@ class BlockSliceQuery(RpcQuery):
         return super(BlockSliceQuery, self).__call__(length=length, head=head)
 
     def get_range(self):
-        """
-        Get block level range.
+        """ Get block level range.
         """
         def get_level(x):
             if isinstance(x, int):
@@ -157,10 +154,9 @@ class BlockSliceQuery(RpcQuery):
                 yield upvote
 
     def find_ballots(self) -> Generator:
-        """
-        Find ballot operations for the current period.
+        """ Find ballot operations for the current period.
 
-        :return: Generator (lazy)
+        :returns: Generator (lazy)
         """
         last, head = self.get_range()
         state_changes = find_state_changes(
@@ -174,8 +170,7 @@ class BlockSliceQuery(RpcQuery):
                 yield ballot
 
     def find_origination(self, contract_id):
-        """
-        Find contract origination.
+        """ Find contract origination.
 
         :param contract_id: Contract ID (KT-address)
         """
@@ -195,8 +190,7 @@ class BlockSliceQuery(RpcQuery):
         return self._getitem(level).operations.find_origination(contract_id)
 
     def find_operation(self, operation_group_hash) -> dict:
-        """
-        Find operation by hash.
+        """ Find operation by hash.
 
         :param operation_group_hash: base58
         :raises: StopIteration if not found
@@ -255,14 +249,12 @@ class CyclesQuery(PeriodQuery):
     __val_key__ = 'cycle'
 
     def __call__(self, **params):
-        """
-        Get current cycle.
+        """ Get current cycle.
         """
         return self.head.cycle()
 
     def __getitem__(self, item) -> BlockSliceQuery:
-        """
-        Get block range by cycle/cycle range.
+        """ Get block range by cycle/cycle range.
 
         :param item: Cycle number or range (slice), range start/stop can be empty or negative
         :rtype: BlockSliceQuery
@@ -275,14 +267,12 @@ class VotingPeriodsQuery(PeriodQuery):
     __val_key__ = 'voting_period'
 
     def __call__(self, **params):
-        """
-        Get current voting period.
+        """ Get current voting period.
         """
         return self.head.voting_period()
 
     def __getitem__(self, item) -> BlockSliceQuery:
-        """
-        Get block range by voting_period/voting_period range.
+        """ Get block range by voting_period/voting_period range.
 
         :param item: Voting_period number or range (slice), range start/stop can be empty or negative
         :rtype: BlockSliceQuery

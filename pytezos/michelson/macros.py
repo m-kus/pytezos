@@ -57,15 +57,14 @@ def seq(instr=None) -> list:
 
 
 def expand_macro(prim, annots, args, internal=False, extra=None):
-    """
-    Expands Michelson macro.
+    """ Expands Michelson macro.
 
     :param prim: macro name
     :param annots: annotations (optional)
     :param args: arguments (optional)
     :param internal: this function is called during another mocro expansion
     :param extra: list of ignored primitives
-    :return: Code sequence (Micheline expression)
+    :returns: Code sequence (Micheline expression)
     """
     assert isinstance(annots, list)
     assert isinstance(args, list)

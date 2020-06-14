@@ -83,11 +83,10 @@ def scrub_input(v) -> bytes:
 
 
 def base58_decode(v: bytes) -> bytes:
-    """
-    Decode data using Base58 with checksum + validate binary prefix against known kinds and cut in the end.
+    """ Decode data using Base58 with checksum + validate binary prefix against known kinds and cut in the end.
 
     :param v: Array of bytes (use string.encode())
-    :return: bytes
+    :returns: bytes
     """
     try:
         prefix_len = next(
@@ -102,12 +101,11 @@ def base58_decode(v: bytes) -> bytes:
 
 
 def base58_encode(v: bytes, prefix: bytes) -> bytes:
-    """
-    Encode data using Base58 with checksum and add an according binary prefix in the end.
+    """ Encode data using Base58 with checksum and add an according binary prefix in the end.
 
     :param v: Array of bytes
     :param prefix: Human-readable prefix (use b'') e.g. b'tz', b'KT', etc
-    :return: bytes (use string.decode())
+    :returns: bytes (use string.decode())
     """
     try:
         encoding = next(
@@ -130,8 +128,7 @@ def _validate(v, prefixes: list):
 
 
 def validate_pkh(v):
-    """
-    Ensure parameter is a public key hash (starts with b'tz1', b'tz2', b'tz3')
+    """ Ensure parameter is a public key hash (starts with b'tz1', b'tz2', b'tz3')
 
     :param v: string or bytes
     :raises ValueError: if parameter is not a public key hash
@@ -140,8 +137,7 @@ def validate_pkh(v):
 
 
 def validate_sig(v):
-    """
-    Ensure parameter is a signature (starts with b'edsig', b'spsig', b'p2sig', b'sig')
+    """ Ensure parameter is a signature (starts with b'edsig', b'spsig', b'p2sig', b'sig')
 
     :param v: string or bytes
     :raises ValueError: if parameter is not a signature
@@ -150,8 +146,7 @@ def validate_sig(v):
 
 
 def is_pkh(v) -> bool:
-    """
-    Check if value is a public key hash.
+    """ Check if value is a public key hash.
     """
     try:
         validate_pkh(v)
@@ -161,8 +156,7 @@ def is_pkh(v) -> bool:
 
 
 def is_sig(v) -> bool:
-    """
-    Check if value is a signature.
+    """ Check if value is a signature.
     """
     try:
         validate_sig(v)
@@ -172,8 +166,7 @@ def is_sig(v) -> bool:
 
 
 def is_bh(v) -> bool:
-    """
-    Check if value is a block hash.
+    """ Check if value is a block hash.
     """
     try:
         _validate(v, prefixes=[b'B'])
@@ -183,8 +176,7 @@ def is_bh(v) -> bool:
 
 
 def is_ogh(v) -> bool:
-    """
-    Check if value is an operation group hash.
+    """ Check if value is an operation group hash.
     """
     try:
         _validate(v, prefixes=[b'o'])
@@ -194,8 +186,7 @@ def is_ogh(v) -> bool:
 
 
 def is_kt(v) -> bool:
-    """
-    Check if value is a KT address.
+    """ Check if value is a KT address.
     """
     try:
         _validate(v, prefixes=[b'KT1'])
@@ -205,8 +196,7 @@ def is_kt(v) -> bool:
 
 
 def is_key(v) -> bool:
-    """
-    Check if value is a public key.
+    """ Check if value is a public key.
     """
     try:
         _validate(v, prefixes=[b"edsk", b"edpk", b"spsk", b"p2sk", b"sppk", b"p2pk"])
@@ -216,8 +206,7 @@ def is_key(v) -> bool:
 
 
 def is_chain_id(v) -> bool:
-    """
-    Check if value is a chain id.
+    """ Check if value is a chain id.
     """
     try:
         _validate(v, prefixes=[b'Net'])
@@ -227,11 +216,10 @@ def is_chain_id(v) -> bool:
 
 
 def forge_nat(value) -> bytes:
-    """
-    Encode a number using LEB128 encoding (Zarith).
+    """ Encode a number using LEB128 encoding (Zarith).
 
     :param int value: the value to encode
-    :return: encoded value
+    :returns: encoded value
     :rtype: bytes
     """
     if value < 0:
@@ -255,8 +243,7 @@ def forge_nat(value) -> bytes:
 
 
 def forge_public_key(value) -> bytes:
-    """
-    Encode public key into bytes.
+    """ Encode public key into bytes.
 
     :param value: public key in in base58 form
     """
@@ -274,11 +261,10 @@ def forge_public_key(value) -> bytes:
 
 
 def parse_public_key(data: bytes) -> str:
-    """
-    Decode public key from byte form.
+    """ Decode public key from byte form.
 
     :param data: encoded public key.
-    :return: base58 encoded public key
+    :returns: base58 encoded public key
     """
     key_prefix = {
         b'\x00': b'edpk',
@@ -289,28 +275,25 @@ def parse_public_key(data: bytes) -> str:
 
 
 def parse_chain_id(data: bytes):
-    """
-    Decode chain id from byte form.
+    """ Decode chain id from byte form.
 
     :param data: encoded chain id.
-    :return: base58 encoded chain id
+    :returns: base58 encoded chain id
     """
     return base58_encode(data, b'Net').decode()
 
 
 def parse_signature(data: bytes):
-    """
-    Decode signature from byte form.
+    """ Decode signature from byte form.
 
     :param data: encoded signature.
-    :return: base58 encoded signature (generic)
+    :returns: base58 encoded signature (generic)
     """
     return base58_encode(data, b'sig').decode()
 
 
 def forge_address(value: str, tz_only=False) -> bytes:
-    """
-    Encode address or key hash into bytes.
+    """ Encode address or key hash into bytes.
 
     :param value: base58 encoded address or key_hash
     :param tz_only: True indicates that it's a key_hash (will be encoded in a more compact form)
@@ -333,11 +316,10 @@ def forge_address(value: str, tz_only=False) -> bytes:
 
 
 def parse_address(data: bytes):
-    """
-    Decode address or key_hash from bytes.
+    """ Decode address or key_hash from bytes.
 
     :param data: encoded address or key_hash
-    :return: base58 encoded address
+    :returns: base58 encoded address
     """
     tz_prefixes = {
         b'\x00\x00': b'tz1',
@@ -356,11 +338,10 @@ def parse_address(data: bytes):
 
 
 def parse_contract(data: bytes):
-    """
-    Decode contract (address + optional entrypoint) from bytes
+    """ Decode contract (address + optional entrypoint) from bytes
 
     :param data: encoded contract
-    :return: base58 encoded address and entrypoint (if exists) separated by `%`
+    :returns: base58 encoded address and entrypoint (if exists) separated by `%`
     """
     res = parse_address(data[:22])
     if len(data) > 22:
@@ -369,15 +350,13 @@ def parse_contract(data: bytes):
 
 
 def forge_bool(value: bool) -> bytes:
-    """
-    Encode boolean value into bytes.
+    """ Encode boolean value into bytes.
     """
     return b'\xff' if value else b'\x00'
 
 
 def forge_array(data, len_bytes=4) -> bytes:
-    """
-    Encode array of bytes (prepend length).
+    """ Encode array of bytes (prepend length).
 
     :param data: list of bytes
     :param len_bytes: number of bytes to store array length
@@ -386,12 +365,11 @@ def forge_array(data, len_bytes=4) -> bytes:
 
 
 def parse_array(data, len_bytes=4) -> tuple:
-    """
-    Decode array of bytes.
+    """ Decode array of bytes.
 
     :param data: encoded array
     :param len_bytes: number of bytes to store array length
-    :return: Tuple[list of bytes, array length]
+    :returns: Tuple[list of bytes, array length]
     """
     assert len(data) >= len_bytes, f'not enough bytes to parse array length, wanted {len_bytes}'
     length = int.from_bytes(data[:len_bytes], 'big')
@@ -400,8 +378,7 @@ def parse_array(data, len_bytes=4) -> tuple:
 
 
 def forge_base58(value: str) -> bytes:
-    """
-    Encode base58 string into bytes.
+    """ Encode base58 string into bytes.
 
     :param value: base58 encoded value (with checksum)
     """
@@ -409,8 +386,7 @@ def forge_base58(value: str) -> bytes:
 
 
 def forge_timestamp(value) -> int:
-    """
-    Encode timestamp into bytes.
+    """ Encode timestamp into bytes.
 
     :param value: unix timestamp in seconds (int)
     """
@@ -420,8 +396,7 @@ def forge_timestamp(value) -> int:
 
 
 def forge_contract(value) -> bytes:
-    """
-    Encode a value of contract type (address + optional entrypoint) into bytes.
+    """ Encode a value of contract type (address + optional entrypoint) into bytes.
 
     :param value: 'tz12345' or 'tz12345%default'
     """

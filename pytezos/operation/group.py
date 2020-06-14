@@ -26,8 +26,7 @@ validation_passes = {
 
 
 class OperationGroup(Interop, ContentMixin):
-    """
-    Operation group representation handling contents (single or multiple), signature, other fields,
+    """ Operation group representation: contents (single or multiple), signature, other fields,
     and also useful helpers for filling with precise fees, signing, forging, and injecting.
     """
 
@@ -61,8 +60,7 @@ class OperationGroup(Interop, ContentMixin):
         )
 
     def json_payload(self) -> dict:
-        """
-        Get json payload used for the preapply.
+        """ Get json payload used for the preapply.
         """
         return {
             'protocol': self.protocol,
@@ -72,8 +70,7 @@ class OperationGroup(Interop, ContentMixin):
         }
 
     def binary_payload(self) -> bytes:
-        """
-        Get binary payload used for injection/hash calculation.
+        """ Get binary payload used for injection/hash calculation.
         """
         if not self.signature:
             raise ValueError('Not signed')
@@ -81,8 +78,7 @@ class OperationGroup(Interop, ContentMixin):
         return bytes.fromhex(self.forge()) + forge_base58(self.signature)
 
     def operation(self, content):
-        """
-        Create new operation group with extra content added.
+        """ Create new operation group with extra content added.
 
         :param content: Kind-specific operation body
         :rtype: OperationGroup
@@ -90,8 +86,7 @@ class OperationGroup(Interop, ContentMixin):
         return self._spawn(contents=self.contents + [content])
 
     def fill(self):
-        """
-        Try to fill all fields left unfilled, use approximate fees
+        """ Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :rtype: OperationGroup
@@ -131,8 +126,7 @@ class OperationGroup(Interop, ContentMixin):
         )
 
     def run(self):
-        """
-        Simulate operation without signature checks.
+        """ Simulate operation without signature checks.
 
         :returns: RPC response from `run_operation`
         """
@@ -165,8 +159,7 @@ class OperationGroup(Interop, ContentMixin):
         return local_data
 
     def autofill(self, gas_reserve=100):
-        """
-        Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
+        """ Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
         :param gas_reserve: Add a safe reserve for gas limit (default is 100)
         :rtype: OperationGroup
@@ -197,8 +190,7 @@ class OperationGroup(Interop, ContentMixin):
         return opg
 
     def sign(self):
-        """
-        Sign the operation group with the key specified by `using`.
+        """ Sign the operation group with the key specified by `using`.
 
         :rtype: OperationGroup
         """
@@ -218,17 +210,15 @@ class OperationGroup(Interop, ContentMixin):
         return self._spawn(signature=signature)
 
     def hash(self) -> str:
-        """
-        Calculate the Base58 encoded operation group hash.
+        """ Calculate the Base58 encoded operation group hash.
         """
         hash_digest = blake2b_32(self.binary_payload()).digest()
         return base58_encode(hash_digest, b'o').decode()
 
     def preapply(self):
-        """
-        Preapply signed operation group.
+        """ Preapply signed operation group.
 
-        :return: RPC response from `preapply`
+        :returns: RPC response from `preapply`
         """
         if not self.signature:
             raise ValueError('Not signed')
@@ -237,14 +227,13 @@ class OperationGroup(Interop, ContentMixin):
             operations=[self.json_payload()])[0]
 
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
-        """
-        Inject the signed operation group.
+        """ Inject the signed operation group.
 
         :param _async: do not wait for operation inclusion (default is True)
         :param preapply: do a preapply before injection
         :param check_result: raise RpcError in case operation is refused
         :param num_blocks_wait: number of blocks to wait for injection
-        :return: operation group with metadata (raw RPC response)
+        :returns: operation group with metadata (raw RPC response)
         """
         if preapply:
             opg_with_metadata = self.preapply()
@@ -278,8 +267,7 @@ class OperationGroup(Interop, ContentMixin):
         raise TimeoutError(opg_hash)
 
     def result(self):
-        """
-        Parse the preapply result.
+        """ Parse the preapply result.
 
         :rtype: OperationResult
         """

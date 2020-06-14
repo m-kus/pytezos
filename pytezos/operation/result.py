@@ -5,8 +5,7 @@ from pytezos.rpc.errors import RpcError
 
 
 class OperationResult:
-    """
-    Operation result representation + useful parsing helpers for operation group
+    """ Operation result representation + useful parsing helpers for operation group
     """
 
     def __init__(self, **props):
@@ -24,12 +23,11 @@ class OperationResult:
 
     @staticmethod
     def iter_contents(operation_group: dict):
-        """
-        Lazily iterate operation group contents including internal operations.
+        """ Lazily iterate operation group contents including internal operations.
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
-        :return: generator
+        :returns: generator
         """
         contents = operation_group.get('contents', [operation_group])
         for content in contents:
@@ -40,12 +38,11 @@ class OperationResult:
 
     @staticmethod
     def iter_results(operation_group: dict):
-        """
-        Lazily iterate operation results including internal operation results.
+        """ Lazily iterate operation results including internal operation results.
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
-        :return: generator
+        :returns: generator
         """
         for content in OperationResult.iter_contents(operation_group):
             if content['internal'] and content.get('result'):
@@ -55,10 +52,9 @@ class OperationResult:
 
     @staticmethod
     def consumed_gas(operation_group) -> int:
-        """
-        Get total consumed gas for an operation group (recursively).
+        """ Get total consumed gas for an operation group (recursively).
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
         return sum(map(lambda x: int(x.get('consumed_gas', '0')),
@@ -66,10 +62,9 @@ class OperationResult:
 
     @staticmethod
     def paid_storage_size_diff(operation_group) -> int:
-        """
-        Get total paid storage size diff for an operation group (recursively).
+        """ Get total paid storage size diff for an operation group (recursively).
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
         return sum(map(lambda x: int(x.get('paid_storage_size_diff', '0')),
@@ -77,10 +72,9 @@ class OperationResult:
 
     @staticmethod
     def burned(operation_group) -> int:
-        """
-        Get total burned (due to account allocations) for an operation group (recursively).
+        """ Get total burned (due to account allocations) for an operation group (recursively).
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
         return sum(map(
@@ -89,10 +83,9 @@ class OperationResult:
 
     @staticmethod
     def is_applied(operation_group) -> bool:
-        """
-        Check if ALL operations in a group are applied.
+        """ Check if ALL operations in a group are applied.
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
         return all(map(lambda x: x['status'] == 'applied',
@@ -100,12 +93,11 @@ class OperationResult:
 
     @staticmethod
     def errors(operation_group: dict) -> list:
-        """
-        Collect errors from all operation results in a group.
+        """ Collect errors from all operation results in a group.
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
-        :return: list of errors [{"id": "", ...}]
+        :returns: list of errors [{"id": "", ...}]
         """
         all_errors = (
             result.get("errors", []) if result["status"] != "applied" else []
@@ -115,12 +107,11 @@ class OperationResult:
 
     @staticmethod
     def originated_contracts(operation_group: dict) -> list:
-        """
-        Collect originated contract addresses from all operation results in a group.
+        """ Collect originated contract addresses from all operation results in a group.
 
-        :param operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
-        :return: list of addresses ["tz12345...", ...]
+        :returns: list of addresses ["tz12345...", ...]
         """
         originated_contracts = list()
         for result in OperationResult.iter_results(operation_group):
@@ -149,10 +140,9 @@ class OperationResult:
 
     @classmethod
     def from_operation_group(cls, operation_group: dict, **predicates):
-        """
-        Initialize with operation group contents.
+        """ Initialize with operation group contents.
 
-        :param operation_group: operation_group: {"branch": "B...", "contents": [...], ...}
+        :param operation_group: operation_group: {"branch": "B...", "contents": [...], ...} \
         :param predicates: filter contents using predicates `field=value`
         :rtype: List[OperationResult]
         """
@@ -172,8 +162,7 @@ class OperationResult:
 
     @classmethod
     def from_origination(cls, content: dict):
-        """
-        Initialize with origination content.
+        """ Initialize with origination content.
 
         :param content:
         :rtype: OperationResult
@@ -186,8 +175,7 @@ class OperationResult:
 
     @classmethod
     def from_transaction(cls, content: dict):
-        """
-        Initialize with transaction content.
+        """ Initialize with transaction content.
 
         :param content:
         :rtype: OperationResult

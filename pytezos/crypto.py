@@ -173,15 +173,14 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def generate(cls, passphrase='', curve=b'ed', strength=128, language='english', export=True):
-        """
-        Generates new key.
+        """ Generates new key.
 
         :param passphrase: optional password
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
         :param strength: mnemonic strength, default is 128
         :param language: mnemonic language, default is english
         :param export: export as json file in the current folder, default is True
-        :return: Key
+        :rtype: Key
         """
         mnemonic = Mnemonic(language).generate(strength)
         key = cls.from_mnemonic(mnemonic, passphrase, curve=curve)
@@ -200,8 +199,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_mnemonic(cls, mnemonic, passphrase='', email='', validate=True, curve=b'ed', activation_code=None):
-        """
-        Creates a key object from a bip39 mnemonic.
+        """ Creates a key object from a bip39 mnemonic.
 
         :param mnemonic: a 15 word bip39 english mnemonic
         :param passphrase: a mnemonic password or a fundraiser key
@@ -232,8 +230,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_faucet(cls, path):
-        """
-        Import key from a faucet file: https://faucet.tzalpha.net/
+        """ Import key from a faucet file: https://faucet.tzalpha.net/
 
         :param path: path to the json file
         :rtype: Key
@@ -254,8 +251,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_alias(cls, alias, passphrase='', tezos_client_dir='~/.tezos-client'):
-        """
-        Import secret key from tezos-client keychain.
+        """ Import secret key from tezos-client keychain.
 
         :param alias: key alias
         :param passphrase: if key is encrypted (optional)
@@ -280,20 +276,18 @@ class Key(metaclass=InlineDocstring):
         return key
 
     def public_key(self):
-        """
-        Creates base58 encoded public key representation.
+        """ Creates base58 encoded public key representation.
 
-        :return: the public key associated with the private key
+        :returns: the public key associated with the private key
         """
         return base58_encode(self.public_point, self.curve + b'pk').decode()
 
     def secret_key(self, passphrase=None, ed25519_seed=True):
-        """
-        Creates base58 encoded private key representation.
+        """ Creates base58 encoded private key representation.
 
         :param passphrase: encryption phrase for the private key
         :param ed25519_seed: encode seed rather than full key for ed25519 curve (True by default)
-        :return: the secret key associated with this key, if available
+        :returns: the secret key associated with this key, if available
         """
         if not self.secret_exponent:
             raise ValueError("Secret key not known.")
@@ -325,22 +319,20 @@ class Key(metaclass=InlineDocstring):
         return base58_encode(key, prefix).decode()
 
     def public_key_hash(self):
-        """
-        Creates base58 encoded public key hash for this key.
+        """ Creates base58 encoded public key hash for this key.
 
-        :return: the public key hash for this key
+        :returns: the public key hash for this key
         """
         pkh = blake2b(data=self.public_point, digest_size=20).digest()
         prefix = {b'ed': b'tz1', b'sp': b'tz2', b'p2': b'tz3'}[self.curve]
         return base58_encode(pkh, prefix).decode()
 
     def sign(self, message, generic=False):
-        """
-        Sign a raw sequence of bytes.
+        """ Sign a raw sequence of bytes.
 
         :param message: sequence of bytes, raw format or hexadecimal notation
         :param generic: do not specify elliptic curve if set to True
-        :return: signature in base58 encoding
+        :returns: signature in base58 encoding
         """
         message = scrub_input(message)
 
@@ -371,11 +363,11 @@ class Key(metaclass=InlineDocstring):
         return base58_encode(signature, prefix).decode()
 
     def verify(self, signature, message):
-        """
-        Verify signature, raise exception if it is not valid.
+        """ Verify signature, raise exception if it is not valid.
 
         :param message: sequance of bytes, raw format or hexadecimal notation
         :param signature: a signature in base58 encoding
+        :raises: ValueError if signature is not valid
         """
         signature = scrub_input(signature)
         message = scrub_input(message)

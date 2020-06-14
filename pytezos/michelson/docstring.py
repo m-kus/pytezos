@@ -19,13 +19,12 @@ domain_types = {
 
 
 def generate_docstring(schema: Schema, title, root='0') -> str:
-    """
-    Generate Michelson type (of arbitrary complexity) documentation in a more readable form.
+    """ Generate Michelson type (of arbitrary complexity) documentation in a more readable form.
 
     :param schema: parameter/storage schema
     :param title: documentation title
     :param root: binary path to the root element (default is '0')
-    :return: formatted docstring
+    :returns: formatted docstring
     """
     docstring = list()
     known_types = set()

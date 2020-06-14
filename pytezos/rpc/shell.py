@@ -19,30 +19,26 @@ class ShellQuery(RpcQuery, path=''):
 
     @property
     def blocks(self):
-        """
-        Shortcut for `chains.main.blocks`
+        """ Shortcut for `chains.main.blocks`
         """
         return self.chains.main.blocks
 
     @property
     def head(self):
-        """
-        Shortcut for `blocks.head`
+        """ Shortcut for `blocks.head`
         """
         return self.blocks.head
 
     @property
     @lru_cache(maxsize=None)
     def block(self):
-        """
-        Cached head block, useful if you just want to explore things.
+        """ Cached head block, useful if you just want to explore things.
         """
         return self.blocks[self.head.hash()]
 
     @property
     def cycles(self):
-        """
-        Operate on cycles rather than blocks.
+        """ Operate on cycles rather than blocks.
         """
         return CyclesQuery(
             node=self.node,
@@ -63,21 +59,18 @@ class ShellQuery(RpcQuery, path=''):
 
     @property
     def contracts(self):
-        """
-        Shortcut for `head.context.contracts`
+        """ Shortcut for `head.context.contracts`
         """
         return self.head.context.contracts
 
     @property
     def mempool(self):
-        """
-        Shortcut for `chains.main.mempool`
+        """ Shortcut for `chains.main.mempool`
         """
         return self.chains.main.mempool
 
     def wait_next_block(self, block_hash=None):
-        """
-        Wait until next block is finalized.
+        """ Wait until next block is finalized.
 
         :param block_hash: Current block hash (optional). If not set, current head is used.
         """
@@ -104,8 +97,7 @@ class ShellQuery(RpcQuery, path=''):
 class ChainQuery(RpcQuery, path='/chains/{}'):
 
     def watermark(self):
-        """
-        Chain watermark, hex encoded.
+        """ Chain watermark, hex encoded.
         """
         data = self.chain_id()
         return hexlify(base58_decode(data.encode())).decode()
@@ -120,10 +112,9 @@ class InvalidBlockQuery(RpcQuery, path='/chains/{}/invalid_blocks/{}'):
 class MempoolQuery(RpcQuery, path='/chains/{}/mempool'):
 
     def post(self, configuration):
-        """
-        Set operation filter rules.
+        """ Set operation filter rules.
 
-        :param configuration: a JSON dictionary, known keys are `minimal_fees`, `minimal_nanotez_per_gas_unit`,
+        :param configuration: a JSON dictionary, known keys are `minimal_fees`, `minimal_nanotez_per_gas_unit`, \
         `minimal_nanotez_per_byte`
         """
         return self._post(json=configuration)
@@ -132,8 +123,7 @@ class MempoolQuery(RpcQuery, path='/chains/{}/mempool'):
 class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operations'):
 
     def __getitem__(self, item):
-        """
-        Search for operation in node's mempool by hash.
+        """ Search for operation in node's mempool by hash.
 
         :param item: operation group hash (base58)
         """
@@ -162,8 +152,7 @@ class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operatio
 class DescribeQuery(RpcQuery, path='/describe'):
 
     def __call__(self, recurse=True):
-        """
-        Get RPCs documentation and input/output schema.
+        """ Get RPCs documentation and input/output schema.
 
         :param recurse: Show information for child elements, default is True.
         In some cases doesn't work without this flag.
@@ -182,24 +171,23 @@ class DescribeQuery(RpcQuery, path='/describe'):
 class BlockInjectionQuery(RpcQuery, path='/injection/block'):
 
     def post(self, block, _async=False, force=False, chain=None):
-        """
-        Inject a block in the node and broadcast it.
+        """ Inject a block in the node and broadcast it.
         The `operations` embedded in `blockHeader` might be pre-validated using a contextual RPCs from the latest block
         (e.g. '/blocks/head/context/preapply').
 
-        :param block: Json input:
-        {
-            "data": <hex-encoded block header>,
-            "operations": [ [ {
+        :param block: Json input
+            {
+                "data": <hex-encoded block header>,
+                "operations": [ [ {
                 "branch": <block_hash>,
                 "data": <hex-encoded operation>
-            } ... ] ... ]
-        }
-        :param _async: By default, the RPC will wait for the block to be validated before answering,
+                } ... ] ... ]
+            }
+        :param _async: By default, the RPC will wait for the block to be validated before answering, \
         set True if you don't want to.
         :param force:
         :param chain: Optionally you can specify the chain
-        :return: ID of the block
+        :returns: ID of the block
         """
         return self._post(
             params={
@@ -214,16 +202,15 @@ class BlockInjectionQuery(RpcQuery, path='/injection/block'):
 class OperationInjectionQuery(RpcQuery, path='/injection/operation'):
 
     def post(self, operation, _async=False, chain=None):
-        """
-        Inject an operation in node and broadcast it.
+        """ Inject an operation in node and broadcast it.
         The `signedOperationContents` should be constructed using a contextual RPCs from the latest block
         and signed by the client.
 
         :param operation: Hex-encoded operation data or bytes
-        :param _async: By default, the RPC will wait for the operation to be (pre-)validated before answering,
+        :param _async: By default, the RPC will wait for the operation to be (pre-)validated before answering, \
         set True if you don't want to.
         :param chain: Optionally you can specify the chain
-        :return: ID of the operation
+        :returns: ID of the operation
         """
         if isinstance(operation, bytes):
             operation = operation.hex()
@@ -240,22 +227,21 @@ class OperationInjectionQuery(RpcQuery, path='/injection/operation'):
 class ProtocolInjectionQuery(RpcQuery, path='/injection/protocol'):
 
     def post(self, protocol, _async=False, force=False):
-        """
-        Inject a protocol in node.
+        """ Inject a protocol in node.
 
-        :param protocol: Json input:
-        {
-            "expected_env_version": <integer>,
-            "components": [{
-                "name": <unistring>,
-                "interface"?: <hex-encoded data>,
-                "implementation": <hex-encoded data> }
-                 ...
-            ]}
-        }
+        :param protocol: Json input
+            {
+                "expected_env_version": <integer>,
+                "components": [{
+                    "name": <unistring>,
+                    "interface"?: <hex-encoded data>,
+                    "implementation": <hex-encoded data> }
+                     ...
+                ]}
+            }
         :param _async:
         :param force:
-        :return: ID of the protocol
+        :returns: ID of the protocol
         """
         return self._post(
             params={

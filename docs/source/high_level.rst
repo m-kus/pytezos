@@ -1,6 +1,12 @@
 High-level interfaces
 ================================
 
+PyTezos client
+++++++++++++++++
+.. autoclass:: pytezos.client.PyTezosClient
+   :members:
+   :inherited-members:
+
 Contract interface
 ++++++++++++++++++++
 .. autoclass:: pytezos.michelson.interface.ContractInterface
@@ -11,6 +17,7 @@ Contract entrypoint proxy
 +++++++++++++++++++++++++++
 .. autoclass:: pytezos.michelson.interface.ContractEntrypoint
    :members:
+   :special-members: __call__
    :inherited-members:
 
 Contract call proxy

@@ -15,8 +15,7 @@ class MichelineSchemaError(ValueError):
 
 
 def build_schema(code) -> Schema:
-    """
-    Creates internal structures necessary for decoding/encoding micheline:
+    """ Creates internal structures necessary for decoding/encoding micheline:
     `metadata` -> micheline tree with collapsed `pair`, `or`, and `option` nodes
     `bin_types` -> maps binary path to primitive
     `bin_names` -> binary path to key name mapping
@@ -34,14 +33,13 @@ def build_schema(code) -> Schema:
 
 
 def decode_micheline(val_expr, type_expr, schema: Schema, root='0'):
-    """
-    Converts Micheline data into Python object.
+    """ Converts Micheline data into Python object.
 
     :param val_expr: Micheline value expression
     :param type_expr: Michelson type expression for the entire type
     :param schema: schema built for particular contract/section
     :param root: which binary node to take as root, used to decode BigMap values/diffs
-    :return: Object
+    :returns: Object
     """
     try:
         return parse_micheline(val_expr, type_expr, schema, root)
@@ -52,14 +50,13 @@ def decode_micheline(val_expr, type_expr, schema: Schema, root='0'):
 
 
 def encode_micheline(data, schema: Schema, root='0', binary=False):
-    """
-    Converts Python object into Micheline expression.
+    """ Converts Python object into Micheline expression.
 
     :param data: Python object
     :param schema: schema built for particular contract/section
     :param root: which binary node to take as root, used to encode BigMap values
     :param binary: Encode keys and addresses in bytes rather than strings, default is False
-    :return: Micheline expression
+    :returns: Micheline expression
     """
     try:
         bin_values = parse_json(data, schema, root)
@@ -71,8 +68,7 @@ def encode_micheline(data, schema: Schema, root='0', binary=False):
 
 
 def convert(source, schema: Schema = None, output='micheline', inline=False):
-    """
-    Convert data between different representations (DO NOT USE FOR STORAGE/PARAMETER, can be ambiguous).
+    """ Convert data between different representations (DO NOT USE FOR STORAGE/PARAMETER, can be ambiguous).
 
     :param source: Data, can be one of Michelson (string), Micheline expression, object
     :param schema: Needed if decoding/encoding objects (optional)
@@ -100,12 +96,11 @@ def convert(source, schema: Schema = None, output='micheline', inline=False):
 
 
 def build_big_map_schema(data, schema: Schema) -> BigMapSchema:
-    """
-    Generate Big_map schema from the contract storage
+    """ Generate Big_map schema from the contract storage
 
     :param data: Raw storage (Micheline expression)
     :param schema: Storage schema
-    :return: Mappings: Big_map id to JSON path and vice versa
+    :returns: Mappings: Big_map id to JSON path and vice versa
     :rtype: BigMapSchema
     """
     bin_to_id = dict()
@@ -131,8 +126,7 @@ def build_big_map_schema(data, schema: Schema) -> BigMapSchema:
 
 
 def is_micheline(value) -> bool:
-    """
-    Check if value is a Micheline expression (using heuristics, so not 100% accurate).
+    """ Check if value is a Micheline expression (using heuristics, so not 100% accurate).
 
     :param value: Object
     :rtype: bool

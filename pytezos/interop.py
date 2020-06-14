@@ -44,8 +44,7 @@ class KeyHash(Key):
 
 
 class Interop(metaclass=InlineDocstring):
-    """
-    Mixin for blockchain interaction, stores node connection and key object.
+    """ Mixin for blockchain interaction, stores node connection and key object.
     """
 
     def __repr__(self):
@@ -107,11 +106,10 @@ class Interop(metaclass=InlineDocstring):
         raise NotImplementedError
 
     def using(self, shell: ShellQuery = None, key: Key = None):
-        """
-        Change current rpc endpoint and account (private key).
+        """ Change current rpc endpoint and account (private key).
 
         :param shell: one of 'babylonnet', 'mainnet', 'zeronet', or RPC node uri, or instance of `ShellQuery`
         :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
-        :return: A copy of current object with changes applied
+        :returns: A copy of current object with changes applied
         """
         return self._spawn(shell=shell, key=key)

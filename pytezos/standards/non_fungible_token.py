@@ -12,8 +12,7 @@ storage_tz = "storage (map nat address)"
 
 
 class NonFungibleTokenImpl(Contract):
-    """
-    This is an example of how to force contract interface (in case it's not annotated)
+    """ This is an example of how to force contract interface (in case it's not annotated)
     """
 
     @property

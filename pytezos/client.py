@@ -12,8 +12,7 @@ from pytezos.standards.non_fungible_token import NonFungibleTokenImpl
 
 
 class PyTezosClient(Interop, ContentMixin):
-    """
-    Entry point for a developer, start your script with:
+    """ Entry point for a developer, start your script with:
     `from pytezos import pytezos`
     """
 
@@ -32,8 +31,7 @@ class PyTezosClient(Interop, ContentMixin):
         )
 
     def operation_group(self, protocol=None, branch=None, contents=None, signature=None) -> OperationGroup:
-        """
-        Create new operation group (multiple contents).
+        """ Create new operation group (multiple contents).
         You can leave all fields empty in order to create an empty operation group.
 
         :param protocol: Leave None for autocomplete, otherwise you know what to do
@@ -52,8 +50,7 @@ class PyTezosClient(Interop, ContentMixin):
         )
 
     def operation(self, content: dict) -> OperationGroup:
-        """
-        Create an operation group with single content.
+        """ Create an operation group with single content.
 
         :param content: Operation body (depending on `kind`)
         :rtype: OperationGroup
@@ -65,8 +62,7 @@ class PyTezosClient(Interop, ContentMixin):
         )
 
     def account(self, account_id=None) -> dict:
-        """
-        Shortcut for RPC contract request.
+        """ Shortcut for RPC contract request.
 
         :param account_id: tz/KT address, leave None to show info about current key
         """
@@ -77,8 +73,7 @@ class PyTezosClient(Interop, ContentMixin):
         return (Decimal(self.account()['balance']) / 10 ** 6).quantize(Decimal('0.000001'))
 
     def now(self) -> int:
-        """
-        Timestamp of the current head (UTC).
+        """ Timestamp of the current head (UTC).
         """
         constants = self.shell.block.context.constants()  # cached
         ts = self.shell.head.header()['timestamp']
@@ -96,8 +91,7 @@ class PyTezosClient(Interop, ContentMixin):
         )
 
     def contract(self, contract_id) -> ContractInterface:
-        """
-        Get a high-level interface for a given smart contract id.
+        """ Get a high-level interface for a given smart contract id.
 
         :param contract_id: KT address of a smart contract
         :rtype: ContractInterface
@@ -105,8 +99,7 @@ class PyTezosClient(Interop, ContentMixin):
         return self._get_contract_interface(contract_id)
 
     def nft_app(self, contract_id) -> ContractInterface:
-        """
-        Get a high-level NFT interface for a given smart contract id.
+        """ Get a high-level NFT interface for a given smart contract id.
 
         Read more at https://nft.stove-labs.com/
         :param contract_id: KT address of a smart contract

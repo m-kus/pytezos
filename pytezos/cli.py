@@ -49,8 +49,7 @@ def get_contract(path):
 class PyTezosCli:
 
     def storage(self, action, path=None):
-        """
-        Manage contract storage.
+        """ Manage contract storage.
 
         :param action: One of `schema`, `default`
         :param path: Path to the .tz file, or the following uri: <network>:<KT-address>
@@ -64,8 +63,7 @@ class PyTezosCli:
             assert False, action
 
     def parameter(self, action, path=None):
-        """
-        Manage contract parameter.
+        """ Manage contract parameter.
 
         :param action: One of `schema`
         :param path: Path to the .tz file, or the following uri: <network>:<KT-address>
@@ -77,8 +75,7 @@ class PyTezosCli:
             assert False, action
 
     def activate(self, path, network='carthagenet'):
-        """
-        Activates and reveals key from the faucet file.
+        """ Activates and reveals key from the faucet file.
 
         :param path: Path to the .json file downloaded from https://faucet.tzalpha.net/
         :param network: Default is Babylonnet
@@ -113,8 +110,7 @@ class PyTezosCli:
 
     def deploy(self, path, storage=None, network='carthagenet', key=None,
                github_repo_slug=None, github_oauth_token=None, dry_run=False):
-        """
-        Deploy contract to the specified network.
+        """ Deploy contract to the specified network.
 
         :param path: Path to the .tz file
         :param storage: Storage in JSON format (not Micheline)
