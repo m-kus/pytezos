@@ -31,3 +31,18 @@ class TestREPLRegression(TestCase):
         i = Interpreter()
         i.execute('PATCH NOW "2020-06-17T10:00:00Z"')
         i.execute('PATCH NOW 1593082373')
+
+    def test_unpack_concat_nat(self):
+        i = Interpreter()
+        i.execute("""
+            PUSH nat 33 ;
+            PUSH nat 44 ;
+            PACK ;
+            SWAP ;
+            PACK ;
+            CONCAT ;
+            UNPACK nat ;
+        """)
+        top = i.ctx.stack[0]  # type: Option
+        assert_stack_type(top, Option)
+        self.assertTrue(top.is_none())

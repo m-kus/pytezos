@@ -340,4 +340,6 @@ def unforge_micheline(data: bytes):
         else:
             assert False, f'unkonwn tag {tag} at position {ptr}'
 
-    return parse()
+    res = parse()
+    assert ptr == len(data), f'have not reach EOS (pos {ptr}/{len(data)})'
+    return res
