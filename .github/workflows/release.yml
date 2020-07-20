@@ -24,6 +24,7 @@ jobs:
     - name: Prepare deploy
       run: |
         make docs
+        poetry config -q -n http-basic.pypi __token__ $PYPI_TOKEN
     # - name: telegram notification
     #   uses: appleboy/telegram-action@master
     #   with:
