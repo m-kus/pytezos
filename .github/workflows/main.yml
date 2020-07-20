@@ -1,4 +1,4 @@
-name: Release notifications
+name: Release
 on: push
 
 jobs:
@@ -21,6 +21,11 @@ jobs:
         poetry install -v
     - name: Run tests
       run: poetry run pytest tests/
+    - name: Prepare deploy
+      run: |
+        make docs
+        poetry config http-basic.pypi __token__ $PYPI_TOKEN
+        poetry build
     - name: telegram notification
       uses: appleboy/telegram-action@master
       with:
