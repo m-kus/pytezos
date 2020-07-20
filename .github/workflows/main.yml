@@ -9,20 +9,19 @@ jobs:
     - uses: actions/checkout@master
     - name: set env
       run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
-    - name: Libsodium
-      run: sudo apt-get update -q && sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y 
-    - name: Install
-      uses: abatilo/actions-poetry@v1.5.0
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python_version: 3.6.0
-        poetry_version: 1.0
-        args: install
-    - name: Run pytest
-      uses: abatilo/actions-poetry@v1.5.0
-      with:
-        python_version: 3.6.0
-        poetry_version: 1.0
-        args: poetry run pytest tests/
+        python-version: '3.6.x'
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
+        curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+        source $HOME/.poetry/env
+        poetry install -v
+    - name: Run tests
+      run: poetry run pytest tests/
     - name: telegram notification
       uses: appleboy/telegram-action@master
       with:
