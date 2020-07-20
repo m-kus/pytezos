@@ -24,7 +24,7 @@ jobs:
     - name: Make docs
       run: make docs
     - name: Poetry config
-      run: poetry config -q -n http-basic.pypi __token__ $PYPI_TOKEN
+      run: poetry config -vvv http-basic.pypi __token__ $PYPI_TOKEN
     # - name: telegram notification
     #   uses: appleboy/telegram-action@master
     #   with:
