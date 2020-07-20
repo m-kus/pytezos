@@ -1,0 +1,21 @@
+# name: Release
+# on: push
+
+# jobs:
+#   build:
+#     name: Build
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@master
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: '3.6.x'
+#     - uses: dschep/install-poetry-action@v1.3
+#     - name: Install dependencies
+#       run: |
+#         sudo apt-get update -q
+#         sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
+#         poetry install -v
+#     - name: Run tests
+#       run: poetry run pytest tests/
