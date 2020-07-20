@@ -25,7 +25,7 @@ jobs:
       run: make docs
     - name: Poetry build
       run: |
-        poetry config http-basic.pypi __token__ ${secrets.PYPI_TOKEN}
+        poetry config http-basic.pypi __token__ ${{secrets.PYPI_TOKEN}}
         poetry build
     # - name: telegram notification
     #   uses: appleboy/telegram-action@master
