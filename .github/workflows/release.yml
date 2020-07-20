@@ -23,8 +23,10 @@ jobs:
     #   run: poetry run pytest tests/
     - name: Make docs
       run: make docs
-    - name: Poetry config
-      run: poetry config -vvv http-basic.pypi __token__ $PYPI_TOKEN
+    - name: Poetry build
+      run: |
+        poetry config http-basic.pypi __token__ ${secrets.PYPI_TOKEN}
+        poetry build
     # - name: telegram notification
     #   uses: appleboy/telegram-action@master
     #   with:
