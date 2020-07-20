@@ -1,5 +1,8 @@
 name: Release
-on: push
+on:
+  push:
+    tags:
+      - '*.*.*'
 
 jobs:
   build:
@@ -19,27 +22,38 @@ jobs:
         sudo apt-get update -q
         sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
         poetry install -v
-    # - name: Run tests
-    #   run: poetry run pytest tests/
+    - name: Run tests
+      run: poetry run pytest tests/
     - name: Make docs
       run: make docs
-    - name: Poetry build
+    - name: Poetry publish
       run: |
         poetry config http-basic.pypi __token__ ${{secrets.PYPI_TOKEN}}
         poetry build
-    # - name: telegram notification
-    #   uses: appleboy/telegram-action@master
-    #   with:
-    #     to: ${{ secrets.TELEGRAM_TO }}
-    #     token: ${{ secrets.TELEGRAM_TOKEN }}
-    #     message: |
-    #       Pytezos ${{ env.RELEASE_VERSION }} has been released 🎉
-    #       More info at https://github.com/baking-bad/pytezos/releases/tag/${{ env.RELEASE_VERSION }}
-    # - name: slack notification
-    #   uses: Ilshidur/action-slack@master
-    #   env:
-    #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-    #   with:
-    #     args: |
-    #       Pytezos ${{ env.RELEASE_VERSION }} has been released 🎉
-    #       More info at https://github.com/baking-bad/pytezos/releases/tag/${{ env.RELEASE_VERSION }}
+        poetry publish
+    - name: Deploy to GH Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/build/html
+    - name: Build github release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+    - name: telegram notification
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          Pytezos ${{ env.RELEASE_VERSION }} has been released 🎉
+          More info at https://github.com/baking-bad/pytezos/releases/tag/${{ env.RELEASE_VERSION }}
+    - name: slack notification
+      uses: Ilshidur/action-slack@master
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      with:
+        args: |
+          Pytezos ${{ env.RELEASE_VERSION }} has been released 🎉
+          More info at https://github.com/baking-bad/pytezos/releases/tag/${{ env.RELEASE_VERSION }}
