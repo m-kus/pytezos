@@ -19,6 +19,7 @@ def do_parameter(ctx: Context, prim, args, annots):
 
 @instruction('storage', args_len=1)
 def do_parameter(ctx: Context, prim, args, annots):
+    assert not args[0].get('annots'), 'top-level storage annotations are not allowed'
     ctx.set('storage', args[0])
 
 

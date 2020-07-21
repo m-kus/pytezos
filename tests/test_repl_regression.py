@@ -54,3 +54,8 @@ class TestREPLRegression(TestCase):
             LEFT string ;
             IF_RIGHT { FAIL } {}
         """)
+
+    def test_top_level_annots(self):
+        i = Interpreter()
+        with self.assertRaises(MichelsonRuntimeError):
+            i.execute("""storage (int :s)""")
