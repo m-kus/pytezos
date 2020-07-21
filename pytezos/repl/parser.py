@@ -47,6 +47,24 @@ class MichelsonTypeCheckError(MichelsonRuntimeError):
     pass
 
 
+def assert_no_field_annots(annots):
+    if isinstance(annots, list):
+        assert all(map(lambda x: not x.startswith('%'), annots)), \
+            f'field annotations are not allowed here'
+
+
+def assert_single_type_annot(annots):
+    if isinstance(annots, list):
+        assert len(list(filter(lambda x: x.startswith(':'), annots))) <= 1, \
+            f'multiple type annotations are not allowed'
+
+
+def assert_single_var_annot(annots):
+    if isinstance(annots, list):
+        assert len(list(filter(lambda x: x.startswith('@'), annots))) <= 1, \
+            f'multiple variable annotations are not allowed'
+
+
 def assert_type(value, exp_type):
     assert isinstance(value, exp_type), f'expected {exp_type.__name__}, got {type(value).__name__}'
 
@@ -221,9 +239,16 @@ def parse_type(type_expr) -> Tuple[str, list, Callable]:
     prim, args = parse_prim_expr(type_expr)
     if prim not in parsers:
         raise MichelsonRuntimeError.init('unknown primitive', prim)
+
     args_len, func = parsers[prim]
     if len(args) != args_len:
         raise MichelsonRuntimeError.init(f'expected {args_len} arg(s), got {len(args)}', prim)
+
+    assert_single_type_annot(type_expr.get('annots'))
+    if prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda']:
+        for arg in args:
+            assert_no_field_annots(arg.get('annots'))
+
     return prim, args, func
 
 

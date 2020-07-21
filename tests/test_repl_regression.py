@@ -59,3 +59,18 @@ class TestREPLRegression(TestCase):
         i = Interpreter()
         with self.assertRaises(MichelsonRuntimeError):
             i.execute("""storage (int :s)""")
+
+    def test_disallowed_field_annots(self):
+        i = Interpreter()
+        with self.assertRaises(MichelsonRuntimeError):
+            i.execute("""storage (big_map (address %key) (mutez %balance))""")
+
+    def test_single_var_annot(self):
+        i = Interpreter()
+        with self.assertRaises(MichelsonRuntimeError):
+            i.execute("""PUSH @foo @bar nat 42""")
+
+    def test_single_type_annot(self):
+        i = Interpreter()
+        with self.assertRaises(MichelsonRuntimeError):
+            i.execute("""PUSH (nat :foo :bar) 42""")

@@ -5,7 +5,7 @@ from pytezos.repl.control import instruction
 from pytezos.repl.context import Context
 from pytezos.repl.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \
     KeyHash, Timestamp, expr_equal, Operation
-from pytezos.repl.parser import get_entry_expr
+from pytezos.repl.parser import get_entry_expr, parse_type
 
 INITIAL_BALANCE = 257000000
 MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'
@@ -14,12 +14,14 @@ UNIT_TYPE_EXPR = {'prim': 'unit'}
 
 @instruction('parameter', args_len=1)
 def do_parameter(ctx: Context, prim, args, annots):
+    _ = parse_type(args[0])
     ctx.set('parameter', args[0])
 
 
 @instruction('storage', args_len=1)
 def do_parameter(ctx: Context, prim, args, annots):
     assert not args[0].get('annots'), 'top-level storage annotations are not allowed'
+    _ = parse_type(args[0])
     ctx.set('storage', args[0])
 
 

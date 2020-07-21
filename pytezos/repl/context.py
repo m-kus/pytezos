@@ -8,6 +8,7 @@ from pytezos.encoding import base58_encode
 from pytezos.repl.types import StackItem, assert_stack_item
 from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.repl.big_map import BigMapPool
+from pytezos.repl.parser import assert_single_var_annot
 
 
 class DummyGen:
@@ -73,6 +74,7 @@ class Context:
 
     def push(self, item: StackItem, annots=None, move=False):
         assert_stack_item(item)
+        assert_single_var_annot(annots)
         self.stack.insert(self.protected, item if move else item.rename(annots))
         self.pushed = True
         self.print(f'push {repr(item)}')
