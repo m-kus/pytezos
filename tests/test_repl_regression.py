@@ -74,3 +74,15 @@ class TestREPLRegression(TestCase):
         i = Interpreter()
         with self.assertRaises(MichelsonRuntimeError):
             i.execute("""PUSH (nat :foo :bar) 42""")
+
+    def test_dup_n_macro(self):
+        i = Interpreter()
+        i.execute("""
+            PUSH nat 100500 ;
+            PUSH nat 42 ;
+            PUSH string "Hello" ;
+            PUSH string "World" ;
+            DUP 3 ;           
+        """)
+        top = i.ctx.stack[0]
+        self.assertEqual(42, int(top))

@@ -1,6 +1,7 @@
 import functools
 from pprint import pformat
 
+from pytezos.michelson.macros import expand_duxp
 from pytezos.repl.context import Context
 from pytezos.repl.types import StackItem, assert_stack_type, assert_expr_equal, Option, Lambda, Bool, List, Or, Pair, \
     Map, Set
@@ -78,8 +79,15 @@ def do_drop_1(ctx: Context, prim, args, annots):
     do_drop(ctx, prim, [{'int': '1'}], annots)
 
 
-@instruction('DUP')
+@instruction('DUP', args_len=1)  # this is actually a macro, not an instruction (at least in Carthage)
 def do_dup(ctx: Context, prim, args, annots):
+    count = get_int(args[0])
+    code_expr = expand_duxp('U' * count, annots, args=None)  # DUP 5 -> DUUUUUP
+    do_interpret(ctx, code_expr)
+
+
+@instruction('DUP')
+def do_dup_1(ctx: Context, prim, args, annots):
     top = ctx.peek()
     ctx.push(top, annots=annots)
 
