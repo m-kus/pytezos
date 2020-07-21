@@ -46,3 +46,11 @@ class TestREPLRegression(TestCase):
         top = i.ctx.stack[0]  # type: Option
         assert_stack_type(top, Option)
         self.assertTrue(top.is_none())
+
+    def test_if_right(self):
+        i = Interpreter()
+        i.execute("""
+            PUSH nat 42 ;
+            LEFT string ;
+            IF_RIGHT { FAIL } {}
+        """)

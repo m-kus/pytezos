@@ -285,6 +285,13 @@ def expand_if_some(prim, annots, args) -> dict:
     return expr(prim='IF_NONE', args=list(reversed(args)))
 
 
+@macro(r'^IF_RIGHT$')
+def expand_if_right(prim, annots, args) -> dict:
+    assert not annots
+    assert len(args) == 2
+    return expr(prim='IF_LEFT', args=list(reversed(args)))
+
+
 @macro(r'^SET_CAR$')
 def expand_set_car(prim, annots, args) -> list:
     assert not args
