@@ -219,7 +219,9 @@ class ScriptsRunCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/r
             {
                 "script": <michelson expression>,
                 "storage": <michelson expression>,
+                "entrypoint": <string>,
                 "input": <michelson expression>,
+                "chain_id": <base58 encoded>,
                 "amount": <mutez>,
                 "source": <account address>,  // optional
                 "payer": <account address>,  // optional
@@ -255,7 +257,9 @@ class ScriptsTraceCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts
             {
                 "script": <michelson expression>,
                 "storage": <michelson expression>,
+                "entrypoint": <string>,
                 "input": <michelson expression>,
+                "chain_id": <base58 encoded>,
                 "amount": <mutez>,
                 "source": <account address>,  // optional
                 "payer": <account address>,  // optional
@@ -267,6 +271,21 @@ class ScriptsTraceCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts
 
 
 class ScriptsTypecheckCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/typecheck_code'):
+
+    def post(self, expression):
+        """ Check that some data expression is well formed and of a given type in the current context.
+
+        :param expression: Json input
+            {
+                "program": <michelson expression>,
+                "gas": <bignum>  // optional
+            }
+        :returns: Json object
+        """
+        return self._post(json=expression)
+
+
+class ScriptsTypecheckDataQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/typecheck_data'):
 
     def post(self, expression):
         """ Check that some data expression is well formed and of a given type in the current context.
