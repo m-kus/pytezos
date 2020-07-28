@@ -33,7 +33,7 @@ def do_dump_all(ctx: Context, prim, args, annots):
     return do_dump(ctx, prim, args=[{'int': str(len(ctx))}], annots=annots)
 
 
-@instruction('PRINT', args_len=1)
+@instruction('PRINT', args_len=1)  # TODO: deprecated
 def do_print(ctx: Context, prim, args, annots):
     ctx.printf(template=get_string(args[0]))
 
@@ -141,7 +141,7 @@ def do_unset(ctx: Context, prim, args, annots):
     ctx.unset(key)
 
 
-@instruction('INCLUDE', args_len=1)
+@instruction('INCLUDE', args_len=1)  # TODO: deprecated
 def do_include(ctx: Context, prim, args, annots):
     path = get_string(args[0])
 
@@ -152,7 +152,7 @@ def do_include(ctx: Context, prim, args, annots):
         network = parts[0] if len(parts) > 1 else ctx.get('NETWORK', 'mainnet')
         address = parts[1] if len(parts) > 1 else parts[0]
         assert is_kt(address), f'expected filename or KT address (with network), got {path}'
-        script = Interop().using(network).shell.contracts[address].script()
+        script = Interop(shell=network).shell.contracts[address].script()
         code = script['code']
         ctx.set('STORAGE', script['storage'])
 
@@ -179,7 +179,7 @@ def do_reset(ctx: Context, prim, args, annots):
     network = get_string(args[0])
     assert network in networks, f'expected on of {", ".join(networks)}, got {network}'
     ctx.set('NETWORK', network)
-    chain_id = ChainID(Interop().using(network).shell.chains.main.chain_id())
+    chain_id = ChainID(Interop(shell=network).shell.chains.main.chain_id())
     ctx.set('CHAIN_ID', chain_id)
     ctx.big_maps.reset()
     ctx.drop_all()

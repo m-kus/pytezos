@@ -168,7 +168,7 @@ class BigMapPool:
         key_hash = get_key_hash(key.val_expr, key.type_expr)
         network = big_map.val_expr['_network']
         try:
-            res = Interop().using(network).shell.head.context.big_maps[int(big_map)][key_hash]()
+            res = Interop(shell=network).shell.head.context.big_maps[int(big_map)][key_hash]()
         except JSONDecodeError:
             res = None
         return res

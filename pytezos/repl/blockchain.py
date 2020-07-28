@@ -89,7 +89,7 @@ def do_now(ctx: Context, prim, args, annots):
     if res is None:
         network = ctx.get('NETWORK')
         if network:
-            interop = Interop().using(network)
+            interop = Interop(shell=network)
             constants = interop.shell.block.context.constants()  # cached
             ts = interop.shell.head.header()['timestamp']
             dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
@@ -107,7 +107,7 @@ def check_contract(ctx: Context, address, entry_annot, type_expr):
         ctx.print('skip check')
         return True
     try:
-        script = Interop().using(network).shell.contracts[address].script()
+        script = Interop(shell=network).shell.contracts[address].script()
         p_type_expr = next(s for s in script['code'] if s['prim'] == 'parameter')
         actual, _ = get_entry_expr(p_type_expr, entry_annot)
         if expr_equal(type_expr, actual):
