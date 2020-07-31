@@ -246,8 +246,9 @@ def expand_pxr(prim, annots, args) -> list:
 @macro(r'^UNPAIR$')
 def expand_unpair(prim, annots, args) -> list:
     assert not args
-    assert len(annots) in {0, 2}
-    car_annots, cdr_annots = (seq(annots[0]), seq(annots[1])) if annots else ([], [])
+    assert len(annots) <= 2, f'invalid number of annotations: {annots}'
+    car_annots = seq(annots[0]) if len(annots) > 0 else []
+    cdr_annots = seq(annots[1]) if len(annots) > 1 else []
     return [DUP,
             expr(prim='CAR', annots=car_annots),
             dip_n(expr(prim='CDR', annots=cdr_annots))]

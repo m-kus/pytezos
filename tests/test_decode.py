@@ -101,3 +101,7 @@ class TestComparable(TestCase):
     def test_wrapped_expr(self):
         p = MichelsonParser()
         p.parse('(Pair 1 2)')
+
+    def test_unpair_single_annot(self):
+        p = MichelsonParser()
+        p.parse('UNPAIR @left')
