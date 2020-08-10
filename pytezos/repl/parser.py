@@ -407,7 +407,7 @@ def parse_mutez(val_expr, type_expr, selector, type_path):
 @primitive('address')
 def parse_address(val_expr, type_expr, selector, type_path):
     val = dispatch_core_map(val_expr, {
-        'bytes': lambda x: encoding.parse_address(bytes.fromhex(x)),
+        'bytes': lambda x: encoding.parse_contract(bytes.fromhex(x)),
         'string': lambda x: x
     })
     return selector(val_expr, type_expr, val, type_path)

@@ -466,7 +466,9 @@ class Address(String, prim='address'):
 
     @classmethod
     def new(cls, address):
-        assert is_pkh(address) or is_kt(address), f'expected address, got {address}'
+        assert is_pkh(address[:36]) or is_kt(address[:36]), f'expected {cls.prim}, got {address}'
+        if len(address) > 36:
+            assert address[36] == '%', f'expected {cls.prim}, got {address}'
         return cls(val=address,
                    val_expr={'string': address},
                    type_expr={'prim': cls.prim})
@@ -476,9 +478,9 @@ class Contract(StackItem, prim='contract', args_len=1):
 
     @classmethod
     def new(cls, contract, type_expr):
-        assert is_pkh(contract[:36]) or is_kt(contract[:36]), f'expected contract, got {contract}'
+        assert is_pkh(contract[:36]) or is_kt(contract[:36]), f'expected {cls.prim}, got {contract}'
         if len(contract) > 36:
-            assert contract[36] == '%', f'expected contract, got {contract}'
+            assert contract[36] == '%', f'expected {cls.prim}, got {contract}'
         return cls(val=contract,
                    val_expr={'string': contract},
                    type_expr={'prim': cls.prim, 'args': [type_expr]})

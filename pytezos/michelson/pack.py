@@ -41,7 +41,7 @@ def prepack_micheline(val_expr, type_expr):
         elif type_prim == 'key' and is_string:
             return {'bytes': forge_public_key(val_node['string']).hex()}
         elif type_prim == 'address' and is_string:
-            return {'bytes': forge_address(val_node['string']).hex()}
+            return {'bytes': forge_contract(val_node['string']).hex()}
         elif type_prim == 'contract' and is_string:
             return {'bytes': forge_contract(val_node['string']).hex()}
         elif type_prim == 'timestamp' and is_string:
