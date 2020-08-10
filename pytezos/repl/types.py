@@ -5,7 +5,7 @@ from pytezos.michelson.pack import get_key_hash
 from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.encoding import is_pkh, is_kt, is_chain_id
 from pytezos.repl.parser import parse_expression, parse_prim_expr, assert_expr_equal, assert_comparable, \
-    expr_equal, assert_type, get_prim_args, assert_big_map_val, Unit as UnitNone
+    expr_equal, assert_type, get_prim_args, reduce_type_annots, Unit as UnitNone
 
 
 def assert_stack_item(item: 'StackItem'):
@@ -356,7 +356,8 @@ class Map(StackItem, prim='map', args_len=2):
         _ = [assert_stack_item(x) for kv in items for x in kv]
         k0, v0 = items[0]
         return cls.init(val_expr=[{'prim': 'Elt', 'args': [k.val_expr, v.val_expr]} for k, v in items],
-                        type_expr={'prim': cls.prim, 'args': [k0.type_expr, v0.type_expr]})
+                        type_expr={'prim': cls.prim, 'args': [reduce_type_annots(k0.type_expr),
+                                                              reduce_type_annots(v0.type_expr)]})
 
     def __contains__(self, key: StackItem):
         self.assert_key_type(key)
