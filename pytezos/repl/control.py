@@ -165,7 +165,7 @@ def do_apply(ctx: Context, prim, args, annots):
 def do_failwith(ctx: Context, prim, args, annots):
     assert_no_annots(prim, annots)
     top = ctx.pop1()
-    assert False, repr(top)
+    raise MichelsonRuntimeError.init(repr(top), prim=top.type_expr['prim'], data=top)
 
 
 @instruction('IF', args_len=2)

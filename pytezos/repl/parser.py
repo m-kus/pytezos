@@ -29,18 +29,19 @@ class Unit(object):
 
 class MichelsonRuntimeError(ValueError):
 
-    def __init__(self, message, trace):
+    def __init__(self, message, trace, data):
         super(MichelsonRuntimeError, self).__init__(f'{message}: {" -> ".join(trace)}')
         self.message = message
         self.trace = trace
+        self.data = data
 
     @classmethod
-    def init(cls, message, prim):
-        return cls(message, trace=[prim])
+    def init(cls, message, prim, data=None):
+        return cls(message, trace=[prim], data=data)
 
     @classmethod
     def wrap(cls, error: 'MichelsonRuntimeError', prim):
-        return cls(error.message, trace=[prim] + error.trace)
+        return cls(error.message, trace=[prim] + error.trace, data=error.data)
 
 
 class MichelsonTypeCheckError(MichelsonRuntimeError):
@@ -63,6 +64,28 @@ def assert_single_var_annot(annots):
     if isinstance(annots, list):
         assert len(list(filter(lambda x: x.startswith('@'), annots))) <= 1, \
             f'multiple variable annotations are not allowed'
+
+
+def reduce_type_annots(type_expr):
+    def reduce(a, b):
+        def _ret(seq, val):
+            if len(seq) > 0:
+                return seq
+            else:
+                return [val if val.startswith(':') else f':{val[1:]}']
+
+        if isinstance(a, list):
+            return _ret(a, b)
+        elif isinstance(b, list):
+            return _ret(b, a)
+        else:
+            return []
+
+    return dict(
+        prim=type_expr['prim'],
+        args=type_expr.get('args', []),
+        annots=functools.reduce(reduce, type_expr.get('annots', []), [])
+    )
 
 
 def assert_type(value, exp_type):
