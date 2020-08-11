@@ -66,25 +66,12 @@ def assert_single_var_annot(annots):
             f'multiple variable annotations are not allowed'
 
 
-def reduce_type_annots(type_expr):
-    def reduce(a, b):
-        def _ret(seq, val):
-            if len(seq) > 0:
-                return seq
-            else:
-                return [val if val.startswith(':') else f':{val[1:]}']
-
-        if isinstance(a, list):
-            return _ret(a, b)
-        elif isinstance(b, list):
-            return _ret(b, a)
-        else:
-            return []
-
+def remove_field_annots(type_expr):
     return dict(
         prim=type_expr['prim'],
         args=type_expr.get('args', []),
-        annots=functools.reduce(reduce, type_expr.get('annots', []), [])
+        annots=list(filter(lambda x: not x.startswith('%'),
+                           type_expr.get('annots', [])))
     )
 
 
@@ -187,6 +174,10 @@ def restore_entry_expr(val_expr, type_expr, field_annot):
     return val_expr
 
 
+def get_type_annots(type_expr: dict) -> list:
+    return list(filter(lambda x: x.startswith(':'), type_expr.get('annots', [])))
+
+
 def expr_equal(a, b):
     if type(a) != type(b):
         return False
@@ -194,8 +185,15 @@ def expr_equal(a, b):
         if a.get('prim'):
             if a['prim'] != b['prim']:
                 return False
+            elif not expr_equal(a.get('args', []), b.get('args', [])):
+                return False
             else:
-                return expr_equal(a.get('args', []), b.get('args', []))
+                a_type_annots = get_type_annots(a)
+                b_type_anonts = get_type_annots(b)
+                if a_type_annots and b_type_anonts:
+                    return a_type_annots == b_type_anonts
+                else:
+                    return True
         else:
             return a == b
     elif isinstance(a, list):

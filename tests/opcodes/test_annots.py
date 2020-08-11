@@ -5,7 +5,7 @@ from tests import abspath
 from pytezos.repl.interpreter import Interpreter, MichelsonRuntimeError
 
 
-class OpcodeTestBigMapCommit(TestCase):
+class OpcodeTestAnnotations(TestCase):
 
     def setUp(self):
         self.maxDiff = None
@@ -28,3 +28,18 @@ class OpcodeTestBigMapCommit(TestCase):
                                'tz1euqMMX8dhf21M921UEq3f1EKy98FSYqTX': 30000000000000000000,
                                'tz1fWUkzMvnz4dmRn4kQMytahG6R4MMoobwp': 30000000000000000000},
                               e.data._val)
+
+    def test_type_annots_mismatch(self):
+        res = self.i.execute("""
+        parameter (pair (nat :a) (nat :b)) ;
+        storage (pair (nat :c) (nat :d)) ;
+        code {
+            CAR ;
+            NIL operation ;
+            PAIR ;
+        }
+        """)
+        self.assertTrue(res['success'])
+
+        with self.assertRaises(MichelsonRuntimeError):
+            self.i.execute("RUN (Pair 1 2) (Pair 3 4)")

@@ -5,7 +5,7 @@ from pytezos.michelson.pack import get_key_hash
 from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.encoding import is_pkh, is_kt, is_chain_id
 from pytezos.repl.parser import parse_expression, parse_prim_expr, assert_expr_equal, assert_comparable, \
-    expr_equal, assert_type, get_prim_args, reduce_type_annots, Unit as UnitNone
+    expr_equal, assert_type, get_prim_args, remove_field_annots, Unit as UnitNone
 
 
 def assert_stack_item(item: 'StackItem'):
@@ -223,7 +223,7 @@ class List(StackItem, prim='list', args_len=1):
     def new(cls, items: list):
         assert isinstance(items, list) and len(items) > 0, f'expected non-empty list'
         return cls.init(val_expr=[assert_stack_item(x) or x.val_expr for x in items],
-                        type_expr={'prim': cls.prim, 'args': [reduce_type_annots(items[0].type_expr)]})
+                        type_expr={'prim': cls.prim, 'args': [remove_field_annots(items[0].type_expr)]})
 
     def assert_val_type(self, item: StackItem):
         assert_stack_item(item)
@@ -260,13 +260,13 @@ class Option(StackItem, prim='option', args_len=1):
     def some(cls, item: StackItem):
         assert_stack_item(item)
         return cls.init(val_expr={'prim': 'Some', 'args': [item.val_expr]},
-                        type_expr={'prim': cls.prim, 'args': [reduce_type_annots(item.type_expr)]})
+                        type_expr={'prim': cls.prim, 'args': [remove_field_annots(item.type_expr)]})
 
     @classmethod
     def none(cls, type_expr):
         return cls(val=None,
                    val_expr={'prim': 'None'},
-                   type_expr={'prim': cls.prim, 'args': [reduce_type_annots(type_expr)]})
+                   type_expr={'prim': cls.prim, 'args': [remove_field_annots(type_expr)]})
 
     def is_none(self):
         return self._val is None
@@ -316,7 +316,7 @@ class Set(StackItem, prim='set', args_len=1):
         assert isinstance(items, list) and len(items) > 0, f'expected non-empty list'
         assert len(set(items)) == len(items), f'duplicate keys found'
         return cls.init(val_expr=[assert_stack_item(x) or x.val_expr for x in items],
-                        type_expr={'prim': cls.prim, 'args': [reduce_type_annots(items[0].type_expr)]})
+                        type_expr={'prim': cls.prim, 'args': [remove_field_annots(items[0].type_expr)]})
 
     def __contains__(self, item: StackItem):
         self.assert_key_type(item)
@@ -356,8 +356,8 @@ class Map(StackItem, prim='map', args_len=2):
         _ = [assert_stack_item(x) for kv in items for x in kv]
         k0, v0 = items[0]
         return cls.init(val_expr=[{'prim': 'Elt', 'args': [k.val_expr, v.val_expr]} for k, v in items],
-                        type_expr={'prim': cls.prim, 'args': [reduce_type_annots(k0.type_expr),
-                                                              reduce_type_annots(v0.type_expr)]})
+                        type_expr={'prim': cls.prim, 'args': [remove_field_annots(k0.type_expr),
+                                                              remove_field_annots(v0.type_expr)]})
 
     def __contains__(self, key: StackItem):
         self.assert_key_type(key)
@@ -484,7 +484,7 @@ class Contract(StackItem, prim='contract', args_len=1):
             assert contract[36] == '%', f'expected {cls.prim}, got {contract}'
         return cls(val=contract,
                    val_expr={'string': contract},
-                   type_expr={'prim': cls.prim, 'args': [reduce_type_annots(type_expr)]})
+                   type_expr={'prim': cls.prim, 'args': [remove_field_annots(type_expr)]})
 
     def assert_param_type(self, item: StackItem):
         assert_stack_item(item)
