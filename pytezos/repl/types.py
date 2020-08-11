@@ -491,7 +491,7 @@ class Contract(StackItem, prim='contract', args_len=1):
         assert_expr_equal(self.type_expr['args'][0], item.type_expr)
 
     def get_address(self):
-        return self._val[:36]
+        return self._val
 
     def get_entrypoint(self):
         annot = self._val[36:] or '%default'
