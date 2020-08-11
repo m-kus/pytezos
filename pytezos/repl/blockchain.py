@@ -61,10 +61,10 @@ def do_self(ctx: Context, prim, args, annots):
     p_type_expr = ctx.get('parameter')
     assert p_type_expr, f'parameter type is not initialized'
 
-    entry_annot = next((a for a in annots if a[0] == '%'), '%default')
-    ctx.print(f'use {entry_annot}')
+    entry_annot = next((a for a in annots if a[0] == '%'), '')
+    ctx.print(f'use {entry_annot or "%default"}')
 
-    p_type_expr, _ = get_entry_expr(p_type_expr, entry_annot)
+    p_type_expr, _ = get_entry_expr(p_type_expr, entry_annot or "%default")
     res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
     ctx.push(res, annots=['@self'])
 
@@ -109,7 +109,7 @@ def check_contract(ctx: Context, address, entry_annot, type_expr):
     try:
         script = Interop(shell=network).shell.contracts[address].script()
         p_type_expr = next(s for s in script['code'] if s['prim'] == 'parameter')
-        actual, _ = get_entry_expr(p_type_expr, entry_annot)
+        actual, _ = get_entry_expr(p_type_expr, entry_annot or '%default')
         if expr_equal(type_expr, actual):
             return True
         else:
@@ -135,7 +135,7 @@ def do_contract(ctx: Context, prim, args, annots):
     top = ctx.pop1()
     assert_stack_type(top, Address)
 
-    entry_annot = next((a for a in annots if a[0] == '%'), '%default')
+    entry_annot = next((a for a in annots if a[0] == '%'), '')
     contract = Contract.new(str(top) + entry_annot, type_expr=args[0])
 
     if check_contract(ctx, address=str(top), entry_annot=entry_annot, type_expr=args[0]):
