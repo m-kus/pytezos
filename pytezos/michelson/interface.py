@@ -179,7 +179,7 @@ class ContractCall(Interop):
         if sender is None:
             sender = source
         if amount is None:
-            amount = 0
+            amount = self.amount or 0
         if balance is None:
             balance = 0
 

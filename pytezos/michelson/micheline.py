@@ -5,7 +5,7 @@ from decimal import Decimal
 from collections import namedtuple, defaultdict
 from functools import lru_cache
 
-from pytezos.encoding import forge_public_key, forge_address, forge_base58
+from pytezos.encoding import forge_public_key, forge_address, forge_base58, forge_contract
 from pytezos.michelson.formatter import micheline_to_michelson
 from pytezos.michelson.grammar import MichelsonParser
 from pytezos.repl.parser import parse_expression, dispatch_core_map
@@ -53,7 +53,10 @@ def encode_literal(value, prim, binary=False):
         value = forge_public_key(value).hex()
     elif prim in ['address', 'contract', 'key_hash'] and binary:
         core_type = 'bytes'
-        value = forge_address(value, tz_only=prim == 'key_hash').hex()
+        if prim == 'key_hash':
+            value = forge_address(value, tz_only=True).hex()
+        else:
+            value = forge_contract(value).hex()
     elif prim == 'chain_id':  # and binary ?
         core_type = 'bytes'
         value = forge_base58(value).hex()

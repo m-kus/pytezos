@@ -1,6 +1,6 @@
 # this contracts handles two big_maps
 storage
-  (or (pair (big_map :first string string) (big_map :second string string)) unit) ;
+  (or (pair (big_map string string) (big_map string string)) unit) ;
 parameter
   # it has 5 entry points
   # swap: swaps the two maps.
