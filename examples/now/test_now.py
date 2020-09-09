@@ -26,8 +26,8 @@ class TimeContractTest(TestCase):
         res = contract.call().result(storage=0)
         self.assertEqual(now, res.storage)
 
-    def test_now_zeronet(self):
-        contract = ContractInterface.create_from(code, shell='zeronet')
-        now = format_timestamp(pytezos.using('zeronet').now())
+    def test_now_dalphanet(self):
+        contract = ContractInterface.create_from(code, shell='dalphanet')
+        now = format_timestamp(pytezos.using('dalphanet').now())
         res = contract.call().result(storage=0)
         self.assertEqual(now, res.storage)

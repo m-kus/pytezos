@@ -1,11 +1,11 @@
 from os.path import exists, expanduser
 
-from pytezos.rpc import ShellQuery, RpcNode, mainnet, babylonnet, carthagenet, zeronet, localhost, labnet, pool
+from pytezos.rpc import ShellQuery, RpcNode, mainnet, carthagenet, dalphanet, delphinet, localhost, labnet, pool
 from pytezos.crypto import Key, is_installed
 from pytezos.encoding import is_key, is_pkh
 from pytezos.tools.docstring import InlineDocstring
 
-default_shell = 'carthagenet'
+default_shell = 'delphinet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
 default_key_hash = 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa'
 
@@ -63,12 +63,12 @@ class Interop(metaclass=InlineDocstring):
         if isinstance(shell, str):
             networks = {
                 'mainnet': mainnet,
-                'babylonnet': babylonnet,
                 'carthagenet': carthagenet,
-                'zeronet': zeronet,
                 'sandboxnet': localhost.sandboxnet,
                 'bbbox': localhost.bbbox,
                 'labnet': labnet,
+                'dalphanet': dalphanet,
+                'delphinet': delphinet,
                 'mainnet-pool': pool.mainnet
             }
             if shell in networks:
@@ -108,7 +108,7 @@ class Interop(metaclass=InlineDocstring):
     def using(self, shell: ShellQuery = None, key: Key = None):
         """ Change current rpc endpoint and account (private key).
 
-        :param shell: one of 'babylonnet', 'mainnet', 'zeronet', or RPC node uri, or instance of `ShellQuery`
+        :param shell: one of 'carthagenet', 'mainnet', 'delphinet', 'dalphanet' or RPC node uri, or instance of `ShellQuery`
         :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
         :returns: A copy of current object with changes applied
         """

@@ -9,7 +9,7 @@ from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, 
     dispatch_core_map
 from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List, Operation
 
-networks = ['mainnet', 'zeronet', 'babylonnet', 'carthagenet']
+networks = ['mainnet', 'delphinet', 'dalphanet', 'carthagenet']
 helpers_prim = ['DUMP', 'PRINT', 'DROP_ALL', 'EXPAND', 'RUN', 'PATCH', 'INCLUDE',
                 'DEBUG', 'BIG_MAP_DIFF', 'BEGIN', 'COMMIT', 'RESET', 'STORAGE']
 patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']

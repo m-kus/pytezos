@@ -105,7 +105,7 @@ We are interested in ``using`` method, which is responsible for setting up manag
    <function Interop.using at 0x7fe5d2232840>
 
    Change current rpc endpoint and account (private key)
-   :param shell: one of 'alphanet', 'mainnet', 'zeronet', RPC node uri, or instance of `ShellQuery`
+   :param shell: one of 'mainnet', 'carthagenet', 'delphinet', 'dalphanet', RPC node uri, or instance of `ShellQuery`
    :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
    :return: A copy of current object with changes applied
 
@@ -134,8 +134,9 @@ Public available RPC providers are available at ``pytezos.rpc``\ :
 
    Networks
    .mainnet  # https://rpc.tzkt.io/mainnet/
-   .alphanet  # https://rpc.tzkt.io/alphanet/
-   .zeronet  # https://rpc.tzkt.io/zeronet/
+   .carthagenet  # https://rpc.tzkt.io/carthagenet/
+   .delphinet  # https://rpc.tzkt.io/delphinet/
+   .dalphanet  # https://rpc.tzkt.io/dalphanet/
 
 Sandboxed mode
 ^^^^^^^^^^^^^^
