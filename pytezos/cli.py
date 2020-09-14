@@ -18,14 +18,7 @@ kernel_json = {
 
 
 def make_bcd_link(network, address):
-    net = {
-        'carthagenet': 'carthage',
-        'babylonnet': 'babylon',
-        'sandboxnet': 'sandbox',
-        'mainnet': 'main',
-        'zeronet': 'zeronet'
-    }
-    return f'https://better-call.dev/{net[network]}/{address}'
+    return f'https://better-call.dev/{network}/{address}'
 
 
 def get_contract(path):
@@ -34,7 +27,7 @@ def get_contract(path):
         assert len(files) == 1
         contract = Contract.from_file(abspath(files[0]))
 
-    elif any(map(lambda x: path.startswith(x), ['zeronet', 'babylonnet', 'mainnet', 'carthagenet'])):
+    elif any(map(lambda x: path.startswith(x), ['delphinet', 'dalphanet', 'mainnet', 'carthagenet'])):
         network, address = path.split(':')
         ptz = pytezos.using(shell=network)
         script = ptz.shell.contracts[address].script()

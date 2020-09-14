@@ -33,14 +33,15 @@ localhost = RpcProvider(
 )
 tzkt = RpcProvider(
     mainnet='https://rpc.tzkt.io/mainnet/',
-    babylonnet='https://rpc.tzkt.io/babylonnet/',
     carthagenet='https://rpc.tzkt.io/carthagenet/',
-    zeronet='https://rpc.tzkt.io/zeronet/'
+    dalphanet='https://rpc.tzkt.io/dalphanet/',
+    delphinet='https://rpc.tzkt.io/delphinet/',
 )
 giganode = RpcProvider(
     mainnet='https://mainnet-tezos.giganode.io/',
     carthagenet='https://testnet-tezos.giganode.io/',
-    labnet='https://labnet-tezos.giganode.io/'
+    labnet='https://labnet-tezos.giganode.io/',
+    dalphanet='https://dalphanet-tezos.giganode.io/'
 )
 pool = RpcProvider(
     klass=RpcMultiNode,
@@ -52,10 +53,6 @@ pool = RpcProvider(
         'https://api.tez.ie/',
 
     ],
-    babylonnet=[
-        'https://rpc.tzkt.io/babylonnet/',
-        'https://tezos-dev.cryptonomic-infra.tech/',
-    ],
     carthagenet=[
         'https://rpc.tzkt.io/carthagenet/',
         'https://carthagenet.tezos.org.ua/',
@@ -63,7 +60,7 @@ pool = RpcProvider(
 )
 
 mainnet = tzkt.mainnet
-babylonnet = tzkt.babylonnet
 carthagenet = tzkt.carthagenet
-zeronet = tzkt.zeronet
 labnet = giganode.labnet
+dalphanet = tzkt.dalphanet
+delphinet = tzkt.delphinet

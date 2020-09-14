@@ -17,6 +17,17 @@ operation_tags = {
 }
 
 
+def has_parameters(content):
+    if content.get('parameters'):
+        if content['parameters']['entrypoint'] == 'default' \
+                and content['parameters']['value'] == {'prim': 'Unit'}:
+            return False
+        else:
+            return True
+    else:
+        return False
+
+
 def forge_operation(content) -> bytes:
     """ Forge operation content (locally).
 
@@ -74,7 +85,7 @@ def forge_transaction(content):
     res += forge_nat(int(content['amount']))
     res += forge_address(content['destination'])
 
-    if content.get('parameters'):
+    if has_parameters(content):
         res += forge_bool(True)
         res += forge_entrypoint(content['parameters']['entrypoint'])
         res += forge_array(forge_micheline(content['parameters']['value']))
