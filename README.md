@@ -84,7 +84,7 @@ docker pull bakingbad/pytezos
 Read [quick start guide](https://pytezos.baking-bad.org/quick_start.html)
 
 ### API reference
-Check out a complete [API reference](https://pytezos.baking-bad.org)
+Check out a complete [API reference](https://pytezos.baking-bad.org/contents.html)
 
 #### Inline documentation
 If you are working in Jupyter/Google Colab or any other interactive console, 

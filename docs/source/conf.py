@@ -71,13 +71,13 @@ html_additional_pages = {'index': 'index.html'}
 
 # -- Extension configuration -------------------------------------------------
 
-googleanalytics_id = 'UA-131043773-1'
+googleanalytics_id = 'UA-160856677-2'
 
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-html_baseurl = 'https://pytezos.baking-bad.org/'
+html_baseurl = 'https://pytezos.org/'
 html_extra_path = ['robots.txt']
 html_favicon = 'favicon.ico'
