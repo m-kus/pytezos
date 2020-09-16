@@ -5,6 +5,10 @@ from pytezos.rpc.search import *
 from pytezos.rpc.node import RpcNode, RpcMultiNode
 
 
+def is_public_network(network):
+    return network in ['mainnet', 'carthagenet', 'delphinet', 'dalphanet']
+
+
 class RpcProvider:
 
     def __init__(self, klass=RpcNode, **urls):
@@ -13,7 +17,10 @@ class RpcProvider:
 
     @lru_cache(maxsize=None)
     def __getattr__(self, network) -> ShellQuery:
-        return ShellQuery(node=self.klass(uri=self.urls[network], network=network))
+        return ShellQuery(node=self.klass(
+            uri=self.urls[network],
+            network=network,
+            caching=is_public_network(network)))
 
     def __dir__(self):
         return list(super(RpcProvider, self).__dir__()) + list(self.urls.keys())

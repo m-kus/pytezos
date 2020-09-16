@@ -59,9 +59,10 @@ class RpcError(Exception):
 
 class RpcNode:
 
-    def __init__(self, uri, network=''):
+    def __init__(self, uri, network='', caching=False):
         self.uri = uri
         self.network = network
+        self.caching = caching
         self._cache = dict()
         self._session = requests.Session()
 
@@ -85,13 +86,15 @@ class RpcNode:
             },
             **kwargs
         )
-        if res.status_code != 200:
+        if res.status_code == 404:
+            raise RpcError(f'Not found: {path}')
+        elif res.status_code != 200:
             raise RpcError.from_response(res) from None
 
         return res
 
     def get(self, path, params=None, caching=False, cache_key=None, timeout=None):
-        if caching:
+        if caching and self.caching:
             if not cache_key:
                 cache_key = path
                 if params:
@@ -100,14 +103,14 @@ class RpcNode:
                 return self._cache[cache_key]
 
         res = self.request('GET', path, params=params, timeout=timeout).json()
-        if caching:
+        if caching and self.caching:
             self._cache[cache_key] = res
 
         return res
 
     def post(self, path, params=None, json=None, caching=False):
         cache_key = None
-        if caching:
+        if caching and self.caching:
             cache_key = sha1((path + str(json)).encode()).hexdigest()
             if cache_key in self._cache:
                 return self._cache[cache_key]
@@ -118,7 +121,7 @@ class RpcNode:
         except JSONDecodeError:
             res = response.text
 
-        if caching:
+        if caching and self.caching:
             self._cache[cache_key] = res
 
         return res
@@ -132,8 +135,8 @@ class RpcNode:
 
 class RpcMultiNode(RpcNode):
 
-    def __init__(self, uri, network):
-        super(RpcMultiNode, self).__init__(uri=uri, network=network)
+    def __init__(self, uri, network, caching):
+        super(RpcMultiNode, self).__init__(uri=uri, network=network, caching=caching)
         if not isinstance(uri, list):
             self.uri = [uri]
         self.nodes = list(map(lambda x: RpcNode(x, network), self.uri))
