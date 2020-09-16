@@ -3,6 +3,7 @@ from unittest import TestCase
 from pytezos.repl.interpreter import Interpreter, StackItem, MichelsonRuntimeError
 from pytezos.repl.control import assert_stack_type
 from pytezos.repl.types import Option
+from pytezos.michelson.pack import unpack, pack
 
 
 class TestREPLRegression(TestCase):
@@ -86,3 +87,9 @@ class TestREPLRegression(TestCase):
         """)
         top = i.ctx.stack[0]
         self.assertEqual(42, int(top))
+
+    def test_contract_unpackable(self):
+        type_expr = {'prim': 'contract', 'args': [{'prim': 'string'}]}
+        data = pack(val_expr={'string': 'KT1KzoKR7v1HjF2JqfYAWFV2ihzmUVJsDqXy%hello'}, type_expr=type_expr)
+        with self.assertRaises(AssertionError):
+            unpack(data=data, type_expr=type_expr)

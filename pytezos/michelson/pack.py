@@ -87,6 +87,12 @@ def get_key_hash(val_expr, type_expr, bin_path='') -> str:
     return base58_encode(data, b'expr').decode()
 
 
+def assert_unpackable(type_node):
+    type_prim, type_args = parse_prim_expr(type_node)
+    assert type_prim not in ['contract'], f'{type_prim} cannot be UNPACKed'
+    _ = [assert_unpackable(type_arg) for type_arg in type_args]
+
+
 def unpack(data: bytes, type_expr):
     """ Unpack bytes (currently without unpacking domain types, so it's unforging + cutting 0x05 prefix).
 
@@ -95,5 +101,6 @@ def unpack(data: bytes, type_expr):
     :returns: Micheline expression
     """
     assert data.startswith(b'\x05'), f'packed data should start with 05'
+    assert_unpackable(type_expr)
     parsed = unforge_micheline(data[1:])
     return parsed
