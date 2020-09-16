@@ -1,4 +1,5 @@
 import pendulum
+import bson
 from pendulum.parsing.exceptions import ParserError
 from datetime import datetime
 from itertools import count
@@ -133,10 +134,16 @@ class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
         return self.metadata()['level']['level']
 
     def cycle(self) -> int:
-        """
-        Get cycle for this block from metadata.
+        """ Get cycle for this block from metadata.
         """
         return self.metadata()['level']['cycle']
+
+    def protocol_parameters(self):
+        """ Get decoded protocol parameters if they do exist in the header
+        """
+        pp = self.header().get('content', {}).get('protocol_parameters')
+        if pp:
+            return bson.loads(bytes.fromhex(pp)[4:])
 
 
 class ContractQuery(RpcQuery, path='/chains/{}/blocks/{}/context/contracts/{}'):
