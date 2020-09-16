@@ -2,6 +2,7 @@ rpc_docs = {
   "/": {
     "props": [
       "chains",
+      "config",
       "errors",
       "fetch_protocol",
       "injection",
@@ -9,6 +10,7 @@ rpc_docs = {
       "network",
       "protocols",
       "stats",
+      "version",
       "workers"
     ]
   },
@@ -84,6 +86,31 @@ rpc_docs = {
     },
     "DELETE": {
       "descr": "Remove an invalid block for the tezos storage",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/config": {
+    "props": [
+      "network"
+    ]
+  },
+  "/config/network": {
+    "props": [
+      "user_activated_protocol_overrides",
+      "user_activated_upgrades"
+    ]
+  },
+  "/config/network/user_activated_protocol_overrides": {
+    "GET": {
+      "descr": "List of protocols which replace other protocols",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/config/network/user_activated_upgrades": {
+    "GET": {
+      "descr": "List of protocols to switch to at given levels",
       "args": [],
       "ret": "Object"
     }
@@ -189,7 +216,7 @@ rpc_docs = {
   },
   "/monitor/commit_hash": {
     "GET": {
-      "descr": "Get information on the build of the node.",
+      "descr": "DEPRECATED: use `version` instead.",
       "args": [],
       "ret": "Object"
     }
@@ -481,7 +508,7 @@ rpc_docs = {
   },
   "/network/version": {
     "GET": {
-      "descr": "Supported network layer version.",
+      "descr": "DEPRECATED: use `version` instead.",
       "args": [],
       "ret": "Object"
     }
@@ -509,6 +536,16 @@ rpc_docs = {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [],
       "ret": "Object"
+    },
+    "props": [
+      "environment"
+    ]
+  },
+  "/protocols/{}/environment": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [],
+      "ret": "Object"
     }
   },
   "/stats": {
@@ -527,6 +564,13 @@ rpc_docs = {
   "/stats/memory": {
     "GET": {
       "descr": "Gets memory usage stats",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/version": {
+    "GET": {
+      "descr": "Get information on the node version",
       "args": [],
       "ret": "Object"
     }
@@ -612,10 +656,23 @@ rpc_docs = {
   },
   "/chains/{}/mempool": {
     "props": [
+      "filter",
       "monitor_operations",
       "pending_operations",
       "request_operations"
     ]
+  },
+  "/chains/{}/mempool/filter": {
+    "GET": {
+      "descr": "Get the configuration of the mempool filter.",
+      "args": [],
+      "ret": "Object"
+    },
+    "POST": {
+      "descr": "Set the configuration of the mempool filter.",
+      "args": [],
+      "ret": "Object"
+    }
   },
   "/chains/{}/mempool/monitor_operations": {
     "GET": {
@@ -684,7 +741,6 @@ rpc_docs = {
       "contracts",
       "delegates",
       "nonces",
-      "ocp_delegates",
       "raw",
       "seed"
     ]
@@ -748,7 +804,6 @@ rpc_docs = {
       "counter",
       "delegate",
       "entrypoints",
-      "frozen_balance_ocp",
       "manager_key",
       "script",
       "storage"
@@ -796,13 +851,6 @@ rpc_docs = {
   "/chains/{}/blocks/{}/context/contracts/{}/entrypoints/{}": {
     "GET": {
       "descr": "Return the type of the given entrypoint of the contract",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/contracts/{}/frozen_balance_ocp": {
-    "POST": {
-      "descr": "Access the frozen balance of a contract.",
       "args": [],
       "ret": "Object"
     }
@@ -934,19 +982,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/ocp_delegates": {
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/ocp_delegates/{}": {
-    "GET": {
-      "descr": "Everything about a delegate.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
   "/chains/{}/blocks/{}/context/raw": {
     "props": [
       "bytes",
@@ -1037,7 +1072,6 @@ rpc_docs = {
       "endorsing_rights",
       "forge",
       "forge_block_header",
-      "frozen",
       "levels_in_current_cycle",
       "parse",
       "preapply",
@@ -1140,134 +1174,6 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/forge_block_header": {
     "POST": {
       "descr": "Forge a block header",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen": {
-    "props": [
-      "computed_rolls_ocp",
-      "cycle_computed_rolls_ocp",
-      "delegates_ocp",
-      "delegation_balances_ocp",
-      "delegator_balances_ocp",
-      "deleguees_ocp",
-      "deposits_ocp",
-      "fees_ocp",
-      "rewards_ocp",
-      "rolls_ocp",
-      "snapshot_level_ocp"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/computed_rolls_ocp": {
-    "POST": {
-      "descr": "Delegation balances of all delegates.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/cycle_computed_rolls_ocp": {
-    "item": {
-      "name": "block_cycle",
-      "descr": "A cycle integer"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/cycle_computed_rolls_ocp/{}": {
-    "POST": {
-      "descr": "Get selected index and rolls for a cycle.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/delegates_ocp": {
-    "POST": {
-      "descr": "Delegates.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/delegation_balances_ocp": {
-    "POST": {
-      "descr": "Delegation balances of all delegates.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/delegator_balances_ocp": {
-    "item": {
-      "name": "contract_id",
-      "descr": "A contract identifier encoded in b58check."
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/delegator_balances_ocp/{}": {
-    "POST": {
-      "descr": "Delegators balances for a delegate.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/deleguees_ocp": {
-    "item": {
-      "name": "contract_id",
-      "descr": "A contract identifier encoded in b58check."
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/deleguees_ocp/{}": {
-    "POST": {
-      "descr": "Deleguees.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/deposits_ocp": {
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/deposits_ocp/{}": {
-    "POST": {
-      "descr": "Frozen deposits for a given delegate.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/fees_ocp": {
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/fees_ocp/{}": {
-    "POST": {
-      "descr": "Frozen fees for a given delegate.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/rewards_ocp": {
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/rewards_ocp/{}": {
-    "POST": {
-      "descr": "Frozen rewards for a given delegate.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/rolls_ocp": {
-    "POST": {
-      "descr": "Rolls.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/frozen/snapshot_level_ocp": {
-    "POST": {
-      "descr": "YYYY.",
       "args": [],
       "ret": "Object"
     }
@@ -1566,6 +1472,1183 @@ rpc_docs = {
       "descr": "List of proposals with number of supporters.",
       "args": [],
       "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "active_delegates_with_rolls",
+      "big_maps",
+      "block_priority",
+      "commitments",
+      "contracts",
+      "cycle",
+      "delegates",
+      "delegates_with_frozen_balance",
+      "ramp_up",
+      "rolls",
+      "votes"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/active_delegates_with_rolls": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/active_delegates_with_rolls/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "index",
+      "next"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "big_map_id",
+      "descr": "A big map identifier"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "contents",
+      "key_type",
+      "total_bytes",
+      "value_type"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}/contents": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "script_expr",
+      "descr": "script_expr (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}/contents/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}/key_type": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}/total_bytes": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}/value_type": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/big_maps/next": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/block_priority": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/commitments": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "Blinded public key hash",
+      "descr": "Blinded public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/commitments/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "global_counter",
+      "index"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/global_counter": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "contract_id",
+      "descr": "A contract identifier encoded in b58check."
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "balance",
+      "change",
+      "code",
+      "counter",
+      "delegate",
+      "delegate_desactivation",
+      "delegated",
+      "frozen_balance",
+      "inactive_delegate",
+      "manager",
+      "paid_bytes",
+      "roll_list",
+      "storage",
+      "used_bytes"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/balance": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/change": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/code": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/counter": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/delegate": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/delegate_desactivation": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/delegated": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "contract_id",
+      "descr": "A contract identifier encoded in b58check."
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/delegated/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "deposits",
+      "fees",
+      "rewards"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}/deposits": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}/fees": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}/rewards": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/inactive_delegate": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/manager": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/paid_bytes": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/roll_list": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/storage": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/used_bytes": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "last_roll",
+      "nonces",
+      "random_seed",
+      "roll_snapshot"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/last_roll": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "int",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/last_roll/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/nonces": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_level",
+      "descr": "A level integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/nonces/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/random_seed": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/roll_snapshot": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/delegates": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/delegates/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/delegates_with_frozen_balance": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/delegates_with_frozen_balance/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/delegates_with_frozen_balance/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "deposits",
+      "rewards"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up/deposits": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up/deposits/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up/rewards": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up/rewards/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "index",
+      "limbo",
+      "next",
+      "owner"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/index": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "roll",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/index/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "successor"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/index/{}/successor": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/limbo": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/next": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "current",
+      "snapshot"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/current": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "roll",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/current/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "int",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "roll",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot/{}/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "ballots",
+      "current_period_kind",
+      "current_proposal",
+      "listings",
+      "listings_size",
+      "participation_ema",
+      "proposals",
+      "proposals_count"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/ballots": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/ballots/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/current_period_kind": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/current_proposal": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/listings": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/listings/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/listings_size": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/participation_ema": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/proposals": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "Protocol_hash",
+      "descr": "Protocol_hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/proposals/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/proposals/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/proposals_count": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/proposals_count/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
     }
   }
 }

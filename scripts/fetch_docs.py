@@ -3,7 +3,7 @@ from os.path import join, dirname
 from collections import defaultdict
 from typing import Dict
 
-from pytezos.rpc import babylonnet
+from pytezos.rpc import delphinet
 
 no_descr = '¯\\_(ツ)_/¯'
 
@@ -48,12 +48,14 @@ def parse_describe_output(data, root='/'):
 
 
 if __name__ == '__main__':
-    shell_docs = parse_describe_output(babylonnet.describe(recurse=True))
-    chain_docs = parse_describe_output(babylonnet.describe.chains.main.mempool(recurse=True),
+    shell_docs = parse_describe_output(delphinet.describe(recurse=True))
+    chain_docs = parse_describe_output(delphinet.describe.chains.main.mempool(recurse=True),
                                        root='/chains/{}/mempool')
-    block_docs = parse_describe_output(babylonnet.describe.chains.main.blocks.head(recurse=True),
+    block_docs = parse_describe_output(delphinet.describe.chains.main.blocks.head(recurse=True),
                                        root='/chains/{}/blocks/{}')
-    docs = json.dumps({**shell_docs, **chain_docs, **block_docs}, indent=2)
+    context_docs = parse_describe_output(delphinet.describe.chains.main.blocks.head.context.raw.json(recurse=True),
+                                         root='/chains/{}/blocks/{}/context/raw/json')
+    docs = json.dumps({**shell_docs, **chain_docs, **block_docs, **context_docs}, indent=2)
     output_path = join(dirname(dirname(__file__)), 'pytezos/rpc/docs.py')
     with open(output_path, 'w+') as f:
         f.write(f'rpc_docs = {docs}\n')
