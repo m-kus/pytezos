@@ -290,7 +290,7 @@ class Key(metaclass=InlineDocstring):
         :returns: the secret key associated with this key, if available
         """
         if not self.secret_exponent:
-            raise ValueError("Secret key not known.")
+            raise ValueError("Secret key is undefined")
 
         if self.curve == b'ed' and ed25519_seed:
             key = pysodium.crypto_sign_sk_to_seed(self.secret_exponent)
