@@ -394,7 +394,7 @@ class ContractInterface(Interop):
             self.contract.storage.big_map_init(storage)
 
         query = self.contract.storage.big_map_query(path)
-        if query.get('big_map_id'):
+        if 'big_map_id' in query:
             value = self.shell.blocks[block_id].context.big_maps[query['big_map_id']][query['script_expr']]()
         else:
             value = self.shell.blocks[block_id].context.contracts[self.address].big_map_get.post(query)
