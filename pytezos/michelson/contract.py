@@ -196,14 +196,12 @@ class ContractStorage(metaclass=InlineDocstring):
         (since Babylon you can have more than one BigMap at arbitrary position)
         :rtype: dict
         """
-        key = basename(path)
-        big_map_path = dirname(path)
-        big_map_id = self.big_map_id(join('/', big_map_path)) if big_map_path else None
+        big_map_id = self.big_map_id(join('/', dirname(path)))
         key_root, _, _ = self._locate_big_map(big_map_id)
-        encoded_key = encode_micheline(data=key, schema=self.schema, root=key_root)
+        encoded_key = encode_micheline(data=basename(path), schema=self.schema, root=key_root)
         key_hash = get_key_hash(encoded_key, self.code, bin_path=key_root)
 
-        if big_map_id:
+        if big_map_id is not None:
             query = dict(
                 big_map_id=big_map_id,
                 script_expr=key_hash)

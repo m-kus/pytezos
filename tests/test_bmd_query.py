@@ -155,3 +155,10 @@ class TestBmdQuery(TestCase):
         cs.big_map_init(michelson_to_micheline("""
             Pair 100 { Elt (Pair "main" 0) 42 }
         """))
+
+    def test_bmd_ptr_0(self):
+        cs = ContractStorage(michelson_to_micheline("storage (big_map string (map address timestamp))"))
+        cs.big_map_init(michelson_to_micheline('0'))
+        query = cs.big_map_query("hello")
+        self.assertEqual({'big_map_id': 0, 'script_expr': 'exprtsjEVVZk3Gm82U9wEs8kvwRiQwUT7zipJwvCeFMNsApe2tQ15s'},
+                         query)
