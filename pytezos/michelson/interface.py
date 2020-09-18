@@ -144,10 +144,19 @@ class ContractCall(Interop):
                          parameters=self.parameters) \
             .fill()
 
-    def inject(self):
+    def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
         """ Autofill, sign and inject resulting operation group.
+
+        :param _async: do not wait for operation inclusion (default is True)
+        :param preapply: do a preapply before injection
+        :param check_result: raise RpcError in case operation is refused
+        :param num_blocks_wait: number of blocks to wait for injection
         """
-        return self.operation_group.autofill().sign().inject()
+        return self.operation_group.autofill().sign().inject(
+            _async=_async,
+            preapply=preapply,
+            check_result=check_result,
+            num_blocks_wait=num_blocks_wait)
 
     def cmdline(self):
         """ Generate command line for tezos client.
