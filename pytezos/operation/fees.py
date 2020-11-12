@@ -3,7 +3,7 @@ from pytezos.operation.forge import forge_operation
 hard_gas_limit_per_operation = 1040000
 hard_storage_limit_per_operation = 60000
 minimal_fees = 100
-minimal_nanotez_per_byte = 1
+minimal_nanotez_per_byte = .25
 minimal_nanotez_per_gas_unit = .1
 
 
@@ -40,10 +40,10 @@ def default_gas_limit(content) -> int:
     :param content: operation content {..., "kind": "transaction", ... }
     """
     values = {
-        'reveal': 10000,
-        'delegation': 10000,
-        'origination': hard_gas_limit_per_operation if content.get('script') else 10000,
-        'transaction': hard_gas_limit_per_operation if content.get('destination', '').startswith('KT') else 10207
+        'reveal': 1000,
+        'delegation': 1000,
+        'origination': hard_gas_limit_per_operation,
+        'transaction': hard_gas_limit_per_operation if content.get('destination', '').startswith('KT') else 1427
     }
     return values.get(content['kind'])
 
@@ -56,7 +56,7 @@ def default_storage_limit(content):
     values = {
         'reveal': 0,
         'delegation': 0,
-        'origination': hard_storage_limit_per_operation if content.get('script') else 10207,
+        'origination': hard_storage_limit_per_operation,
         'transaction': hard_storage_limit_per_operation if content.get('destination', '').startswith('KT') else 257
     }
     return values.get(content['kind'])
