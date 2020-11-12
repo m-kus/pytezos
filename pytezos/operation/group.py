@@ -1,4 +1,5 @@
 from pprint import pformat
+from itertools import count
 
 from pytezos.crypto import blake2b_32
 from pytezos.operation.content import ContentMixin
@@ -85,17 +86,22 @@ class OperationGroup(Interop, ContentMixin):
         """
         return self._spawn(contents=self.contents + [content])
 
-    def fill(self):
+    def fill(self, counter=None):
         """ Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
+        :param counter: Override counter value (for manual handling)
         :rtype: OperationGroup
         """
         chain_id = self.chain_id or self.shell.chains.main.chain_id()
         branch = self.branch or self.shell.head.predecessor.hash()
         protocol = self.protocol or self.shell.head.header()['protocol']
         source = self.key.public_key_hash()
-        counter = self.shell.contracts[source].count()
+
+        if counter is not None:
+            counter = count(start=int(counter), step=1)
+        else:
+            counter = self.shell.contracts[source].count()
 
         replace_map = {
             'pkh': source,
@@ -125,12 +131,13 @@ class OperationGroup(Interop, ContentMixin):
             branch=branch
         )
 
-    def run(self):
+    def run(self, block_id='head'):
         """ Simulate operation without signature checks.
 
+        :param block_id: Specify a level at which this operation should be applied (default is head)
         :returns: RPC response from `run_operation`
         """
-        return self.shell.head.helpers.scripts.run_operation.post({
+        return self.shell.blocks[block_id].helpers.scripts.run_operation.post({
             'operation': {
                 'branch': self.branch,
                 'contents': self.contents,
@@ -158,13 +165,14 @@ class OperationGroup(Interop, ContentMixin):
 
         return local_data
 
-    def autofill(self, gas_reserve=100):
+    def autofill(self, gas_reserve=100, counter=None):
         """ Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
         :param gas_reserve: Add a safe reserve for gas limit (default is 100)
+        :param counter: Override counter value (for manual handling)
         :rtype: OperationGroup
         """
-        opg = self.fill()
+        opg = self.fill(counter=counter)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata)) from None
