@@ -95,6 +95,9 @@ def generate_docstring(schema: Schema, title, root='0') -> str:
             if bin_type == 'big_map':
                 res += '  /* big_map */'
 
+        elif bin_type == 'option':
+            res = decode_node(bin_path + '0')
+
         else:
             res = node['prim']
             if res not in core_types:

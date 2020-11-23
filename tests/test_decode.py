@@ -105,3 +105,8 @@ class TestComparable(TestCase):
     def test_unpair_single_annot(self):
         p = MichelsonParser()
         p.parse('UNPAIR @left')
+
+    def test_root_option(self):
+        storage = ContractStorage(michelson_to_micheline("storage (option string)"))
+        self.assertEqual({"prim": "None"}, storage.encode(None))
+        self.assertEqual({"prim": "Some", "args": [{"string": ""}]}, storage.encode(""))
