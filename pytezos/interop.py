@@ -1,6 +1,6 @@
 from os.path import exists, expanduser
 
-from pytezos.rpc import ShellQuery, RpcNode, mainnet, carthagenet, dalphanet, delphinet, localhost, labnet, pool
+from pytezos.rpc import ShellQuery, RpcNode, mainnet, carthagenet, dalphanet, delphinet, localhost, labnet, pool, edonet
 from pytezos.crypto import Key, is_installed
 from pytezos.encoding import is_key, is_pkh
 from pytezos.tools.docstring import InlineDocstring
@@ -69,6 +69,7 @@ class Interop(metaclass=InlineDocstring):
                 'labnet': labnet,
                 'dalphanet': dalphanet,
                 'delphinet': delphinet,
+                'edonet': edonet,
                 'mainnet-pool': pool.mainnet
             }
             if shell in networks:
