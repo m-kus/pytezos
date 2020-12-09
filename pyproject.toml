@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytezos"
-version = "2.5.13"
+version = "2.5.14"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]
@@ -16,6 +16,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
+wheel = "*"
 pyblake2 = "^1.1.2"
 base58 = "^1.0.3"
 requests = "^2.21.0"
@@ -32,7 +33,6 @@ pysodium = "^0.7.1"
 secp256k1 = "^0.13.2"
 fastecdsa = "^1.7.1"
 bson = "^0.5.10"
-wheel = "*"
 
 [tool.poetry.dev-dependencies]
 parameterized = "^0.7.0"
@@ -47,5 +47,5 @@ sphinxcontrib-googleanalytics = "^0.1"
 pytezos = 'pytezos:cli.main'
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -268,6 +268,8 @@ def parse_json(data, schema: Schema, bin_root='0'):
 
     def parse_comparable(key, bin_path, index):
         if schema.bin_types[bin_path] == 'keypair':
+            if isinstance(key, str):
+                key = tuple(key.split('::'))
             assert isinstance(key, tuple), f'tuple expected, got {key}'
             for i, arg_path in enumerate(schema.metadata[bin_path]['args']):
                 assert i < len(key), f'not enough elements in tuple {key}'
