@@ -41,6 +41,10 @@ Use apt or your favourite package manager:
 ```
 $ sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev
 ```
+Also, ensure wheel package is installed:
+```
+$ pip install wheel
+```
 
 #### MacOS
 
