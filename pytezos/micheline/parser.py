@@ -4,7 +4,7 @@ from ply.yacc import yacc
 import re
 import json
 
-from pytezos.michelson.macros import expand_macro
+from pytezos.repl.macros import expand_macro
 
 
 class MichelsonParserError(ValueError):
@@ -198,3 +198,15 @@ class MichelsonParser(object):
         if len(code) > 0 and code[0] == '(' and code[-1] == ')':
             code = code[1:-1]
         return self.parser.parse(code)
+
+
+def michelson_to_micheline(data, parser=None):
+    """ Converts Michelson source text into a Micheline expression.
+
+    :param data: Michelson string
+    :param parser: custom Michelson parser (optional)
+    :returns: Micheline expression
+    """
+    if parser is None:
+        parser = MichelsonParser()
+    return parser.parse(data)

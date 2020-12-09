@@ -364,6 +364,16 @@ def parse_pair(val_expr, type_expr, selector, type_path):
     return selector(val_expr, type_expr, val, type_path)
 
 
+@primitive('pair', args_len=3)
+def parse_pair3(val_expr, type_expr, selector, type_path):
+    pass
+
+
+@primitive('pair')
+def parse_pair4(val_expr, type_expr, selector, type_path):
+    pass
+
+
 @primitive('option', args_len=1)
 def parse_option(val_expr, type_expr, selector, type_path):
     val = dispatch_prim_map(val_expr, {
