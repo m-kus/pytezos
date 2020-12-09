@@ -2,7 +2,7 @@ from pprint import pformat
 from copy import deepcopy
 
 from pytezos.michelson.pack import get_key_hash
-from pytezos.michelson.converter import micheline_to_michelson
+from pytezos.micheline.formatter import micheline_to_michelson
 from pytezos.encoding import is_pkh, is_kt, is_chain_id
 from pytezos.repl.parser import parse_expression, parse_prim_expr, assert_expr_equal, assert_comparable, \
     expr_equal, assert_type, get_prim_args, remove_field_annots, Unit as UnitNone
