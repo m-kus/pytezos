@@ -151,7 +151,7 @@ def format_stderr(error):
 
 class Interpreter:
     """ Michelson interpreter reimplemented in Python.
-    Based on the following reference: https://michelson.nomadic-labs.com/
+    Based on the following reference: https://tezos.gitlab.io/michelson-reference/
     """
 
     def __init__(self, debug=True):
