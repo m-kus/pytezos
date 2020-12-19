@@ -2,7 +2,7 @@ from os.path import exists, expanduser
 
 from pytezos.rpc import ShellQuery, RpcNode, mainnet, carthagenet, dalphanet, delphinet, localhost, labnet, pool, edonet
 from pytezos.crypto import Key, is_installed
-from pytezos.encoding import is_key, is_pkh
+from pytezos.encoding import is_public_key, is_pkh
 from pytezos.tools.docstring import InlineDocstring
 
 default_shell = 'delphinet'
@@ -89,8 +89,8 @@ class Interop(metaclass=InlineDocstring):
                 'alice': alice_key
             }
             if key in keys:
-                self.key = keys[key]
-            elif is_key(key):
+                self.key = Key.from_encoded_key(keys[key])
+            elif is_public_key(key):
                 self.key = Key.from_encoded_key(key)
             elif is_pkh(key):
                 self.key = KeyHash(key)

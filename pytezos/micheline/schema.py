@@ -1,6 +1,8 @@
 import functools
 from os.path import join, dirname
 
+from pytezos.micheline.types import extend_annots, get_name, parse_type
+
 parsers = {}
 
 
@@ -15,21 +17,8 @@ def primitive(prim, args_len=None):
     return register_primitive
 
 
-def parse_prim_expr(expr) -> tuple:
-    assert isinstance(expr, dict), f'expected dict, got {type(expr).__name__}'
-    assert 'prim' in expr, f'prim field is absent'
-    return expr['prim'], expr.get('args', []), expr.get('annots', [])
-
-
-def forward(type_expr, annots):
-    assert isinstance(annots, list), f'expected list, got {annots}'
-    return dict(prim=type_expr['prim'],
-                args=type_expr.get('args', []),
-                annots=type_expr.get('annots', []) + annots)
-
-
 def parse_expression(type_expr, schema, type_path='/'):
-    prim, args, annots = parse_prim_expr(type_expr)
+    prim, args, annots = parse_type(type_expr)
     if prim in parsers:
         func, args_len = parsers[prim]
         if args_len is not None:
@@ -45,12 +34,12 @@ def parse_expression(type_expr, schema, type_path='/'):
 
 @primitive('parameter', args_len=1)
 def parse_parameter(args, annots, schema, type_path):
-    parse_expression(forward(args[0], annots), schema, type_path)
+    parse_expression(extend_annots(args[0], annots), schema, type_path)
 
 
 @primitive('storage', args_len=1)
 def parse_storage(args, annots, schema, type_path):
-    parse_expression(forward(args[0], annots), schema, type_path)
+    parse_expression(extend_annots(args[0], annots), schema, type_path)
 
 
 @primitive('option', args_len=1)
@@ -60,7 +49,7 @@ def parse_option(args, annots, schema, type_path):
         prim='option',
         args=[arg_path]
     )
-    parse_expression(forward(args[0], annots), schema, arg_path)
+    parse_expression(extend_annots(args[0], annots), schema, arg_path)
 
 
 def _parse_iterable(prim, args, annots, schema, type_path):
@@ -105,11 +94,13 @@ def parse_big_map(args, annots, schema, type_path):
 
 
 def _parse_struct(prim, args, annots, schema, type_path):
-    args_paths = [join(type_path, str(i)) for i in range(len(args))]
+    args_len = len(args)
+    args_paths = [join(type_path, str(i)) for i in range(args_len)]
     schema[type_path] = dict(
         prim=prim,
         args=args_paths,
-        annots=annots
+        annots=annots,
+        args_len=args_len
     )
     for i, arg in enumerate(args):
         parse_expression(arg, schema, args_paths[i])
@@ -130,17 +121,7 @@ def _get_flat_args(node, schema) -> list:
     return res
 
 
-def get_name(node, prefixes, default=None):
-    annots = node.get('annots', [])
-    assert isinstance(annots, list), f'expected list, got {annots}'
-    for prefix in prefixes:
-        name = next(filter(lambda x: x.startswith(prefix), annots), None)
-        if name is not None:
-            return name[1:]
-    return default
-
-
-def get_names(node, schema, prefixes):
+def _get_names(node, schema, prefixes):
     names, is_named = [], False
     for i, arg_path in enumerate(node.get('args', [])):
         name = get_name(schema[arg_path], prefixes)
@@ -154,7 +135,7 @@ def get_names(node, schema, prefixes):
 
 def _parse_union(schema, type_path):
     args_paths = _get_flat_args(schema[type_path], schema)
-    args_names, _ = get_names(schema[type_path], schema, prefixes=['%'])
+    args_names, _ = _get_names(schema[type_path], schema, prefixes=['%'])
     is_enum = all(map(lambda x: schema[x]['prim'] == 'unit', args_paths))
     schema[type_path] = dict(
         prim='enum' if is_enum else 'union',
@@ -176,7 +157,7 @@ def parse_or(args, annots, schema, type_path):
 
 def _parse_tuple(schema, type_path):
     args_paths = _get_flat_args(schema[type_path], schema)
-    args_names, is_named = get_names(schema[type_path], schema, prefixes=['%', ':'])
+    args_names, is_named = _get_names(schema[type_path], schema, prefixes=['%', ':'])
     schema[type_path] = dict(
         prim='tuple',
         args=args_paths,
@@ -224,3 +205,23 @@ def build_schema(type_expr):
     schema = {}
     parse_expression(type_expr, schema)
     return schema
+
+
+def resolve_type_path(type_expr, schema, type_path='/'):
+    prim, args, _ = parse_type(type_expr)
+    if prim in ['parameter', 'storage']:
+        assert len(args) == 1, f'expected single argument, got {len(args)}'
+        return resolve_type_path(args[0], schema, type_path)
+
+    split_path = type_path.lstrip('/').split('/', maxsplit=1)
+    rest_path = split_path[-1] if len(split_path) == 2 else ''
+    ptr = split_path[0]
+
+    if ptr == '':
+        return type_expr
+    elif ptr in ['o', 'l', 's', 'k']:
+        return resolve_type_path(args[0], schema, rest_path)
+    elif ptr == 'v':
+        return resolve_type_path(args[1], schema, rest_path)
+    else:
+        return resolve_type_path(args[int(ptr)], schema, rest_path)
