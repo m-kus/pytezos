@@ -18,7 +18,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         })
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if isinstance(self.value, MichelsonType):
             arg = self.value.to_micheline_value(mode=mode)

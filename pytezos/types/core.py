@@ -13,7 +13,7 @@ class StringType(MichelsonType, prim='string'):
         assert len(value) == len(value.encode()), f'unicode symbols are not allowed: {val_expr}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return {'string': self.value}
 
@@ -36,7 +36,7 @@ class IntType(MichelsonType, prim='int'):
         value = parse_micheline_literal(val_expr, {'int': int})
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return {'int': str(self.value)}
 
@@ -71,7 +71,7 @@ class BytesType(MichelsonType, prim='bytes'):
         value = parse_micheline_literal(val_expr, {'bytes': bytes.fromhex})
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return {'bytes': self.value.hex()}
 
@@ -103,7 +103,7 @@ class BoolType(MichelsonType, prim='bool'):
         })
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return {'prim': 'True' if self.value else 'False'}
 
@@ -125,7 +125,7 @@ class UnitType(MichelsonType, prim='unit'):
         value = parse_micheline_value(val_expr, {('Unit', 0): lambda x: unit()})
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return {'prim': 'Unit'}
 

@@ -16,7 +16,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         assert value == list(sorted(value)), f'set values are unsorted'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return list(map(lambda x: x.to_micheline_value(mode=mode), self.value))
 

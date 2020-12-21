@@ -5,7 +5,7 @@ from os.path import basename, exists, expanduser, dirname, join
 from pytezos.tools.docstring import get_class_docstring, InlineDocstring
 from pytezos.michelson.docstring import generate_docstring
 from pytezos.michelson.micheline import make_default, michelson_to_micheline, is_optional
-from pytezos.michelson.formatter import micheline_to_michelson
+from pytezos.micheline.formatter import micheline_to_michelson
 from pytezos.michelson.converter import build_schema, decode_micheline, encode_micheline, build_big_map_schema
 from pytezos.michelson.pack import get_key_hash
 

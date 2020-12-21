@@ -23,7 +23,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         assert keys == list(sorted(keys)), f'keys are unsorted'
         self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return [
             {'prim': 'Elt',

@@ -75,6 +75,10 @@ class MichelsonType:
                           type_name=self.type_name,
                           args=deepcopy(self.args))
 
+    @classmethod
+    def construct_type(cls, field_name, type_name, args):
+        return cls(value=undefined(), field_name=field_name, type_name=type_name, args=args)
+
     @staticmethod
     def from_micheline_type(type_expr):
         prim, type_args, field_name, type_name = parse_micheline_type(type_expr)
@@ -83,7 +87,7 @@ class MichelsonType:
         assert args_len is None or len(type_args) == args_len, f'{prim}: expected {args_len} args, got {len(type_args)}'
         args = list(map(MichelsonType.from_micheline_type, type_args))   # type: List[MichelsonType]
 
-        if prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda']:
+        if prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
             for arg in args:
                 assert arg.field_name is None, f'{prim} argument type cannot be annotated: %{arg.field_name}'
         if prim in ['set', 'map', 'big_map']:
@@ -91,7 +95,7 @@ class MichelsonType:
         if prim == 'big_map':
             assert args[0].is_big_map_friendly(), f'impossible big_map value type'
 
-        return cls(value=undefined(), field_name=field_name, type_name=type_name, args=args)
+        return cls.construct_type(field_name=field_name, type_name=type_name, args=args)
 
     def get_micheline_type(self) -> dict:
         annots = []
@@ -113,6 +117,9 @@ class MichelsonType:
         raise NotImplementedError
 
     def to_python_object(self):
+        raise NotImplementedError
+
+    def generate_pydoc(self, definitions: list):
         raise NotImplementedError
 
     def __int__(self):

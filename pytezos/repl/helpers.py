@@ -5,7 +5,7 @@ from pytezos.interop import Interop
 from pytezos.encoding import is_kt, forge_timestamp
 from pytezos.repl.control import instruction, do_interpret
 from pytezos.repl.context import Context
-from pytezos.repl.parser import get_int, get_string, get_bool, parse_prim_expr, restore_entry_expr, assert_expr_equal, \
+from pytezos.micheline.types import get_int, get_string, get_bool, parse_prim_expr, restore_entry_expr, assert_expr_equal, \
     dispatch_core_map
 from pytezos.repl.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List, Operation
 

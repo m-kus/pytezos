@@ -3,7 +3,8 @@ from simplejson import JSONDecodeError
 
 from pytezos.interop import Interop
 from pytezos.repl.types import StackItem, Map, BigMap
-from pytezos.repl.parser import parse_expression, assert_expr_equal, get_int, assert_comparable, assert_big_map_val
+from pytezos.micheline.types import assert_expr_equal
+from pytezos.micheline.reducer import parse_expression, get_int, assert_comparable, assert_big_map_val
 from pytezos.michelson.pack import get_key_hash
 
 

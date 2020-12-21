@@ -17,7 +17,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         else:
             return super(BigMapType, self).parse_micheline_value(val_expr)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         if isinstance(self.value, int):
             return {'int': str(self.value)}
         else:
@@ -34,3 +34,4 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             return self.value
         else:
             return super(BigMapType, self).to_python_object()
+

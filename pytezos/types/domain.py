@@ -8,7 +8,7 @@ from pytezos.types.base import MichelsonType, parse_micheline_literal
 from pytezos.micheline.parser import michelson_to_micheline
 
 
-class TimestampType(IntType, prim='int'):
+class TimestampType(IntType, prim='timestamp'):
 
     def parse_micheline_value(self, val_expr):
         value = parse_micheline_literal(val_expr, {
@@ -17,7 +17,7 @@ class TimestampType(IntType, prim='int'):
         })
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': str(self.value)}
@@ -65,7 +65,7 @@ class AddressType(StringType, prim='address'):
         assert is_address(value), f'expected tz/KT address, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_contract(self.value)}  # because address can also have an entrypoint
@@ -103,7 +103,7 @@ class KeyType(StringType, prim='key'):
         assert is_public_key(value), f'expected ed/sp/p2 public key, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_public_key(self.value)}
@@ -131,7 +131,7 @@ class KeyHashType(StringType, prim='key_hash'):
         assert is_pkh(value), f'expected tz1/tz2/tz3 key hash, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_address(self.value, tz_only=True)}
@@ -159,7 +159,7 @@ class SignatureType(StringType, prim='signature'):
         assert is_sig(value), f'expected signature, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_base58(self.value)}
@@ -187,7 +187,7 @@ class ChainIdType(StringType, prim='chain_id'):
         assert is_sig(value), f'expected signature, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_base58(self.value)}
@@ -236,7 +236,7 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
         return self.spawn(val_expr)
 
-    def to_micheline_value(self, mode='optimized'):
+    def to_micheline_value(self, mode='readable'):
         self.assert_value_defined()
         return self.value
 

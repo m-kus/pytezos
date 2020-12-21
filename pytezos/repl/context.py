@@ -8,7 +8,7 @@ from pytezos.encoding import base58_encode
 from pytezos.repl.types import StackItem, assert_stack_item
 from pytezos.michelson.converter import micheline_to_michelson
 from pytezos.repl.big_map import BigMapPool
-from pytezos.repl.parser import assert_single_var_annot
+from pytezos.micheline.types import assert_single_var_annot
 
 
 class DummyGen:

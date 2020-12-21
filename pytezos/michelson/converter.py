@@ -4,7 +4,7 @@ from collections import namedtuple
 from pytezos.michelson.forge import prim_tags
 from pytezos.michelson.micheline import Schema, collapse_micheline, build_maps, parse_micheline, \
     parse_json, make_micheline, michelson_to_micheline
-from pytezos.michelson.formatter import micheline_to_michelson
+from pytezos.micheline.formatter import micheline_to_michelson
 from pytezos.michelson.docstring import generate_docstring
 
 BigMapSchema = namedtuple('BigMapSchema', ['bin_to_id', 'id_to_bin'])

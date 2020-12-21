@@ -2,7 +2,7 @@ from pytezos.crypto import blake2b_32
 from pytezos.encoding import forge_base58, forge_address, forge_public_key, forge_contract, forge_timestamp, \
     base58_encode
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
-from pytezos.repl.parser import parse_prim_expr
+from pytezos.micheline.reducer import parse_prim_expr
 
 
 def prepack_micheline(val_expr, type_expr):
