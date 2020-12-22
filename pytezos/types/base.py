@@ -2,6 +2,21 @@ from typing import Tuple, Dict, Callable, List
 from pprint import pformat
 from copy import deepcopy
 
+type_mappings = {
+    'nat': 'int  /* Natural number */',
+    'unit': 'Unit || None /* Void */',
+    'bytes': 'string  /* Hex string */ ||\n\tbytes  /* Python byte string */',
+    'timestamp': 'int  /* Unix time in seconds */ ||\n\tstring  /* Formatted datetime `%Y-%m-%dT%H:%M:%SZ` */',
+    'mutez': 'int  /* Amount in `utz` (10^-6) */ ||\n\tDecimal  /* Amount in `tz` */',
+    'contract': 'string  /* Base58 encoded `KT` address with optional entrypoint */',
+    'address': 'string  /* Base58 encoded `tz` or `KT` address */',
+    'key': 'string  /* Base58 encoded public key */',
+    'key_hash': 'string  /* Base58 encoded public key hash */',
+    'signature': 'string  /* Base58 encoded signature */',
+    'lambda': 'string  /* Michelson source code */',
+    'chain_id': 'string  /* Base58 encoded chain ID */'
+}
+
 
 class undefined:
     pass
@@ -119,8 +134,12 @@ class MichelsonType:
     def to_python_object(self):
         raise NotImplementedError
 
-    def generate_pydoc(self, definitions: list):
-        raise NotImplementedError
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        assert len(self.args) == 0, f'defined for simple types only'
+        if self.prim in type_mappings:
+            if all(x != self.prim for x, _ in definitions):
+                definitions.append((self.prim, type_mappings[self.prim]))
+        return self.prim
 
     def __int__(self):
         assert isinstance(self.value, int), f'expected int, got {type(self.value).__name__}'

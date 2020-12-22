@@ -10,5 +10,7 @@ class TestMichelsonTypesCore(TestCase):
 
     def test_adt(self):
         param_type = MichelsonType.from_micheline_type(parameter)
+        print(param_type.generate_pydoc())
         storage_type = MichelsonType.from_micheline_type(storage)
+        print(storage_type.generate_pydoc())
         self.assertTrue(True)

@@ -44,3 +44,8 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         self.assert_value_defined()
         self.assert_equal_types(other)
         assert self.is_comparable(), f'not a comparable type'
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        name = self.field_name or self.type_name or imposed_name
+        arg_doc = self.args[0].generate_pydoc(definitions, imposed_name=name)
+        return f'{arg_doc} || None'

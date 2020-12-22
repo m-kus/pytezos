@@ -1,3 +1,5 @@
+from typing import Generator, Tuple
+
 from pytezos.types.base import MichelsonType, parse_micheline_value
 
 
@@ -23,16 +25,14 @@ class OrType(MichelsonType, prim='or', args_len=2):
                 return {'prim': prim, 'args': [self.value[i].to_micheline_type(mode=mode)]}
         assert False
 
-    def enumerate_args(self, path='') -> list:
-        flat_args = []
+    def iter_args(self, path='') -> Generator:
         for i, arg in enumerate(self.args):
             if isinstance(arg, OrType):
-                flat_args.extend(arg.enumerate_args(path + str(i)))
+                yield from arg.iter_args(path + str(i))
             else:
-                flat_args.append((path + str(i), arg))
-        return flat_args
+                yield path + str(i), arg
 
-    def iter_values(self, path=''):
+    def iter_values(self, path='') -> Generator:
         self.assert_value_defined()
         for i, arg in enumerate(self.value):
             if isinstance(arg, OrType):
@@ -43,7 +43,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
                 assert arg is None, f'unexpected arg {arg}'
 
     def get_schema(self):  # TODO: cache it
-        flat_args = self.enumerate_args()
+        flat_args = list(self.iter_args())
         reserved_names = set()
         entry_points = {}
         paths = {}
@@ -54,7 +54,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
             else:
                 entry_points[path] = f'{arg.prim}_{i}'
             paths[entry_points[path]] = path
-        return entry_points, paths
+        return flat_args, entry_points, paths
 
     def parse_python_object(self, py_obj):
         if isinstance(py_obj, tuple):
@@ -67,7 +67,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
             return self.spawn(value)
         elif isinstance(py_obj, dict):
             assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
-            _, paths = self.get_schema()
+            _, _, paths = self.get_schema()
             entry_point = next(py_obj)
             assert entry_point in paths, f'unknown entrypoint {entry_point}'
 
@@ -86,7 +86,18 @@ class OrType(MichelsonType, prim='or', args_len=2):
             assert False, f'expected tuple or dict, got {type(py_obj).__name__}'
 
     def to_python_object(self):
-        entry_points, _ = self.get_schema()
+        _, entry_points, _ = self.get_schema()
         path, value = next(self.iter_values())
         assert path in entry_points, f'unknown entry point: {path}'
         return {entry_points[path]: value.to_python_object()}
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        flat_args, entry_points, _ = self.get_schema()
+        variants = [
+            (entry_points[path], arg.generate_pydoc(definitions, imposed_name=entry_points[path]))
+            for path, arg in flat_args
+        ]
+        doc = ' ||\n\t'.join(f'{{ "{entry_point}": {arg_doc} }}' for entry_point, arg_doc in variants)
+        name = self.field_name or self.type_name or imposed_name or f'{self.prim}_{len(definitions)}'
+        definitions.insert(0, (name, doc))
+        return f'${name}'

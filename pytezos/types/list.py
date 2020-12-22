@@ -26,3 +26,8 @@ class ListType(MichelsonType, prim='list', args_len=1):
     def to_python_object(self):
         self.assert_value_defined()
         return list(map(lambda x: x.to_python_object(), self.value))
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        name = self.field_name or self.type_name or imposed_name
+        arg_doc = self.args[0].generate_pydoc(definitions, imposed_name=f'{name}_item' if name else None)
+        return f'[ {arg_doc}, ... ]'

@@ -1,3 +1,4 @@
+from typing import Generator
 from pytezos.types.base import MichelsonType, undefined
 
 
@@ -39,7 +40,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             assert False, f'at least two args expected, got {len(args)}'
         return self.spawn(tuple(value))
 
-    def iter_comb(self):
+    def iter_comb(self) -> Generator:
         self.assert_value_defined()
         left, right = self.value
         yield left
@@ -64,17 +65,15 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def enumerate_args(self, path='') -> list:
-        flat_args = []
+    def iter_args(self, path='') -> Generator:
         for i, arg in enumerate(self.args):
             if isinstance(arg, PairType) and arg.field_name is None and arg.type_name is None:
-                flat_args.extend(arg.enumerate_args(path + str(i)))
+                yield from arg.iter_args(path + str(i))
             else:
-                flat_args.append((path + str(i), arg))
-        return flat_args
+                yield path + str(i), arg
 
     def get_schema(self):  # TODO: cache it
-        flat_args = self.enumerate_args()
+        flat_args = list(self.iter_args())
         reserved_names = set()
         names = {}
         for i, (path, arg) in enumerate(flat_args):
@@ -84,13 +83,12 @@ class PairType(MichelsonType, prim='pair', args_len=None):
                 names[path] = name
             else:
                 names[path] = f'{arg.prim}_{i}'
-
         if reserved_names:
-            return names, {name: path for path, name in names.items()}
+            return flat_args, names, {name: path for path, name in names.items()}
         else:
-            return None, {i: path for i, path in enumerate(names)}
+            return flat_args, None, {i: path for i, path in enumerate(names)}
 
-    def iter_values(self, path=''):
+    def iter_values(self, path='') -> Generator:
         self.assert_value_defined()
         for i, arg in enumerate(self.value):
             if isinstance(arg, PairType) and arg.field_name is None and arg.type_name is None:
@@ -110,7 +108,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             value = tuple(self.args[i].parse_python_object(item) for i, item in enumerate(py_obj))
             return self.spawn(value)
         else:
-            names, paths = self.get_schema()
+            _, names, paths = self.get_schema()
             if names:
                 assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
                 values = {paths[name]: value for name, value in py_obj.items()}
@@ -128,9 +126,27 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             return self.parse_python_object(wrap_tuple())
 
     def to_python_object(self):
-        names, _ = self.get_schema()
+        _, names, _ = self.get_schema()
         flat_values = [arg.to_python_object() for arg in self.iter_values()]
         if names:
             return {names[path]: arg for path, arg in flat_values}
         else:
             return tuple(arg for _, arg in flat_values)
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        flat_args, names, _ = self.get_schema()
+        if names:
+            fields = [
+                (names[path], arg.generate_pydoc(definitions, imposed_name=names[path]))
+                for path, arg in flat_args
+            ]
+            doc = '{\n' + ',\n'.join(f'\t  "{name}": {arg_doc}' for name, arg_doc in fields) + '\n\t}'
+        else:
+            items = [
+                arg.generate_pydoc(definitions, imposed_name=f'{arg.prim}_{i}')
+                for i, (_, arg) in enumerate(flat_args)
+            ]
+            doc = '(\n' + ',\n'.join(f'\t  {arg_doc}' for arg_doc in items) + '\n\t)'
+        name = self.field_name or self.type_name or imposed_name or f'{self.prim}_{len(definitions)}'
+        definitions.insert(0, (name, doc))
+        return f'${name}'

@@ -1,7 +1,7 @@
 from pytezos.types.base import MichelsonType
 from pytezos.types.section import ParameterType, StorageType
 from pytezos.types.big_map import BigMapType
-from pytezos.types.core import IntType, NatType, StringType, BoolType, BytesType, UnitType
+from pytezos.types.core import IntType, NatType, StringType, BoolType, BytesType, UnitType, Unit
 from pytezos.types.domain import TimestampType, AddressType, ChainIdType, ContractType, KeyHashType, KeyType, \
     MutezType, NeverType, LambdaType, SignatureType
 from pytezos.types.list import ListType

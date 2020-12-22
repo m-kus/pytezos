@@ -43,3 +43,9 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def to_python_object(self):
         self.assert_value_defined()
         return {k.to_python_object(): v.to_python_object() for k, v in self.value}
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        name = self.field_name or self.type_name or imposed_name
+        arg_names = [f'{name}_key', f'{name}_value'] if name else [None, None]
+        key, val = [arg.generate_pydoc(definitions, imposed_name=arg_names[i]) for i, arg in enumerate(self.args)]
+        return f'{{ {key}: {val}, ... }}'

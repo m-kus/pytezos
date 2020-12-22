@@ -224,10 +224,31 @@ class NeverType(MichelsonType, prim='never'):
 
 
 class ContractType(AddressType, prim='contract', args_len=1):
-    pass
+
+    @property
+    def param_type(self):
+        return self.args[0]
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        param_expr = micheline_to_michelson(self.param_type.get_micheline_type())
+        if self.param_type.args:
+            name = self.field_name or self.type_name or imposed_name or f'{self.prim}_{len(definitions)}'
+            param_name = f'{name}_param'
+            definitions.insert(0, (param_name, param_expr))
+            return f'contract (${param_name})'
+        else:
+            return f'contract ({param_expr})'
 
 
 class LambdaType(MichelsonType, prim='lambda', args_len=2):
+
+    @property
+    def param_type(self):
+        return self.args[0]
+
+    @property
+    def return_type(self):
+        return self.args[1]
 
     def assert_value_defined(self):
         assert isinstance(self.value, list), f'value is undefined'
@@ -252,3 +273,16 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
     def __repr__(self):
         self.assert_value_defined()
         return micheline_to_michelson(self.value)
+
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        name = self.field_name or self.type_name or imposed_name or f'{self.prim}_{len(definitions)}'
+        expr = {}
+        for i, suffix in enumerate(['return', 'param']):
+            arg_expr = micheline_to_michelson(self.args[i].get_micheline_type())
+            if self.args[i].args:
+                arg_name = f'{name}_{suffix}'
+                definitions.insert(0, (arg_name, arg_expr))
+                expr[suffix] = f'${arg_name}'
+            else:
+                expr[suffix] = arg_expr
+        return f'lambda ({expr["param"]} -> {expr["return"]})'

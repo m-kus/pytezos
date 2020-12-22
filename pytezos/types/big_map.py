@@ -35,3 +35,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         else:
             return super(BigMapType, self).to_python_object()
 
+    def generate_pydoc(self, definitions: list, imposed_name=None):
+        name = self.field_name or self.type_name or imposed_name
+        arg_names = [f'{name}_key', f'{name}_value'] if name else [None, None]
+        key, val = [arg.generate_pydoc(definitions, imposed_name=arg_names[i]) for i, arg in enumerate(self.args)]
+        return f'{{ {key}: {val}, ... }} || int /* Big_map ID */'
