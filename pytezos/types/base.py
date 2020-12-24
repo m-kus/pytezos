@@ -1,6 +1,5 @@
 from typing import Tuple, Dict, Callable, List
 from pprint import pformat
-from copy import deepcopy
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
@@ -70,12 +69,12 @@ class MichelsonType:
     prim = None
     type_classes = {}
 
-    def __init__(self, value, field_name=None, type_name=None, variable_name=None, args=None):
+    def __init__(self, value=undefined(), field_name=None, type_name=None, var_name=None, type_args=None):
         self.value = value
         self.field_name = field_name
         self.type_name = type_name
-        self.variable_name = variable_name
-        self.args = args or []  # type: List[MichelsonType]
+        self.var_name = var_name
+        self.type_args = type_args or []  # type: List[MichelsonType]
 
     @classmethod
     def __init_subclass__(cls, prim='', args_len=0, **kwargs):
@@ -85,14 +84,27 @@ class MichelsonType:
             cls.prim = prim
 
     def spawn(self, value):
-        return type(self)(value=value,
+        return type(self)(value=value,  # NOTE: can be mutated, but not in practice
                           field_name=self.field_name,
                           type_name=self.type_name,
-                          args=deepcopy(self.args))
+                          type_args=self.type_args)  # NOTE: can be mutated, but not in practice
+
+    def rename(self, var_name):
+        return type(self)(value=self.value,  # NOTE: can be mutated, but not in practice
+                          field_name=self.field_name,
+                          type_name=self.type_name,
+                          var_name=var_name,
+                          type_args=self.type_args)  # NOTE: can be mutated, but not in practice
 
     @classmethod
-    def construct_type(cls, field_name, type_name, args):
-        return cls(value=undefined(), field_name=field_name, type_name=type_name, args=args)
+    def construct_type(cls, field_name, type_name, type_args: List['MichelsonType']):
+        return cls(value=undefined(), field_name=field_name, type_name=type_name, type_args=type_args)
+
+    def get_type(self):
+        return type(self)(value=undefined(),
+                          field_name=self.field_name,
+                          type_name=self.type_name,
+                          type_args=[arg.get_type() for arg in self.type_args])
 
     @staticmethod
     def from_micheline_type(type_expr):
@@ -118,24 +130,30 @@ class MichelsonType:
             annots.append(f'%{self.field_name}')
         if self.type_name is not None:
             annots.append(f':{self.type_name}')
-        type_args = [arg.get_micheline_type() for arg in self.args]
+        type_args = [arg.get_micheline_type() for arg in self.type_args]
         expr = dict(prim=self.prim, annots=annots, args=type_args)
         return {k: v for k, v in expr.items() if v}
 
-    def parse_micheline_value(self, val_expr):
+    def parse_micheline_value(self, val_expr) -> 'MichelsonType':
         raise NotImplementedError
 
-    def to_micheline_value(self, mode):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         raise NotImplementedError
 
-    def parse_python_object(self, py_obj):
+    def parse_python_object(self, py_obj) -> 'MichelsonType':
         raise NotImplementedError
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         raise NotImplementedError
 
-    def generate_pydoc(self, definitions: list, imposed_name=None):
-        assert len(self.args) == 0, f'defined for simple types only'
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
+        return self.spawn(value=self.value)
+
+    def aggregate_lazy_diff(self, lazy_diff: List[dict]):
+        assert self.prim not in ['big_map', 'sapling_state'], f'must be explicitly defined for lazy types'
+
+    def generate_pydoc(self, definitions: List[Tuple[str, str]], inferred_name=None) -> str:
+        assert len(self.type_args) == 0, f'defined for simple types only'
         if self.prim in type_mappings:
             if all(x != self.prim for x, _ in definitions):
                 definitions.append((self.prim, type_mappings[self.prim]))
@@ -189,34 +207,34 @@ class MichelsonType:
         if self.prim in ['bls12_381_fr', 'bls12_381_g1', 'bls12_381_g2', 'sapling_state', 'sapling_transaction',
                          'big_map', 'contract', 'lambda', 'list', 'map', 'set', 'operation', 'ticket']:
             return False
-        return all(map(lambda x: x.is_comparable(), self.args))
+        return all(map(lambda x: x.is_comparable(), self.type_args))
 
     def is_passable(self):
         if self.prim in ['operation']:
             return False
-        return all(map(lambda x: x.is_passable(), self.args))
+        return all(map(lambda x: x.is_passable(), self.type_args))
 
     def is_storable(self):
         if self.prim in ['contract', 'operation']:
             return False
-        return all(map(lambda x: x.is_storable(), self.args))
+        return all(map(lambda x: x.is_storable(), self.type_args))
 
     def is_pushable(self):
         if self.prim in ['big_map', 'contract', 'operation', 'sapling_state', 'ticket']:
             return False
-        return all(map(lambda x: x.is_pushable(), self.args))
+        return all(map(lambda x: x.is_pushable(), self.type_args))
 
     def is_packable(self):
         if self.prim in ['big_map', 'operation', 'sapling_state', 'ticket']:
             return False
-        return all(map(lambda x: x.is_packable(), self.args))
+        return all(map(lambda x: x.is_packable(), self.type_args))
 
     def is_duplicable(self):
         if self.prim in ['ticket']:
             return False
-        return all(map(lambda x: x.is_duplicable(), self.args))
+        return all(map(lambda x: x.is_duplicable(), self.type_args))
 
     def is_big_map_friendly(self):
         if self.prim in ['big_map', 'operation', 'sapling_state']:
             return False
-        return all(map(lambda x: x.is_big_map_friendly(), self.args))
+        return all(map(lambda x: x.is_big_map_friendly(), self.type_args))

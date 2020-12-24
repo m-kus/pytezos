@@ -17,7 +17,7 @@ class TimestampType(IntType, prim='timestamp'):
         })
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': str(self.value)}
@@ -35,7 +35,7 @@ class TimestampType(IntType, prim='timestamp'):
             assert False, f'unexpected value type {py_obj}'
         return self.spawn(value)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return self.value
 
@@ -65,7 +65,7 @@ class AddressType(StringType, prim='address'):
         assert is_address(value), f'expected tz/KT address, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_contract(self.value)}  # because address can also have an entrypoint
@@ -78,7 +78,7 @@ class AddressType(StringType, prim='address'):
         assert is_address(py_obj), f'expected tz/KT address, got {py_obj}'
         return self.spawn(py_obj)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return str(self.value)
 
@@ -103,7 +103,7 @@ class KeyType(StringType, prim='key'):
         assert is_public_key(value), f'expected ed/sp/p2 public key, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_public_key(self.value)}
@@ -116,7 +116,7 @@ class KeyType(StringType, prim='key'):
         assert is_public_key(py_obj), f'expected ed/sp/p2 public key, got {py_obj}'
         return self.spawn(py_obj)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return self.value
 
@@ -131,7 +131,7 @@ class KeyHashType(StringType, prim='key_hash'):
         assert is_pkh(value), f'expected tz1/tz2/tz3 key hash, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_address(self.value, tz_only=True)}
@@ -144,7 +144,7 @@ class KeyHashType(StringType, prim='key_hash'):
         assert is_pkh(py_obj), f'expected tz1/tz2/tz3 key hash, got {py_obj}'
         return self.spawn(py_obj)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return self.value
 
@@ -159,7 +159,7 @@ class SignatureType(StringType, prim='signature'):
         assert is_sig(value), f'expected signature, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_base58(self.value)}
@@ -172,7 +172,7 @@ class SignatureType(StringType, prim='signature'):
         assert is_sig(py_obj), f'expected signature, got {py_obj}'
         return self.spawn(py_obj)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return self.value
 
@@ -187,7 +187,7 @@ class ChainIdType(StringType, prim='chain_id'):
         assert is_sig(value), f'expected signature, got {value}'
         return self.spawn(value)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         if mode == 'optimized':
             return {'int': forge_base58(self.value)}
@@ -200,7 +200,7 @@ class ChainIdType(StringType, prim='chain_id'):
         assert is_sig(py_obj), f'expected signature, got {py_obj}'
         return self.spawn(py_obj)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return self.value
 
@@ -213,13 +213,13 @@ class NeverType(MichelsonType, prim='never'):
     def parse_micheline_value(self, val_expr):
         assert False, f'forbidden'
 
-    def to_micheline_value(self, mode):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         assert False, f'forbidden'
 
     def parse_python_object(self, py_obj):
         assert False, f'forbidden'
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         assert False, f'forbidden'
 
 
@@ -227,12 +227,12 @@ class ContractType(AddressType, prim='contract', args_len=1):
 
     @property
     def param_type(self):
-        return self.args[0]
+        return self.type_args[0]
 
-    def generate_pydoc(self, definitions: list, imposed_name=None):
+    def generate_pydoc(self, definitions: list, inferred_name=None):
         param_expr = micheline_to_michelson(self.param_type.get_micheline_type())
-        if self.param_type.args:
-            name = self.field_name or self.type_name or imposed_name or f'{self.prim}_{len(definitions)}'
+        if self.param_type.type_args:
+            name = self.field_name or self.type_name or inferred_name or f'{self.prim}_{len(definitions)}'
             param_name = f'{name}_param'
             definitions.insert(0, (param_name, param_expr))
             return f'contract (${param_name})'
@@ -244,11 +244,11 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
     @property
     def param_type(self):
-        return self.args[0]
+        return self.type_args[0]
 
     @property
     def return_type(self):
-        return self.args[1]
+        return self.type_args[1]
 
     def assert_value_defined(self):
         assert isinstance(self.value, list), f'value is undefined'
@@ -257,7 +257,7 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
         return self.spawn(val_expr)
 
-    def to_micheline_value(self, mode='readable'):
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
         self.assert_value_defined()
         return self.value
 
@@ -266,23 +266,23 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         value = michelson_to_micheline(py_obj)
         return self.spawn(value)
 
-    def to_python_object(self):
+    def to_python_object(self, lazy_diff=False):
         self.assert_value_defined()
         return micheline_to_michelson(self.value)
 
-    def __repr__(self):
-        self.assert_value_defined()
-        return micheline_to_michelson(self.value)
-
-    def generate_pydoc(self, definitions: list, imposed_name=None):
-        name = self.field_name or self.type_name or imposed_name or f'{self.prim}_{len(definitions)}'
+    def generate_pydoc(self, definitions: list, inferred_name=None):
+        name = self.field_name or self.type_name or inferred_name or f'{self.prim}_{len(definitions)}'
         expr = {}
         for i, suffix in enumerate(['return', 'param']):
-            arg_expr = micheline_to_michelson(self.args[i].get_micheline_type())
-            if self.args[i].args:
+            arg_expr = micheline_to_michelson(self.type_args[i].get_micheline_type())
+            if self.type_args[i].type_args:
                 arg_name = f'{name}_{suffix}'
                 definitions.insert(0, (arg_name, arg_expr))
                 expr[suffix] = f'${arg_name}'
             else:
                 expr[suffix] = arg_expr
         return f'lambda ({expr["param"]} -> {expr["return"]})'
+
+    def __repr__(self):
+        self.assert_value_defined()
+        return micheline_to_michelson(self.value)
