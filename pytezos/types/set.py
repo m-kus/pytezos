@@ -1,63 +1,38 @@
 from typing import Generator, List
+from copy import copy
 
-from pytezos.types.base import MichelsonType
+from pytezos.types.base import MichelsonType, LazyStorage
 
 
 class SetType(MichelsonType, prim='set', args_len=1):
 
-    def assert_value_defined(self):
-        assert isinstance(self.value, list), f'expected list, got {type(self.value).__name__}'
-
-    def assert_item_defined(self, item):
-        assert isinstance(item, type(self.type_args[0])), \
-            f'invalid element type: expected {type(self.type_args[0]).__name__}, got {type(item).__name__}'
+    def __init__(self, items: List[MichelsonType]):
+        super(SetType, self).__init__()
+        self.items = items
 
     def __len__(self):
-        self.assert_value_defined()
-        return len(self.value)
+        return len(self.items)
 
     def __iter__(self) -> Generator[MichelsonType, None, None]:
-        self.assert_value_defined()
-        for item in self.value:
-            self.assert_item_defined(item)
-            yield item
+        yield from iter(self.items)
 
-    def contains(self, item: MichelsonType) -> bool:
-        self.assert_value_defined()
-        self.assert_item_defined(item)
-        return item in self.value
-
-    def add(self, item: MichelsonType) -> MichelsonType:
-        self.assert_value_defined()
-        self.assert_item_defined(item)
-        if item in self.value:
-            return self
-        else:
-            return self.spawn(list(sorted([item] + self.value)))
-
-    def remove(self, item: MichelsonType) -> MichelsonType:
-        self.assert_value_defined()
-        self.assert_item_defined(item)
-        if item in self.value:
-            return self.spawn(list(filter(lambda x: x != item, self.value)))
-        else:
-            return self
-
-    def parse_micheline_value(self, val_expr):
+    @classmethod
+    def from_micheline_value(cls, val_expr):
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
-        value = list(map(self.type_args[0].parse_micheline_value, val_expr))
-        assert len(set(value)) == len(value), f'duplicate elements found'
-        assert value == list(sorted(value)), f'set values are unsorted'
-        return self.spawn(value)
+        items = list(map(cls.type_args[0].from_micheline_value, val_expr))
+        assert len(set(items)) == len(items), f'duplicate elements found'
+        assert items == list(sorted(items)), f'set values are unsorted'
+        return cls(items)
+
+    @classmethod
+    def from_python_object(cls, py_obj):
+        assert isinstance(py_obj, set), f'expected set, got {type(py_obj).__name__}'
+        items = list(map(cls.type_args[0].from_python_object, py_obj))
+        items = list(sorted(items))
+        return cls(items)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return list(map(lambda x: x.to_micheline_value(mode=mode, lazy_diff=lazy_diff), self))
-
-    def parse_python_object(self, py_obj):
-        assert isinstance(py_obj, set), f'expected set, got {type(py_obj).__name__}'
-        value = list(map(self.type_args[0].parse_python_object, py_obj))
-        value = list(sorted(value))
-        return self.spawn(value)
 
     def to_python_object(self, lazy_diff=False):
         return list(map(lambda x: x.to_python_object(lazy_diff=lazy_diff), self))
@@ -68,13 +43,32 @@ class SetType(MichelsonType, prim='set', args_len=1):
         return f'{{ {arg_doc}, ... }}'
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        value = [item.merge_lazy_diff(lazy_diff) for item in self]
-        return self.spawn(value)
+        return copy(self)  # Big_map is not comparable
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict]):
-        for item in self:
-            item.aggregate_lazy_diff(lazy_diff)
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
+        pass  # Big_map is not comparable
+
+    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+        pass  # Big_map is not comparable
+
+    def contains(self, item: MichelsonType) -> bool:
+        assert isinstance(item, self.type_args[0]), f'expected {self.type_args[0].__name__}, got {type(item).__name__}'
+        return item in self.items
+
+    def add(self, item: MichelsonType) -> MichelsonType:
+        if self.contains(item):
+            return copy(self)
+        else:
+            items = [item] + self.items
+            return type(self)(list(sorted(items)))
+
+    def remove(self, item: MichelsonType) -> MichelsonType:
+        if self.contains(item):
+            items = list(filter(lambda x: x != item, self.items))
+            return type(self)(items)
+        else:
+            return copy(self)
 
     def __contains__(self, py_obj):
-        key = self.type_args[0].parse_python_object(py_obj)
+        key = self.type_args[0].from_python_object(py_obj)
         return self.contains(key)

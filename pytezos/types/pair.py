@@ -1,6 +1,6 @@
 from typing import Generator, Tuple, List, Union
 
-from pytezos.types.base import MichelsonType, undefined
+from pytezos.types.base import MichelsonType, undefined, LazyStorage
 from pytezos.types.schema import TypeSchema
 
 
@@ -132,9 +132,13 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         value = tuple(item.merge_lazy_diff(lazy_diff) for item in self)
         return self.spawn(value)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict]):
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         for item in self:
-            item.aggregate_lazy_diff(lazy_diff)
+            item.aggregate_lazy_diff(lazy_diff, mode=mode)
+
+    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+        for item in self:
+            item.attach_lazy_storage(lazy_storage, action=action)
 
     def __getitem__(self, name: Union[int, str]) -> MichelsonType:
         self.assert_value_defined()

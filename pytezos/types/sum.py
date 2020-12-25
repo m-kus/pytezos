@@ -1,6 +1,6 @@
 from typing import Generator, Tuple, Optional, List
 
-from pytezos.types.base import MichelsonType, parse_micheline_value
+from pytezos.types.base import MichelsonType, parse_micheline_value, LazyStorage
 from pytezos.types.schema import TypeSchema
 
 
@@ -85,10 +85,15 @@ class OrType(MichelsonType, prim='or', args_len=2):
         value = tuple(item.merge_lazy_diff(lazy_diff) if item else None for item in self)
         return self.spawn(value)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict]):
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         for item in self:
             if item is not None:
-                item.aggregate_lazy_diff(lazy_diff)
+                item.aggregate_lazy_diff(lazy_diff, mode=mode)
+
+    def attach_lazy_storage(self, lazy_storage: LazyStorage, action):
+        for item in self:
+            if item is not None:
+                item.attach_lazy_storage(lazy_storage, action=action)
 
     def __getitem__(self, entry_point: str):
         schema = TypeSchema.from_flat_args(self.prim, list(self.iter_type_args()))

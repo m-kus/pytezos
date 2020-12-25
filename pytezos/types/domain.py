@@ -205,24 +205,6 @@ class ChainIdType(StringType, prim='chain_id'):
         return self.value
 
 
-class NeverType(MichelsonType, prim='never'):
-
-    def assert_value_defined(self):
-        assert False, f'forbidden'
-
-    def parse_micheline_value(self, val_expr):
-        assert False, f'forbidden'
-
-    def to_micheline_value(self, mode='readable', lazy_diff=False):
-        assert False, f'forbidden'
-
-    def parse_python_object(self, py_obj):
-        assert False, f'forbidden'
-
-    def to_python_object(self, lazy_diff=False):
-        assert False, f'forbidden'
-
-
 class ContractType(AddressType, prim='contract', args_len=1):
 
     @property

@@ -1,4 +1,6 @@
-from pytezos.types.base import MichelsonType
+from typing import List
+
+from pytezos.types.base import MichelsonType, LazyStorage
 
 
 class ParameterType(MichelsonType, prim='parameter', args_len=1):
@@ -29,10 +31,25 @@ class ParameterType(MichelsonType, prim='parameter', args_len=1):
             definitions.insert(0, (self.prim, res))
         return '\n'.join(f'${var}:\n\t{doc}\n' for var, doc in definitions)
 
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
+        value = self.value.merge_lazy_diff(lazy_diff)
+        return self.spawn(value)
+
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
+        self.assert_value_defined()
+        self.value.aggregate_lazy_diff(lazy_diff, mode=mode)
+
+    def attach_lazy_storage(self, lazy_storage: LazyStorage, action='copy'):
+        self.assert_value_defined()
+        self.value.attach_lazy_storage(lazy_storage, action=action)
+
     def __getitem__(self, item):
         self.assert_value_defined()
         return self.value[item]
 
 
 class StorageType(ParameterType, prim='storage', args_len=1):
-    pass
+
+    def attach_lazy_storage(self, lazy_storage: LazyStorage, action='remove'):
+        self.assert_value_defined()
+        self.value.attach_lazy_storage(lazy_storage, action=action)

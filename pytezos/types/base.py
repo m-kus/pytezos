@@ -1,5 +1,5 @@
-from typing import Tuple, Dict, Callable, List
-from pprint import pformat
+from copy import copy
+from typing import Tuple, Dict, Callable, List, Optional, Type, cast
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
@@ -28,6 +28,21 @@ class unit(object):
 
     def __eq__(self, other):
         return isinstance(other, unit)
+
+
+class LazyStorage:
+
+    def register_big_map(self, ptr: int, action: str):
+        raise NotImplementedError
+
+    def get_tmp_big_map_id(self) -> int:
+        raise NotImplementedError
+
+    def get_big_map_diff(self) -> Tuple[int, str]:
+        raise NotImplementedError
+
+    def get_big_map_value(self, key_hash: str):
+        raise NotImplementedError
 
 
 def parse_micheline_type(type_expr) -> Tuple[str, list, str, str]:
@@ -66,15 +81,14 @@ def parse_micheline_literal(val_expr, handlers: Dict[str, Callable]):
 
 
 class MichelsonType:
-    prim = None
-    type_classes = {}
+    prim: str = ''
+    field_name: Optional[str] = None
+    type_name: Optional[str] = None
+    type_args: List[Type['MichelsonType']] = []
+    type_classes: Dict[str, Tuple[Type['MichelsonType'], int]] = {}
 
-    def __init__(self, value=undefined(), field_name=None, type_name=None, var_name=None, type_args=None):
-        self.value = value
-        self.field_name = field_name
-        self.type_name = type_name
+    def __init__(self, var_name: Optional[str] = None):
         self.var_name = var_name
-        self.type_args = type_args or []  # type: List[MichelsonType]
 
     @classmethod
     def __init_subclass__(cls, prim='', args_len=0, **kwargs):
@@ -83,36 +97,87 @@ class MichelsonType:
             cls.type_classes[prim] = (cls, args_len)
             cls.prim = prim
 
-    def spawn(self, value):
-        return type(self)(value=value,  # NOTE: can be mutated, but not in practice
-                          field_name=self.field_name,
-                          type_name=self.type_name,
-                          type_args=self.type_args)  # NOTE: can be mutated, but not in practice
-
-    def rename(self, var_name):
-        return type(self)(value=self.value,  # NOTE: can be mutated, but not in practice
-                          field_name=self.field_name,
-                          type_name=self.type_name,
-                          var_name=var_name,
-                          type_args=self.type_args)  # NOTE: can be mutated, but not in practice
+    @classmethod
+    def construct_type(cls, field_name: str, type_name: str,
+                       type_args: List[Type['MichelsonType']]) -> Type['MichelsonType']:
+        res = type(cls.__name__, (cls,), dict(field_name=field_name, type_name=type_name, type_args=type_args))
+        return cast(Type['MichelsonType'], res)
 
     @classmethod
-    def construct_type(cls, field_name, type_name, type_args: List['MichelsonType']):
-        return cls(value=undefined(), field_name=field_name, type_name=type_name, type_args=type_args)
+    def __instancecheck__(cls, instance):
+        if type(instance).prim != cls.prim:
+            return False
+        
 
-    def get_type(self):
-        return type(self)(value=undefined(),
-                          field_name=self.field_name,
-                          type_name=self.type_name,
-                          type_args=[arg.get_type() for arg in self.type_args])
+    @classmethod
+    def get_micheline_type(cls) -> dict:
+        annots = []
+        if cls.field_name is not None:
+            annots.append(f'%{cls.field_name}')
+        if cls.type_name is not None:
+            annots.append(f':{cls.type_name}')
+        type_args = [arg.get_micheline_type() for arg in cls.type_args]
+        expr = dict(prim=cls.prim, annots=annots, args=type_args)
+        return {k: v for k, v in expr.items() if v}
+
+    @classmethod
+    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None) -> str:
+        assert len(cls.type_args) == 0, f'defined for simple types only'
+        if cls.prim in type_mappings:
+            if all(x != cls.prim for x, _ in definitions):
+                definitions.append((cls.prim, type_mappings[cls.prim]))
+        return cls.prim
+
+    @classmethod
+    def is_comparable(cls):
+        if cls.prim in ['bls12_381_fr', 'bls12_381_g1', 'bls12_381_g2', 'sapling_state', 'sapling_transaction',
+                        'big_map', 'contract', 'lambda', 'list', 'map', 'set', 'operation', 'ticket']:
+            return False
+        return all(map(lambda x: x.is_comparable(), cls.type_args))
+
+    @classmethod
+    def is_passable(cls):
+        if cls.prim in ['operation']:
+            return False
+        return all(map(lambda x: x.is_passable(), cls.type_args))
+
+    @classmethod
+    def is_storable(cls):
+        if cls.prim in ['contract', 'operation']:
+            return False
+        return all(map(lambda x: x.is_storable(), cls.type_args))
+
+    @classmethod
+    def is_pushable(cls):
+        if cls.prim in ['big_map', 'contract', 'operation', 'sapling_state', 'ticket']:
+            return False
+        return all(map(lambda x: x.is_pushable(), cls.type_args))
+
+    @classmethod
+    def is_packable(cls):
+        if cls.prim in ['big_map', 'operation', 'sapling_state', 'ticket']:
+            return False
+        return all(map(lambda x: x.is_packable(), cls.type_args))
+
+    @classmethod
+    def is_duplicable(cls):
+        if cls.prim in ['ticket']:
+            return False
+        return all(map(lambda x: x.is_duplicable(), cls.type_args))
+
+    @classmethod
+    def is_big_map_friendly(cls):
+        if cls.prim in ['big_map', 'operation', 'sapling_state']:
+            return False
+        return all(map(lambda x: x.is_big_map_friendly(), cls.type_args))
 
     @staticmethod
-    def from_micheline_type(type_expr):
+    def dispatch_type(type_expr) -> Type['MichelsonType']:
         prim, type_args, field_name, type_name = parse_micheline_type(type_expr)
         assert prim in MichelsonType.type_classes, f'unknown primitive {prim}'
         cls, args_len = MichelsonType.type_classes[prim]
         assert args_len is None or len(type_args) == args_len, f'{prim}: expected {args_len} args, got {len(type_args)}'
-        args = list(map(MichelsonType.from_micheline_type, type_args))   # type: List[MichelsonType]
+        args = list(map(MichelsonType.dispatch_type, type_args))
 
         if prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
             for arg in args:
@@ -122,119 +187,67 @@ class MichelsonType:
         if prim == 'big_map':
             assert args[0].is_big_map_friendly(), f'impossible big_map value type'
 
-        return cls.construct_type(field_name=field_name, type_name=type_name, args=args)
+        return cls.construct_type(field_name=field_name, type_name=type_name, type_args=args)
 
-    def get_micheline_type(self) -> dict:
-        annots = []
-        if self.field_name is not None:
-            annots.append(f'%{self.field_name}')
-        if self.type_name is not None:
-            annots.append(f':{self.type_name}')
-        type_args = [arg.get_micheline_type() for arg in self.type_args]
-        expr = dict(prim=self.prim, annots=annots, args=type_args)
-        return {k: v for k, v in expr.items() if v}
+    @classmethod
+    def from_micheline_value(cls, val_expr) -> 'MichelsonType':
+        raise NotImplementedError
 
-    def parse_micheline_value(self, val_expr) -> 'MichelsonType':
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'MichelsonType':
         raise NotImplementedError
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        raise NotImplementedError
-
-    def parse_python_object(self, py_obj) -> 'MichelsonType':
         raise NotImplementedError
 
     def to_python_object(self, lazy_diff=False):
         raise NotImplementedError
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        return self.spawn(value=self.value)
+        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
+        return copy(self)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict]):
-        assert self.prim not in ['big_map', 'sapling_state'], f'must be explicitly defined for lazy types'
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
+        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
 
-    def generate_pydoc(self, definitions: List[Tuple[str, str]], inferred_name=None) -> str:
-        assert len(self.type_args) == 0, f'defined for simple types only'
-        if self.prim in type_mappings:
-            if all(x != self.prim for x, _ in definitions):
-                definitions.append((self.prim, type_mappings[self.prim]))
-        return self.prim
+    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):  # NOTE: mutation
+        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
 
-    def __int__(self):
-        assert isinstance(self.value, int), f'expected int, got {type(self.value).__name__}'
-        return self.value
-
-    def __str__(self):
-        assert isinstance(self.value, str), f'expected string, got {type(self.value).__name__}'
-        return self.value
-
-    def __bytes__(self):
-        assert isinstance(self.value, bytes), f'expected bytes, got {type(self.value).__name__}'
-        return self.value
-
-    def __bool__(self):
-        assert isinstance(self.value, bool), f'expected bool, got {type(self.value).__name__}'
-        return self.value
-
-    def __repr__(self):
-        return pformat(self.value, indent=2, compact=True)
-
-    def assert_value_defined(self):
+    def __lt__(self, other):  # for sortable
         raise NotImplementedError
 
-    def assert_equal_types(self, other):
-        assert isinstance(other, type(self)), \
-            f'cannot compare different types: {type(self).__name__} vs {type(other).__name__}'
-        assert isinstance(other.value, type(self.value)), \
-            f'cannot compare different types: {type(self.value).__name__} vs {type(other.value).__name__}'
+    # def assert_value_defined(self):
+    #     raise NotImplementedError
+    #
+    # def assert_equal_types(self, other: 'MichelsonType'):
+    #     assert isinstance(other, type(self)), \
+    #         f'cannot compare different types: {type(self).__name__} vs {type(other).__name__}'
 
-    def __cmp__(self, other):
-        self.assert_value_defined()
-        self.assert_equal_types(other)
-        assert self.is_comparable(), f'not a comparable type'
-        assert type(self.value) in [str, int, bytes, bool],  \
-            f'can only compare simple types, not {type(self.value).__name__}'
-        return self.value.__cmp__(other.value)
-
-    def is_defined(self):
-        try:
-            self.assert_value_defined()
-        except AssertionError:
-            return False
-        else:
-            return True
-
-    def is_comparable(self):
-        if self.prim in ['bls12_381_fr', 'bls12_381_g1', 'bls12_381_g2', 'sapling_state', 'sapling_transaction',
-                         'big_map', 'contract', 'lambda', 'list', 'map', 'set', 'operation', 'ticket']:
-            return False
-        return all(map(lambda x: x.is_comparable(), self.type_args))
-
-    def is_passable(self):
-        if self.prim in ['operation']:
-            return False
-        return all(map(lambda x: x.is_passable(), self.type_args))
-
-    def is_storable(self):
-        if self.prim in ['contract', 'operation']:
-            return False
-        return all(map(lambda x: x.is_storable(), self.type_args))
-
-    def is_pushable(self):
-        if self.prim in ['big_map', 'contract', 'operation', 'sapling_state', 'ticket']:
-            return False
-        return all(map(lambda x: x.is_pushable(), self.type_args))
-
-    def is_packable(self):
-        if self.prim in ['big_map', 'operation', 'sapling_state', 'ticket']:
-            return False
-        return all(map(lambda x: x.is_packable(), self.type_args))
-
-    def is_duplicable(self):
-        if self.prim in ['ticket']:
-            return False
-        return all(map(lambda x: x.is_duplicable(), self.type_args))
-
-    def is_big_map_friendly(self):
-        if self.prim in ['big_map', 'operation', 'sapling_state']:
-            return False
-        return all(map(lambda x: x.is_big_map_friendly(), self.type_args))
+    #
+    # def __int__(self):
+    #     assert isinstance(self.value, int), f'expected int, got {type(self.value).__name__}'
+    #     return self.value
+    #
+    # def __str__(self):
+    #     assert isinstance(self.value, str), f'expected string, got {type(self.value).__name__}'
+    #     return self.value
+    #
+    # def __bytes__(self):
+    #     assert isinstance(self.value, bytes), f'expected bytes, got {type(self.value).__name__}'
+    #     return self.value
+    #
+    # def __bool__(self):
+    #     assert isinstance(self.value, bool), f'expected bool, got {type(self.value).__name__}'
+    #     return self.value
+    #
+    # def __repr__(self):
+    #     return pformat(self.value, indent=2, compact=True)
+    #
+    # def __cmp__(self, other: 'MichelsonType'):
+    #     self.assert_equal_types(other)
+    #     self.assert_value_defined()
+    #     other.assert_value_defined()
+    #     assert self.is_comparable(), f'not a comparable type'
+    #     assert type(self.value) in [str, int, bytes, bool],  \
+    #         f'can only compare simple types, not {type(self.value).__name__}'
+    #     return self.value.__cmp__(other.value)
