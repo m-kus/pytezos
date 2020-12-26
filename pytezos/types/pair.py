@@ -1,4 +1,4 @@
-from typing import Generator, Tuple, List, Union, Type, Optional
+from typing import Generator, Tuple, List, Union, Type, Optional, cast
 
 from pytezos.types.base import MichelsonType, LazyStorage
 from pytezos.types.struct import Struct
@@ -13,18 +13,23 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
 
-    @classmethod
-    def from_items(cls, items: List[MichelsonType]):
-        raise NotImplementedError
+    @staticmethod
+    def from_items(items: List[MichelsonType]):
+        assert len(items) == 2, f'expected two items, got {len(items)}'
+        cls = PairType.construct_type(type_args=[type(item) for item in items])
+        return cls(items=tuple(items))
 
     @classmethod
     def construct_type(cls, type_args: List[Type['MichelsonType']],
-                       field_name: Optional[str] = None, type_name: Optional[str] = None) -> Type['MichelsonType']:
+                       field_name: Optional[str] = None, type_name: Optional[str] = None) -> Type['PairType']:
         if len(type_args) > 2:  # comb
             type_args = [type_args[0], PairType.construct_type(type_args=type_args[1:])]
         else:
             assert len(type_args) == 2, f'unexpected number of args: {len(type_args)}'
-        return super(PairType, cls).construct_type(type_args=type_args, field_name=field_name, type_name=type_name)
+        type_class = super(PairType, cls).construct_type(type_args=type_args,
+                                                         field_name=field_name,
+                                                         type_name=type_name)
+        return cast(Type['PairType'], type_class)
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
@@ -67,7 +72,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return cls(value)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'PairType':
         if isinstance(py_obj, list):
             py_obj = tuple(py_obj)
         elif isinstance(py_obj, str):
@@ -111,7 +116,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         else:
             return tuple(arg.to_python_object(lazy_diff=lazy_diff) for arg in flat_values)
 
-    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'PairType':
         value = tuple(item.merge_lazy_diff(lazy_diff) for item in self)
         return type(self)(value)
 

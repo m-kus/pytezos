@@ -221,4 +221,3 @@ class MichelsonType:
 
     def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):  # NOTE: mutation
         assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
-

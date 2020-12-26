@@ -1,4 +1,4 @@
-from typing import Generator, Tuple, Optional, List
+from typing import Generator, Tuple, Optional, List, Union
 
 from pytezos.types.base import MichelsonType, parse_micheline_value, LazyStorage
 from pytezos.types.struct import Struct
@@ -12,6 +12,9 @@ class OrType(MichelsonType, prim='or', args_len=2):
 
     def __iter__(self) -> Generator[Optional[MichelsonType], None, None]:
         yield from self.items
+
+    def is_left(self) -> bool:
+        return self.items[0] is not None
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
@@ -62,7 +65,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
         assert isinstance(flat_values, dict) and len(flat_values) == 1
         return {name: value.to_python_object(lazy_diff=lazy_diff) for name, value in flat_values.items()}
 
-    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'OrType':
         value = tuple(item.merge_lazy_diff(lazy_diff) if item else None for item in self)
         return type(self)(value)
 
@@ -76,6 +79,9 @@ class OrType(MichelsonType, prim='or', args_len=2):
             if item is not None:
                 item.attach_lazy_storage(lazy_storage, action=action)
 
-    def __getitem__(self, key: str):
-        struct = Struct.from_nested_type(type(self), ignore_annots=True, force_named=True)
-        return struct.get_value(self.items, key, ignore_annots=True, allow_nones=True)
+    def __getitem__(self, key: Union[int, str]):
+        if isinstance(key, int) and 0 <= key <= 1:
+            return self.items[key]
+        else:
+            struct = Struct.from_nested_type(type(self), ignore_annots=True, force_named=True)
+            return struct.get_value(self.items, key, ignore_annots=True, allow_nones=True)

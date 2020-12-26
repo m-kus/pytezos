@@ -18,6 +18,9 @@ class StringType(MichelsonType, prim='string'):
     def __repr__(self):
         return self.value
 
+    def __str__(self):
+        return self.value
+
     @classmethod
     def from_value(cls, value: str):
         assert isinstance(value, str), f'expected string, got {type(value).__name__}'
@@ -54,6 +57,9 @@ class IntType(MichelsonType, prim='int'):
 
     def __repr__(self):
         return str(self.value)
+
+    def __int__(self):
+        return self.value
 
     @classmethod
     def from_micheline_value(cls, val_expr):
@@ -105,6 +111,9 @@ class BytesType(MichelsonType, prim='bytes'):
     def __repr__(self):
         return self.value.hex()
 
+    def __bytes__(self):
+        return self.value
+
     @classmethod
     def from_micheline_value(cls, val_expr):
         value = parse_micheline_literal(val_expr, {'bytes': bytes.fromhex})
@@ -143,6 +152,9 @@ class BoolType(MichelsonType, prim='bool'):
 
     def __repr__(self):
         return str(self.value)
+
+    def __bool__(self):
+        return self.value
 
     @classmethod
     def from_micheline_value(cls, val_expr):

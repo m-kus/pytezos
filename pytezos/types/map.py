@@ -71,7 +71,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         return list(sorted(items, key=lambda x: x[0]))
 
     @classmethod
-    def from_python_object(cls, py_obj) -> 'MichelsonType':
+    def from_python_object(cls, py_obj) -> 'MapType':
         return cls(cls.parse_python_object(py_obj))
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
@@ -83,7 +83,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def to_python_object(self, lazy_diff=False) -> dict:
         return {k.to_python_object(): v.to_python_object(lazy_diff=lazy_diff) for k, v in self}
 
-    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MapType':
         value = [(key, val.merge_lazy_diff(lazy_diff)) for key, val in self]
         return type(self)(value)
 

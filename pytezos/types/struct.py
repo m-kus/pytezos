@@ -136,12 +136,12 @@ class Struct:
             assert False
 
     def get_flat_values(self, nested_item: Iterable[MichelsonType], ignore_annots=False, allow_nones=False) \
-            -> Union[Dict[str, MichelsonType], Tuple[MichelsonType, ...]]:
+            -> Union[Dict[str, MichelsonType], List[MichelsonType, ...]]:
         flat_values = list(self.iter_values(self.prim, nested_item, ignore_annots, allow_nones))
         if self.is_named():
             return {self.get_name(path): arg for path, arg in flat_values if arg is not None}
         else:
-            return tuple(arg for _, arg in flat_values)
+            return [arg for _, arg in flat_values]
 
     def get_value(self, nested_item: Iterable[MichelsonType], key: Union[str, int],
                   ignore_annots=False, allow_nones=False) -> MichelsonType:
