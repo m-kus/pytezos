@@ -1,4 +1,4 @@
-from typing import Tuple, Generator, List
+from typing import Tuple, Generator, List, Type
 
 from pytezos.types.base import MichelsonType, LazyStorage
 
@@ -14,6 +14,20 @@ class ListType(MichelsonType, prim='list', args_len=1):
 
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from self.items
+
+    @staticmethod
+    def empty(item_type: Type[MichelsonType]):
+        cls = ListType.construct_type(type_args=[item_type])
+        return cls(items=[])
+
+    @staticmethod
+    def from_items(items: List[MichelsonType]):
+        assert len(items) > 0, 'cannot instantiate from empty list'
+        item_type = type(items[0])
+        for item in items[1:]:
+            item_type.assert_equal_types(type(item))
+        cls = ListType.construct_type(type_args=[item_type])
+        return cls(items)
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
@@ -58,7 +72,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return head, tail
 
     def prepend(self, item: MichelsonType) -> 'ListType':
-        assert isinstance(item, self.type_args[0]), f'expected {self.type_args[0].__name__}, got {type(item).__name__}'
+        self.type_args[0].assert_equal_types(type(item))
         return type(self)([item] + self.items)
 
     def __getitem__(self, idx: int) -> MichelsonType:

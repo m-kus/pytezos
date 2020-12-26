@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Generator, List
+from typing import Optional, Tuple, Generator, List, Type
 
 from pytezos.types.base import MichelsonType, parse_micheline_value, LazyStorage
 
@@ -14,6 +14,28 @@ class MapType(MichelsonType, prim='map', args_len=2):
 
     def __iter__(self) -> Generator[Tuple[MichelsonType, MichelsonType], None, None]:
         yield from iter(self.items)
+
+    @staticmethod
+    def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'MapType':
+        cls = MapType.construct_type(type_args=[key_type, val_type])
+        return cls(items=[])
+
+    @staticmethod
+    def from_items(items: List[Tuple[MichelsonType, MichelsonType]]) -> 'MapType':
+        assert len(items) > 0, 'cannot instantiate from empty list'
+        key_type, val_type = type(items[0][0]), type(items[0][1])
+        for key, val in items[1:]:
+            key_type.assert_equal_types(type(key))
+            val_type.assert_equal_types(type(val))
+        cls = MapType.construct_type(type_args=[key_type, val_type])
+        cls.check_constraints(items)
+        return cls(items=items)
+
+    @classmethod
+    def check_constraints(cls, items: List[Tuple[MichelsonType, MichelsonType]]):
+        keys = list(map(lambda x: x[0], items))
+        assert len(set(keys)) == len(keys), f'duplicate keys found'
+        assert keys == list(sorted(keys)), f'keys are unsorted'
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
@@ -32,9 +54,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
             })
 
         items = list(map(parse_elt, val_expr))
-        keys = list(map(lambda x: x[0], items))
-        assert len(set(keys)) == len(keys), f'duplicate keys found'
-        assert keys == list(sorted(keys)), f'keys are unsorted'
+        cls.check_constraints(items)
         return items
 
     @classmethod
@@ -76,8 +96,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
             val.attach_lazy_storage(lazy_storage, action=action)
 
     def get(self, key: MichelsonType, check_dup=True) -> Optional[MichelsonType]:
-        assert isinstance(key, self.type_args[0]), \
-            f'expected key type {self.type_args[0].__name__}, got {type(key).__name__}'
+        self.type_args[0].assert_equal_types(type(key))
         if check_dup:
             assert self.type_args[1].is_duplicable(), f'use get and update instead'
         return next((item[1] for item in self if item[0] == key), None)
@@ -86,7 +105,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         return self.get(key, check_dup=False) is not None
 
     def update(self, key: MichelsonType, val: Optional[MichelsonType]) -> Tuple[Optional[MichelsonType], MichelsonType]:
-        prev_val = self.get(key)
+        prev_val = self.get(key, check_dup=False)
         if prev_val is not None:
             if val is not None:
                 items = [(k, v if k != key else val) for k, v in self]

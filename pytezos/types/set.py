@@ -1,4 +1,4 @@
-from typing import Generator, List
+from typing import Generator, List, Type
 from copy import copy
 
 from pytezos.types.base import MichelsonType, LazyStorage
@@ -16,16 +16,35 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
 
-    @classmethod
-    def from_micheline_value(cls, val_expr):
-        assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
-        items = list(map(cls.type_args[0].from_micheline_value, val_expr))
-        assert len(set(items)) == len(items), f'duplicate elements found'
-        assert items == list(sorted(items)), f'set values are unsorted'
+    @staticmethod
+    def empty(item_type: Type[MichelsonType]) -> 'SetType':
+        cls = SetType.construct_type(type_args=[item_type])
+        return cls(items=[])
+
+    @staticmethod
+    def from_items(items: List[MichelsonType]) -> 'SetType':
+        assert len(items) > 0, 'cannot instantiate from empty list'
+        item_type = type(items[0])
+        for item in items[1:]:
+            item_type.assert_equal_types(type(item))
+        cls = SetType.construct_type(type_args=[item_type])
+        cls.check_constraints(items)
         return cls(items)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def check_constraints(cls, items: List[MichelsonType]):
+        assert len(set(items)) == len(items), f'duplicate elements found'
+        assert items == list(sorted(items)), f'set elements are not sorted'
+
+    @classmethod
+    def from_micheline_value(cls, val_expr) -> 'SetType':
+        assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
+        items = list(map(cls.type_args[0].from_micheline_value, val_expr))
+        cls.check_constraints(items)
+        return cls(items)
+
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'SetType':
         assert isinstance(py_obj, set), f'expected set, got {type(py_obj).__name__}'
         items = list(map(cls.type_args[0].from_python_object, py_obj))
         items = list(sorted(items))
@@ -52,7 +71,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         pass  # Big_map is not comparable
 
     def contains(self, item: MichelsonType) -> bool:
-        assert isinstance(item, self.type_args[0]), f'expected {self.type_args[0].__name__}, got {type(item).__name__}'
+        self.type_args[0].assert_equal_types(type(item))
         return item in self.items
 
     def add(self, item: MichelsonType) -> MichelsonType:

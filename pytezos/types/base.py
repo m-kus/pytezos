@@ -90,6 +90,12 @@ class MichelsonType:
     def __init__(self, var_name: Optional[str] = None):
         self.var_name = var_name
 
+    def __lt__(self, other: 'MichelsonType'):  # for sorting
+        assert not self.is_comparable(), f'must be implemented for comparable types'
+
+    def __eq__(self, other: 'MichelsonType'):  # for contains
+        assert not self.is_comparable(), f'must be implemented for comparable types'
+
     @classmethod
     def __init_subclass__(cls, prim='', args_len=0, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -97,17 +103,38 @@ class MichelsonType:
             cls.type_classes[prim] = (cls, args_len)
             cls.prim = prim
 
+    @staticmethod
+    def match(type_expr) -> Type['MichelsonType']:
+        prim, type_args, field_name, type_name = parse_micheline_type(type_expr)
+        assert prim in MichelsonType.type_classes, f'unknown primitive {prim}'
+        cls, args_len = MichelsonType.type_classes[prim]
+        assert args_len is None or len(type_args) == args_len, f'{prim}: expected {args_len} args, got {len(type_args)}'
+        args = [MichelsonType.match(arg) for arg in type_args]
+        return cls.construct_type(type_args=args, field_name=field_name, type_name=type_name)
+
     @classmethod
-    def construct_type(cls, field_name: str, type_name: str,
-                       type_args: List[Type['MichelsonType']]) -> Type['MichelsonType']:
+    def construct_type(cls, type_args: List[Type['MichelsonType']],
+                       field_name: Optional[str] = None, type_name: Optional[str] = None) -> Type['MichelsonType']:
+        if cls.prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
+            for arg in type_args:
+                assert arg.field_name is None, f'{cls.prim} argument type cannot be annotated: %{arg.field_name}'
+        if cls.prim in ['set', 'map', 'big_map']:
+            assert type_args[0].is_comparable(), f'{cls.prim} key type has to be comparable (not {type_args[0].prim})'
+        if cls.prim == 'big_map':
+            assert type_args[0].is_big_map_friendly(), f'impossible big_map value type'
         res = type(cls.__name__, (cls,), dict(field_name=field_name, type_name=type_name, type_args=type_args))
         return cast(Type['MichelsonType'], res)
 
     @classmethod
-    def __instancecheck__(cls, instance):
-        if type(instance).prim != cls.prim:
-            return False
-        
+    def assert_equal_types(cls, other: Type['MichelsonType']):
+        assert cls.prim == other.prim, f'primitive: "{cls.prim}" vs "{other.prim}"'
+        if cls.type_name and other.type_name:
+            assert cls.type_name == other.type_name, f'type annotations: "{cls.type_name}" vs "{other.type_name}"'
+        if cls.field_name and other.field_name:
+            assert cls.field_name == other.field_name, f'field annotations: "{cls.field_name}" vs "{other.field_name}"'
+        assert len(cls.type_args) == len(other.type_args), f'args len: {len(cls.type_args)} vs {len(other.type_args)}'
+        for i, arg in enumerate(other.type_args):
+            assert cls.type_args[i].assert_equal_types(arg)
 
     @classmethod
     def get_micheline_type(cls) -> dict:
@@ -171,24 +198,6 @@ class MichelsonType:
             return False
         return all(map(lambda x: x.is_big_map_friendly(), cls.type_args))
 
-    @staticmethod
-    def dispatch_type(type_expr) -> Type['MichelsonType']:
-        prim, type_args, field_name, type_name = parse_micheline_type(type_expr)
-        assert prim in MichelsonType.type_classes, f'unknown primitive {prim}'
-        cls, args_len = MichelsonType.type_classes[prim]
-        assert args_len is None or len(type_args) == args_len, f'{prim}: expected {args_len} args, got {len(type_args)}'
-        args = list(map(MichelsonType.dispatch_type, type_args))
-
-        if prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
-            for arg in args:
-                assert arg.field_name is None, f'{prim} argument type cannot be annotated: %{arg.field_name}'
-        if prim in ['set', 'map', 'big_map']:
-            assert args[0].is_comparable(), f'{prim} key type has to be comparable (cannot be {args[0].prim})'
-        if prim == 'big_map':
-            assert args[0].is_big_map_friendly(), f'impossible big_map value type'
-
-        return cls.construct_type(field_name=field_name, type_name=type_name, type_args=args)
-
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'MichelsonType':
         raise NotImplementedError
@@ -213,41 +222,3 @@ class MichelsonType:
     def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):  # NOTE: mutation
         assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
 
-    def __lt__(self, other):  # for sortable
-        raise NotImplementedError
-
-    # def assert_value_defined(self):
-    #     raise NotImplementedError
-    #
-    # def assert_equal_types(self, other: 'MichelsonType'):
-    #     assert isinstance(other, type(self)), \
-    #         f'cannot compare different types: {type(self).__name__} vs {type(other).__name__}'
-
-    #
-    # def __int__(self):
-    #     assert isinstance(self.value, int), f'expected int, got {type(self.value).__name__}'
-    #     return self.value
-    #
-    # def __str__(self):
-    #     assert isinstance(self.value, str), f'expected string, got {type(self.value).__name__}'
-    #     return self.value
-    #
-    # def __bytes__(self):
-    #     assert isinstance(self.value, bytes), f'expected bytes, got {type(self.value).__name__}'
-    #     return self.value
-    #
-    # def __bool__(self):
-    #     assert isinstance(self.value, bool), f'expected bool, got {type(self.value).__name__}'
-    #     return self.value
-    #
-    # def __repr__(self):
-    #     return pformat(self.value, indent=2, compact=True)
-    #
-    # def __cmp__(self, other: 'MichelsonType'):
-    #     self.assert_equal_types(other)
-    #     self.assert_value_defined()
-    #     other.assert_value_defined()
-    #     assert self.is_comparable(), f'not a comparable type'
-    #     assert type(self.value) in [str, int, bytes, bool],  \
-    #         f'can only compare simple types, not {type(self.value).__name__}'
-    #     return self.value.__cmp__(other.value)
