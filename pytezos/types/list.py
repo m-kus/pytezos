@@ -1,4 +1,5 @@
 from typing import Tuple, Generator, List, Type
+from pprint import pformat
 
 from pytezos.types.base import MichelsonType, LazyStorage
 
@@ -8,6 +9,9 @@ class ListType(MichelsonType, prim='list', args_len=1):
     def __init__(self, items: List[MichelsonType]):
         super(ListType, self).__init__()
         self.items = items
+
+    def __repr__(self):
+        return pformat([repr(x) for x in self.items])
 
     def __len__(self):
         return len(self.items)

@@ -1,4 +1,5 @@
 from typing import Generator, Tuple, Optional, List, Union
+from pprint import pformat
 
 from pytezos.types.base import MichelsonType, parse_micheline_value, LazyStorage
 from pytezos.types.struct import Struct
@@ -9,6 +10,9 @@ class OrType(MichelsonType, prim='or', args_len=2):
     def __init__(self, items: Tuple[Optional[MichelsonType], ...]):
         super(OrType, self).__init__()
         self.items = items
+
+    def __repr__(self):
+        return pformat(tuple(map(repr, self.items)))
 
     def __iter__(self) -> Generator[Optional[MichelsonType], None, None]:
         yield from self.items

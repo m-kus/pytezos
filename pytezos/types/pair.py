@@ -1,4 +1,5 @@
 from typing import Generator, Tuple, List, Union, Type, Optional, cast
+from pprint import pformat
 
 from pytezos.types.base import MichelsonType, LazyStorage
 from pytezos.types.struct import Struct
@@ -10,18 +11,31 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         super(PairType, self).__init__()
         self.items = items
 
+    def __repr__(self):
+        return pformat(tuple(map(repr, self.items)))
+
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
 
     @staticmethod
-    def from_items(items: List[MichelsonType]):
-        assert len(items) == 2, f'expected two items, got {len(items)}'
+    def from_items(items: List[MichelsonType]) -> 'PairType':
         cls = PairType.construct_type(type_args=[type(item) for item in items])
-        return cls(items=tuple(items))
+        return cls.init(items)
+
+    @classmethod
+    def init(cls, items: List[MichelsonType]) -> 'PairType':
+        if len(items) > 2:
+            right_cls = cast(Type['PairType'], cls.type_args[1])
+            items = items[0], right_cls.init(items[1:])
+        else:
+            items = tuple(items)
+        return cls(items)
 
     @classmethod
     def construct_type(cls, type_args: List[Type['MichelsonType']],
-                       field_name: Optional[str] = None, type_name: Optional[str] = None) -> Type['PairType']:
+                       field_name: Optional[str] = None,
+                       type_name: Optional[str] = None,
+                       type_params: Optional[list] = None, **kwargs) -> Type['PairType']:
         if len(type_args) > 2:  # comb
             type_args = [type_args[0], PairType.construct_type(type_args=type_args[1:])]
         else:

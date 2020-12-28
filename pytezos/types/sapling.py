@@ -1,45 +1,60 @@
+from typing import cast, List, Type, Optional
+
 from pytezos.types.base import MichelsonType
+from pytezos.types.core import BytesType
 
 
-class BLS12_381_FrType(MichelsonType, prim='bls12_381_fr'):
+class BLS12_381_G1Type(BytesType, prim='bls12_381_g1'):
 
-    @staticmethod
-    def to_bytes(value: int) -> bytes:
-        return value.to_bytes(48, 'big')
+    def __init__(self, value: bytes):
+        super(BLS12_381_G1Type, self).__init__()
+        self.value = value
 
-    def assert_value_defined(self):
-        assert isinstance(self.value, int) or isinstance(self.value, bytes), \
-            f'expected int or bytes, got {type(self.value).__name__}'
-
-    def parse_micheline_value(self, val_expr) -> 'MichelsonType':
-        if isinstance(val_expr, str):
-            pass
-
-    def parse_python_object(self, py_obj) -> 'MichelsonType':
-        if isinstance(py_obj, bytes):
-            value = py_obj
-        elif isinstance(py_obj, str):
-            if py_obj.startswith('0x'):
-                py_obj = py_obj[2:]
-            value = bytes.fromhex(py_obj)
-        elif isinstance(py_obj, int):
-            value = self.to_bytes(py_obj)
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'BLS12_381_G1Type':
+        if isinstance(py_obj, int):
+            value = py_obj.to_bytes(48, 'big')
+            return cls(value)
         else:
-            assert False, f'unexpected value type {py_obj}'
-        return self.spawn(value)
+            res = super(BLS12_381_G1Type, cls).from_python_object(py_obj)
+            return cast('BLS12_381_G1Type', res)
 
 
-class BLS12_381_G1Type(MichelsonType, prim='bls12_381_g1'):
+class BLS12_381_G2Type(BytesType, prim='bls12_381_g2'):
+
+    def __init__(self, value: bytes):
+        super(BLS12_381_G2Type, self).__init__()
+        self.value = value
+
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'BLS12_381_G2Type':
+        if isinstance(py_obj, int):
+            value = py_obj.to_bytes(96, 'big')
+            return cls(value)
+        else:
+            res = super(BLS12_381_G2Type, cls).from_python_object(py_obj)
+            return cast('BLS12_381_G2Type', res)
+
+
+class BLS12_381_FrType(BytesType, prim='bls12_381_fr'):
+
+    def __init__(self, value: bytes):
+        super(BLS12_381_FrType, self).__init__()
+        self.value = value
+
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'BLS12_381_FrType':
+        if isinstance(py_obj, int):
+            value = py_obj.to_bytes(96, 'big')
+            return cls(value)
+        else:
+            res = super(BLS12_381_FrType, cls).from_python_object(py_obj)
+            return cast('BLS12_381_FrType', res)
+
+
+class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len=1):
     pass
 
 
-class BLS12_381_G2Type(MichelsonType, prim='bls12_381_g2'):
-    pass
-
-
-class SaplingStateType(MichelsonType, prim='sapling_state'):
-    pass
-
-
-class SaplingTransactionType(MichelsonType, prim='sapling_transaction'):
+class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
     pass

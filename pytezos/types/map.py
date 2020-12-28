@@ -1,4 +1,5 @@
 from typing import Optional, Tuple, Generator, List, Type
+from pprint import pformat
 
 from pytezos.types.base import MichelsonType, parse_micheline_value, LazyStorage
 
@@ -8,6 +9,9 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def __init__(self, items: List[Tuple[MichelsonType, MichelsonType]]):
         super(MapType, self).__init__()
         self.items = items
+
+    def __repr__(self):
+        return pformat({repr(k): repr(v) for k, v in self.items})
 
     def __len__(self):
         return len(self.items)

@@ -22,7 +22,7 @@ class StringType(MichelsonType, prim='string'):
         return self.value
 
     @classmethod
-    def from_value(cls, value: str):
+    def from_value(cls, value: str) -> 'StringType':
         assert isinstance(value, str), f'expected string, got {type(value).__name__}'
         assert len(value) == len(value.encode()), f'unicode symbols are not allowed: {value}'
         return cls(value)
@@ -33,7 +33,7 @@ class StringType(MichelsonType, prim='string'):
         return cls.from_value(value)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'StringType':
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
@@ -62,12 +62,12 @@ class IntType(MichelsonType, prim='int'):
         return self.value
 
     @classmethod
-    def from_micheline_value(cls, val_expr):
+    def from_micheline_value(cls, val_expr) -> 'IntType':
         value = parse_micheline_literal(val_expr, {'int': int})
         return cls(value)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'IntType':
         assert isinstance(py_obj, int), f'expected integer, got {type(py_obj).__name__}'
         return cls(py_obj)
 
@@ -81,17 +81,17 @@ class IntType(MichelsonType, prim='int'):
 class NatType(IntType, prim='nat'):
 
     @classmethod
-    def from_value(cls, value: int):
+    def from_value(cls, value: int) -> 'NatType':
         assert value >= 0, f'expected natural number, got {value}'
         return cls(value)
 
     @classmethod
-    def from_micheline_value(cls, val_expr):
+    def from_micheline_value(cls, val_expr) -> 'NatType':
         value = parse_micheline_literal(val_expr, {'int': int})
         return cls.from_value(value)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'NatType':
         assert isinstance(py_obj, int), f'expected integer, got {type(py_obj).__name__}'
         return cls.from_value(py_obj)
 
@@ -115,12 +115,12 @@ class BytesType(MichelsonType, prim='bytes'):
         return self.value
 
     @classmethod
-    def from_micheline_value(cls, val_expr):
+    def from_micheline_value(cls, val_expr) -> 'BytesType':
         value = parse_micheline_literal(val_expr, {'bytes': bytes.fromhex})
         return cls(value)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'BytesType':
         if isinstance(py_obj, bytes):
             value = py_obj
         elif isinstance(py_obj, str):
@@ -157,7 +157,7 @@ class BoolType(MichelsonType, prim='bool'):
         return self.value
 
     @classmethod
-    def from_micheline_value(cls, val_expr):
+    def from_micheline_value(cls, val_expr) -> 'BoolType':
         value = parse_micheline_value(val_expr, {
             ('False', 0): lambda x: False,
             ('True', 0): lambda x: True
@@ -165,7 +165,7 @@ class BoolType(MichelsonType, prim='bool'):
         return cls(value)
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'BoolType':
         assert isinstance(py_obj, bool), f'expected boolean, got {type(py_obj).__name__}'
         return cls(py_obj)
 
@@ -191,12 +191,12 @@ class UnitType(MichelsonType, prim='unit'):
         return 'Unit'
 
     @classmethod
-    def parse_micheline_value(cls, val_expr):
+    def from_micheline_value(cls, val_expr) -> 'UnitType':
         parse_micheline_value(val_expr, {('Unit', 0): lambda x: x})
         return cls()
 
     @classmethod
-    def from_python_object(cls, py_obj):
+    def from_python_object(cls, py_obj) -> 'UnitType':
         assert py_obj is None or isinstance(py_obj, unit), f'expected None or Unit, got {type(py_obj).__name__}'
         return cls()
 

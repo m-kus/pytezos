@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Tuple, Dict, Callable, List, Optional, Type, cast
+from typing import Tuple, Dict, Callable, List, Optional, Type, cast, Union
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
@@ -44,6 +44,21 @@ class LazyStorage:
     def get_big_map_value(self, key_hash: str):
         raise NotImplementedError
 
+    def register_sapling_state(self, ptr: int):
+        raise NotImplementedError
+
+    def get_tmp_sapling_state_id(self) -> int:
+        raise NotImplementedError
+
+    def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> list:
+        raise NotImplementedError
+
+
+def is_type_expr(type_expr) -> bool:
+    return isinstance(type_expr, dict) \
+            and isinstance(type_expr.get('prim'), str) \
+            and type_expr['prim'] == type_expr['prim'].lower()
+
 
 def parse_micheline_type(type_expr) -> Tuple[str, list, str, str]:
     assert isinstance(type_expr, dict), f'expected dict, got {type(type_expr).__name__} (type_expr)'
@@ -85,6 +100,7 @@ class MichelsonType:
     field_name: Optional[str] = None
     type_name: Optional[str] = None
     type_args: List[Type['MichelsonType']] = []
+    type_params: List[Union[int]] = []
     type_classes: Dict[str, Tuple[Type['MichelsonType'], int]] = {}
 
     def __init__(self, var_name: Optional[str] = None):
@@ -96,6 +112,12 @@ class MichelsonType:
     def __eq__(self, other: 'MichelsonType'):  # for contains
         assert not self.is_comparable(), f'must be implemented for comparable types'
 
+    def __str__(self):
+        assert False, 'has to be explicitly defined'
+
+    def __repr__(self):
+        assert False, 'has to be explicitly defined'
+
     @classmethod
     def __init_subclass__(cls, prim='', args_len=0, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -105,24 +127,34 @@ class MichelsonType:
 
     @staticmethod
     def match(type_expr) -> Type['MichelsonType']:
-        prim, type_args, field_name, type_name = parse_micheline_type(type_expr)
+        prim, args, field_name, type_name = parse_micheline_type(type_expr)
         assert prim in MichelsonType.type_classes, f'unknown primitive {prim}'
         cls, args_len = MichelsonType.type_classes[prim]
-        assert args_len is None or len(type_args) == args_len, f'{prim}: expected {args_len} args, got {len(type_args)}'
-        args = [MichelsonType.match(arg) for arg in type_args]
-        return cls.construct_type(type_args=args, field_name=field_name, type_name=type_name)
+        assert args_len is None or len(args) == args_len, f'{prim}: expected {args_len} args, got {len(args)}'
+        type_args = [MichelsonType.match(arg) for arg in args if is_type_expr(arg)]
+        type_params = [parse_micheline_literal(arg, {'int': int}) for arg in args if not is_type_expr(arg)]
+        return cls.construct_type(type_args=type_args,
+                                  field_name=field_name,
+                                  type_name=type_name,
+                                  type_params=type_params)
 
     @classmethod
     def construct_type(cls, type_args: List[Type['MichelsonType']],
-                       field_name: Optional[str] = None, type_name: Optional[str] = None) -> Type['MichelsonType']:
+                       field_name: Optional[str] = None,
+                       type_name: Optional[str] = None,
+                       type_params: Optional[list] = None, **kwargs) -> Type['MichelsonType']:
         if cls.prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
             for arg in type_args:
                 assert arg.field_name is None, f'{cls.prim} argument type cannot be annotated: %{arg.field_name}'
-        if cls.prim in ['set', 'map', 'big_map']:
+        if cls.prim in ['set', 'map', 'big_map', 'ticket']:
             assert type_args[0].is_comparable(), f'{cls.prim} key type has to be comparable (not {type_args[0].prim})'
         if cls.prim == 'big_map':
             assert type_args[0].is_big_map_friendly(), f'impossible big_map value type'
-        res = type(cls.__name__, (cls,), dict(field_name=field_name, type_name=type_name, type_args=type_args))
+        res = type(cls.__name__, (cls,), dict(field_name=field_name,
+                                              type_name=type_name,
+                                              type_args=type_args,
+                                              type_params=type_params,
+                                              **kwargs))
         return cast(Type['MichelsonType'], res)
 
     @classmethod
@@ -213,11 +245,11 @@ class MichelsonType:
         raise NotImplementedError
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
+        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda']
         return copy(self)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
+        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda', 'ticket']
 
     def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):  # NOTE: mutation
-        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda'], f'defined for simple types only'
+        assert len(self.type_args) == 0 or self.prim in ['contract', 'lambda', 'ticket']

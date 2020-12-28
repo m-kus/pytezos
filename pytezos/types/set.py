@@ -1,5 +1,6 @@
 from typing import Generator, List, Type
 from copy import copy
+from pprint import pformat
 
 from pytezos.types.base import MichelsonType, LazyStorage
 
@@ -9,6 +10,9 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def __init__(self, items: List[MichelsonType]):
         super(SetType, self).__init__()
         self.items = items
+
+    def __repr__(self):
+        return pformat({repr(x) for x in self.items})
 
     def __len__(self):
         return len(self.items)

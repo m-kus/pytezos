@@ -9,6 +9,9 @@ class SectionType(MichelsonType):
         super(SectionType, self).__init__()
         self.item = item
 
+    def __repr__(self):
+        return repr(self.item)
+
     @staticmethod
     def match(type_expr) -> Type['SectionType']:
         return cast(Type['SectionType'], MichelsonType.match(type_expr))

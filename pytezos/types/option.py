@@ -21,7 +21,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         return self.item == other.item
 
     def __repr__(self):
-        return f'{self.item}!' if self.item else 'None'
+        return f'{repr(self.item)}!' if self.item else 'None'
 
     @staticmethod
     def none(some_type: Type[MichelsonType]) -> 'OptionType':
