@@ -1,0 +1,80 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "prim": "Right",
+      "args": [
+        {
+          "prim": "Left",
+          "args": [
+            {
+              "prim": "Right",
+              "args": [
+                {
+                  "prim": "Right",
+                  "args": [
+                    {
+                      "string": "KT1Ei4QkvFWjCnQah3oxxAd36jdn3LQ9ydM7"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          [
+            {
+              "bytes": "000084b75ba3926a849d69fd892571360b73ad657cc5"
+            },
+            {
+              "bytes": "0000fd7524364905923f39f3805625292b6c71086118"
+            }
+          ],
+          [
+            {
+              "string": "blacklist"
+            },
+            {
+              "string": "burn"
+            },
+            {
+              "string": "mint"
+            },
+            {
+              "string": "setRole"
+            },
+            {
+              "string": "updateNav"
+            }
+          ]
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "187"
+          },
+          [
+            {
+              "bytes": "00004c6ae8cd07694c13872977f85c713476908845ed"
+            },
+            {
+              "bytes": "00009a1e0a6f4b1220c8b3449ba33c68a2bf409a98f8"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

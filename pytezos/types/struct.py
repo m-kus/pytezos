@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional, Dict, Union, Type, Iterable, cast, Generator
+from typing import List, Tuple, Optional, Dict, Union, Type, Iterable, cast, Generator, Any
 
 from pytezos.types.base import MichelsonType
 
@@ -134,6 +134,23 @@ class Struct:
             return self.make_nested_or(py_obj)
         else:
             assert False
+
+    def normalize_micheline_value(self, entry_point, val_expr):
+        assert self.prim == 'or'
+        assert self.is_named(), f'sum type has to be named'
+        assert entry_point in self.key_to_path, f'unknown entrypoint {entry_point}'
+
+        def wrap_expr(expr, path):
+            if len(path) == 0:
+                return expr
+            elif path[0] == '0':
+                return {'prim': 'Left', 'args': [wrap_expr(expr, path[1:])]}
+            elif path[1] == '1':
+                return {'prim': 'Right', 'args': [wrap_expr(expr, path[1:])]}
+            else:
+                assert False, path
+
+        return wrap_expr(val_expr, self.get_path(entry_point))
 
     def get_flat_values(self, nested_item: Iterable[MichelsonType], ignore_annots=False, allow_nones=False) \
             -> Union[Dict[str, MichelsonType], List[MichelsonType, ...]]:

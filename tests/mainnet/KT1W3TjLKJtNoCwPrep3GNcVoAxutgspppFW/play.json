@@ -1,0 +1,96 @@
+{
+  "parameters": {
+    "entrypoint": "play",
+    "value": {
+      "prim": "Unit"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "True"
+              },
+              {
+                "bytes": "000032f42c288829e36cc5a8b648f4b81e93f3983279"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "bytes": "00004e62d01df1f73123f2694fc904de6e94385a363d"
+                    },
+                    {
+                      "int": "1000"
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "1000"
+                    },
+                    {
+                      "prim": "Pair",
+                      "args": [
+                        {
+                          "bytes": "00004e62d01df1f73123f2694fc904de6e94385a363d"
+                        },
+                        {
+                          "int": "1609812191"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "5"
+              },
+              {
+                "int": "1000001"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "2"
+              },
+              {
+                "int": "999"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

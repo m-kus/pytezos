@@ -1,0 +1,110 @@
+{
+  "parameters": {
+    "entrypoint": "addLiquidity",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1cHZnUfeuP5UhNi3xyXTtvUpupiLZMG2GE"
+            },
+            {
+              "int": "1"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "179996586"
+            },
+            {
+              "string": "2021-01-05T16:58:14.701Z"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "262"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "22047633858"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "00003390196b6fb561bfeaa7e1e7968cdf692a2f466c"
+                  },
+                  {
+                    "bytes": "01e5fec2566787cf3a1f1e0928ec9f44b052a8672800"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "23617662625"
+                  },
+                  {
+                    "int": "20637828883"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "262",
+      "key_hash": "exprtoCeZ5SGmYefMVxT4ZsZsLWKU9VD94RuHjHGYVSKX6JqX2LDmR",
+      "key": {
+        "bytes": "0000b69b5b954d409349cfe652091d10a0ad5699bd79"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "168030972"
+          },
+          []
+        ]
+      }
+    }
+  ]
+}

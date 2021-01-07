@@ -1,0 +1,119 @@
+{
+  "parameters": {
+    "entrypoint": "main",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "7"
+            },
+            {
+              "prim": "Left",
+              "args": [
+                [
+                  {
+                    "prim": "DROP"
+                  },
+                  {
+                    "prim": "NIL",
+                    "args": [
+                      {
+                        "prim": "operation"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "PUSH",
+                    "args": [
+                      {
+                        "prim": "key_hash"
+                      },
+                      {
+                        "string": "tz1dot7ShX1KqvSX8AksqfXWm4cxqCQDHtYx"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "IMPLICIT_ACCOUNT"
+                  },
+                  {
+                    "prim": "PUSH",
+                    "args": [
+                      {
+                        "prim": "mutez"
+                      },
+                      {
+                        "int": "1000000"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "UNIT"
+                  },
+                  {
+                    "prim": "TRANSFER_TOKENS"
+                  },
+                  {
+                    "prim": "CONS"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        [
+          {
+            "prim": "Some",
+            "args": [
+              {
+                "string": "sigVU8Xja4MMhubDKPR9XcD5bhgtSvJ7gbd32ASddhJwGuYUCgQm5a53PVKFvLi27XF3tYAVBivYvTitrEt7NkqNeQMhB6TW"
+              }
+            ]
+          },
+          {
+            "prim": "Some",
+            "args": [
+              {
+                "string": "sigTiwqxEwxt8ZDmCMp4Lwy8PNZfhqo7aFFWt2fx3RLvv8t1fQNJYuxnNoo7nqfFsaYSRXhXEqmNTQ1f7azGGJR7BXLvqxtw"
+              }
+            ]
+          },
+          {
+            "prim": "None"
+          }
+        ]
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "8"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "2"
+          },
+          [
+            {
+              "bytes": "010339ce8dcbd2d63e1bc20659fc58aaca43d93df82a07ef65e875c355f652c8d8fd"
+            },
+            {
+              "bytes": "01025c7bb3ee223233928125d5d0b4a45010d1928db26a734f300f57c3fc6cc758f0"
+            },
+            {
+              "bytes": "0103c7e81e525b3d2c55c9abcd4d97fe83265a10f4fa21d0bc728e430a2cdc3e1ad2"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

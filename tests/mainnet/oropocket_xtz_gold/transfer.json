@@ -1,0 +1,111 @@
+{
+  "parameters": {
+    "entrypoint": "transfer",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "tz1Ts3m2dXTXB66XN7cg5ALiAvzZY6AxrFd9"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1XSRAbb2sd7MZZU7RVdLivkbGab8mEzXe4"
+            },
+            {
+              "int": "1000"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "00005a374e077b2e539f222af1e61964d7487c8b95fe"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "6"
+              },
+              {
+                "int": "140"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "OroPocket Gold"
+              },
+              {
+                "prim": "False"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "XTZGold"
+              },
+              {
+                "int": "432364140"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "140",
+      "key_hash": "exprtdu27mA67fDuwuTjbpjTmARMEoMTMxeSNJXeaTwUtp1J5aiqzj",
+      "key": {
+        "bytes": "00005a374e077b2e539f222af1e61964d7487c8b95fe"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          [],
+          {
+            "int": "70442542"
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "140",
+      "key_hash": "exprvMhy8cUk55Wgr93wpTcYm9kCq5hRbxDbN3312FALYfTH6mxJdA",
+      "key": {
+        "bytes": "0000816f472bcc1859ba942688cec260510615ccd300"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          [],
+          {
+            "int": "1000"
+          }
+        ]
+      }
+    }
+  ]
+}

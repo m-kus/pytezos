@@ -1,0 +1,96 @@
+{
+  "parameters": {
+    "entrypoint": "burn",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "0000e17255b958280d55feb685f40e5ee598c090b89a"
+        },
+        {
+          "int": "5000000"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00000cc84c2f6520dab375e8636d606671f3f5575abe"
+              },
+              {
+                "int": "254"
+              }
+            ]
+          },
+          {
+            "int": "255"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01e0a1035a390e9104b62439250043207bb4d4045000"
+                  },
+                  {
+                    "int": "256"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "257"
+                  },
+                  {
+                    "bytes": "0000521fc029738499f7961a65008b98e7532dbe84be"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "268495639000"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "257",
+      "key_hash": "expruoYXFwX6Nf9xRQ9PpjP5gkp2Jx97c2yXZbUEaAaHB51XBXWwDt",
+      "key": {
+        "bytes": "0000e17255b958280d55feb685f40e5ee598c090b89a"
+      },
+      "value": {
+        "int": "835000000"
+      }
+    }
+  ]
+}

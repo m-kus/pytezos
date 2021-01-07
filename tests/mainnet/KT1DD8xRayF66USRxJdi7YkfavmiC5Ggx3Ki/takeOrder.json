@@ -1,0 +1,45 @@
+{
+  "parameters": {
+    "entrypoint": "takeOrder",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "0"
+        },
+        {
+          "string": "tz1RQyhtY3dp5LJop3h7hfHwWFYidorcWQaV"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1"
+          },
+          {
+            "int": "206"
+          }
+        ]
+      },
+      {
+        "bytes": "00005aa23b65704ba747ca86e6d80777326183357511"
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "206",
+      "key_hash": "exprtZBwZUeYYYfUs9B9Rg2ywHezVHnCCnmF9WsDQVrs582dSK63dC",
+      "key": {
+        "int": "0"
+      }
+    }
+  ]
+}

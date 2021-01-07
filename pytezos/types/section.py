@@ -1,6 +1,8 @@
-from typing import List, Type, cast
+from typing import List, Type, cast, Dict, Any
 
 from pytezos.types.base import MichelsonType, LazyStorage
+from pytezos.types.sum import OrType
+from pytezos.types.struct import Struct
 
 
 class SectionType(MichelsonType):
@@ -35,7 +37,7 @@ class SectionType(MichelsonType):
         return cls(item)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        return {'prim': self.prim, 'args': [self.item.to_micheline_value(mode=mode, lazy_diff=lazy_diff)]}
+        return self.item.to_micheline_value(mode=mode, lazy_diff=lazy_diff)
 
     def to_python_object(self, lazy_diff=False):
         return self.item.to_python_object(lazy_diff=lazy_diff)
@@ -56,6 +58,42 @@ class SectionType(MichelsonType):
 
 
 class ParameterType(SectionType, prim='parameter', args_len=1):
+
+    @classmethod
+    def list_entry_points(cls) -> Dict[str, Type[MichelsonType]]:
+        entry_points = dict()
+        if cls.type_args[0].prim == 'or':
+            flat_args = Struct.get_flat_args(cls.type_args[0], ignore_annots=True)
+            if isinstance(flat_args, dict):
+                entry_points = flat_args
+        assert 'default' not in entry_points, f'default entry point is overloaded'  # actually it's not prohibited
+        entry_points['default'] = cls.type_args[0]
+        return entry_points
+
+    @classmethod
+    def from_parameters(cls, parameters: Dict[str, Any]) -> 'MichelsonType':
+        assert isinstance(parameters, dict) and list(parameters.keys()) == ['entrypoint', 'value'], \
+            f'expected {{entrypoint, value}}, got {parameters}'
+        entry_point = parameters['entrypoint']
+        if cls.type_args[0].prim == 'or':
+            struct = Struct.from_nested_type(cls.type_args[0], ignore_annots=True)
+            if struct.get_path(entry_point):
+                val_expr = struct.normalize_micheline_value(entry_point, parameters['value'])
+                item = cls.type_args[0].from_micheline_value(val_expr)
+                return cls(item)
+        assert entry_point == 'default', f'unexpected entrypoint {entry_point}'
+        return cls.from_micheline_value(parameters['value'])
+
+    def to_parameters(self, mode='readable') -> Dict[str, Any]:
+        entry_point, item = 'default', self.item
+        if isinstance(self.item, OrType):
+            struct = Struct.from_nested_type(self.type_args[0], ignore_annots=True)
+            if struct.is_named():
+                flat_values = struct.get_flat_values(self.item.items, ignore_annots=True, allow_nones=True)
+                assert isinstance(flat_values, dict) and len(flat_values) == 1
+                entry_point, item = next(iter(flat_values.items()))
+        return {'entrypoint': entry_point,
+                'value': item.to_micheline_value(mode=mode)}
 
     def attach_lazy_storage(self, lazy_storage: LazyStorage, action='copy'):
         super(ParameterType, self).attach_lazy_storage(lazy_storage, action)

@@ -1,0 +1,62 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "prim": "Left",
+      "args": [
+        {
+          "prim": "Some",
+          "args": [
+            {
+              "string": "tz1NortRftucvAkD1J58L32EhSVrQEWJCEnB"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000c9234342bc8a13f1f1942c14eca1514f011a281d"
+          },
+          {
+            "bytes": "0000c9234342bc8a13f1f1942c14eca1514f011a281d"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "0"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1600948800"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "2592000"
+                  },
+                  {
+                    "int": "1277000000"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

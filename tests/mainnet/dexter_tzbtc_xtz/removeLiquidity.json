@@ -1,0 +1,126 @@
+{
+  "parameters": {
+    "entrypoint": "removeLiquidity",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1Zya25zMcv5a5UbYyLYVuES7SA5eWcis5b"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "string": "tz1Zya25zMcv5a5UbYyLYVuES7SA5eWcis5b"
+                },
+                {
+                  "int": "72000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "121364724"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "895328"
+                },
+                {
+                  "string": "2021-01-05T14:49:32.012Z"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "123"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "77026652901"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "011b5edfd90cc62eaf4299bdc2eedae4306bea9fe200"
+                  },
+                  {
+                    "bytes": "01a3d0f58d8964bd1b37fb0a0c197b38cf46608d4900"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "960718595"
+                  },
+                  {
+                    "int": "130228442947"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "123",
+      "key_hash": "expruxtNMUkpCK1seiVkPdhpffqjSs5RDP9Z7sU5QsqwbTjRogaZuB",
+      "key": {
+        "bytes": "00009d43d09259f23a259f3f5988892c89600f04cf41"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "0"
+          },
+          []
+        ]
+      }
+    }
+  ]
+}

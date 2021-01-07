@@ -1,0 +1,93 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "prim": "Left",
+      "args": [
+        {
+          "prim": "Left",
+          "args": [
+            {
+              "prim": "Left",
+              "args": [
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "string": "tz1Ps66mRUJmQsQnfNjc1bzXtjbWzHjXttkS"
+                    },
+                    {
+                      "prim": "Pair",
+                      "args": [
+                        {
+                          "string": "tz1QDpEoz4Hbbtiwd9giPpBLRbmkRVoovUc3"
+                        },
+                        {
+                          "int": "100000000000000000000"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "199"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000e1e0abbc1b785932b59db090ace4c0e41081ab93"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "100000000000000000001"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "199",
+      "key_hash": "exprtYbmP54GSLbQcasScuKgAyf6uU6mVDxXTcWrE7GLDiWMMgy2mS",
+      "key": {
+        "bytes": "00002e58c1587a16ab729a75dfaf4b54ffb684d80919"
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "199",
+      "key_hash": "expruN559syyJF3EXSWGxCNwadbGSsgghs7UGTL9GBGmufyV5f9e6Q",
+      "key": {
+        "bytes": "000032444006a223721dc64c16a85734cfe9868a8d40"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "100000000000000000000"
+          },
+          []
+        ]
+      }
+    }
+  ]
+}

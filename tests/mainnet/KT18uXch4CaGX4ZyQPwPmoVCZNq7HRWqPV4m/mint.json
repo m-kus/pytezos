@@ -1,0 +1,103 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "100"
+        },
+        {
+          "string": "tz1WYewgFhnhWUogS6PpHcaVkaJt6A289zTX"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  []
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  [
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "bytes": "000077a5260f13f1d63616bb9ff73f4e44bbcd1c1d75"
+                        },
+                        {
+                          "int": "100"
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "bytes": "0000f35c313f534da44bbda5fa679c69c0e6f72baf7e"
+                        },
+                        {
+                          "int": "400"
+                        }
+                      ]
+                    }
+                  ],
+                  {
+                    "int": "10"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01070f247b3a725433b7134accd82fedfc764e23da00"
+                  },
+                  {
+                    "string": "Actions Ordinaires"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01070f247b3a725433b7134accd82fedfc764e23da00"
+                  },
+                  {
+                    "string": "EAGLE"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "int": "9223372036854775307"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

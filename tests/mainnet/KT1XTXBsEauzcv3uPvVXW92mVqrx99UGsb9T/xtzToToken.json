@@ -1,0 +1,84 @@
+{
+  "parameters": {
+    "entrypoint": "xtzToToken",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "tz1ZbokEB5tekbPxyWdo28ugn3UUkbQjguK3"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "571935133"
+            },
+            {
+              "string": "2021-01-05T16:38:16.764Z"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "262"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "21824908534"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "00003390196b6fb561bfeaa7e1e7968cdf692a2f466c"
+                  },
+                  {
+                    "bytes": "01e5fec2566787cf3a1f1e0928ec9f44b052a8672800"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "23304076860"
+                  },
+                  {
+                    "int": "20494896362"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

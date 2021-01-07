@@ -1,0 +1,72 @@
+{
+  "parameters": {
+    "entrypoint": "notarizeDocument",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "6911da3512d8681fc702e54c04e291c8446f5053816aa1dcba98de5acfe50411"
+        },
+        [
+          {
+            "string": "tz1M1Uo82m6VoWhakxk1qwDP2t7sVaorw5PZ"
+          },
+          {
+            "string": "tz1aJhwyr7P1vStnMK6h65w5ayRMWWDsfUUz"
+          },
+          {
+            "string": "tz1fnVPSVCtZFbf5mLyGyUsiE9dt6HpzU8Ft"
+          }
+        ]
+      ]
+    }
+  },
+  "storage": {
+    "int": "182"
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "182",
+      "key_hash": "exprvJG2o34xA99yae5wxVSLe4WvSZuieHGnNdKNKQeokghYkHwhJ2",
+      "key": {
+        "string": "6911da3512d8681fc702e54c04e291c8446f5053816aa1dcba98de5acfe50411"
+      },
+      "value": [
+        {
+          "prim": "Elt",
+          "args": [
+            {
+              "bytes": "00000f06a6ad67d49a6678f0eec95c68f849f7b365b1"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "prim": "Elt",
+          "args": [
+            {
+              "bytes": "0000a0e2564422e2d50fccebf9b78c35b6fd5ea9473d"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "prim": "Elt",
+          "args": [
+            {
+              "bytes": "0000dcfc209cccf6c0e2d9ae560af9bc691cf5e9c138"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -65,7 +65,7 @@ def normalize_alias(alias):
     return alias.replace(' ', '_').replace('/', '_').replace(':', '_').lower()
 
 
-def fetch_test_data():
+def fetch_mainnet_samples():
     contracts = iter_bcd_contracts(max_count=100)
     for contract in contracts:
         name = normalize_alias(contract.get('alias', '')) or contract['address']
@@ -89,4 +89,4 @@ def fetch_test_data():
 
 
 if __name__ == '__main__':
-    fetch_test_data()
+    fetch_mainnet_samples()

@@ -1,0 +1,32 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "string": "afb789b73f793a4f118b1b295e26474c43795a2a8a518999d7967079be4d5da0"
+    }
+  },
+  "storage": {
+    "int": "52"
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "52",
+      "key_hash": "expruGVhDNZX1NWJsEVZG7Z5krdkGqWqpDhmgX6cgj23XGiNrL7x9q",
+      "key": {
+        "string": "afb789b73f793a4f118b1b295e26474c43795a2a8a518999d7967079be4d5da0"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1609866013"
+          },
+          {
+            "bytes": "00004cc5b68779c9166b20f6aed04f6fb7b01929ab9a"
+          }
+        ]
+      }
+    }
+  ]
+}

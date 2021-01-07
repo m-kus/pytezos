@@ -1,0 +1,51 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "prim": "Right",
+      "args": [
+        {
+          "prim": "Left",
+          "args": [
+            {
+              "prim": "Right",
+              "args": [
+                {
+                  "string": "tz1gEMsgfFqfZiUEmGypaD8SPYouBFbPahqu"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "199"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000e1e0abbc1b785932b59db090ace4c0e41081ab93"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "1"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

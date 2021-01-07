@@ -1,0 +1,749 @@
+{
+  "code": [
+    {
+      "prim": "parameter",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "unit",
+              "annots": [
+                "%default"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "string",
+                  "annots": [
+                    "%lambdaName"
+                  ]
+                },
+                {
+                  "prim": "bytes",
+                  "annots": [
+                    "%lambdaParameter"
+                  ]
+                }
+              ],
+              "annots": [
+                "%runEntrypointLambda"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "storage",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "big_map",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "prim": "bytes"
+                    }
+                  ],
+                  "annots": [
+                    "%arbitraryValues"
+                  ]
+                },
+                {
+                  "prim": "big_map",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "prim": "bytes"
+                    }
+                  ],
+                  "annots": [
+                    "%lambdas"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "big_map",
+              "args": [
+                {
+                  "prim": "address"
+                },
+                {
+                  "prim": "address"
+                }
+              ],
+              "annots": [
+                "%ovens"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "code",
+      "args": [
+        [
+          {
+            "prim": "DUP"
+          },
+          {
+            "prim": "CDR"
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "CAR"
+          },
+          {
+            "prim": "IF_LEFT",
+            "args": [
+              [
+                {
+                  "prim": "DROP"
+                },
+                {
+                  "prim": "PUSH",
+                  "args": [
+                    {
+                      "prim": "unit"
+                    },
+                    {
+                      "prim": "Unit"
+                    }
+                  ]
+                },
+                {
+                  "prim": "PACK"
+                },
+                {
+                  "prim": "PUSH",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "string": "default"
+                    }
+                  ]
+                },
+                {
+                  "prim": "PAIR"
+                },
+                {
+                  "prim": "SWAP"
+                },
+                {
+                  "prim": "DUP"
+                },
+                {
+                  "prim": "CAR"
+                },
+                {
+                  "prim": "CDR"
+                },
+                {
+                  "prim": "DIG",
+                  "args": [
+                    {
+                      "int": "2"
+                    }
+                  ]
+                },
+                {
+                  "prim": "DUP"
+                },
+                {
+                  "prim": "DUG",
+                  "args": [
+                    {
+                      "int": "3"
+                    }
+                  ]
+                },
+                {
+                  "prim": "CAR"
+                },
+                {
+                  "prim": "PUSH",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "string": "entrypoint/"
+                    }
+                  ]
+                },
+                {
+                  "prim": "CONCAT"
+                },
+                {
+                  "prim": "GET"
+                },
+                {
+                  "prim": "IF_NONE",
+                  "args": [
+                    [
+                      {
+                        "prim": "PUSH",
+                        "args": [
+                          {
+                            "prim": "string"
+                          },
+                          {
+                            "string": "0"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "FAILWITH"
+                      }
+                    ],
+                    []
+                  ]
+                },
+                {
+                  "prim": "SELF"
+                },
+                {
+                  "prim": "ADDRESS"
+                },
+                {
+                  "prim": "SWAP"
+                },
+                {
+                  "prim": "UNPACK",
+                  "args": [
+                    {
+                      "prim": "lambda",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "bytes"
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "big_map",
+                                          "args": [
+                                            {
+                                              "prim": "string"
+                                            },
+                                            {
+                                              "prim": "bytes"
+                                            }
+                                          ],
+                                          "annots": [
+                                            "%arbitraryValues"
+                                          ]
+                                        },
+                                        {
+                                          "prim": "big_map",
+                                          "args": [
+                                            {
+                                              "prim": "string"
+                                            },
+                                            {
+                                              "prim": "bytes"
+                                            }
+                                          ],
+                                          "annots": [
+                                            "%lambdas"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "address"
+                                        },
+                                        {
+                                          "prim": "address"
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%ovens"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "address"
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "list",
+                              "args": [
+                                {
+                                  "prim": "operation"
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "string"
+                                        },
+                                        {
+                                          "prim": "bytes"
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%arbitraryValues"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "string"
+                                        },
+                                        {
+                                          "prim": "bytes"
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%lambdas"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "big_map",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "address"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%ovens"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "IF_NONE",
+                  "args": [
+                    [
+                      {
+                        "prim": "DROP",
+                        "args": [
+                          {
+                            "int": "3"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "PUSH",
+                        "args": [
+                          {
+                            "prim": "string"
+                          },
+                          {
+                            "string": "1"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "FAILWITH"
+                      }
+                    ],
+                    [
+                      {
+                        "prim": "SWAP"
+                      },
+                      {
+                        "prim": "DIG",
+                        "args": [
+                          {
+                            "int": "2"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "DIG",
+                        "args": [
+                          {
+                            "int": "3"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "CDR"
+                      },
+                      {
+                        "prim": "PAIR"
+                      },
+                      {
+                        "prim": "PAIR"
+                      },
+                      {
+                        "prim": "EXEC"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                {
+                  "prim": "SWAP"
+                },
+                {
+                  "prim": "DUP"
+                },
+                {
+                  "prim": "CAR"
+                },
+                {
+                  "prim": "CDR"
+                },
+                {
+                  "prim": "DIG",
+                  "args": [
+                    {
+                      "int": "2"
+                    }
+                  ]
+                },
+                {
+                  "prim": "DUP"
+                },
+                {
+                  "prim": "DUG",
+                  "args": [
+                    {
+                      "int": "3"
+                    }
+                  ]
+                },
+                {
+                  "prim": "CAR"
+                },
+                {
+                  "prim": "PUSH",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "string": "entrypoint/"
+                    }
+                  ]
+                },
+                {
+                  "prim": "CONCAT"
+                },
+                {
+                  "prim": "GET"
+                },
+                {
+                  "prim": "IF_NONE",
+                  "args": [
+                    [
+                      {
+                        "prim": "PUSH",
+                        "args": [
+                          {
+                            "prim": "string"
+                          },
+                          {
+                            "string": "0"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "FAILWITH"
+                      }
+                    ],
+                    []
+                  ]
+                },
+                {
+                  "prim": "SELF"
+                },
+                {
+                  "prim": "ADDRESS"
+                },
+                {
+                  "prim": "SWAP"
+                },
+                {
+                  "prim": "UNPACK",
+                  "args": [
+                    {
+                      "prim": "lambda",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "bytes"
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "big_map",
+                                          "args": [
+                                            {
+                                              "prim": "string"
+                                            },
+                                            {
+                                              "prim": "bytes"
+                                            }
+                                          ],
+                                          "annots": [
+                                            "%arbitraryValues"
+                                          ]
+                                        },
+                                        {
+                                          "prim": "big_map",
+                                          "args": [
+                                            {
+                                              "prim": "string"
+                                            },
+                                            {
+                                              "prim": "bytes"
+                                            }
+                                          ],
+                                          "annots": [
+                                            "%lambdas"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "address"
+                                        },
+                                        {
+                                          "prim": "address"
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%ovens"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "address"
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "list",
+                              "args": [
+                                {
+                                  "prim": "operation"
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "string"
+                                        },
+                                        {
+                                          "prim": "bytes"
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%arbitraryValues"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "string"
+                                        },
+                                        {
+                                          "prim": "bytes"
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%lambdas"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "big_map",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "address"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%ovens"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "IF_NONE",
+                  "args": [
+                    [
+                      {
+                        "prim": "DROP",
+                        "args": [
+                          {
+                            "int": "3"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "PUSH",
+                        "args": [
+                          {
+                            "prim": "string"
+                          },
+                          {
+                            "string": "1"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "FAILWITH"
+                      }
+                    ],
+                    [
+                      {
+                        "prim": "SWAP"
+                      },
+                      {
+                        "prim": "DIG",
+                        "args": [
+                          {
+                            "int": "2"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "DIG",
+                        "args": [
+                          {
+                            "int": "3"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "CDR"
+                      },
+                      {
+                        "prim": "PAIR"
+                      },
+                      {
+                        "prim": "PAIR"
+                      },
+                      {
+                        "prim": "EXEC"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    }
+  ],
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "258"
+          },
+          {
+            "int": "259"
+          }
+        ]
+      },
+      {
+        "int": "260"
+      }
+    ]
+  }
+}
