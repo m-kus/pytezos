@@ -4,6 +4,7 @@ from parameterized import parameterized
 from pytezos.michelson.converter import michelson_to_micheline
 from pytezos.michelson.contract import ContractStorage, ContractParameter
 from pytezos.michelson.grammar import MichelsonParser
+from pytezos.repl.parser import parse_expression
 
 storage_data = [(
     """Pair (Pair "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU" True) 
@@ -110,3 +111,7 @@ class TestComparable(TestCase):
         storage = ContractStorage(michelson_to_micheline("storage (option string)"))
         self.assertEqual({"prim": "None"}, storage.encode(None))
         self.assertEqual({"prim": "Some", "args": [{"string": ""}]}, storage.encode(""))
+
+    def test_timestamp_with_millis(self):
+        res = parse_expression({'string': '2021-01-06T14:57:27.821Z'}, {'prim': 'timestamp'})
+        self.assertEqual(1609945047, res)

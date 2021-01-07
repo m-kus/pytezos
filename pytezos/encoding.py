@@ -1,6 +1,5 @@
 import base58
-import calendar
-from datetime import datetime
+import strict_rfc3339
 
 
 def tb(l):
@@ -385,14 +384,13 @@ def forge_base58(value: str) -> bytes:
     return base58_decode(value.encode())
 
 
-def forge_timestamp(value) -> int:
+def forge_timestamp(value: str) -> int:
     """ Encode timestamp into bytes.
 
     :param value: unix timestamp in seconds (int)
     """
     assert isinstance(value, str)
-    dt = datetime.strptime(value, '%Y-%m-%dT%H:%M:%SZ')
-    return calendar.timegm(dt.utctimetuple())
+    return int(strict_rfc3339.rfc3339_to_timestamp(value))
 
 
 def forge_contract(value) -> bytes:
