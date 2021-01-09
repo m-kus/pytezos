@@ -1,4 +1,5 @@
 from copy import copy
+from pprint import pformat
 from typing import Tuple, Dict, Callable, List, Optional, Type, cast, Union
 
 type_mappings = {
@@ -61,24 +62,24 @@ def is_type_expr(type_expr) -> bool:
 
 
 def parse_micheline_type(type_expr) -> Tuple[str, list, str, str]:
-    assert isinstance(type_expr, dict), f'expected dict, got {type(type_expr).__name__} (type_expr)'
+    assert isinstance(type_expr, dict), f'expected dict, got {pformat(type_expr)} (type_expr)'
     prim = type_expr.get('prim')
     assert prim is not None, f'prim field is absent'
     args = type_expr.get('args', [])
-    assert isinstance(args, list), f'expected list, got {type(args).__name__} (args)'
+    assert isinstance(args, list), f'{prim}: expected list of args, got {pformat(args)} (args)'
     annots = type_expr.get('annots', [])
-    assert isinstance(args, list), f'expected list of, got {type(args).__name__} (annots)'
+    assert isinstance(annots, list), f'{prim}: expected list of annots, got {pformat(args)} (annots)'
 
     def parse_name(prefix) -> str:
         sub_annots = [x[1:] for x in annots if x.startswith(prefix)]
-        assert len(sub_annots) <= 1, f'multiple "{prefix}" annotations are not allowed: {sub_annots}'
+        assert len(sub_annots) <= 1, f'{prim}: multiple "{prefix}" annotations are not allowed: {sub_annots}'
         return sub_annots[0] if sub_annots else None
 
     return prim, args, parse_name('%'), parse_name(':')
 
 
 def parse_micheline_value(val_expr, handlers: Dict[Tuple[str, int], Callable]):
-    assert isinstance(val_expr, dict), f'expected dict, got {type(val_expr).__name__}'
+    assert isinstance(val_expr, dict), f'expected dict, got {pformat(val_expr)} (val_expr)'
     prim, args = val_expr.get('prim'), val_expr.get('args', [])
     expected = ' or '.join(map(lambda x: f'{x[0]} ({x[1]} args)', handlers.items()))
     assert (prim, len(args)) in handlers, f'expected {expected}, got {prim} ({len(args)} args)'
@@ -87,7 +88,7 @@ def parse_micheline_value(val_expr, handlers: Dict[Tuple[str, int], Callable]):
 
 
 def parse_micheline_literal(val_expr, handlers: Dict[str, Callable]):
-    assert isinstance(val_expr, dict), f'expected dict, got {type(val_expr).__name__}'
+    assert isinstance(val_expr, dict), f'expected dict, got {pformat(val_expr)}'
     core_type, value = next((k, v) for k, v in val_expr.items() if k[0] != '_' and k != 'annots')
     expected = ' or '.join(map(lambda x: f'`{x}`', handlers))
     assert core_type in handlers, f'expected one of {expected}, got {core_type}'
@@ -161,20 +162,27 @@ class MichelsonType:
     def assert_equal_types(cls, other: Type['MichelsonType']):
         assert cls.prim == other.prim, f'primitive: "{cls.prim}" vs "{other.prim}"'
         if cls.type_name and other.type_name:
-            assert cls.type_name == other.type_name, f'type annotations: "{cls.type_name}" vs "{other.type_name}"'
+            assert cls.type_name == other.type_name, \
+                f'{cls.prim}: type annotations: "{cls.type_name}" vs "{other.type_name}"'
         if cls.field_name and other.field_name:
-            assert cls.field_name == other.field_name, f'field annotations: "{cls.field_name}" vs "{other.field_name}"'
-        assert len(cls.type_args) == len(other.type_args), f'args len: {len(cls.type_args)} vs {len(other.type_args)}'
+            assert cls.field_name == other.field_name,  \
+                f'{cls.prim}: field annotations: "{cls.field_name}" vs "{other.field_name}"'
+        assert len(cls.type_args) == len(other.type_args), \
+            f'{cls.prim}: args len: {len(cls.type_args)} vs {len(other.type_args)}'
         for i, arg in enumerate(other.type_args):
-            assert cls.type_args[i].assert_equal_types(arg)
+            cls.type_args[i].assert_equal_types(arg)
+
+    @classmethod
+    def get_anon_type(cls) -> Type['MichelsonType']:
+        return cls.construct_type(type_args=cls.type_args)
 
     @classmethod
     def get_micheline_type(cls) -> dict:
         annots = []
-        if cls.field_name is not None:
-            annots.append(f'%{cls.field_name}')
         if cls.type_name is not None:
             annots.append(f':{cls.type_name}')
+        if cls.field_name is not None:
+            annots.append(f'%{cls.field_name}')
         type_args = [arg.get_micheline_type() for arg in cls.type_args]
         expr = dict(prim=cls.prim, annots=annots, args=type_args)
         return {k: v for k, v in expr.items() if v}

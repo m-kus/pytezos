@@ -95,7 +95,7 @@ class AddressType(StringType, prim='address'):
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if mode == 'optimized':
-            return {'int': forge_contract(self.value)}  # because address can also have an entrypoint
+            return {'bytes': forge_contract(self.value).hex()}  # because address can also have an entrypoint
         elif mode == 'readable':
             return {'string': self.value}
         else:
@@ -126,7 +126,7 @@ class KeyType(StringType, prim='key'):
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if mode == 'optimized':
-            return {'int': forge_public_key(self.value)}
+            return {'bytes': forge_public_key(self.value).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
@@ -157,7 +157,7 @@ class KeyHashType(StringType, prim='key_hash'):
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if mode == 'optimized':
-            return {'int': forge_address(self.value, tz_only=True)}
+            return {'bytes': forge_address(self.value, tz_only=True).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
@@ -188,7 +188,7 @@ class SignatureType(StringType, prim='signature'):
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if mode == 'optimized':
-            return {'int': forge_base58(self.value)}
+            return {'bytes': forge_base58(self.value).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
@@ -219,7 +219,7 @@ class ChainIdType(StringType, prim='chain_id'):
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if mode == 'optimized':
-            return {'int': forge_base58(self.value)}
+            return {'bytes': forge_base58(self.value).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:

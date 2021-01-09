@@ -107,20 +107,22 @@ class PairType(MichelsonType, prim='pair', args_len=None):
                 yield item
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self.iter_comb()]
-        if mode == 'readable':
-            return {'prim': 'Pair', 'args': args}
-        elif mode == 'optimized':
-            if len(args) == 2:
-                return {'prim': 'Pair', 'args': args}
-            elif len(args) == 3:
-                return {'prim': 'Pair', 'args': [args[0], {'prim': 'Pair', 'args': args[1:]}]}
-            elif len(args) >= 4:
-                return args
-            else:
-                assert False, f'unexpected args len {len(args)}'
-        else:
-            assert False, f'unsupported mode {mode}'
+        args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self]
+        return {'prim': 'Pair', 'args': args}
+        # args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self.iter_comb()]
+        # if mode == 'readable':
+        #     return {'prim': 'Pair', 'args': args}
+        # elif mode == 'optimized':
+        #     if len(args) == 2:
+        #         return {'prim': 'Pair', 'args': args}
+        #     elif len(args) == 3:
+        #         return {'prim': 'Pair', 'args': [args[0], {'prim': 'Pair', 'args': args[1:]}]}
+        #     elif len(args) >= 4:
+        #         return args
+        #     else:
+        #         assert False, f'unexpected args len {len(args)}'
+        # else:
+        #     assert False, f'unsupported mode {mode}'
 
     def to_python_object(self, lazy_diff=False) -> Union[dict, tuple]:
         struct = Struct.from_nested_type(type(self))

@@ -26,33 +26,42 @@ class Struct:
         return self.key_to_path[key]
 
     @staticmethod
-    def iter_type_args(nested_type: Type[MichelsonType], ignore_annots=False, path='') \
+    def iter_type_args(nested_type: Type[MichelsonType], ignore_annots=False, force_recurse=False, path='') \
             -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
         for i, arg in enumerate(nested_type.type_args):
             if arg.prim == nested_type.prim:
-                if not ignore_annots and (arg.field_name or arg.type_name):
+                name = arg.field_name or arg.type_name
+                if not ignore_annots and name:
                     yield path + str(i), arg
-                else:
-                    yield from Struct.iter_type_args(arg, ignore_annots, path=path + str(i))
+                if force_recurse or ignore_annots or not name:
+                    yield from Struct.iter_type_args(arg,
+                                                     ignore_annots=ignore_annots,
+                                                     force_recurse=force_recurse,
+                                                     path=path + str(i))
             else:
                 yield path + str(i), arg
 
     @staticmethod
-    def iter_values(prim: str, nested_item: Iterable[MichelsonType], ignore_annots=False, allow_nones=False, path='') \
+    def iter_values(prim: str, nested_item: Iterable[MichelsonType],
+                    ignore_annots=False, allow_nones=False, force_recurse=False, path='') \
             -> Generator[Tuple[str, MichelsonType], None, None]:
         for i, arg in enumerate(nested_item):
-            if arg.prim == prim:
-                if not ignore_annots and (arg.field_name or arg.type_name):
-                    yield path + str(i), arg
-                else:
-                    arg = cast(Iterable[MichelsonType], arg)
-                    yield from Struct.iter_values(prim, arg, ignore_annots, allow_nones, path + str(i))
-            elif isinstance(arg, MichelsonType):
-                yield path + str(i), arg
-            elif arg is None:
+            if arg is None:
                 assert allow_nones, f'Nones are not allowed for {prim} args'
+            elif arg.prim == prim:
+                name = arg.field_name or arg.type_name
+                if not ignore_annots and name:
+                    yield path + str(i), arg
+                if ignore_annots or not name or force_recurse:
+                    arg = cast(Iterable[MichelsonType], arg)
+                    yield from Struct.iter_values(prim, arg,
+                                                  ignore_annots=ignore_annots,
+                                                  allow_nones=allow_nones,
+                                                  force_recurse=force_recurse,
+                                                  path=path + str(i))
             else:
-                assert False, f'unexpected arg {arg}'
+                assert isinstance(arg, MichelsonType), f'unexpected arg {arg}'
+                yield path + str(i), arg
 
     @staticmethod
     def get_type_layout(flat_args: List[Tuple[str, Type[MichelsonType]]], force_named=False) \
@@ -75,9 +84,10 @@ class Struct:
         return keys, paths
 
     @classmethod
-    def get_flat_args(cls, nested_type: Type[MichelsonType], ignore_annots=False, force_named=False) \
+    def get_flat_args(cls, nested_type: Type[MichelsonType],
+                      ignore_annots=False, force_named=False, force_recurse=False) \
             -> Union[Dict[str, Type[MichelsonType]], List[Type[MichelsonType]]]:
-        flat_args = list(cls.iter_type_args(nested_type, ignore_annots=ignore_annots))
+        flat_args = list(cls.iter_type_args(nested_type, ignore_annots=ignore_annots, force_recurse=force_recurse))
         keys, _ = cls.get_type_layout(flat_args, force_named=force_named)
         if keys:
             return {keys[path]: arg for path, arg in flat_args}
@@ -85,8 +95,9 @@ class Struct:
             return [arg for _, arg in flat_args]
 
     @classmethod
-    def from_nested_type(cls, nested_type: Type[MichelsonType], ignore_annots=False, force_named=False) -> 'Struct':
-        flat_args = list(cls.iter_type_args(nested_type, ignore_annots=ignore_annots))
+    def from_nested_type(cls, nested_type: Type[MichelsonType],
+                         ignore_annots=False, force_named=False, force_recurse=False) -> 'Struct':
+        flat_args = list(cls.iter_type_args(nested_type, ignore_annots=ignore_annots, force_recurse=force_recurse))
         keys, paths = cls.get_type_layout(flat_args, force_named=force_named)
         return cls(prim=nested_type.prim, path_to_key=keys, key_to_path=paths)
 
@@ -145,16 +156,20 @@ class Struct:
                 return expr
             elif path[0] == '0':
                 return {'prim': 'Left', 'args': [wrap_expr(expr, path[1:])]}
-            elif path[1] == '1':
+            elif path[0] == '1':
                 return {'prim': 'Right', 'args': [wrap_expr(expr, path[1:])]}
             else:
                 assert False, path
 
         return wrap_expr(val_expr, self.get_path(entry_point))
 
-    def get_flat_values(self, nested_item: Iterable[MichelsonType], ignore_annots=False, allow_nones=False) \
-            -> Union[Dict[str, MichelsonType], List[MichelsonType, ...]]:
-        flat_values = list(self.iter_values(self.prim, nested_item, ignore_annots, allow_nones))
+    def get_flat_values(self, nested_item: Iterable[MichelsonType],
+                        ignore_annots=False, allow_nones=False, force_recurse=False) \
+            -> Union[Dict[str, MichelsonType], List[MichelsonType]]:
+        flat_values = list(self.iter_values(self.prim, nested_item,
+                                            ignore_annots=ignore_annots,
+                                            allow_nones=allow_nones,
+                                            force_recurse=force_recurse))
         if self.is_named():
             return {self.get_name(path): arg for path, arg in flat_values if arg is not None}
         else:

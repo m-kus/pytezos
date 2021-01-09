@@ -36,8 +36,8 @@ class OrType(MichelsonType, prim='or', args_len=2):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'OrType':
         value = parse_micheline_value(val_expr, {
-            ('Left', 1): lambda x: (cls.type_args[0].from_micheline_value(x), None),
-            ('Right', 1): lambda x: (None, cls.type_args[1].from_micheline_value(x))
+            ('Left', 1): lambda x: (cls.type_args[0].from_micheline_value(x[0]), None),
+            ('Right', 1): lambda x: (None, cls.type_args[1].from_micheline_value(x[0]))
         })
         return cls(value)
 

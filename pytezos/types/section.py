@@ -59,15 +59,18 @@ class SectionType(MichelsonType):
 
 class ParameterType(SectionType, prim='parameter', args_len=1):
 
+    @staticmethod
+    def match(type_expr) -> Type['ParameterType']:
+        return cast(Type['ParameterType'], MichelsonType.match(type_expr))
+
     @classmethod
     def list_entry_points(cls) -> Dict[str, Type[MichelsonType]]:
-        entry_points = dict()
+        entry_points = dict(default=cls.type_args[0])
         if cls.type_args[0].prim == 'or':
-            flat_args = Struct.get_flat_args(cls.type_args[0], ignore_annots=True)
+            flat_args = Struct.get_flat_args(cls.type_args[0], force_recurse=True)
             if isinstance(flat_args, dict):
-                entry_points = flat_args
-        assert 'default' not in entry_points, f'default entry point is overloaded'  # actually it's not prohibited
-        entry_points['default'] = cls.type_args[0]
+                for name, arg in flat_args.items():
+                    entry_points[name] = arg.get_anon_type()
         return entry_points
 
     @classmethod
@@ -76,7 +79,7 @@ class ParameterType(SectionType, prim='parameter', args_len=1):
             f'expected {{entrypoint, value}}, got {parameters}'
         entry_point = parameters['entrypoint']
         if cls.type_args[0].prim == 'or':
-            struct = Struct.from_nested_type(cls.type_args[0], ignore_annots=True)
+            struct = Struct.from_nested_type(cls.type_args[0], force_recurse=True)
             if struct.get_path(entry_point):
                 val_expr = struct.normalize_micheline_value(entry_point, parameters['value'])
                 item = cls.type_args[0].from_micheline_value(val_expr)
@@ -87,9 +90,9 @@ class ParameterType(SectionType, prim='parameter', args_len=1):
     def to_parameters(self, mode='readable') -> Dict[str, Any]:
         entry_point, item = 'default', self.item
         if isinstance(self.item, OrType):
-            struct = Struct.from_nested_type(self.type_args[0], ignore_annots=True)
+            struct = Struct.from_nested_type(self.type_args[0], force_recurse=True)
             if struct.is_named():
-                flat_values = struct.get_flat_values(self.item.items, ignore_annots=True, allow_nones=True)
+                flat_values = struct.get_flat_values(self.item.items, force_recurse=True, allow_nones=True)
                 assert isinstance(flat_values, dict) and len(flat_values) == 1
                 entry_point, item = next(iter(flat_values.items()))
         return {'entrypoint': entry_point,
@@ -100,6 +103,10 @@ class ParameterType(SectionType, prim='parameter', args_len=1):
 
 
 class StorageType(SectionType, prim='storage', args_len=1):
+
+    @staticmethod
+    def match(type_expr) -> Type['StorageType']:
+        return cast(Type['StorageType'], MichelsonType.match(type_expr))
 
     def attach_lazy_storage(self, lazy_storage: LazyStorage, action='remove'):
         super(StorageType, self).attach_lazy_storage(lazy_storage, action)
