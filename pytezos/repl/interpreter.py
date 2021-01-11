@@ -2,9 +2,10 @@ import yaml
 from copy import deepcopy
 from pprint import pformat
 
-from pytezos.michelson.grammar import MichelsonParser, MichelsonParserError
+from pytezos.micheline.parser import MichelsonParser, MichelsonParserError
 from pytezos.michelson.converter import michelson_to_micheline, micheline_to_michelson
-from pytezos.repl.control import do_interpret, MichelsonRuntimeError
+from pytezos.micheline.types import MichelsonRuntimeError
+from pytezos.repl.control import do_interpret
 from pytezos.repl.helpers import *
 from pytezos.repl.arithmetic import *
 from pytezos.repl.structures import *

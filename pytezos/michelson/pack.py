@@ -1,8 +1,9 @@
 from pytezos.crypto import blake2b_32
 from pytezos.encoding import forge_base58, forge_address, forge_public_key, forge_contract, forge_timestamp, \
-    base58_encode
+    base58_encode, parse_chain_id, parse_address, parse_public_key, parse_signature
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
-from pytezos.repl.parser import parse_prim_expr
+from pytezos.micheline.reducer import parse_prim_expr
+from pytezos.micheline.formatter import micheline_to_michelson
 
 
 def prepack_micheline(val_expr, type_expr):
@@ -14,7 +15,7 @@ def prepack_micheline(val_expr, type_expr):
     :returns: Micheline expression
     """
     def try_pack(val_node, type_node):
-        type_prim, type_args = parse_prim_expr(type_node)
+        type_prim, type_args, _ = parse_prim_expr(type_node)
         is_string = isinstance(val_node, dict) and val_node.get('string')
 
         if type_prim in ['set', 'list']:
@@ -104,3 +105,55 @@ def unpack(data: bytes, type_expr):
     assert_unpackable(type_expr)
     parsed = unforge_micheline(data[1:])
     return parsed
+
+
+def micheline_value_to_python_object(val_expr):
+    if isinstance(val_expr, dict):
+        if len(val_expr) == 1:
+            prim = next(iter(val_expr))
+            if prim == 'string':
+                return val_expr[prim]
+            elif prim == 'int':
+                return int(val_expr[prim])
+            elif prim == 'bytes':
+                return try_unpack(bytes.fromhex(val_expr[prim]))
+            elif prim == 'bool':
+                return True if val_expr[prim] == 'True' else False
+        elif val_expr.get('prim'):
+            prim = val_expr['prim']
+            if prim == 'Pair':
+                return tuple(micheline_value_to_python_object(x) for x in val_expr['args'])
+    return micheline_to_michelson(val_expr)
+
+
+def try_unpack(data: bytes):
+    try:
+        return parse_chain_id(data)
+    except ValueError:
+        pass
+    try:
+        return parse_address(data)
+    except (ValueError, KeyError):
+        pass
+    try:
+        return parse_public_key(data)
+    except (ValueError, KeyError):
+        pass
+    try:
+        return parse_signature(data)
+    except ValueError:
+        pass
+
+    if len(data) > 0 and data.startswith(b'\x05'):
+        try:
+            res = unforge_micheline(data[1:])
+            return micheline_value_to_python_object(res)
+        except (ValueError, AssertionError):
+            pass
+
+    try:
+        return data.decode()
+    except ValueError:
+        pass
+
+    return data

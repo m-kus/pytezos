@@ -6,9 +6,9 @@ from collections import namedtuple, defaultdict
 from functools import lru_cache
 
 from pytezos.encoding import forge_public_key, forge_address, forge_base58, forge_contract
-from pytezos.michelson.formatter import micheline_to_michelson
-from pytezos.michelson.grammar import MichelsonParser
-from pytezos.repl.parser import parse_expression, dispatch_core_map
+from pytezos.micheline.formatter import micheline_to_michelson
+from pytezos.micheline.parser import MichelsonParser
+from pytezos.micheline.reducer import parse_expression, dispatch_core_map
 
 Nested = namedtuple('Nested', ['prim', 'args'])
 Schema = namedtuple('Schema', ['metadata', 'bin_types', 'bin_names', 'json_to_bin'])

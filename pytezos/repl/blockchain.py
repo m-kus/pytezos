@@ -5,7 +5,7 @@ from pytezos.repl.control import instruction
 from pytezos.repl.context import Context
 from pytezos.repl.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \
     KeyHash, Timestamp, expr_equal, Operation
-from pytezos.repl.parser import get_entry_expr, parse_type
+from pytezos.micheline.types import get_entry_expr, parse_type
 
 INITIAL_BALANCE = 257000000
 MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'

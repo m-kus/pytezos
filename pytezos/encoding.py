@@ -194,7 +194,7 @@ def is_kt(v) -> bool:
     return True
 
 
-def is_key(v) -> bool:
+def is_public_key(v) -> bool:
     """ Check if value is a public key.
     """
     try:
@@ -212,6 +212,13 @@ def is_chain_id(v) -> bool:
     except (ValueError, TypeError):
         return False
     return True
+
+
+def is_address(value: str) -> bool:
+    """ Check if value is a tz/KT address
+    """
+    address = value.split('%')[0]
+    return is_kt(address) or is_pkh(address)
 
 
 def forge_nat(value) -> bytes:
@@ -387,7 +394,7 @@ def forge_base58(value: str) -> bytes:
 def forge_timestamp(value: str) -> int:
     """ Encode timestamp into bytes.
 
-    :param value: unix timestamp in seconds (int)
+    :param value: RFC3339 time string
     """
     assert isinstance(value, str)
     return int(strict_rfc3339.rfc3339_to_timestamp(value))

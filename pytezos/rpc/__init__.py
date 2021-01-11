@@ -43,6 +43,7 @@ tzkt = RpcProvider(
     carthagenet='https://rpc.tzkt.io/carthagenet/',
     dalphanet='https://rpc.tzkt.io/dalphanet/',
     delphinet='https://rpc.tzkt.io/delphinet/',
+    edonet='https://rpc.tzkt.io/edonet/'
 )
 giganode = RpcProvider(
     mainnet='https://mainnet-tezos.giganode.io/',
@@ -71,3 +72,4 @@ carthagenet = tzkt.carthagenet
 labnet = giganode.labnet
 dalphanet = tzkt.dalphanet
 delphinet = tzkt.delphinet
+edonet = tzkt.edonet

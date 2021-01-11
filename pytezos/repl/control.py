@@ -1,11 +1,11 @@
 import functools
 from pprint import pformat
 
-from pytezos.michelson.macros import expand_duxp
+from pytezos.repl.macros import expand_duxp
 from pytezos.repl.context import Context
 from pytezos.repl.types import StackItem, assert_stack_type, assert_expr_equal, Option, Lambda, Bool, List, Or, Pair, \
     Map, Set
-from pytezos.repl.parser import get_int, MichelsonRuntimeError, assert_pushable, parse_prim_expr
+from pytezos.micheline.types import get_int, MichelsonRuntimeError, assert_pushable, parse_prim_expr
 
 instructions = {}
 

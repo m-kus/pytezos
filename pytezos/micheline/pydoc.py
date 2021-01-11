@@ -1,6 +1,6 @@
 from os.path import dirname
 
-from pytezos.micheline.schema import get_name
+from pytezos.micheline.types import get_name
 from pytezos.micheline.formatter import micheline_to_michelson
 
 core_types = ['string', 'int', 'bool']

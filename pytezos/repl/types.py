@@ -4,8 +4,9 @@ from copy import deepcopy
 from pytezos.michelson.pack import get_key_hash
 from pytezos.micheline.formatter import micheline_to_michelson
 from pytezos.encoding import is_pkh, is_kt, is_chain_id
-from pytezos.repl.parser import parse_expression, parse_prim_expr, assert_expr_equal, assert_comparable, \
-    expr_equal, assert_type, get_prim_args, remove_field_annots, Unit as UnitNone
+from pytezos.micheline.reducer import parse_expression, Unit as UnitNone
+from pytezos.micheline.types import parse_prim_expr, get_prim_args, assert_expr_equal, assert_comparable, \
+    expr_equal, assert_type, remove_field_annots, get_name
 
 
 def assert_stack_item(item: 'StackItem'):
@@ -27,12 +28,6 @@ def dispatch_type_map(a, b, mapping):
 
 def assert_equal_types(a, b):
     assert type(a) == type(b), f'different types {type(a).__name__} and {type(b).__name__}'
-
-
-def get_name(annots: list, prefix, default=None):
-    if isinstance(annots, list):
-        return next((x[1:] for x in annots if x.startswith(prefix)), default)
-    return default
 
 
 class StackItem:
@@ -123,7 +118,7 @@ class StackItem:
         return self._modify(cache_val=True)
 
     def rename(self, annots: list):
-        return self._modify(cache_val=True, name=get_name(annots, prefix='@'))
+        return self._modify(cache_val=True, name=next(filter(lambda x: x.startswith('@'), annots), None))
 
 
 class String(StackItem, prim='string'):
@@ -245,7 +240,7 @@ class Pair(StackItem, prim='pair', args_len=2):
     def get_element(self, idx: int):
         assert idx in [0, 1], f'unexpected element index {idx}'
         type_expr = self.type_expr['args'][idx]
-        inferred_name = get_name(type_expr.get('annots'), '%', default=['car', 'cdr'][idx])
+        inferred_name = get_name(type_expr, prefixes=['%'], default=['car', 'cdr'][idx])
         if self.name:
             inferred_name = f'{self.name}.{inferred_name}'
 
