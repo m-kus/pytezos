@@ -1,4 +1,5 @@
 import requests
+import logging
 import json
 from os import makedirs
 from os.path import dirname, join, exists
@@ -9,7 +10,7 @@ def write_test_data(folder, name, data):
         f.write(json.dumps(data, indent=2))
 
 
-def fetch_bcd_search_results(since=1606659653, offset=0):
+def fetch_bcd_search_results(since=1590969600, offset=0):
     return requests.get('https://api.better-call.dev/v1/search', params={
         'q': 'KT1',
         'i': 'contract',
@@ -24,7 +25,7 @@ def iter_bcd_contracts(max_count=100):
     offset = 0
     while offset < max_count:
         res = fetch_bcd_search_results(offset=offset)
-        if len(res) == 0:
+        if len(res['items']) == 0:
             break
         for item in res['items']:
             yield item['body']
@@ -34,6 +35,11 @@ def iter_bcd_contracts(max_count=100):
 def fetch_script(address):
     return requests.get(
         f'https://rpc.tzkt.io/mainnet/chains/main/blocks/head/context/contracts/{address}/script').json()
+
+
+def fetch_entrypoints(address):
+    return requests.get(
+        f'https://rpc.tzkt.io/mainnet/chains/main/blocks/head/context/contracts/{address}/entrypoints').json()
 
 
 def fetch_operation_result(level, opg_hash, counter, internal, address):
@@ -65,8 +71,8 @@ def normalize_alias(alias):
     return alias.replace(' ', '_').replace('/', '_').replace(':', '_').lower()
 
 
-def fetch_mainnet_samples():
-    contracts = iter_bcd_contracts(max_count=100)
+def fetch_mainnet_samples(max_count=100):
+    contracts = iter_bcd_contracts(max_count=max_count)
     for contract in contracts:
         name = normalize_alias(contract.get('alias', '')) or contract['address']
         folder = join(dirname(dirname(__file__)), 'tests', 'mainnet', name)
@@ -75,7 +81,9 @@ def fetch_mainnet_samples():
         else:
             makedirs(folder)
         script = fetch_script(contract['address'])
-        write_test_data(folder, 'script', script)
+        write_test_data(folder, '__script__', script)
+        entrypoints = fetch_entrypoints(contract['address'])
+        write_test_data(folder, '__entrypoints__', entrypoints)
         for entrypoint in contract['entrypoints']:
             operation = fetch_bcd_operation(contract['address'], entrypoint)
             if operation:
@@ -89,4 +97,5 @@ def fetch_mainnet_samples():
 
 
 if __name__ == '__main__':
-    fetch_mainnet_samples()
+    logging.basicConfig(level=logging.DEBUG)
+    fetch_mainnet_samples(10)

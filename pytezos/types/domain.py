@@ -41,7 +41,7 @@ class TimestampType(IntType, prim='timestamp'):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
 
 
@@ -101,7 +101,7 @@ class AddressType(StringType, prim='address'):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
 
 
@@ -132,7 +132,7 @@ class KeyType(StringType, prim='key'):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
 
 
@@ -163,7 +163,7 @@ class KeyHashType(StringType, prim='key_hash'):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
 
 
@@ -194,7 +194,7 @@ class SignatureType(StringType, prim='signature'):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
 
 
@@ -225,7 +225,7 @@ class ChainIdType(StringType, prim='chain_id'):
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
 
 
@@ -280,5 +280,5 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return self.value
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         return micheline_to_michelson(self.value)

@@ -69,11 +69,11 @@ class OptionType(MichelsonType, prim='option', args_len=1):
             arg = self.item.to_micheline_value(mode=mode, lazy_diff=lazy_diff)
             return {'prim': 'Some', 'args': [arg]}
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         if self.is_none():
             return None
         else:
-            return self.item.to_python_object(lazy_diff=lazy_diff)
+            return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         if self.is_none():

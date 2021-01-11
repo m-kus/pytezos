@@ -249,7 +249,7 @@ class MichelsonType:
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         raise NotImplementedError
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         raise NotImplementedError
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':

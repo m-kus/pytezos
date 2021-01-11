@@ -84,8 +84,12 @@ class MapType(MichelsonType, prim='map', args_len=2):
             for elt in self
         ]
 
-    def to_python_object(self, lazy_diff=False) -> dict:
-        return {k.to_python_object(): v.to_python_object(lazy_diff=lazy_diff) for k, v in self}
+    def to_python_object(self, try_unpack=False, lazy_diff=False) -> dict:
+        return {
+            k.to_python_object(try_unpack=try_unpack):
+                v.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff) if v else None
+            for k, v in self
+        }
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MapType':
         value = [(key, val.merge_lazy_diff(lazy_diff)) for key, val in self]

@@ -57,8 +57,8 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return list(map(lambda x: x.to_micheline_value(mode=mode, lazy_diff=lazy_diff), self))
 
-    def to_python_object(self, lazy_diff=False):
-        return list(map(lambda x: x.to_python_object(lazy_diff=lazy_diff), self))
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
+        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff), self))
 
     def generate_pydoc(self, definitions: list, inferred_name=None):
         name = self.field_name or self.type_name or inferred_name

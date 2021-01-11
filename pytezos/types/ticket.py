@@ -75,8 +75,8 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return self.to_comb().to_micheline_value(mode=mode)
 
-    def to_python_object(self, lazy_diff=False):
-        return self.ticketer, self.item.to_python_object(), self.amount
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
+        return self.ticketer, self.item.to_python_object(try_unpack=try_unpack), self.amount
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         return self

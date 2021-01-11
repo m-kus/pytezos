@@ -124,13 +124,19 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         # else:
         #     assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, lazy_diff=False) -> Union[dict, tuple]:
+    def to_python_object(self, try_unpack=False, lazy_diff=False) -> Union[dict, tuple]:
         struct = Struct.from_nested_type(type(self))
         flat_values = struct.get_flat_values(self.items)
         if isinstance(flat_values, dict):
-            return {name: arg.to_python_object(lazy_diff=lazy_diff) for name, arg in flat_values.items()}
+            return {
+                name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+                for name, arg in flat_values.items()
+            }
         else:
-            return tuple(arg.to_python_object(lazy_diff=lazy_diff) for arg in flat_values)
+            return tuple(
+                arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+                for arg in flat_values
+            )
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'PairType':
         value = tuple(item.merge_lazy_diff(lazy_diff) for item in self)

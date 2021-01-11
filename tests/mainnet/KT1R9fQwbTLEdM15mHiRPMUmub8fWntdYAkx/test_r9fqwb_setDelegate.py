@@ -10,31 +10,31 @@ folder = 'tzbtc'
 entrypoint = 'transfer'
 
 
-class MainnetOperationTestCaseTemplate(TestCase):
+class MainnetOperationTestCaseR9FQWB(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(join(dirname(__file__), f'{folder}', '__script__.json')) as f:
+        with open(join(dirname(__file__), f'', '__script__.json')) as f:
             script = json.loads(f.read())
 
         cls.parameter_type = ParameterType.match(script['code'][0])
         cls.storage_type = StorageType.match(script['code'][1])
 
-        with open(join(dirname(__file__), f'{folder}', f'{entrypoint}.json')) as f:
+        with open(join(dirname(__file__), f'', f'setDelegate.json')) as f:
             operation = json.loads(f.read())
 
-        cls.entrypoint = f'{entrypoint}'
+        cls.entrypoint = f'setDelegate'
         cls.operation = operation
         # cls.maxDiff = None
 
-    def test_parameters_template(self):
+    def test_parameters_r9fqwb(self):
         params = self.parameter_type.from_parameters(self.operation['parameters'])
         py_obj = params.to_python_object()
         # pprint(py_obj)
         param_expr = params.to_parameters(mode='optimized')
         self.assertEqual(self.operation['parameters'], param_expr)
 
-    def test_lazy_storage_template(self):
+    def test_lazy_storage_r9fqwb(self):
         storage = self.storage_type.from_micheline_value(self.operation['storage'])
         lazy_diff = big_map_diff_to_lazy_diff(self.operation['big_map_diff'])
         extended_storage = storage.merge_lazy_diff(lazy_diff)

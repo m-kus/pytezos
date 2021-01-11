@@ -6,6 +6,30 @@ from pytezos.types.map import MapType
 from pytezos.michelson.pack import get_key_hash
 
 
+def big_map_diff_to_lazy_diff(big_map_diff: List[dict]):
+    lazy_diff = dict()
+    for diff in big_map_diff:
+        ptr = diff['big_map']
+        if ptr not in lazy_diff:
+            lazy_diff[ptr] = {
+                'kind': 'big_map',
+                'id': ptr,
+                'diff': {'action': 'update', 'updates': []}
+            }
+        if diff['action'] == 'alloc':
+            lazy_diff[ptr]['diff']['action'] = diff['action']
+            lazy_diff[ptr]['diff']['key_type'] = diff['key_type']
+            lazy_diff[ptr]['diff']['value_type'] = diff['value_type']
+        elif diff['action'] == 'update':
+            item = {'key': diff['key'], 'key_hash': diff['key_hash']}
+            if diff.get('value'):
+                item['value'] = diff['value']
+            lazy_diff[ptr]['diff']['updates'].append(item)
+        else:
+            raise NotImplementedError(diff['action'])
+    return list(lazy_diff.values())
+
+
 class BigMapType(MapType, prim='big_map', args_len=2):
 
     def __init__(self, items: List[Tuple[MichelsonType, MichelsonType]],
@@ -67,10 +91,10 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             assert self.ptr is not None, f'Big_map id is not defined'
             return {'int': str(self.ptr)}
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         if lazy_diff:
-            res = super(BigMapType, self).to_python_object()
-            removals = {key.to_python_object(): None for key in self.removed_keys}
+            res = super(BigMapType, self).to_python_object(try_unpack=try_unpack)
+            removals = {key.to_python_object(try_unpack=try_unpack): None for key in self.removed_keys}
             return {**res, **removals}
         else:
             assert self.ptr is not None, f'Big_map id is not defined'
@@ -97,7 +121,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         assert self.ptr is not None, f'Big_map id is not defined'
-        ptr, action = self.storage.get_big_map_diff() if self.storage else (self.ptr, 'alloc')
+        ptr, action = self.storage.get_big_map_diff() if self.storage else (self.ptr, 'update')
         key_type, val_type = [arg.get_micheline_type() for arg in self.type_args]
 
         def make_update(key: MichelsonType, val: Optional[MichelsonType]) -> dict:

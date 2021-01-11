@@ -43,7 +43,7 @@ class Struct:
 
     @staticmethod
     def iter_values(prim: str, nested_item: Iterable[MichelsonType],
-                    ignore_annots=False, allow_nones=False, force_recurse=False, path='') \
+                    ignore_annots=False, allow_nones=False, path='') \
             -> Generator[Tuple[str, MichelsonType], None, None]:
         for i, arg in enumerate(nested_item):
             if arg is None:
@@ -52,12 +52,11 @@ class Struct:
                 name = arg.field_name or arg.type_name
                 if not ignore_annots and name:
                     yield path + str(i), arg
-                if ignore_annots or not name or force_recurse:
+                else:
                     arg = cast(Iterable[MichelsonType], arg)
                     yield from Struct.iter_values(prim, arg,
                                                   ignore_annots=ignore_annots,
                                                   allow_nones=allow_nones,
-                                                  force_recurse=force_recurse,
                                                   path=path + str(i))
             else:
                 assert isinstance(arg, MichelsonType), f'unexpected arg {arg}'
@@ -164,12 +163,11 @@ class Struct:
         return wrap_expr(val_expr, self.get_path(entry_point))
 
     def get_flat_values(self, nested_item: Iterable[MichelsonType],
-                        ignore_annots=False, allow_nones=False, force_recurse=False) \
+                        ignore_annots=False, allow_nones=False) \
             -> Union[Dict[str, MichelsonType], List[MichelsonType]]:
         flat_values = list(self.iter_values(self.prim, nested_item,
                                             ignore_annots=ignore_annots,
-                                            allow_nones=allow_nones,
-                                            force_recurse=force_recurse))
+                                            allow_nones=allow_nones))
         if self.is_named():
             return {self.get_name(path): arg for path, arg in flat_values if arg is not None}
         else:

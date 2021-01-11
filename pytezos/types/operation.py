@@ -18,5 +18,5 @@ class OperationType(MichelsonType, prim='operation'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         assert False, 'forbidden'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         pass

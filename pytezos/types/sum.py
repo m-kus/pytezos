@@ -63,11 +63,14 @@ class OrType(MichelsonType, prim='or', args_len=2):
                 return {'prim': prim, 'args': [self.items[i].to_micheline_type(mode=mode, lazy_diff=lazy_diff)]}
         assert False, f'unexpected value {self.items}'
 
-    def to_python_object(self, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False):
         struct = Struct.from_nested_type(type(self), ignore_annots=True, force_named=True)
         flat_values = struct.get_flat_values(self.items, ignore_annots=True, allow_nones=True)
         assert isinstance(flat_values, dict) and len(flat_values) == 1
-        return {name: value.to_python_object(lazy_diff=lazy_diff) for name, value in flat_values.items()}
+        return {
+            name: value.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+            for name, value in flat_values.items()
+        }
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'OrType':
         value = tuple(item.merge_lazy_diff(lazy_diff) if item else None for item in self)
