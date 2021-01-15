@@ -5,9 +5,9 @@ from binascii import hexlify
 from datetime import datetime
 from time import sleep
 
-from pytezos.encoding import base58_decode
+from pytezos.crypto.encoding import base58_decode
 from pytezos.rpc.query import RpcQuery
-from pytezos.tools.docstring import get_attr_docstring
+from pytezos.docstring import get_attr_docstring
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
 
 

@@ -2,9 +2,9 @@ from unittest import TestCase
 from parameterized import parameterized
 
 from pytezos.michelson.converter import michelson_to_micheline
-from pytezos.michelson.contract import ContractStorage, ContractParameter
+from pytezos.contract.script import ContractStorage, ContractParameter
 from pytezos.michelson.grammar import MichelsonParser
-from pytezos.repl.parser import parse_expression
+from pytezos.michelson.instructions import parse_expression
 
 storage_data = [(
     """Pair (Pair "tz1YPSCGWXwBdTncK2aCctSZAXWvGsGwVJqU" True) 

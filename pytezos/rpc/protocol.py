@@ -5,10 +5,10 @@ from datetime import datetime
 from itertools import count
 from typing import Iterator
 
-from pytezos.tools.docstring import get_attr_docstring
+from pytezos.docstring import get_attr_docstring
 from pytezos.rpc.search import BlockSliceQuery
 from pytezos.rpc.query import RpcQuery
-from pytezos.encoding import is_bh, is_ogh
+from pytezos.crypto.encoding import is_bh, is_ogh
 
 
 def to_timestamp(v):

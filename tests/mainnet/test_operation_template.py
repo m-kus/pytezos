@@ -5,9 +5,10 @@ import json
 
 from pytezos.types import StorageType, ParameterType
 from pytezos.types.big_map import big_map_diff_to_lazy_diff
+from pytezos.types.base import get_script_section
 
-folder = 'tzbtc'
-entrypoint = 'transfer'
+folder = 'dexter_usdtz_xtz'
+entrypoint = 'removeLiquidity'
 
 
 class MainnetOperationTestCaseTemplate(TestCase):
@@ -17,8 +18,8 @@ class MainnetOperationTestCaseTemplate(TestCase):
         with open(join(dirname(__file__), f'{folder}', '__script__.json')) as f:
             script = json.loads(f.read())
 
-        cls.parameter_type = ParameterType.match(script['code'][0])
-        cls.storage_type = StorageType.match(script['code'][1])
+        cls.parameter_type = ParameterType.match(get_script_section(script, 'parameter'))
+        cls.storage_type = StorageType.match(get_script_section(script, 'storage'))
 
         with open(join(dirname(__file__), f'{folder}', f'{entrypoint}.json')) as f:
             operation = json.loads(f.read())
@@ -28,15 +29,16 @@ class MainnetOperationTestCaseTemplate(TestCase):
         # cls.maxDiff = None
 
     def test_parameters_template(self):
-        params = self.parameter_type.from_parameters(self.operation['parameters'])
-        py_obj = params.to_python_object()
+        original_params = self.parameter_type.from_parameters(self.operation['parameters'])
+        py_obj = original_params.to_python_object()
         # pprint(py_obj)
-        param_expr = params.to_parameters(mode='optimized')
-        self.assertEqual(self.operation['parameters'], param_expr)
+        readable_params = self.parameter_type.from_parameters(original_params.to_parameters(mode='readable'))
+        # optimized_params = self.parameter_type.from_parameters(original_params.to_parameters(mode='optimized'))
+        self.assertEqual(py_obj, readable_params.to_python_object())
 
     def test_lazy_storage_template(self):
         storage = self.storage_type.from_micheline_value(self.operation['storage'])
         lazy_diff = big_map_diff_to_lazy_diff(self.operation['big_map_diff'])
         extended_storage = storage.merge_lazy_diff(lazy_diff)
         py_obj = extended_storage.to_python_object(try_unpack=True, lazy_diff=True)
-        # pprint(py_obj[0])
+        # pprint(py_obj)

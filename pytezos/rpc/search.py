@@ -3,8 +3,8 @@ from loguru import logger
 
 from pytezos.rpc.node import RpcError
 from pytezos.rpc.query import RpcQuery
-from pytezos.tools.docstring import get_attr_docstring
-from pytezos.encoding import is_bh
+from pytezos.docstring import get_attr_docstring
+from pytezos.crypto.encoding import is_bh
 
 
 def find_state_change_intervals(head: int, last: int, get: Callable, equals: Callable,

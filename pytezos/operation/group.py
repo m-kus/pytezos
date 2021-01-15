@@ -1,15 +1,16 @@
 from pprint import pformat
 from itertools import count
 
-from pytezos.crypto import blake2b_32
+from pytezos.crypto.key import blake2b_32
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.forge import forge_operation_group
 from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-from pytezos.encoding import forge_base58, base58_encode
+from pytezos.crypto.encoding import base58_encode
+from pytezos.michelson.forge import forge_base58
 from pytezos.interop import Interop
-from pytezos.tools.docstring import get_class_docstring
+from pytezos.docstring import get_class_docstring
 
 validation_passes = {
     'endorsement': 0,

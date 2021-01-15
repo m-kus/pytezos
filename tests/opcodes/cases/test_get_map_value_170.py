@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from tests import abspath
 
-from pytezos.repl.interpreter import Interpreter
+from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
-from pytezos.repl.parser import parse_expression
+from pytezos.michelson.instructions import parse_expression
 
 
 class OpcodeTestget_map_value_170(TestCase):

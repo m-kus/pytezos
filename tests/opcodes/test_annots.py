@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from tests import abspath
 
-from pytezos.repl.interpreter import Interpreter, MichelsonRuntimeError
+from pytezos.michelson.repl import Interpreter, MichelsonRuntimeError
 
 
 class OpcodeTestAnnotations(TestCase):

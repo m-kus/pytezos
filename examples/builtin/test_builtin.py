@@ -17,5 +17,5 @@ class TestBuiltin(TestCase):
 
     def test_call_option_some(self):
         res = self.ci.callAnotherContract('KT1VG2WtYdSWz5E7chTeAdDPZNy2MpP8pTfL').interpret(storage=None)
-        print(self.ci.contract.parameter)
+        print(self.ci.script.parameter)
         self.assertEqual(1, len(res.operations))

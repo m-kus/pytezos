@@ -1,153 +1,15 @@
-from pytezos.encoding import forge_array, parse_array
+import base58
+import strict_rfc3339
 
-prim_tags = {
-    'parameter': b'\x00',
-    'storage': b'\x01',
-    'code': b'\x02',
-    'False': b'\x03',
-    'Elt': b'\x04',
-    'Left': b'\x05',
-    'None': b'\x06',
-    'Pair': b'\x07',
-    'Right': b'\x08',
-    'Some': b'\x09',
-    'True': b'\x0A',
-    'Unit': b'\x0B',
-    'PACK': b'\x0C',
-    'UNPACK': b'\x0D',
-    'BLAKE2B': b'\x0E',
-    'SHA256': b'\x0F',
-    'SHA512': b'\x10',
-    'ABS': b'\x11',
-    'ADD': b'\x12',
-    'AMOUNT': b'\x13',
-    'AND': b'\x14',
-    'BALANCE': b'\x15',
-    'CAR': b'\x16',
-    'CDR': b'\x17',
-    'CHECK_SIGNATURE': b'\x18',
-    'COMPARE': b'\x19',
-    'CONCAT': b'\x1A',
-    'CONS': b'\x1B',
-    '__CREATE_ACCOUNT__': b'\x1C',  # DEPRECATED
-    'CREATE_CONTRACT': b'\x1D',
-    'IMPLICIT_ACCOUNT': b'\x1E',
-    'DIP': b'\x1F',
-    'DROP': b'\x20',
-    'DUP': b'\x21',
-    'EDIV': b'\x22',
-    'EMPTY_MAP': b'\x23',
-    'EMPTY_SET': b'\x24',
-    'EQ': b'\x25',
-    'EXEC': b'\x26',
-    'FAILWITH': b'\x27',
-    'GE': b'\x28',
-    'GET': b'\x29',
-    'GT': b'\x2A',
-    'HASH_KEY': b'\x2B',
-    'IF': b'\x2C',
-    'IF_CONS': b'\x2D',
-    'IF_LEFT': b'\x2E',
-    'IF_NONE': b'\x2F',
-    'INT': b'\x30',
-    'LAMBDA': b'\x31',
-    'LE': b'\x32',
-    'LEFT': b'\x33',
-    'LOOP': b'\x34',
-    'LSL': b'\x35',
-    'LSR': b'\x36',
-    'LT': b'\x37',
-    'MAP': b'\x38',
-    'MEM': b'\x39',
-    'MUL': b'\x3A',
-    'NEG': b'\x3B',
-    'NEQ': b'\x3C',
-    'NIL': b'\x3D',
-    'NONE': b'\x3E',
-    'NOT': b'\x3F',
-    'NOW': b'\x40',
-    'OR': b'\x41',
-    'PAIR': b'\x42',
-    'PUSH': b'\x43',
-    'RIGHT': b'\x44',
-    'SIZE': b'\x45',
-    'SOME': b'\x46',
-    'SOURCE': b'\x47',
-    'SENDER': b'\x48',
-    'SELF': b'\x49',
-    'STEPS_TO_QUOTA': b'\x4A',
-    'SUB': b'\x4B',
-    'SWAP': b'\x4C',
-    'TRANSFER_TOKENS': b'\x4D',
-    'SET_DELEGATE': b'\x4E',
-    'UNIT': b'\x4F',
-    'UPDATE': b'\x50',
-    'XOR': b'\x51',
-    'ITER': b'\x52',
-    'LOOP_LEFT': b'\x53',
-    'ADDRESS': b'\x54',
-    'CONTRACT': b'\x55',
-    'ISNAT': b'\x56',
-    'CAST': b'\x57',
-    'RENAME': b'\x58',
-    'bool': b'\x59',
-    'contract': b'\x5A',
-    'int': b'\x5B',
-    'key': b'\x5C',
-    'key_hash': b'\x5D',
-    'lambda': b'\x5E',
-    'list': b'\x5F',
-    'map': b'\x60',
-    'big_map': b'\x61',
-    'nat': b'\x62',
-    'option': b'\x63',
-    'or': b'\x64',
-    'pair': b'\x65',
-    'set': b'\x66',
-    'signature': b'\x67',
-    'string': b'\x68',
-    'bytes': b'\x69',
-    'mutez': b'\x6A',
-    'timestamp': b'\x6B',
-    'unit': b'\x6C',
-    'operation': b'\x6D',
-    'address': b'\x6E',
-    'SLICE': b'\x6F',
-    'DIG': b'\x70',
-    'DUG': b'\x71',
-    'EMPTY_BIG_MAP': b'\x72',
-    'APPLY': b'\x73',
-    'chain_id': b'\x74',
-    'CHAIN_ID': b'\x75'
-}
+from pytezos.crypto.encoding import base58_encode, base58_decode
+from pytezos.michelson.tags import prim_tags
+
 prim_int = {v[0]: k for k, v in prim_tags.items()}
 
-len_tags = [
-    {
-        False: b'\x03',
-        True: b'\x04'
-    },
-    {
-        False: b'\x05',
-        True: b'\x06'
-    },
-    {
-        False: b'\x07',
-        True: b'\x08'
-    },
-    {
-        False: b'\x09',
-        True: b'\x09'
-    }
-]
 
-reserved_entries = {
-    'default': b'\x00',
-    'root': b'\x01',
-    'do': b'\x02',
-    'set_delegate': b'\x03',
-    'remove_delegate': b'\x04'
-}
+def get_tag(args_len: int, annots_len: int) -> bytes:
+    tag = min(args_len * 2 + 3 + (1 if annots_len > 0 else 0), 9)
+    return tag.to_bytes(1, 'big')
 
 
 def forge_int(value: int) -> bytes:
@@ -170,7 +32,7 @@ def forge_int(value: int) -> bytes:
     return bytes(res)
 
 
-def parse_int(data: bytes) -> (int, int):
+def unforge_int(data: bytes) -> (int, int):
     """ Decode signed unbounded integer from bytes.
 
     :param data: Encoded integer
@@ -195,15 +57,196 @@ def parse_int(data: bytes) -> (int, int):
     return value, length
 
 
-def forge_entrypoint(entrypoint) -> bytes:
-    """ Encode Michelson contract entrypoint into the byte form.
+def forge_nat(value) -> bytes:
+    """ Encode a number using LEB128 encoding (Zarith).
 
-    :param entrypoint: string
+    :param int value: the value to encode
+    :returns: encoded value
+    :rtype: bytes
     """
-    if entrypoint in reserved_entries:
-        return reserved_entries[entrypoint]
+    if value < 0:
+        raise ValueError('Value cannot be negative.')
+
+    buf = bytearray()
+    more = True
+
+    while more:
+        byte = value & 0x7f
+        value >>= 7
+
+        if value:
+            byte |= 0x80
+        else:
+            more = False
+
+        buf.append(byte)
+
+    return bytes(buf)
+
+
+def unforge_chain_id(data: bytes):
+    """ Decode chain id from byte form.
+
+    :param data: encoded chain id.
+    :returns: base58 encoded chain id
+    """
+    return base58_encode(data, b'Net').decode()
+
+
+def unforge_signature(data: bytes):
+    """ Decode signature from byte form.
+
+    :param data: encoded signature.
+    :returns: base58 encoded signature (generic)
+    """
+    return base58_encode(data, b'sig').decode()
+
+
+def forge_bool(value: bool) -> bytes:
+    """ Encode boolean value into bytes.
+    """
+    return b'\xff' if value else b'\x00'
+
+
+def forge_base58(value: str) -> bytes:
+    """ Encode base58 string into bytes.
+
+    :param value: base58 encoded value (with checksum)
+    """
+    return base58_decode(value.encode())
+
+
+def forge_timestamp(value: str) -> int:
+    """ Encode timestamp into bytes.
+
+    :param value: RFC3339 time string
+    """
+    assert isinstance(value, str)
+    return int(strict_rfc3339.rfc3339_to_timestamp(value))
+
+
+def forge_address(value: str, tz_only=False) -> bytes:
+    """ Encode address or key hash into bytes.
+
+    :param value: base58 encoded address or key_hash
+    :param tz_only: True indicates that it's a key_hash (will be encoded in a more compact form)
+    """
+    prefix = value[:3]
+    address = base58.b58decode_check(value)[3:]
+
+    if prefix == 'tz1':
+        res = b'\x00\x00' + address
+    elif prefix == 'tz2':
+        res = b'\x00\x01' + address
+    elif prefix == 'tz3':
+        res = b'\x00\x02' + address
+    elif prefix == 'KT1':
+        res = b'\x01' + address + b'\x00'
     else:
-        return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
+        raise ValueError(value)
+
+    return res[1:] if tz_only else res
+
+
+def unforge_address(data: bytes):
+    """ Decode address or key_hash from bytes.
+
+    :param data: encoded address or key_hash
+    :returns: base58 encoded address
+    """
+    tz_prefixes = {
+        b'\x00\x00': b'tz1',
+        b'\x00\x01': b'tz2',
+        b'\x00\x02': b'tz3'
+    }
+
+    for bin_prefix, tz_prefix in tz_prefixes.items():
+        if data.startswith(bin_prefix):
+            return base58_encode(data[2:], tz_prefix).decode()
+
+    if data.startswith(b'\x01') and data.endswith(b'\x00'):
+        return base58_encode(data[1:-1], b'KT1').decode()
+    else:
+        return base58_encode(data[1:], tz_prefixes[b'\x00' + data[:1]]).decode()
+
+
+def forge_contract(value) -> bytes:
+    """ Encode a value of contract type (address + optional entrypoint) into bytes.
+
+    :param value: 'tz12345' or 'tz12345%default'
+    """
+    parts = value.split('%')
+    address, entrypoint = (parts[0], parts[1]) if len(parts) == 2 else (parts[0], 'default')
+    res = forge_address(address)
+    if entrypoint != 'default':
+        res += entrypoint.encode()
+    return res
+
+
+def unforge_contract(data: bytes):
+    """ Decode contract (address + optional entrypoint) from bytes
+
+    :param data: encoded contract
+    :returns: base58 encoded address and entrypoint (if exists) separated by `%`
+    """
+    res = unforge_address(data[:22])
+    if len(data) > 22:
+        res += f'%{data[22:].decode()}'
+    return res
+
+
+def forge_public_key(value) -> bytes:
+    """ Encode public key into bytes.
+
+    :param value: public key in in base58 form
+    """
+    prefix = value[:4]
+    res = base58.b58decode_check(value)[4:]
+
+    if prefix == 'edpk':
+        return b'\x00' + res
+    elif prefix == 'sppk':
+        return b'\x01' + res
+    elif prefix == 'p2pk':
+        return b'\x02' + res
+
+    raise ValueError(f'Unrecognized key type: #{prefix}')
+
+
+def unforge_public_key(data: bytes) -> str:
+    """ Decode public key from byte form.
+
+    :param data: encoded public key.
+    :returns: base58 encoded public key
+    """
+    key_prefix = {
+        b'\x00': b'edpk',
+        b'\x01': b'sppk',
+        b'\x02': b'p2pk'
+    }
+    return base58_encode(data[1:], key_prefix[data[:1]]).decode()
+
+
+def forge_array(data, len_bytes=4) -> bytes:
+    """ Encode array of bytes (prepend length).
+
+    :param data: list of bytes
+    :param len_bytes: number of bytes to store array length
+    """
+    return len(data).to_bytes(len_bytes, 'big') + data
+
+
+def unforge_array(data, len_bytes=4) -> tuple:
+    """ Decode array of bytes.
+
+    :param data: encoded array
+    :param len_bytes: number of bytes to store array length
+    :returns: Tuple[list of bytes, array length]
+    """
+    assert len(data) >= len_bytes, f'not enough bytes to parse array length, wanted {len_bytes}'
+    length = int.from_bytes(data[:len_bytes], 'big')
+    assert len(data) >= len_bytes + length, f'not enough bytes to parse array body, wanted {length}'
+    return data[len_bytes:len_bytes+length], len_bytes+length
 
 
 def forge_micheline(data) -> bytes:
@@ -222,7 +265,7 @@ def forge_micheline(data) -> bytes:
             args_len = len(data.get('args', []))
             annots_len = len(data.get('annots', []))
 
-            res.append(len_tags[args_len][annots_len > 0])
+            res.extend(get_tag(args_len, annots_len))
             res.append(prim_tags[data['prim']])
 
             if args_len > 0:
@@ -234,7 +277,7 @@ def forge_micheline(data) -> bytes:
 
             if annots_len > 0:
                 res.append(forge_array(' '.join(data['annots']).encode()))
-            elif args_len == 3:
+            elif args_len >= 3:
                 res.append(b'\x00' * 4)
 
         elif data.get('bytes') is not None:
@@ -256,16 +299,6 @@ def forge_micheline(data) -> bytes:
     return b''.join(res)
 
 
-def forge_script(script) -> bytes:
-    """ Encode an origination script into the byte form.
-
-    :param script: {"code": "$Micheline_expression", "storage": "$Micheline_expression"}
-    """
-    code = forge_micheline(script['code'])
-    storage = forge_micheline(script['storage'])
-    return forge_array(code) + forge_array(storage)
-
-
 def unforge_micheline(data: bytes):
     """ Parse Micheline expression from its encoded form (but do not UNPACK).
 
@@ -276,7 +309,7 @@ def unforge_micheline(data: bytes):
 
     def parse_list():
         nonlocal ptr
-        _, offset = parse_array(data[ptr:])
+        _, offset = unforge_array(data[ptr:])
         end, res = ptr + offset, []
         ptr += 4
         while ptr < end:
@@ -298,7 +331,7 @@ def unforge_micheline(data: bytes):
             assert args_len == 0, f'unexpected args len {args_len}'
 
         if annots:
-            value, offset = parse_array(data[ptr:])
+            value, offset = unforge_array(data[ptr:])
             ptr += offset
             if len(value) > 0:
                 expr['annots'] = value.decode().split(' ')
@@ -310,11 +343,11 @@ def unforge_micheline(data: bytes):
         tag = data[ptr]
         ptr += 1
         if tag == 0:
-            value, offset = parse_int(data[ptr:])
+            value, offset = unforge_int(data[ptr:])
             ptr += offset
             return {'int': str(value)}
         elif tag == 1:
-            value, offset = parse_array(data[ptr:])
+            value, offset = unforge_array(data[ptr:])
             ptr += offset
             return {'string': value.decode()}
         elif tag == 2:
@@ -334,7 +367,7 @@ def unforge_micheline(data: bytes):
         elif tag == 9:
             return parse_prim_expr(args_len=3, annots=True)
         elif tag == 10:
-            value, offset = parse_array(data[ptr:])
+            value, offset = unforge_array(data[ptr:])
             ptr += offset
             return {'bytes': value.hex()}
         else:
@@ -343,3 +376,13 @@ def unforge_micheline(data: bytes):
     res = parse()
     assert ptr == len(data), f'have not reach EOS (pos {ptr}/{len(data)})'
     return res
+
+
+def forge_script(script) -> bytes:
+    """ Encode an origination script into the byte form.
+
+    :param script: {"code": "$Micheline_expression", "storage": "$Micheline_expression"}
+    """
+    code = forge_micheline(script['code'])
+    storage = forge_micheline(script['storage'])
+    return forge_array(code) + forge_array(storage)

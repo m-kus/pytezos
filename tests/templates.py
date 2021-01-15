@@ -123,9 +123,9 @@ opcode_test_case = """from unittest import TestCase
 
 from tests import abspath
 
-from pytezos.repl.interpreter import Interpreter
+from pytezos.instructions.interpreter import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
-from pytezos.repl.parser import parse_expression
+from pytezos.instructions.parser import parse_expression
 
 
 class OpcodeTest{case}(TestCase):
@@ -150,9 +150,9 @@ big_map_diff_test_case = """from unittest import TestCase
 
 from tests import abspath
 
-from pytezos.repl.interpreter import Interpreter
+from pytezos.instructions.interpreter import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
-from pytezos.repl.parser import parse_expression
+from pytezos.instructions.parser import parse_expression
 
 
 class OpcodeTest{case}(TestCase):
@@ -180,9 +180,9 @@ success_test_case = """from unittest import TestCase
 
 from tests import abspath
 
-from pytezos.repl.interpreter import Interpreter
+from pytezos.instructions.interpreter import Interpreter
 from pytezos.michelson.converter import michelson_to_micheline
-from pytezos.repl.parser import parse_expression
+from pytezos.instructions.parser import parse_expression
 
 
 class OpcodeTest{case}(TestCase):

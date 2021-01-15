@@ -3,8 +3,9 @@ from os.path import dirname, join
 import json
 
 from pytezos.types import StorageType, ParameterType, MichelsonType
+from pytezos.types.base import get_script_section
 
-folder = 'tzbtc'
+folder = 'dexter_usdtz_xtz'
 
 
 class MainnetContractTestCaseDEXTER_USDTZ_XTZ(TestCase):
@@ -14,8 +15,8 @@ class MainnetContractTestCaseDEXTER_USDTZ_XTZ(TestCase):
         with open(join(dirname(__file__), f'', '__script__.json')) as f:
             script = json.loads(f.read())
 
-        cls.parameter_type = ParameterType.match(script['code'][0])
-        cls.storage_type = StorageType.match(script['code'][1])
+        cls.parameter_type = ParameterType.match(get_script_section(script, 'parameter'))
+        cls.storage_type = StorageType.match(get_script_section(script, 'storage'))
         cls.script = script
 
         with open(join(dirname(__file__), f'', '__entrypoints__.json')) as f:

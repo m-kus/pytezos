@@ -1,6 +1,5 @@
-from pytezos.encoding import forge_address, forge_bool, forge_nat, forge_array, forge_public_key, \
-    forge_base58
-from pytezos.michelson.forge import forge_entrypoint, forge_micheline, forge_script
+from pytezos.michelson.forge import forge_micheline, forge_script, forge_nat, forge_public_key, \
+    forge_address, forge_bool, forge_array, forge_base58
 
 operation_tags = {
     'endorsement': 0,
@@ -130,3 +129,23 @@ def forge_delegation(content):
         res += forge_bool(False)
 
     return res
+
+
+def forge_entrypoint(entrypoint) -> bytes:
+    """ Encode Michelson contract entrypoint into the byte form.
+
+    :param entrypoint: string
+    """
+    if entrypoint in reserved_entries:
+        return reserved_entries[entrypoint]
+    else:
+        return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
+
+
+reserved_entries = {
+    'default': b'\x00',
+    'root': b'\x01',
+    'do': b'\x02',
+    'set_delegate': b'\x03',
+    'remove_delegate': b'\x04'
+}

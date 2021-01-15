@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from tests import get_data
-from pytezos.michelson.contract import ContractStorage
+from pytezos.contract.script import ContractStorage
 
 
 class BigMapCodingTestooDVQW(TestCase):

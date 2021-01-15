@@ -1,7 +1,7 @@
 from unittest import TestCase
 from parameterized import parameterized
 
-from pytezos.encoding import scrub_input, base58_encode, base58_decode, is_pkh, is_sig, is_bh
+from pytezos.crypto.encoding import scrub_input, base58_encode, base58_decode, is_pkh, is_sig, is_bh
 
 
 class TestEncoding(TestCase):
