@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Type
 
 from pytezos.crypto.encoding import is_address, is_public_key, is_pkh, \
     is_sig, \
@@ -7,7 +8,9 @@ from pytezos.michelson.forge import forge_public_key, unforge_public_key, unforg
     unforge_address, unforge_contract, forge_base58, forge_timestamp, forge_contract
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
 from pytezos.michelson.types.core import NatType, IntType, StringType
-from pytezos.michelson.types.base import MichelsonType, parse_micheline_literal
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
 
 
@@ -255,8 +258,8 @@ class ContractType(AddressType, prim='contract', args_len=1):
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
-        param_expr = micheline_to_michelson(cls.type_args[0].get_micheline_type())
-        if cls.type_args[0].type_args:
+        param_expr = micheline_to_michelson(cls.args[0].as_micheline_expr())
+        if cls.args[0].args:
             name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
             param_name = f'{name}_param'
             definitions.insert(0, (param_name, param_expr))
@@ -267,7 +270,7 @@ class ContractType(AddressType, prim='contract', args_len=1):
 
 class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
-    def __init__(self, value: list):
+    def __init__(self, value: Type[MichelsonInstruction]):
         super(LambdaType, self).__init__()
         self.value = value
 
@@ -279,8 +282,8 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
         expr = {}
         for i, suffix in enumerate(['return', 'param']):
-            arg_expr = micheline_to_michelson(cls.type_args[i].get_micheline_type())
-            if cls.type_args[i].type_args:
+            arg_expr = micheline_to_michelson(cls.args[i].as_micheline_expr())
+            if cls.args[i].args:
                 arg_name = f'{name}_{suffix}'
                 definitions.insert(0, (arg_name, arg_expr))
                 expr[suffix] = f'${arg_name}'
@@ -290,22 +293,22 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
     @classmethod
     def dummy(cls) -> 'LambdaType':
-        return cls([])
+        return cls(MichelsonInstruction.match([]))
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'LambdaType':
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
-        return cls(val_expr)
+        return cls(MichelsonInstruction.match(val_expr))
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'LambdaType':
         assert isinstance(py_obj, str), f'expected string, got {type(py_obj).__name__}'
         value = michelson_to_micheline(py_obj)
-        return cls(value)
+        return cls.from_micheline_value(value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         # TODO: optimized mode -> harcoded values in the code
-        return self.value
+        return self.value.as_micheline_expr()
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
-        return micheline_to_michelson(self.value)
+        return micheline_to_michelson(self.to_micheline_value())

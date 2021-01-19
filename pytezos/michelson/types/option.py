@@ -1,6 +1,8 @@
 from typing import List, Optional, Type
 
-from pytezos.michelson.types.base import MichelsonType, parse_micheline_value, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.context.base import NodeContext
 
 
 class OptionType(MichelsonType, prim='option', args_len=1):
@@ -28,12 +30,12 @@ class OptionType(MichelsonType, prim='option', args_len=1):
 
     @staticmethod
     def none(some_type: Type[MichelsonType]) -> 'OptionType':
-        cls = OptionType.construct_type(type_args=[some_type])
+        cls = OptionType.create_type(args=[some_type])
         return cls(None)
 
     @staticmethod
     def from_some(item: MichelsonType) -> 'OptionType':
-        cls = OptionType.construct_type(type_args=[type(item)])
+        cls = OptionType.create_type(args=[type(item)])
         return cls(item)
 
     @classmethod
@@ -43,13 +45,13 @@ class OptionType(MichelsonType, prim='option', args_len=1):
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name
-        arg_doc = cls.type_args[0].generate_pydoc(definitions, inferred_name=name)
+        arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=name)
         return f'{arg_doc} || None'
 
     @classmethod
     def from_micheline_value(cls, val_expr):
         item = parse_micheline_value(val_expr, {
-            ('Some', 1): lambda x: cls.type_args[0].from_micheline_value(x[0]),
+            ('Some', 1): lambda x: cls.args[0].from_micheline_value(x[0]),
             ('None', 0): lambda x: None
         })
         return cls(item)
@@ -59,7 +61,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         if py_obj is None:
             item = None
         else:
-            item = cls.type_args[0].from_python_object(py_obj)
+            item = cls.args[0].from_python_object(py_obj)
         return cls(item)
 
     def is_none(self) -> bool:
@@ -93,6 +95,6 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         if not self.is_none():
             self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+    def attach_context(self, context: NodeContext):
         if not self.is_none():
-            self.item.attach_lazy_storage(lazy_storage, action=action)
+            self.item.attach_context(context)

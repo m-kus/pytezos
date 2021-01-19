@@ -6,8 +6,8 @@ from pytezos.michelson.parse import MichelsonParser, MichelsonParserError
 from pytezos.michelson.converter import michelson_to_micheline, micheline_to_michelson
 from pytezos.micheline.types import MichelsonRuntimeError
 from pytezos.michelson.instructions.helpers import *
-from pytezos.michelson.instructions.structures import *
-from pytezos.michelson.instructions.blockchain import *
+from pytezos.michelson.instructions.struct import *
+from pytezos.michelson.instructions.tezos import *
 
 
 def get_content(obj: dict):

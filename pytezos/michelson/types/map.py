@@ -1,7 +1,9 @@
 from typing import Optional, Tuple, Generator, List, Type
 from pprint import pformat
 
-from pytezos.michelson.types.base import MichelsonType, parse_micheline_value, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.context.base import NodeContext
 
 
 class MapType(MichelsonType, prim='map', args_len=2):
@@ -21,7 +23,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
 
     @staticmethod
     def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'MapType':
-        cls = MapType.construct_type(type_args=[key_type, val_type])
+        cls = MapType.create_type(args=[key_type, val_type])
         return cls(items=[])
 
     @staticmethod
@@ -31,7 +33,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         for key, val in items[1:]:
             key_type.assert_equal_types(type(key))
             val_type.assert_equal_types(type(val))
-        cls = MapType.construct_type(type_args=[key_type, val_type])
+        cls = MapType.create_type(args=[key_type, val_type])
         cls.check_constraints(items)
         return cls(items=items)
 
@@ -45,7 +47,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name
         arg_names = [f'{name}_key', f'{name}_value'] if name else [None, None]
-        key, val = [arg.generate_pydoc(definitions, inferred_name=arg_names[i]) for i, arg in enumerate(cls.type_args)]
+        key, val = [arg.generate_pydoc(definitions, inferred_name=arg_names[i]) for i, arg in enumerate(cls.args)]
         return f'{{ {key}: {val}, ... }}'
 
     @classmethod
@@ -58,7 +60,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
 
         def parse_elt(elt_expr) -> Tuple[MichelsonType, MichelsonType]:
             return parse_micheline_value(elt_expr, {
-                ('Elt', 2): lambda x: tuple(cls.type_args[i].from_micheline_value(arg) for i, arg in enumerate(x))
+                ('Elt', 2): lambda x: tuple(cls.args[i].from_micheline_value(arg) for i, arg in enumerate(x))
             })
 
         items = list(map(parse_elt, val_expr))
@@ -73,7 +75,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def parse_python_object(cls, py_obj) -> List[Tuple[MichelsonType, MichelsonType]]:
         assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
         items = [
-            (cls.type_args[0].from_python_object(k), cls.type_args[1].from_python_object(v))
+            (cls.args[0].from_python_object(k), cls.args[1].from_python_object(v))
             for k, v in py_obj.items()
         ]
         return list(sorted(items, key=lambda x: x[0]))
@@ -103,14 +105,14 @@ class MapType(MichelsonType, prim='map', args_len=2):
         for _, val in self:
             val.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+    def attach_context(self, context: NodeContext):
         for _, val in self:
-            val.attach_lazy_storage(lazy_storage, action=action)
+            val.attach_context(context)
 
     def get(self, key: MichelsonType, check_dup=True) -> Optional[MichelsonType]:
-        self.type_args[0].assert_equal_types(type(key))
+        self.args[0].assert_equal_types(type(key))
         if check_dup:
-            assert self.type_args[1].is_duplicable(), f'use get and update instead'
+            assert self.args[1].is_duplicable(), f'use get and update instead'
         return next((item[1] for item in self if item[0] == key), None)
 
     def contains(self, key: MichelsonType):
@@ -131,11 +133,11 @@ class MapType(MichelsonType, prim='map', args_len=2):
         return prev_val, type(self)(items)
 
     def __contains__(self, key_obj):
-        key = self.type_args[0].from_python_object(key_obj)
+        key = self.args[0].from_python_object(key_obj)
         return self.contains(key)
 
     def __getitem__(self, key_obj) -> MichelsonType:
-        key = self.type_args[0].from_python_object(key_obj)
+        key = self.args[0].from_python_object(key_obj)
         val = self.get(key)
         assert val is not None, f'not found: {key_obj}'
         return val

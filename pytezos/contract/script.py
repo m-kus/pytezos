@@ -2,7 +2,7 @@ from typing import Type
 from functools import lru_cache
 from os.path import exists, expanduser
 
-from pytezos.docstring import get_class_docstring, InlineDocstring
+from pytezos.jupyter import get_class_docstring, InlineDocstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.types import ParameterType, StorageType, MichelsonType
@@ -34,13 +34,15 @@ class ContractParameter(metaclass=InlineDocstring):
         """
         return self.type.from_parameters(data).to_python_object()
 
-    def encode(self, data):
+    def encode(self, data, optimized=False):
         """ Convert Python object to Micheline expression using internal schema.
 
         :param data: Python object
+        :param optimized: set to True to compress data
         :returns: object
         """
-        return self.type.from_python_object(data).to_parameters()
+        mode = 'optimized' if optimized else 'readable'
+        return self.type.from_python_object(data).to_parameters(mode=mode)
 
     def entries(self):
         """ Get list of entry points: names and docstrings.
@@ -81,13 +83,15 @@ class ContractStorage(metaclass=InlineDocstring):
         """
         return self.type.from_micheline_value(data).to_python_object()
 
-    def encode(self, data):
+    def encode(self, data, optimized=False):
         """ Convert Python object to Micheline expression using internal schema.
 
         :param data: Python object
+        :param optimized: set to True to compress data
         :returns: object
         """
-        return self.type.from_python_object(data).to_micheline_value()
+        mode = 'optimized' if optimized else 'readable'
+        return self.type.from_python_object(data).to_micheline_value(mode=mode)
 
     def default(self):
         """ Try to generate empty storage, returns Micheline expression.

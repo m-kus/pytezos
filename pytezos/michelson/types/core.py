@@ -1,5 +1,5 @@
-from pytezos.michelson.types.base import MichelsonType, parse_micheline_literal, parse_micheline_value, unit
-from pytezos.michelson.pack import blind_unpack as blind_unpack
+from pytezos.michelson.types.base import MichelsonType, unit
+from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack as blind_unpack
 
 Unit = unit()
 
@@ -75,6 +75,10 @@ class IntType(MichelsonType, prim='int'):
     @classmethod
     def dummy(cls) -> 'IntType':
         return cls()
+
+    @classmethod
+    def from_value(cls, value: int) -> 'IntType':
+        return cls(value)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'IntType':
@@ -186,6 +190,10 @@ class BoolType(MichelsonType, prim='bool'):
     @classmethod
     def dummy(cls) -> 'BoolType':
         return cls(False)
+
+    @classmethod
+    def from_value(cls, value: bool):
+        return cls(value)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'BoolType':

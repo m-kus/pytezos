@@ -7,7 +7,7 @@ from pytezos.operation.content import ContentMixin
 from pytezos.contract.interface import ContractInterface
 from pytezos.contract.script import ContractScript
 from pytezos.interop import Interop
-from pytezos.docstring import get_class_docstring
+from pytezos.jupyter import get_class_docstring
 
 
 class PyTezosClient(Interop, ContentMixin):

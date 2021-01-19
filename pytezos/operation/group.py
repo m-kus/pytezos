@@ -10,7 +10,7 @@ from pytezos.rpc.errors import RpcError
 from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.forge import forge_base58
 from pytezos.interop import Interop
-from pytezos.docstring import get_class_docstring
+from pytezos.jupyter import get_class_docstring
 
 validation_passes = {
     'endorsement': 0,

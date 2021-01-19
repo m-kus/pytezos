@@ -1,7 +1,8 @@
 from typing import Generator, Tuple, List, Union, Type, Optional, cast
 from pprint import pformat
 
-from pytezos.michelson.types.base import MichelsonType, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.context.base import NodeContext
 from pytezos.michelson.types.struct import Struct
 
 
@@ -25,30 +26,31 @@ class PairType(MichelsonType, prim='pair', args_len=None):
 
     @staticmethod
     def from_items(items: List[MichelsonType]) -> 'PairType':
-        cls = PairType.construct_type(type_args=[type(item) for item in items])
+        cls = PairType.create_type(args=[type(item) for item in items])
         return cls.init(items)
 
     @classmethod
     def init(cls, items: List[MichelsonType]) -> 'PairType':
         if len(items) > 2:
-            right_cls = cast(Type['PairType'], cls.type_args[1])
+            right_cls = cast(Type['PairType'], cls.args[1])
             items = items[0], right_cls.init(items[1:])
         else:
             items = tuple(items)
         return cls(items)
 
     @classmethod
-    def construct_type(cls, type_args: List[Type['MichelsonType']],
-                       field_name: Optional[str] = None,
-                       type_name: Optional[str] = None,
-                       type_params: Optional[list] = None, **kwargs) -> Type['PairType']:
-        if len(type_args) > 2:  # comb
-            type_args = [type_args[0], PairType.construct_type(type_args=type_args[1:])]
+    def create_type(cls,
+                    args: List[Type['MichelsonType']],
+                    field_name: Optional[str] = None,
+                    type_name: Optional[str] = None,
+                    **kwargs) -> Type['PairType']:
+        if len(args) > 2:  # comb
+            args = [args[0], PairType.create_type(args=args[1:])]
         else:
-            assert len(type_args) == 2, f'unexpected number of args: {len(type_args)}'
-        type_class = super(PairType, cls).construct_type(type_args=type_args,
-                                                         field_name=field_name,
-                                                         type_name=type_name)
+            assert len(args) == 2, f'unexpected number of args: {len(args)}'
+        type_class = super(PairType, cls).create_type(args=args,
+                                                      field_name=field_name,
+                                                      type_name=type_name)
         return cast(Type['PairType'], type_class)
 
     @classmethod
@@ -66,7 +68,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
                 arg.generate_pydoc(definitions, inferred_name=f'{arg.prim}_{i}')
                 for i, arg in enumerate(flat_args)
             ]
-            if all(arg.prim in ['pair', 'or'] or not arg.type_args for arg in flat_args):
+            if all(arg.prim in ['pair', 'or'] or not arg.args for arg in flat_args):
                 return f'( {", ".join(items)} )'
             else:
                 doc = '(\n' + ',\n'.join(f'\t  {arg_doc}' for arg_doc in items) + '\n\t)'
@@ -75,7 +77,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
 
     @classmethod
     def dummy(cls) -> 'PairType':
-        return cls(tuple(arg.dummy() for arg in cls.type_args))
+        return cls(tuple(arg.dummy() for arg in cls.args))
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'PairType':
@@ -88,9 +90,9 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             assert False, f'either dict(prim) or list expected, got {type(val_expr).__name__}'
 
         if len(args) == 2:
-            value = tuple(cls.type_args[i].from_micheline_value(arg) for i, arg in enumerate(args))
+            value = tuple(cls.args[i].from_micheline_value(arg) for i, arg in enumerate(args))
         elif len(args) > 2:
-            value = cls.type_args[0].from_micheline_value(args[0]), cls.type_args[1].from_micheline_value(args[1:])
+            value = cls.args[0].from_micheline_value(args[0]), cls.args[1].from_micheline_value(args[1:])
         else:
             assert False, f'at least two args expected, got {len(args)}'
         return cls(value)
@@ -99,11 +101,9 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     def from_python_object(cls, py_obj) -> 'PairType':
         if isinstance(py_obj, list):
             py_obj = tuple(py_obj)
-        elif isinstance(py_obj, str):
-            py_obj = tuple(py_obj.split('::'))  # map keys
 
         if isinstance(py_obj, tuple) and len(py_obj) == 2:
-            value = tuple(cls.type_args[i].from_python_object(py_obj[i]) for i in [0, 1])
+            value = tuple(cls.args[i].from_python_object(py_obj[i]) for i in [0, 1])
             return cls(value)
         else:
             struct = Struct.from_nested_type(cls)
@@ -156,9 +156,9 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         for item in self:
             item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+    def attach_context(self, context: NodeContext):
         for item in self:
-            item.attach_lazy_storage(lazy_storage, action=action)
+            item.attach_context(context)
 
     def __getitem__(self, key: Union[int, str]) -> MichelsonType:
         if isinstance(key, int) and 0 <= key <= 1:

@@ -1,6 +1,7 @@
 from typing import Type, cast, List
 
-from pytezos.michelson.types.base import MichelsonType, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.context.base import NodeContext
 
 
 class StorageType(MichelsonType, prim='storage', args_len=1):
@@ -19,23 +20,23 @@ class StorageType(MichelsonType, prim='storage', args_len=1):
     @classmethod
     def generate_pydoc(cls, definitions=None, inferred_name=None):
         definitions = []
-        res = cls.type_args[0].generate_pydoc(definitions, inferred_name or cls.prim)
+        res = cls.args[0].generate_pydoc(definitions, inferred_name or cls.prim)
         if res != f'${cls.prim}':
             definitions.insert(0, (cls.prim, res))
         return '\n'.join(f'${var}:\n\t{doc}\n' for var, doc in definitions)
 
     @classmethod
     def dummy(cls):
-        return cls(cls.type_args[0].dummy())
+        return cls(cls.args[0].dummy())
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'StorageType':
-        item = cls.type_args[0].from_micheline_value(val_expr)
+        item = cls.args[0].from_micheline_value(val_expr)
         return cls(item)
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'StorageType':
-        item = cls.type_args[0].from_python_object(py_obj)
+        item = cls.args[0].from_python_object(py_obj)
         return cls(item)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
@@ -44,8 +45,8 @@ class StorageType(MichelsonType, prim='storage', args_len=1):
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action='remove'):
-        super(StorageType, self).attach_lazy_storage(lazy_storage, action)
+    def attach_context(self, context: NodeContext):
+        super(StorageType, self).attach_context(context)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'StorageType':
         item = self.item.merge_lazy_diff(lazy_diff)

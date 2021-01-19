@@ -3,6 +3,8 @@ import functools
 from collections import namedtuple
 from typing import Tuple
 
+from pytezos.michelson.tags import prim_tags
+
 COMPARE = dict(prim='COMPARE')
 UNIT = dict(prim='UNIT')
 FAILWITH = dict(prim='FAILWITH')
@@ -15,23 +17,6 @@ CDR__ = dict(prim='CDR', annots=['@%%'])
 DROP = dict(prim='DROP')
 FAIL = [[UNIT, FAILWITH]]
 
-primitives = {
-    'ABS', 'ADD', 'ADDRESS', 'AMOUNT', 'AND', 'BALANCE', 'BLAKE2B', 'CAR', 'CAST',
-    'CDR', 'CHECK_SIGNATURE', 'COMPARE', 'CONCAT', 'CONS', 'CONTRACT',
-    'CREATE_ACCOUNT', 'CREATE_CONTRACT', 'DIP', 'DROP', 'DUP', 'EDIV', 'EMPTY_MAP',
-    'EMPTY_SET', 'EQ', 'EXEC', 'Elt', 'FAILWITH', 'False', 'GE', 'GET', 'GT',
-    'HASH_KEY', 'IF', 'IF_CONS', 'IF_LEFT', 'IF_NONE', 'IMPLICIT_ACCOUNT', 'INT',
-    'ISNAT', 'ITER', 'LAMBDA', 'LE', 'LEFT', 'LOOP', 'LOOP_LEFT', 'LSL', 'LSR',
-    'LT', 'Left', 'MAP', 'MEM', 'MUL', 'NEG', 'NEQ', 'NIL', 'NONE', 'NOT', 'NOW',
-    'None', 'OR', 'PACK', 'PAIR', 'PUSH', 'Pair', 'RENAME', 'RIGHT', 'Right',
-    'SELF', 'SENDER', 'SET_DELEGATE', 'SHA256', 'SHA512', 'SIZE', 'SLICE', 'SOME',
-    'SOURCE', 'STEPS_TO_QUOTA', 'SUB', 'SWAP', 'Some', 'TRANSFER_TOKENS', 'True',
-    'UNIT', 'UNPACK', 'UPDATE', 'Unit', 'XOR', 'address', 'big_map', 'bool',
-    'bytes', 'code', 'contract', 'int', 'key_hash', 'key', 'lambda', 'list', 'map',
-    'mutez', 'nat', 'operation', 'option', 'or', 'pair', 'parameter', 'set',
-    'signature', 'storage', 'string', 'timestamp', 'unit', 'DIG', 'DUG', 'EMPTY_BIG_MAP',
-    'APPLY', 'chain_id', 'CHAIN_ID'
-}
 macros = []
 
 PxrNode = namedtuple('PxrNode', ['depth', 'annots', 'args', 'is_root'])
@@ -40,6 +25,7 @@ PxrNode = namedtuple('PxrNode', ['depth', 'annots', 'args', 'is_root'])
 def macro(regexp):
     def register_macro(func):
         macros.append((re.compile(regexp), func))
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
@@ -68,7 +54,7 @@ def expand_macro(prim, annots, args, internal=False, extra=None):
     """
     assert isinstance(annots, list)
     assert isinstance(args, list)
-    if prim in primitives or (isinstance(extra, list) and prim in extra):
+    if prim in prim_tags or (isinstance(extra, list) and prim in extra):
         return expr(prim=prim, annots=annots, args=args)
 
     for regexp, handler in macros:
@@ -191,17 +177,10 @@ def expand_dixp(prim, annots, args) -> dict:
 
 
 @macro(r'^D(UU+)P$')
-def expand_duxp(prim, annots, args) -> list:
+def expand_duxp(prim, annots, args) -> dict:
     assert not args
     depth = len(prim)
-    dup = expr(prim='DUP', annots=annots)
-    if depth == 1:
-        return [dup]
-    elif depth == 2:
-        return [dip_n(dup), SWAP]
-    else:
-        return [dip_n(dup, depth - 1),
-                expr(prim='DIG', args=[{'int': str(depth)}])]
+    return expr(prim='DUP', annots=annots, args=[{'int': str(depth)}])
 
 
 def build_pxr_tree(pxr_macro, pxr_annots) -> PxrNode:

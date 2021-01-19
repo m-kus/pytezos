@@ -4,7 +4,7 @@ from ply.yacc import yacc
 import re
 import json
 
-from pytezos.michelson.instructions.macros import expand_macro
+from pytezos.michelson.macros import expand_macro
 
 
 class MichelsonParserError(ValueError):

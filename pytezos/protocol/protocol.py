@@ -13,7 +13,7 @@ from typing import List, Tuple
 from pytezos.crypto.key import blake2b_32
 from pytezos.crypto.encoding import base58_encode
 from pytezos.protocol.diff import make_patch, apply_patch, generate_unidiff_html
-from pytezos.docstring import get_class_docstring, InlineDocstring
+from pytezos.jupyter import get_class_docstring, InlineDocstring
 
 
 def dir_to_files(path) -> List[Tuple[str, str]]:

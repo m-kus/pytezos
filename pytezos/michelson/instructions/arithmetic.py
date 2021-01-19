@@ -1,234 +1,300 @@
-from hashlib import sha256, sha512
+from typing import List, Union, Tuple, Type, Callable, cast
 
-from pytezos import crypto as crypto
-from pytezos.michelson.instructions.control import instruction
-from pytezos.michelson.instructions.context import Context
-from pytezos.michelson.instructions.types import assert_stack_type, Int, Nat, Timestamp, Mutez, Option, Pair, Bool, Bytes, Key, \
-    Signature, KeyHash, dispatch_type_map
+from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.types import BoolType, IntType, NatType, TimestampType, MutezType, OptionType, PairType
+from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
 
 
-@instruction('ABS')
-def do_abs(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Int)
-    res = Nat(abs(int(top)))
-    ctx.push(res, annots=annots)
+class AbsInstruction(MichelsonInstruction, prim='ABS'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a = cast(IntType, stack.pop1())
+        a.assert_equal_types(IntType)
+        res = NatType.from_value(abs(int(a)))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a], [res]))
+        return cls()
 
 
-@instruction('ADD')
-def do_add(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    res_type = dispatch_type_map(a, b, {
-        (Nat, Nat): Nat,
-        (Nat, Int): Int,
-        (Int, Nat): Int,
-        (Int, Int): Int,
-        (Timestamp, Int): Timestamp,
-        (Int, Timestamp): Timestamp,
-        (Mutez, Mutez): Mutez
-    })
-    res = res_type(int(a) + int(b))
-    ctx.push(res, annots=annots)
+class AddInstruction(MichelsonInstruction, prim='ADD'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
+        res_type, = dispatch_types(a, b, mapping={
+            (NatType, NatType): (NatType,),
+            (NatType, IntType): (IntType,),
+            (IntType, NatType): (IntType,),
+            (IntType, IntType): (IntType,),
+            (TimestampType, IntType): (TimestampType,),
+            (IntType, TimestampType): (TimestampType,),
+            (MutezType, MutezType): (MutezType,)
+        })  # type: Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType]]
+        res = res_type.from_value(int(a) + int(b))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        return cls()
 
 
-@instruction('COMPARE')
-def do_compare(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    res = Int(a.__cmp__(b))
-    ctx.push(res, annots=annots)
+class CompareInstruction(MichelsonInstruction, prim='COMPARE'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a, b = stack.pop2()
+        a.assert_equal_types(type(b))
+        res = IntType.from_value(a.__cmp__(b))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        return cls()
 
 
-@instruction('EDIV')
-def do_ediv(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    q_type, r_type = dispatch_type_map(a, b, {
-        (Nat, Nat): (Nat, Nat),
-        (Nat, Int): (Int, Nat),
-        (Int, Nat): (Int, Nat),
-        (Int, Int): (Int, Nat),
-        (Mutez, Nat): (Mutez, Mutez),
-        (Mutez, Mutez): (Nat, Mutez)
-    })
-    if int(b) == 0:
-        res = Option.none(Pair.new(q_type(), r_type()).type_expr)
-    else:
-        q, r = divmod(int(a), int(b))
-        if r < 0:
-            r += abs(int(b))
-            q += 1
-        res = Option.some(Pair.new(q_type(q), r_type(r)))
-    ctx.push(res, annots=annots)
+class EdivInstruction(MichelsonInstruction, prim='EDIV'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
+        q_type, r_type = dispatch_types(a, b, mapping={
+            (NatType, NatType): (NatType, NatType),
+            (NatType, IntType): (IntType, NatType),
+            (IntType, NatType): (IntType, NatType),
+            (IntType, IntType): (IntType, NatType),
+            (MutezType, NatType): (MutezType, MutezType),
+            (MutezType, MutezType): (NatType, MutezType)
+        })  # type: Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType]]
+        if int(b) == 0:
+            res = OptionType.none(PairType.create_type(args=[q_type, r_type]))
+        else:
+            q, r = divmod(int(a), int(b))
+            if r < 0:
+                r += abs(int(b))
+                q += 1
+            items = [q_type.from_value(q), r_type.from_value(r)]
+            res = OptionType.from_some(PairType.from_items(items))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        return cls()
 
 
-@instruction(['EQ', 'GE', 'GT', 'LE', 'LT', 'NEQ'])
-def do_eq(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Int)
-    handlers = {
-        'EQ': lambda x: x == 0,
-        'GE': lambda x: x >= 0,
-        'GT': lambda x: x > 0,
-        'LE': lambda x: x <= 0,
-        'LT': lambda x: x < 0,
-        'NEQ': lambda x: x != 0
-    }
-    res = Bool(handlers[prim](int(top)))
-    ctx.push(res, annots=annots)
+def execute_zero_compare(prim: str, stack: MichelsonStack, stdout: List[str], compare: Callable[[int], bool]):
+    a = cast(IntType, stack.pop1())
+    a.assert_equal_types(IntType)
+    res = BoolType(compare(int(a)))
+    stack.push(res)
+    stdout.append(format_stdout(prim, [a], [res]))
 
 
-@instruction('INT')
-def do_int(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Nat)
-    res = Int(int(top))
-    ctx.push(res, annots=annots)
+class EqInstruction(MichelsonInstruction, prim='EQ'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_zero_compare(cls.prim, stack, stdout, lambda x: x == 0)
+        return cls()
 
 
-@instruction('ISNAT')
-def do_is_nat(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Int)
-    if int(top) >= 0:
-        res = Option.some(Nat(int(top)))
-    else:
-        res = Option.none(Nat().type_expr)
-    ctx.push(res, annots=annots)
+class GeInstruction(MichelsonInstruction, prim='GE'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_zero_compare(cls.prim, stack, stdout, lambda x: x >= 0)
+        return cls()
 
 
-@instruction(['LSL', 'LSR'])
-def do_lsl(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    assert_stack_type(a, Nat)
-    assert_stack_type(b, Nat)
+class GtInstruction(MichelsonInstruction, prim='GT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_zero_compare(cls.prim, stack, stdout, lambda x: x > 0)
+        return cls()
+
+
+class LeInstruction(MichelsonInstruction, prim='LE'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_zero_compare(cls.prim, stack, stdout, lambda x: x <= 0)
+        return cls()
+
+
+class LtInstruction(MichelsonInstruction, prim='LT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_zero_compare(cls.prim, stack, stdout, lambda x: x < 0)
+        return cls()
+
+
+class NeqInstruction(MichelsonInstruction, prim='NEQ'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_zero_compare(cls.prim, stack, stdout, lambda x: x != 0)
+        return cls()
+
+
+class IntInstruction(MichelsonInstruction, prim='INT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a = cast(NatType, stack.pop1())
+        a.assert_equal_types(NatType)
+        res = IntType.from_value(int(a))
+        stack.push(res)
+        stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
+        return cls()
+
+
+class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a = cast(IntType, stack.pop1())
+        a.assert_equal_types(IntType)
+        if int(a) >= 0:
+            res = OptionType.from_some(NatType.from_value(int(a)))
+        else:
+            res = OptionType.none(NatType)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a], [res]))
+        return cls()
+
+
+def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Callable[[int, int], int]):
+    a, b = cast(Tuple[NatType, NatType], stack.pop2())
+    a.assert_equal_types(NatType)
+    b.assert_equal_types(NatType)
     assert int(b) < 257, f'shift overflow {int(b)}, should not exceed 256'
-    handlers = {
-        'LSL': lambda x: x[0] << x[1],
-        'LSR': lambda x: x[0] >> x[1]
-    }
-    res = Nat(handlers[prim]((int(a), int(b))))
-    ctx.push(res, annots=annots)
+    res = NatType.from_value(shift(int(a), int(b)))
+    stack.push(res)
+    stdout.append(format_stdout(prim, [a, b], [res]))
 
 
-@instruction('MUL')
-def do_mul(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    res_type = dispatch_type_map(a, b, {
-        (Nat, Nat): Nat,
-        (Nat, Int): Int,
-        (Int, Nat): Int,
-        (Int, Int): Int,
-        (Mutez, Nat): Mutez,
-        (Nat, Mutez): Mutez
+class LslInstruction(MichelsonInstruction, prim='LSL'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_shift(cls.prim, stack, stdout, lambda x: x[0] << x[1])
+        return cls()
+
+
+class LsrInstruction(MichelsonInstruction, prim='LSR'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_shift(cls.prim, stack, stdout, lambda x: x[0] >> x[1])
+        return cls()
+
+
+class MulInstruction(MichelsonInstruction, prim='MUL'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a, b = cast(Tuple[Union[IntType, NatType, MutezType], ...], stack.pop2())
+        res_type, = dispatch_types(a, b, mapping={
+            (NatType, NatType): (NatType,),
+            (NatType, IntType): (IntType,),
+            (IntType, NatType): (IntType,),
+            (IntType, IntType): (IntType,),
+            (MutezType, NatType): (MutezType,),
+            (NatType, MutezType): (MutezType,)
+        })  # type: Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType]]
+        res = res_type.from_value(int(a) * int(b))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        return cls()
+
+
+class NegInstruction(MichelsonInstruction, prim='NEG'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a = cast(Union[IntType, NatType], stack.pop1())
+        _ = dispatch_types(a, mapping={
+            (IntType,): (IntType,),
+            (NatType,): (IntType,)
+        })
+        res = IntType.from_value(-int(a))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a], [res]))
+        return cls()
+
+
+class SubInstruction(MichelsonInstruction, prim='SUB'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
+        res_type = dispatch_types(a, b, mapping={
+            (NatType, NatType): (IntType,),
+            (NatType, IntType): (IntType,),
+            (IntType, NatType): (IntType,),
+            (IntType, IntType): (IntType,),
+            (TimestampType, IntType): (TimestampType,),
+            (TimestampType, TimestampType): (IntType,),
+            (MutezType, MutezType): (MutezType,)
+        })  # type: Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType]]
+        res = res_type.from_value(int(a) - int(b))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        return cls()
+
+
+def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add: Callable):
+    a, b = cast(Tuple[Union[BoolType, NatType], ...], stack.pop2())
+    res_type, convert = dispatch_types(a, b, mapping={
+        (BoolType, BoolType): (BoolType, bool),
+        (NatType, NatType): (NatType, int)
     })
-    res = res_type(int(a) * int(b))
-    ctx.push(res, annots=annots)
+    val = add(convert(a), convert(b))
+    res = res_type.from_value(val)
+    stack.push(res)
+    stdout.append(format_stdout(prim, [a, b], [res]))
 
 
-@instruction('NEG')
-def do_neg(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, [Int, Nat])
-    res = Int(-int(top))
-    ctx.push(res, annots=annots)
+class OrInstruction(MichelsonInstruction, prim='OR'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])
+        return cls()
 
 
-@instruction('SUB')
-def do_sub(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    res_type = dispatch_type_map(a, b, {
-        (Nat, Nat): Int,
-        (Nat, Int): Int,
-        (Int, Nat): Int,
-        (Int, Int): Int,
-        (Timestamp, Int): Timestamp,
-        (Timestamp, Timestamp): Int,
-        (Mutez, Mutez): Mutez
-    })
-    res = res_type(int(a) - int(b))
-    ctx.push(res, annots=annots)
+class XorInstruction(MichelsonInstruction, prim='XOR'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])
+        return cls()
 
 
-@instruction(['OR', 'XOR'])
-def do_or_xor(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    val_type, res_type = dispatch_type_map(a, b, {
-        (Bool, Bool): (bool, Bool),
-        (Nat, Nat): (int, Nat),
-    })
-    handlers = {
-        'OR': lambda x: x[0] | x[1],
-        'XOR': lambda x: x[0] ^ x[1]
-    }
-    res = res_type(handlers[prim]((val_type(a), val_type(b))))
-    ctx.push(res, annots=annots)
+class AndInstruction(MichelsonInstruction, prim='AND'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a, b = cast(Tuple[Union[BoolType, NatType, IntType], ...], stack.pop2())
+        res_type, convert = dispatch_types(a, b, mapping={
+            (BoolType, BoolType): (BoolType, bool),
+            (NatType, NatType): (NatType, int),
+            (NatType, IntType): (NatType, int),
+            (IntType, NatType): (NatType, int),
+        })
+        res = res_type.from_value(convert(a) & convert(b))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        return cls()
 
 
-@instruction('AND')
-def do_and(ctx: Context, prim, args, annots):
-    a, b = ctx.pop2()
-    val_type, res_type = dispatch_type_map(a, b, {
-        (Bool, Bool): (bool, Bool),
-        (Nat, Nat): (int, Nat),
-        (Int, Nat): (int, Nat),
-        (Nat, Int): (int, Nat)
-    })
-    res = res_type(val_type(a) & val_type(b))
-    ctx.push(res, annots=annots)
+class NotInstruction(MichelsonInstruction, prim='NOT'):
 
-
-@instruction('NOT')
-def do_not(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, [Nat, Int, Bool])
-    if type(top) in [Nat, Int]:
-        res = Int(~int(top))
-    elif type(top) == Bool:
-        res = Bool(not bool(top))
-    else:
-        assert False
-    ctx.push(res, annots=annots)
-
-
-@instruction('BLAKE2B')
-def do_blake2b(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Bytes)
-    res = Bytes(crypto.blake2b_32(bytes(top)).digest())
-    ctx.push(res, annots=annots)
-
-
-@instruction('CHECK_SIGNATURE')
-def do_check_sig(ctx: Context, prim, args, annots):
-    pk, sig, msg = ctx.pop3()
-    assert_stack_type(pk, Key)
-    assert_stack_type(sig, Signature)
-    assert_stack_type(msg, Bytes)
-    key = crypto.Key.from_encoded_key(str(pk))
-    try:
-        key.verify(signature=str(sig), message=bytes(msg))
-    except:
-        res = Bool(False)
-    else:
-        res = Bool(True)
-    ctx.push(res, annots=annots)
-
-
-@instruction('HASH_KEY')
-def do_hash_key(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Key)
-    key = crypto.Key.from_encoded_key(str(top))
-    res = KeyHash.new(key.public_key_hash())
-    ctx.push(res, annots=annots)
-
-
-@instruction(['SHA256', 'SHA512'])
-def do_sha(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Bytes)
-    handlers = {
-        'SHA256': lambda x: sha256(x).digest(),
-        'SHA512': lambda x: sha512(x).digest(),
-    }
-    res = Bytes(handlers[prim](bytes(top)))
-    ctx.push(res, annots=annots)
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a = cast(Union[IntType, NatType, BoolType], stack.pop1())
+        res_type, convert = dispatch_types(a, mapping={
+            (NatType,): (IntType, lambda x: ~int(x)),
+            (IntType,): (IntType, lambda x: ~int(x)),
+            (BoolType,): (BoolType, lambda x: not bool(x))
+        })
+        res = res_type.from_value(convert(a))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [a], [res]))
+        return cls()

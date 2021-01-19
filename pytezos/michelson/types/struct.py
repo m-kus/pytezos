@@ -5,7 +5,7 @@ from pytezos.michelson.types.base import MichelsonType
 
 def iter_type_args(nested_type: Type[MichelsonType], ignore_annots=False, force_recurse=False, path='') \
         -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
-    for i, arg in enumerate(nested_type.type_args):
+    for i, arg in enumerate(nested_type.args):
         if arg.prim == nested_type.prim:
             name = arg.field_name or arg.type_name
             if not ignore_annots and name:

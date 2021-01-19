@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from tests import abspath
 
-from pytezos.michelson.repl import Interpreter
+from pytezos.michelson.interpreter.repl import Interpreter
 
 
 class OpcodeTestcheck_signature_2(TestCase):

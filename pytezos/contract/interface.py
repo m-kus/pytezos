@@ -1,29 +1,13 @@
 from os.path import exists, expanduser
 from typing import List
-from deprecation import deprecated
 
+from pytezos.context.rpc import RPCNodeContext
 from pytezos.contract.call import ContractCallResult
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.contract.script import ContractScript
 from pytezos.interop import Interop
-from pytezos.docstring import get_class_docstring
-from pytezos.michelson.tags import prim_tags
-
-
-def is_micheline(value) -> bool:
-    """ Check if value is a Micheline expression (using heuristics, so not 100% accurate).
-    :param value: Object
-    :rtype: bool
-    """
-    if isinstance(value, list):
-        def get_prim(x):
-            return x.get('prim') if isinstance(x, dict) else None
-        return set(map(get_prim, value)) == {'parameter', 'storage', 'code'}
-    elif isinstance(value, dict):
-        primitives = list(prim_tags.keys())
-        return any(map(lambda x: x in value, ['prim', 'args', 'annots', *primitives]))
-    else:
-        return False
+from pytezos.jupyter import get_class_docstring
+from pytezos.michelson.micheline import is_micheline
 
 
 class ContractInterface(Interop):
@@ -89,7 +73,14 @@ class ContractInterface(Interop):
 
         return ContractInterface(script=contract, shell=shell)
 
-    @deprecated
+    def at(self, address, shell=None):
+        return ContractInterface(
+            address=address,
+            script=self.script,
+            shell=shell or self.shell,
+            key=self.key
+        )
+
     def big_map_get(self, path, block_id='head'):
         """ Get BigMap entry as Python object by plain key and block height.
 
@@ -102,18 +93,17 @@ class ContractInterface(Interop):
 
         storage_expr = self.shell.blocks[block_id].context.contracts[self.address].storage()
         storage = self.script.storage.type.from_micheline_value(storage_expr)
+        storage.attach_context(RPCNodeContext(shell=self.shell, block_id=block_id))
 
-        # TODO: 1) attach lazy storage 2) path to storage[][][]
-
-        return storage[path]()
-
-    def at(self, address, shell=None):
-        return ContractInterface(
-            address=address,
-            script=self.script,
-            shell=shell or self.shell,
-            key=self.key
-        )
+        node = storage
+        for item in path.split('/'):
+            if len(item) == 0:
+                continue
+            if isinstance(item, str):
+                res = item.split('::')
+                item = tuple(res) if len(res) > 1 else item
+            node = node[item]
+        return node.to_python_object() if node else None
 
     def storage(self, block_id='head'):
         """ Get storage as Python object at a specified block height.

@@ -1,297 +1,286 @@
-import functools
-from pprint import pformat
+from typing import List, cast, Tuple, Union
 
-from pytezos.michelson.instructions.macros import expand_duxp
-from pytezos.michelson.instructions.context import Context
-from pytezos.michelson.instructions.types import StackItem, assert_stack_type, assert_expr_equal, Option, Lambda, Bool, List, Or, Pair, \
-    Map, Set
-from pytezos.micheline.types import get_int, MichelsonRuntimeError, assert_pushable, parse_prim_expr
-
-instructions = {}
+from pytezos.michelson.instructions.stack import PushInstruction
+from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
+from pytezos.michelson.types import MichelsonType, LambdaType, PairType, BoolType, ListType, OrType, OptionType, \
+    MapType, SetType
+from pytezos.michelson.stack import MichelsonStack
 
 
-def assert_no_annots(prim, annots):
-    assert not annots, f'unexpected annotations {annots}'
+class InstructionSequence(MichelsonInstruction, args_len=None):
+
+    def __init__(self, items: List[MichelsonInstruction]):
+        super(InstructionSequence, self).__init__()
+        self.items = items
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        items = [arg.execute(stack, stdout) for arg in cls.args]
+        return cls(items)
 
 
-def instruction(prim, args_len=0):
-    def register_instruction(func):
-        if isinstance(prim, list):
-            for p in prim:
-                instructions[(p, args_len)] = func
+class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
+
+    def __init__(self, item: MichelsonInstruction):
+        super(DipnInstruction, self).__init__()
+        self.item = item
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        depth = parse_micheline_literal(cls.args[0], {'int': int})
+        stdout.append(format_stdout(cls.prim, [f'<{depth}>'], [f'<{depth}>']))
+        stack.protect(depth)
+        item = cls.args[1].execute(stack, stdout)
+        stack.restore(depth)
+        return cls(item)
+
+
+class DipInstruction(MichelsonInstruction, prim='DIP'):
+
+    def __init__(self, item: MichelsonInstruction):
+        super(DipInstruction, self).__init__()
+        self.item = item
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        stdout.append(format_stdout(cls.prim, [f'<1>'], [f'<1>']))
+        stack.protect(1)
+        item = cls.args[1].execute(stack, stdout)
+        stack.restore(1)
+        return cls(item)
+
+
+class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        res = LambdaType.create_type(args=cls.args[:2]).from_micheline_value(cls.args[2])
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+
+
+class ExecInstruction(MichelsonInstruction, prim='EXEC', args_len=3):
+
+    def __init__(self, item: MichelsonInstruction):
+        super(ExecInstruction, self).__init__()
+        self.item = item
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        param, sub = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
+        assert isinstance(sub, LambdaType), f'expected lambda, got {sub.prim}'
+        param.assert_equal_types(sub.args[0])
+        sub_stack = MichelsonStack.from_items([param])
+        sub_stdout = []
+        item = sub.value.execute(sub_stack, sub_stdout)
+        res = sub_stack.pop1()
+        res.assert_equal_types(sub.args[1])
+        assert len(sub_stack) == 0, f'lambda stack is not empty {sub_stack}'
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [param, sub], [res]))
+        stdout.extend(sub_stdout)
+        return cls(item)
+
+
+class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        left, sub = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
+        assert isinstance(sub, LambdaType), f'expected lambda, got {sub.prim}'
+        assert isinstance(sub.args[0], PairType), f'expected pair, got {sub.args[0].prim}'
+        left_type, right_type = sub.args[0].args
+        left.assert_equal_types(left_type)
+
+        value = InstructionSequence.create_type(args=[
+            PushInstruction.create_type(args=[left_type, left]),
+            PairInstruction,
+            sub.value
+        ])
+        res = LambdaType.create_type(args=[right_type, sub.args[1]])(value)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [left, sub], [res]))
+
+
+class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        a = stack.pop1()
+        assert not a.is_big_map_friendly(), f'big_map or sapling_state type not expected here'
+        assert False, a
+
+
+class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
+
+    def __init__(self, item: MichelsonInstruction):
+        super(IfInstruction, self).__init__()
+        self.item = item
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        cond = cast(BoolType, stack.pop1())
+        cond.assert_equal_types(BoolType)
+        stdout.append(format_stdout(cls.prim, [cond], []))
+        branch = cls.args[0] if bool(cond) else cls.args[1]
+        item = branch.execute(stack, stdout)
+        return cls(item)
+
+
+class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
+
+    def __init__(self, item: MichelsonInstruction):
+        super(IfConsInstruction, self).__init__()
+        self.item = item
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        lst = cast(ListType, stack.pop1())
+        assert isinstance(lst, ListType), f'expected list, got {lst.prim}'
+        if len(lst) > 0:
+            head, tail = lst.split_head()
+            stack.push(tail)
+            stack.push(head)
+            stdout.append(format_stdout(cls.prim, [lst], [head, tail]))
+            branch = cls.args[0]
         else:
-            instructions[(prim, args_len)] = func
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-        return wrapper
-    return register_instruction
+            stdout.append(format_stdout(cls.prim, [lst], []))
+            branch = cls.args[1]
+        item = branch.execute(stack, stdout)
+        return cls(item)
 
 
-def parse_instruction(code_expr):
-    prim, args = parse_prim_expr(code_expr)
-    key = (prim, len(args))
-    if key not in instructions:
-        raise MichelsonRuntimeError.init(f'unknown instruction or wrong args len: {key}', prim)
-    handler = instructions[key]
-    annots = code_expr.get('annots', [])
-    return prim, args, annots, handler
-    
+class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
 
-def do_interpret(ctx: Context, code_expr):
-    res = None
-    if isinstance(code_expr, list):
-        for item in code_expr:
-            res = do_interpret(ctx, item)
-    elif isinstance(code_expr, dict):
-        prim, args, annots, handler = parse_instruction(code_expr)
-        try:
-            ctx.begin(prim)
-            res = handler(ctx, prim, args, annots)
-        except AssertionError as e:
-            raise MichelsonRuntimeError.init(str(e), prim)
-        except MichelsonRuntimeError as e:
-            raise MichelsonRuntimeError.wrap(e, prim)
-        finally:
-            ctx.end()
-    else:
-        assert False, f'unexpected code expression {pformat(code_expr, compact=True)}'
-    return res
+    def __init__(self, item: MichelsonInstruction):
+        super(IfLeftInstruction, self).__init__()
+        self.item = item
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        or_ = cast(OrType, stack.pop1())
+        assert isinstance(or_, OrType), f'expected or, got {or_.prim}'
+        stdout.append(format_stdout(cls.prim, [or_], []))
+        branch = cls.args[0] if or_.is_left() else cls.args[1]
+        item = branch.execute(stack, stdout)
+        return cls(item)
 
 
-@instruction('PUSH', args_len=2)
-def do_push(ctx: Context, prim, args, annots):
-    item = StackItem.parse(val_expr=args[1], type_expr=args[0])
-    assert_pushable(item.type_expr)
-    ctx.push(item, annots=annots)
+class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
 
+    def __init__(self, item: MichelsonInstruction):
+        super(IfNoneInstruction, self).__init__()
+        self.item = item
 
-@instruction('DROP', args_len=1)
-def do_drop(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    count = get_int(args[0])
-    _ = ctx.pop(count=count)
-
-
-@instruction('DROP')
-def do_drop_1(ctx: Context, prim, args, annots):
-    do_drop(ctx, prim, [{'int': '1'}], annots)
-
-
-@instruction('DUP', args_len=1)  # this is actually a macro, not an instruction (at least in Carthage)
-def do_dup(ctx: Context, prim, args, annots):
-    count = get_int(args[0])
-    code_expr = expand_duxp('U' * count, annots, args=None)  # DUP 5 -> DUUUUUP
-    do_interpret(ctx, code_expr)
-
-
-@instruction('DUP')
-def do_dup_1(ctx: Context, prim, args, annots):
-    top = ctx.peek()
-    ctx.push(top, annots=annots)
-
-
-@instruction('SWAP')
-def do_swap(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    a, b = ctx.pop2()
-    ctx.push(a, move=True)
-    ctx.push(b, move=True)
-
-
-@instruction('DIG', args_len=1)
-def do_dig(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    index = get_int(args[0])
-    ctx.protect(index)
-    res = ctx.pop1()
-    ctx.restore(index)
-    ctx.push(res, move=True)
-
-
-@instruction('DUG', args_len=1)
-def do_dug(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    index = get_int(args[0])
-    res = ctx.pop1()
-    ctx.protect(index)
-    ctx.push(res, move=True)
-    ctx.restore(index)
-
-
-@instruction('DIP', args_len=2)
-def do_dip(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    count = get_int(args[0])
-    ctx.protect(count)
-    do_interpret(ctx, args[1])
-    ctx.restore(count)
-
-
-@instruction('DIP', args_len=1)
-def do_dip_1(ctx: Context, prim, args, annots):
-    do_dip(ctx, prim, [{'int': '1'}, args[0]], annots)
-
-
-@instruction('LAMBDA', args_len=3)
-def do_lambda(ctx: Context, prim, args, annots):
-    res = Lambda.new(p_type_expr=args[0], r_type_expr=args[1], code=args[2])
-    ctx.push(res, annots=annots)
-
-
-@instruction('EXEC')
-def do_exec(ctx: Context, prim, args, annots):
-    param, lmbda = ctx.pop2()
-    assert_stack_type(lmbda, Lambda)
-    lmbda.assert_param_type(param)
-    lmbda_ctx = ctx.spawn(stack=[param])
-    do_interpret(lmbda_ctx, lmbda.code)
-    ret = lmbda_ctx.pop1()
-    lmbda.assert_ret_type(ret)
-    assert len(lmbda_ctx) == 0, f'lambda stack is not empty {lmbda_ctx}'
-    ctx.push(ret, annots=annots)
-
-
-@instruction('APPLY')
-def do_apply(ctx: Context, prim, args, annots):
-    param, lmbda = ctx.pop2()
-    assert_stack_type(lmbda, Lambda)
-    res = lmbda.partial_apply(param)
-    ctx.push(res)
-
-
-@instruction('FAILWITH')
-def do_failwith(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    top = ctx.pop1()
-    raise MichelsonRuntimeError.init(repr(top), prim=top.type_expr['prim'], data=top)
-
-
-@instruction('IF', args_len=2)
-def do_if(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    cond = ctx.pop1()
-    assert_stack_type(cond, Bool)
-    do_interpret(ctx, args[0 if bool(cond) else 1])
-
-
-@instruction('IF_CONS', args_len=2)
-def do_if_cons(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    top = ctx.pop1()
-    assert_stack_type(top, List)
-    if len(top) > 0:
-        head, tail = top.cut_head()
-        ctx.push(tail)
-        ctx.push(head)
-        do_interpret(ctx, args[0])
-    else:
-        do_interpret(ctx, args[1])
-
-
-@instruction('IF_LEFT', args_len=2)
-def do_if_left(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    top = ctx.pop1()  # type: Or
-    assert_stack_type(top, Or)
-    ctx.push(top.get_some())
-    do_interpret(ctx, args[0 if top.is_left() else 1])
-
-
-@instruction('IF_NONE', args_len=2)
-def do_if_left(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    top = ctx.pop1()
-    assert_stack_type(top, Option)
-    if top.is_none():
-        do_interpret(ctx, args[0])
-    else:
-        ctx.push(top.get_some())
-        do_interpret(ctx, args[1])
-
-
-@instruction('LOOP', args_len=1)
-def do_loop(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    while True:
-        top = ctx.pop1()
-        assert_stack_type(top, Bool)
-        if bool(top):
-            do_interpret(ctx, args[0])
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        opt = cast(OptionType, stack.pop1())
+        assert isinstance(opt, OptionType), f'expected option, got {opt.prim}'
+        if opt.is_none():
+            branch = cls.args[0]
+            stdout.append(format_stdout(cls.prim, [opt], []))
         else:
-            break
+            some = opt.get_some()
+            stack.push(some)
+            stdout.append(format_stdout(cls.prim, [opt], [some]))
+            branch = cls.args[1]
+        item = branch.execute(stack, stdout)
+        return cls(item)
 
 
-@instruction('LOOP_LEFT', args_len=1)
-def do_loop_left(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    while True:
-        top = ctx.pop1()
-        assert_stack_type(top, Or)
-        ctx.push(top.get_some())
-        if top.is_left():
-            do_interpret(ctx, args[0])
-        else:
-            break
+class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
+
+    def __init__(self, items: List[MichelsonInstruction]):
+        super(LoopInstruction, self).__init__()
+        self.items = items
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        items = []
+        while True:
+            cond = cast(BoolType, stack.pop1())
+            cond.assert_equal_types(BoolType)
+            stdout.append(format_stdout(cls.prim, [cond], []))
+            if bool(cond):
+                item = cls.args[0].execute(stack, stdout)
+                items.append(item)
+            else:
+                break
+        return cls(items)
 
 
-@instruction('MAP', args_len=1)
-def do_map(ctx: Context, prim, args, annots):
-    container = ctx.pop1()
-    assert_stack_type(container, [List, Map])
+class LoopLeftInstruction(MichelsonInstruction, prim='LOOP_LEFT', args_len=1):
 
-    if type(container) == List:
-        items = list()
-        for item in container:
-            ctx.push(item)
-            do_interpret(ctx, args[0])
-            ret = ctx.pop1()
-            items.append(ret)
-    elif type(container) == Map:
-        items = list()
-        for key, val in container:
-            ctx.push(Pair.new(key, val))
-            do_interpret(ctx, args[0])
-            ret = ctx.pop1()
-            items.append((key, ret))
-    else:
-        assert False
+    def __init__(self, items: List[MichelsonInstruction]):
+        super(LoopLeftInstruction, self).__init__()
+        self.items = items
 
-    if len(items) == 0:
-        res = container
-    else:
-        res = type(container).new(items)
-    ctx.push(res, annots=annots)
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        items = []
+        while True:
+            or_ = cast(OrType, stack.pop1())
+            assert isinstance(or_, OrType), f'expected or, got {or_.prim}'
+            var = or_.resolve()
+            stack.push(var)
+            stdout.append(format_stdout(cls.prim, [or_], [var]))
+            if or_.is_left():
+                item = cls.args[0].execute(stack, stdout)
+                items.append(item)
+            else:
+                break
+        return cls(items)
 
 
-@instruction('ITER', args_len=1)
-def do_map(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    container = ctx.pop1()
-    inferred_annots = [f'@{container.name}.elt'] if container.name else None
-    if type(container) in [List, Set]:
-        for item in container:
-            ctx.push(item, annots=inferred_annots)
-            do_interpret(ctx, args[0])
-    elif type(container) == Map:
-        for key, val in container:
-            ctx.push(Pair.new(key, val), annots=inferred_annots)
-            do_interpret(ctx, args[0])
-    else:
-        assert False, f'unexpected type {type(container)}'
+class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
+
+    def __init__(self, items: List[MichelsonInstruction]):
+        super(MapInstruction, self).__init__()
+        self.items = items
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        src = cast(Union[ListType, MapType], stack.pop1())
+        executions = []
+        items = []
+        popped = [src]
+        for elt in src:
+            if isinstance(src, MapType):
+                elt = PairType.from_items(list(elt))
+            stack.push(elt)
+            stdout.append(format_stdout(cls.prim, popped, [elt]))
+            execution = cls.args[0].execute(stack, stdout)
+            executions.append(execution)
+            new_elt = stack.pop1()
+            if isinstance(src, MapType):
+                items.append((elt[0], new_elt))
+            else:
+                items.append(new_elt)
+            popped = [new_elt]
+        res = type(src).from_items(items)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, popped, [res]))
+        return cls(executions)
 
 
-@instruction('CAST', args_len=1)
-def do_cast(ctx: Context, prim, args, annots):
-    assert_no_annots(prim, annots)
-    top = ctx.pop1()
-    assert_expr_equal(args[0], top.type_expr)
-    top.type_expr = args[0]
-    ctx.push(top)
+class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
 
+    def __init__(self, items: List[MichelsonInstruction]):
+        super(IterInstruction, self).__init__()
+        self.items = items
 
-@instruction('RENAME')
-def do_rename(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    ctx.push(top, annots=annots)
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+        src = cast(Union[ListType, MapType, SetType], stack.pop1())
+        executions = []
+        popped = [src]
+        for elt in src:
+            if isinstance(src, MapType):
+                elt = PairType.from_items(list(elt))
+            stack.push(elt)
+            stdout.append(format_stdout(cls.prim, popped, [elt]))
+            execution = cls.args[0].execute(stack, stdout)
+            executions.append(execution)
+            popped = []
+        return cls(executions)

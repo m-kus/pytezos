@@ -5,7 +5,7 @@ from pytezos.interop import Interop
 from pytezos.michelson.instructions.types import StackItem, Map, BigMap
 from pytezos.micheline.types import assert_expr_equal
 from pytezos.micheline.reducer import parse_expression, get_int, assert_comparable, assert_big_map_val
-from pytezos.michelson.pack import get_key_hash
+from pytezos.michelson.forge import forge_script_expr
 
 
 def make_elt(args):
@@ -14,7 +14,7 @@ def make_elt(args):
 
 
 def elt_to_update(elt, type_expr, big_map_id):
-    key_hash = get_key_hash(elt['args'][0], type_expr['args'][0])
+    key_hash = forge_script_expr(elt['args'][0], type_expr['args'][0])
     update = {'action': 'update',
               'big_map': str(big_map_id),
               'key_hash': key_hash,
@@ -166,7 +166,7 @@ class BigMapPool:
         self.maybe_remove.clear()
 
     def _get_big_map_val(self, big_map: BigMap, key: StackItem):
-        key_hash = get_key_hash(key.val_expr, key.type_expr)
+        key_hash = forge_script_expr(key.val_expr, key.type_expr)
         network = big_map.val_expr['_network']
         try:
             res = Interop(shell=network).shell.head.context.big_maps[int(big_map)][key_hash]()

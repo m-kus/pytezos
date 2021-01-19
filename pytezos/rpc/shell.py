@@ -7,7 +7,7 @@ from time import sleep
 
 from pytezos.crypto.encoding import base58_decode
 from pytezos.rpc.query import RpcQuery
-from pytezos.docstring import get_attr_docstring
+from pytezos.jupyter import get_attr_docstring
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
 
 

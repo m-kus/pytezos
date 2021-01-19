@@ -26,7 +26,7 @@ class MainnetContractTestCaseH28IIE(TestCase):
         # cls.maxDiff = None
 
     def test_parameter_type_h28iie(self):
-        type_expr = self.parameter_type.get_micheline_type()
+        type_expr = self.parameter_type.as_micheline_expr()
         self.assertEqual(self.script['code'][0], type_expr, 'micheline -> type -> micheline')
 
     def test_entrypoints_h28iie(self):
@@ -38,7 +38,7 @@ class MainnetContractTestCaseH28IIE(TestCase):
                 expected_type.assert_equal_types(ep_type)
 
     def test_storage_type_h28iie(self):
-        type_expr = self.storage_type.get_micheline_type()
+        type_expr = self.storage_type.as_micheline_expr()
         self.assertEqual(self.script['code'][1], type_expr, 'micheline -> type -> micheline')
 
     def test_storage_encoding_h28iie(self):

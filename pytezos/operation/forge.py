@@ -14,6 +14,13 @@ operation_tags = {
     'origination': 109,
     'delegation': 110
 }
+reserved_entrypoints = {
+    'default': b'\x00',
+    'root': b'\x01',
+    'do': b'\x02',
+    'set_delegate': b'\x03',
+    'remove_delegate': b'\x04'
+}
 
 
 def has_parameters(content):
@@ -25,6 +32,17 @@ def has_parameters(content):
             return True
     else:
         return False
+
+
+def forge_entrypoint(entrypoint) -> bytes:
+    """ Encode Michelson contract entrypoint into the byte form.
+
+    :param entrypoint: string
+    """
+    if entrypoint in reserved_entrypoints:
+        return reserved_entrypoints[entrypoint]
+    else:
+        return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
 
 
 def forge_operation(content) -> bytes:
@@ -129,23 +147,3 @@ def forge_delegation(content):
         res += forge_bool(False)
 
     return res
-
-
-def forge_entrypoint(entrypoint) -> bytes:
-    """ Encode Michelson contract entrypoint into the byte form.
-
-    :param entrypoint: string
-    """
-    if entrypoint in reserved_entries:
-        return reserved_entries[entrypoint]
-    else:
-        return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
-
-
-reserved_entries = {
-    'default': b'\x00',
-    'root': b'\x01',
-    'do': b'\x02',
-    'set_delegate': b'\x03',
-    'remove_delegate': b'\x04'
-}

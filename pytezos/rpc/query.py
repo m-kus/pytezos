@@ -2,7 +2,7 @@ from os.path import dirname
 
 from pytezos.rpc.node import RpcNode
 from pytezos.rpc.docs import rpc_docs
-from pytezos.docstring import get_attr_docstring, get_class_docstring, InlineDocstring
+from pytezos.jupyter import get_attr_docstring, get_class_docstring, InlineDocstring
 
 
 def format_docstring(class_type, query_path):

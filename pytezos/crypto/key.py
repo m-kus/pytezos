@@ -7,7 +7,7 @@ from pyblake2 import blake2b
 from mnemonic import Mnemonic
 
 from pytezos.crypto.encoding import scrub_input, base58_decode, base58_encode
-from pytezos.docstring import InlineDocstring, get_class_docstring
+from pytezos.jupyter import InlineDocstring, get_class_docstring
 
 
 class CryptoExtraFallback:

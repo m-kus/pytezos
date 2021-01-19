@@ -2,6 +2,7 @@ import base58
 import strict_rfc3339
 
 from pytezos.crypto.encoding import base58_encode, base58_decode
+from pytezos.crypto.key import blake2b_32
 from pytezos.michelson.tags import prim_tags
 
 prim_int = {v[0]: k for k, v in prim_tags.items()}
@@ -386,3 +387,8 @@ def forge_script(script) -> bytes:
     code = forge_micheline(script['code'])
     storage = forge_micheline(script['storage'])
     return forge_array(code) + forge_array(storage)
+
+
+def forge_script_expr(packed_key: bytes) -> str:
+    data = blake2b_32(packed_key).digest()
+    return base58_encode(data, b'expr').decode()

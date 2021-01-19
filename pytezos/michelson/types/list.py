@@ -1,7 +1,8 @@
 from typing import Tuple, Generator, List, Type
 from pprint import pformat
 
-from pytezos.michelson.types.base import MichelsonType, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.context.base import NodeContext
 
 
 class ListType(MichelsonType, prim='list', args_len=1):
@@ -21,7 +22,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
 
     @staticmethod
     def empty(item_type: Type[MichelsonType]):
-        cls = ListType.construct_type(type_args=[item_type])
+        cls = ListType.create_type(args=[item_type])
         return cls(items=[])
 
     @staticmethod
@@ -30,13 +31,13 @@ class ListType(MichelsonType, prim='list', args_len=1):
         item_type = type(items[0])
         for item in items[1:]:
             item_type.assert_equal_types(type(item))
-        cls = ListType.construct_type(type_args=[item_type])
+        cls = ListType.create_type(args=[item_type])
         return cls(items)
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name
-        arg_doc = cls.type_args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
+        arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
         return f'[ {arg_doc}, ... ]'
 
     @classmethod
@@ -46,13 +47,13 @@ class ListType(MichelsonType, prim='list', args_len=1):
     @classmethod
     def from_micheline_value(cls, val_expr: list) -> 'ListType':
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
-        items = list(map(cls.type_args[0].from_micheline_value, val_expr))
+        items = list(map(cls.args[0].from_micheline_value, val_expr))
         return cls(items)
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'ListType':
         assert isinstance(py_obj, list), f'expected list, got {type(py_obj).__name__}'
-        items = list(map(cls.type_args[0].from_python_object, py_obj))
+        items = list(map(cls.args[0].from_python_object, py_obj))
         return cls(items)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
@@ -69,9 +70,9 @@ class ListType(MichelsonType, prim='list', args_len=1):
         for item in self:
             item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+    def attach_context(self, context: NodeContext):
         for item in self:
-            item.attach_lazy_storage(lazy_storage, action)
+            item.attach_context(context)
 
     def split_head(self) -> Tuple[MichelsonType, 'ListType']:
         assert len(self) > 0, f'cannot split empty list'
@@ -80,7 +81,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return head, tail
 
     def prepend(self, item: MichelsonType) -> 'ListType':
-        self.type_args[0].assert_equal_types(type(item))
+        self.args[0].assert_equal_types(type(item))
         return type(self)([item] + self.items)
 
     def __getitem__(self, idx: int) -> MichelsonType:

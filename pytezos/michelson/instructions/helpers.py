@@ -5,7 +5,7 @@ from pytezos.interop import Interop
 from pytezos.crypto.encoding import is_kt
 from pytezos.michelson.forge import forge_timestamp
 from pytezos.michelson.instructions.control import instruction, do_interpret
-from pytezos.michelson.instructions.context import Context
+from pytezos.michelson.interpreter.context import Context
 from pytezos.micheline.types import get_int, get_string, get_bool, parse_prim_expr, restore_entry_expr, assert_expr_equal, \
     dispatch_core_map
 from pytezos.michelson.instructions.types import Pair, Mutez, Address, ChainID, Timestamp, assert_stack_type, List, Operation

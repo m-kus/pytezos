@@ -1,7 +1,8 @@
 from unittest import TestCase
 from parameterized import parameterized
 
-from pytezos.michelson.pack import get_key_hash, unforge_micheline
+from pytezos.michelson.pack import unforge_micheline
+from pytezos.michelson.forge import forge_script_expr
 
 unknown_data = [
     '0501000000056f776e6572',
@@ -85,7 +86,7 @@ class TestPacking(TestCase):
          "exprufzwVGdAX7zG91UpiAkR2yVxEDE75tHD5YgSBmYMUx22teZTCM")
     ])
     def test_get_key_hash(self, val_expr, type_expr, expected):
-        self.assertEqual(expected, get_key_hash(val_expr, type_expr))
+        self.assertEqual(expected, forge_script_expr(val_expr, type_expr))
 
     @parameterized.expand([(x,) for x in unknown_data])
     def test_blind_unpack(self, data):

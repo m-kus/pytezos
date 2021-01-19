@@ -7,7 +7,7 @@ from pytezos.crypto.key import blake2b
 from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.instructions.types import StackItem, assert_stack_item
 from pytezos.michelson.converter import micheline_to_michelson
-from pytezos.michelson.instructions.big_map import BigMapPool
+from pytezos.michelson.interpreter.big_map import BigMapPool
 from pytezos.micheline.types import assert_single_var_annot
 
 

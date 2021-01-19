@@ -1,7 +1,9 @@
 from typing import Generator, Tuple, Optional, List, Union
 from pprint import pformat
 
-from pytezos.michelson.types.base import MichelsonType, parse_micheline_value, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.context.base import NodeContext
 from pytezos.michelson.types.struct import Struct
 
 
@@ -26,6 +28,9 @@ class OrType(MichelsonType, prim='or', args_len=2):
     def is_left(self) -> bool:
         return self.items[0] is not None
 
+    def resolve(self) -> MichelsonType:
+        return next(item for item in self if item is not None)
+
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
@@ -46,8 +51,8 @@ class OrType(MichelsonType, prim='or', args_len=2):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'OrType':
         value = parse_micheline_value(val_expr, {
-            ('Left', 1): lambda x: (cls.type_args[0].from_micheline_value(x[0]), None),
-            ('Right', 1): lambda x: (None, cls.type_args[1].from_micheline_value(x[0]))
+            ('Left', 1): lambda x: (cls.args[0].from_micheline_value(x[0]), None),
+            ('Right', 1): lambda x: (None, cls.args[1].from_micheline_value(x[0]))
         })
         return cls(value)
 
@@ -57,7 +62,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
             assert len(py_obj) == 2, f'expected 2 args, got {len(py_obj)}'
             assert len([x for x in py_obj if x is None]) == 1, f'only single variant allowed'
             value = tuple(
-                item if item is None else cls.type_args[i].from_python_object(item)
+                item if item is None else cls.args[i].from_python_object(item)
                 for i, item in enumerate(py_obj)
             )
             return cls(value)
@@ -91,10 +96,10 @@ class OrType(MichelsonType, prim='or', args_len=2):
             if item is not None:
                 item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action):
+    def attach_context(self, context: NodeContext):
         for item in self:
             if item is not None:
-                item.attach_lazy_storage(lazy_storage, action=action)
+                item.attach_context(context)
 
     def __getitem__(self, key: Union[int, str]):
         if isinstance(key, int) and 0 <= key <= 1:

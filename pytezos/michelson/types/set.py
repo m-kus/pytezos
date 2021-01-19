@@ -2,7 +2,8 @@ from typing import Generator, List, Type
 from copy import copy
 from pprint import pformat
 
-from pytezos.michelson.types.base import MichelsonType, LazyStorage
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.context.base import NodeContext
 
 
 class SetType(MichelsonType, prim='set', args_len=1):
@@ -22,7 +23,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
 
     @staticmethod
     def empty(item_type: Type[MichelsonType]) -> 'SetType':
-        cls = SetType.construct_type(type_args=[item_type])
+        cls = SetType.create_type(args=[item_type])
         return cls(items=[])
 
     @staticmethod
@@ -31,7 +32,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         item_type = type(items[0])
         for item in items[1:]:
             item_type.assert_equal_types(type(item))
-        cls = SetType.construct_type(type_args=[item_type])
+        cls = SetType.create_type(args=[item_type])
         cls.check_constraints(items)
         return cls(items)
 
@@ -47,14 +48,14 @@ class SetType(MichelsonType, prim='set', args_len=1):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'SetType':
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
-        items = list(map(cls.type_args[0].from_micheline_value, val_expr))
+        items = list(map(cls.args[0].from_micheline_value, val_expr))
         cls.check_constraints(items)
         return cls(items)
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'SetType':
         assert isinstance(py_obj, set), f'expected set, got {type(py_obj).__name__}'
-        items = list(map(cls.type_args[0].from_python_object, py_obj))
+        items = list(map(cls.args[0].from_python_object, py_obj))
         items = list(sorted(items))
         return cls(items)
 
@@ -66,7 +67,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
 
     def generate_pydoc(self, definitions: list, inferred_name=None):
         name = self.field_name or self.type_name or inferred_name
-        arg_doc = self.type_args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
+        arg_doc = self.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
         return f'{{ {arg_doc}, ... }}'
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
@@ -75,11 +76,11 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         pass  # Big_map is not comparable
 
-    def attach_lazy_storage(self, lazy_storage: LazyStorage, action: str):
+    def attach_context(self, context: NodeContext):
         pass  # Big_map is not comparable
 
     def contains(self, item: MichelsonType) -> bool:
-        self.type_args[0].assert_equal_types(type(item))
+        self.args[0].assert_equal_types(type(item))
         return item in self.items
 
     def add(self, item: MichelsonType) -> MichelsonType:
@@ -97,5 +98,5 @@ class SetType(MichelsonType, prim='set', args_len=1):
             return copy(self)
 
     def __contains__(self, py_obj):
-        key = self.type_args[0].from_python_object(py_obj)
+        key = self.args[0].from_python_object(py_obj)
         return self.contains(key)

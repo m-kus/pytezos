@@ -3,7 +3,7 @@ from os.path import exists, expanduser
 from pytezos.rpc import ShellQuery, RpcNode, mainnet, carthagenet, dalphanet, delphinet, localhost, labnet, pool, edonet
 from pytezos.crypto.key import Key, is_installed
 from pytezos.crypto.encoding import is_public_key, is_pkh
-from pytezos.docstring import InlineDocstring
+from pytezos.jupyter import InlineDocstring
 
 default_shell = 'delphinet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly

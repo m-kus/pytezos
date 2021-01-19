@@ -4,7 +4,7 @@ from tests.templates import opcode_test_case, big_map_diff_test_case, success_te
 from os.path import dirname, join, exists
 from os import mkdir
 
-from pytezos.michelson.pack import get_key_hash
+from pytezos.michelson.forge import forge_script_expr
 
 # Merci beaucoup a @arvidnl et tout le monde
 
@@ -878,7 +878,7 @@ def get_big_map_diff(events):
             diff.append({
                 'action': 'update',
                 'big_map': res[0][0],
-                'key_hash': get_key_hash({'string': res[0][1]}, {'prim': 'string'}),
+                'key_hash': forge_script_expr({'string': res[0][1]}, {'prim': 'string'}),
                 'key': {'string': res[0][1]},
                 'value': {'string': res[0][2]}
             })
@@ -888,7 +888,7 @@ def get_big_map_diff(events):
             diff.append({
                 'action': 'update',
                 'big_map': res[0][0],
-                'key_hash': get_key_hash({'string': res[0][1]}, {'prim': 'string'}),
+                'key_hash': forge_script_expr({'string': res[0][1]}, {'prim': 'string'}),
                 'key': {'string': res[0][1]}
             })
             continue

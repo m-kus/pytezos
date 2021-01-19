@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pytezos.interop import Interop
 from pytezos.michelson.instructions.control import instruction
-from pytezos.michelson.instructions.context import Context
+from pytezos.michelson.interpreter.context import Context
 from pytezos.michelson.instructions.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \
     KeyHash, Timestamp, expr_equal, Operation
 from pytezos.micheline.types import get_entry_expr, parse_type

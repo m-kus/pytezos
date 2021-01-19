@@ -40,21 +40,22 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
             return TicketType(ticketer=left.ticketer, item=left.item, amount=left.amount + right.amount)
 
     @classmethod
-    def construct_type(cls, type_args: List[Type['MichelsonType']],
-                       field_name: Optional[str] = None,
-                       type_name: Optional[str] = None,
-                       type_params: Optional[list] = None, **kwargs) -> Type['TicketType']:
-        type_impl = PairType.construct_type(type_args=[AddressType, type_args[0], NatType])
-        type_class = super(TicketType, cls).construct_type(type_args=type_args,
-                                                           field_name=field_name,
-                                                           type_name=type_name,
-                                                           type_impl=type_impl)
+    def create_type(cls,
+                    args: List[Type['MichelsonType']],
+                    field_name: Optional[str] = None,
+                    type_name: Optional[str] = None,
+                    **kwargs) -> Type['TicketType']:
+        type_impl = PairType.create_type(args=[AddressType, args[0], NatType])
+        type_class = super(TicketType, cls).create_type(args=args,
+                                                        field_name=field_name,
+                                                        type_name=type_name,
+                                                        type_impl=type_impl)
         return cast(Type['TicketType'], type_class)
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None) -> str:
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        item_doc = cls.type_args[0].generate_pydoc(definitions, inferred_name=f'{name}_value')
+        item_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_value')
         doc = f'(\n\t  address  /* ticketer */\n\t  {item_doc}\n\t  nat  /* amount */\n\t)'
         definitions.insert(0, (name, doc))
         return f'${name}'

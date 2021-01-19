@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pytezos.docstring import inline_doc
+from pytezos.jupyter import inline_doc
 
 
 def format_mutez(value) -> str:
