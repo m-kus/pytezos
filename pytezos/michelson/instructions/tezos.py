@@ -1,233 +1,244 @@
-from datetime import datetime
+from typing import List, cast, Tuple, Optional, Type
 
-from pytezos.interop import Interop
-from pytezos.michelson.instructions.control import instruction
-from pytezos.michelson.interpreter.context import Context
-from pytezos.michelson.instructions.types import assert_stack_type, Mutez, ChainID, Address, Contract, Option, assert_equal_types, \
-    KeyHash, Timestamp, expr_equal, Operation
-from pytezos.micheline.types import get_entry_expr, parse_type
-
-INITIAL_BALANCE = 257000000
-MAINNET_CHAIN_ID = 'NetXdQprcVkpaWU'
-UNIT_TYPE_EXPR = {'prim': 'unit'}
-
-
-@instruction('parameter', args_len=1)
-def do_parameter(ctx: Context, prim, args, annots):
-    _ = parse_type(args[0])
-    ctx.set('parameter', args[0])
+from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
+from pytezos.michelson.micheline import MichelsonSequence
+from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.sections import ParameterSection
+from pytezos.michelson.types.base import MichelsonType, MichelsonPrimitive
+from pytezos.michelson.types import NatType, StringType, ContractType, AddressType, TimestampType, \
+    OptionType, KeyHashType, UnitType, MutezType, OperationType
+from pytezos.context.base import NodeContext
 
 
-@instruction('storage', args_len=1)
-def do_parameter(ctx: Context, prim, args, annots):
-    assert not args[0].get('annots'), 'top-level storage annotations are not allowed'
-    _ = parse_type(args[0])
-    ctx.set('storage', args[0])
+class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        amount = context.get_operation_amount()
+        res = NatType.from_value(amount)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-@instruction('code', args_len=1)
-def do_parameter(ctx: Context, prim, args, annots):
-    ctx.set('code', args[0])
+class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        balance = context.get_balance()
+        res = NatType.from_value(balance)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-@instruction('AMOUNT')
-def do_amount(ctx: Context, prim, args, annots):
-    res = ctx.get('AMOUNT', Mutez(0))
-    ctx.push(res, annots=['@amount'])
+class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        chain_id = context.get_chain_id()
+        res = StringType.from_value(chain_id)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-def get_balance(ctx: Context):
-    res = ctx.get('BALANCE')
-    if res is None:
-        res = Mutez(INITIAL_BALANCE)
-        ctx.set('BALANCE', res)
-    return res
+def get_entry_point_type(context: NodeContext, name: str, address=None) -> Optional[Type[MichelsonType]]:
+    parameter = ParameterSection.match(context.get_parameter_expr(address))
+    if parameter is None:
+        return None
+    entry_points = parameter.list_entry_points()
+    assert name in entry_points, f'unknown entrypoint {name}'
+    return entry_points[name]
 
 
-@instruction('BALANCE')
-def do_balance(ctx: Context, prim, args, annots):
-    res = get_balance(ctx)
-    ctx.push(res, annots=['@balance'])
-
-
-@instruction('CHAIN_ID')
-def do_chain_id(ctx: Context, prim, args, annots):
-    res = ctx.get('CHAIN_ID', ChainID(MAINNET_CHAIN_ID))
-    ctx.push(res, annots=[f'@{ctx.get("NETWORK", "mainnet")}'])
-
-
-@instruction('SELF')
-def do_self(ctx: Context, prim, args, annots):
-    p_type_expr = ctx.get('parameter')
-    assert p_type_expr, f'parameter type is not initialized'
-
-    entry_annot = next((a for a in annots if a[0] == '%'), '')
-    ctx.print(f'use {entry_annot or "%default"}')
-
-    p_type_expr, _ = get_entry_expr(p_type_expr, entry_annot or "%default")
-    res = Contract.new(ctx.dummy_gen.self + entry_annot, type_expr=p_type_expr)
-    ctx.push(res, annots=['@self'])
-
-
-@instruction('SENDER')
-def do_sender(ctx: Context, prim, args, annots):
-    res = ctx.get('SENDER')
-    assert res is not None, f'SENDER is not initialized'
-    ctx.push(res, annots=['@sender'])
-
-
-@instruction('SOURCE')
-def do_source(ctx: Context, prim, args, annots):
-    res = ctx.get('SOURCE')
-    assert res is not None, f'SOURCE is not initialized'
-    ctx.push(res, annots=['@source'])
-
-
-@instruction('NOW')
-def do_now(ctx: Context, prim, args, annots):
-    res = ctx.get('NOW')
-    if res is None:
-        network = ctx.get('NETWORK')
-        if network:
-            interop = Interop(shell=network)
-            constants = interop.shell.block.context.constants()  # cached
-            ts = interop.shell.head.header()['timestamp']
-            dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
-            first_delay = constants['time_between_blocks'][0]
-            return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
-        else:
-            now = int(datetime.utcnow().timestamp())
-        res = Timestamp(now)
-    ctx.push(res, annots=['@now'])
-
-
-def check_contract(ctx: Context, address, entry_annot, type_expr):
-    network = ctx.get('NETWORK')
-    if not network:
-        ctx.print('skip check')
-        return True
-    try:
-        script = Interop(shell=network).shell.contracts[address].script()
-        p_type_expr = next(s for s in script['code'] if s['prim'] == 'parameter')
-        actual, _ = get_entry_expr(p_type_expr, entry_annot or '%default')
-        if expr_equal(type_expr, actual):
-            return True
-        else:
-            ctx.print('entry type mismatch')
-    except Exception:
-        ctx.print('not found')
-
-    return False
-
-
-@instruction('ADDRESS')
-def do_address(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Contract)
-    res = Address.new(top.get_address())
-    if top.name:
-        annots.append(f'@{top.name}.address')
-    ctx.push(res, annots=annots)
-
-
-@instruction('CONTRACT', args_len=1)
-def do_contract(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, Address)
-
-    entry_annot = next((a for a in annots if a[0] == '%'), '')
-    contract = Contract.new(str(top) + entry_annot, type_expr=args[0])
-
-    if check_contract(ctx, address=str(top), entry_annot=entry_annot, type_expr=args[0]):
-        res = Option.some(contract)
+def get_entry_point_name(annots: List[str]) -> str:
+    if annots:
+        assert len(annots) == 1 and annots[0].startswith('%'), f'single field annotation allowed'
+        return annots[0][1:]
     else:
-        res = Option.none(contract.type_expr)
-
-    if top.name:
-        annots.append(f'@{top.name}.contract')
-    ctx.push(res, annots=[a for a in annots if a[0] != '%'])
+        return 'default'
 
 
-@instruction('IMPLICIT_ACCOUNT')
-def do_implicit_account(ctx: Context, prim, args, annots):
-    top = ctx.pop1()
-    assert_stack_type(top, KeyHash)
-    res = Contract.new(str(top), type_expr=UNIT_TYPE_EXPR)
-    ctx.push(res, annots=annots)
+class SelfInstruction(MichelsonInstruction, prim='SELF'):
+    entry_point: str
+
+    @classmethod
+    def create_type(cls,
+                    args: List[Type['MichelsonPrimitive']],
+                    annots: Optional[list] = None,
+                    **kwargs) -> Type['MichelsonInstruction']:
+        return MichelsonInstruction.create_type(args, annots, entry_point=get_entry_point_name(annots))
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        self_type = get_entry_point_type(context, cls.entry_point)
+        assert self_type, f'parameter type is not defined'
+        self_address = context.get_self_address()
+        res = ContractType.create_type(args=[self_type]).from_value(self_address)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-def decrease_balance(ctx: Context, amount: Mutez):
-    balance = get_balance(ctx)
-    if int(balance) > 0:
-        assert int(amount) <= int(balance), f'needed {int(amount)} utz, got only {int(balance)} utz'
-        ctx.set('BALANCE', Mutez(int(balance) - int(amount)))
+class SenderInstruction(MichelsonInstruction, prim='SENDER'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        sender = context.get_operation_sender()
+        res = AddressType.from_value(sender)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-@instruction('CREATE_CONTRACT', args_len=1)
-def do_create_contract(ctx: Context, prim, args, annots):
-    assert len(args[0]) == 3, 'expected { parameter ; storage ; code }'
-    parameter_type, storage_type, code = args[0]
-    delegate, amount, storage = ctx.pop3()
+class SourceInstruction(MichelsonInstruction, prim='SENDER'):
 
-    assert_stack_type(amount, Mutez)
-    decrease_balance(ctx, amount)
-
-    assert_stack_type(delegate, Option)
-    assert_equal_types(storage_type, storage.type_expr)
-
-    originated_address = Address.new(ctx.dummy_gen.get_fresh_address())
-    content = {
-        'kind': 'origination',
-        'source': ctx.dummy_gen.self,
-        'balance': str(int(amount)),
-        'script': {
-            'storage': storage.val_expr,
-            'code': code
-        },
-        'originated_contract': str(originated_address)
-    }
-
-    if not delegate.is_none():
-        content['delegate'] = str(delegate.get_some())
-
-    orig = Operation.new(content)
-    ctx.push(originated_address)
-    ctx.push(orig)
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        source = context.get_operation_source()
+        res = AddressType.from_value(source)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-@instruction('SET_DELEGATE')
-def do_set_delegate(ctx: Context, prim, args, annots):
-    delegate = ctx.pop1()
-    assert_stack_type(delegate, Option)
+class NowInstruction(MichelsonInstruction, prim='NOW'):
 
-    content = {
-        'kind': 'delegation',
-        'source': ctx.dummy_gen.self,
-        'delegate': None if delegate.is_none() else str(delegate.get_some())
-    }
-    res = Operation.new(content)
-    ctx.push(res)
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        now = context.get_now()
+        res = TimestampType.from_value(now)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
 
 
-@instruction('TRANSFER_TOKENS')
-def do_transfer_tokens(ctx: Context, prim, args, annots):
-    param, amount, dest = ctx.pop3()
+class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
 
-    assert_stack_type(amount, Mutez)
-    decrease_balance(ctx, amount)
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        contract = cast(ContractType, stack.pop1())
+        assert isinstance(contract, ContractType), f'expected contract, got {contract.prim}'
+        res = AddressType.from_value(str(contract))  # TODO: strip field annotation?
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [contract], [res]))
+        return cls()
 
-    assert_stack_type(dest, Contract)
-    dest.assert_param_type(param)
 
-    content = {
-        'kind': 'transaction',
-        'source': ctx.dummy_gen.self,
-        'amount': str(int(amount)),
-        'destination': dest.get_address(),
-        'parameters': {
-            'entrypoint': dest.get_entrypoint(),
-            'value': param.val_expr
-        }
-    }
-    res = Operation.new(content)
-    ctx.push(res)
+class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
+    entry_point: str
+
+    @classmethod
+    def create_type(cls,
+                    args: List[Type['MichelsonPrimitive']],
+                    annots: Optional[list] = None,
+                    **kwargs) -> Type['MichelsonInstruction']:
+        entry_point = get_entry_point_name(annots)
+        assert issubclass(args[0], MichelsonType), f'expected Michelson type, got {args[0]}'
+        return MichelsonInstruction.create_type(args, annots, entry_point=entry_point)
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        address = cast(AddressType, stack.pop1())
+        assert isinstance(address, AddressType), f'expected address, got {address.prim}'
+        entry_type = get_entry_point_type(context, cls.entry_point, address=str(address))
+        contract_type = ContractType.create_type(args=cls.args)
+        try:
+            if entry_type is None:
+                stdout.append(f'{cls.prim}: skip type checking for {str(address)}')
+            else:
+                entry_type.assert_equal_types(cls.args[0])
+            res = OptionType.from_some(contract_type.from_value(f'{str(address)}%{cls.entry_point}'))
+        except AssertionError:
+            res = OptionType.none(contract_type)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [address], [res]))
+        return cls()
+
+
+class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        key_hash = cast(KeyHashType, stack.pop1())
+        key_hash.assert_equal_types(KeyHashType)
+        res = ContractType.create_type(args=[UnitType]).from_value(str(key_hash))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [key_hash], [res]))
+        return cls()
+
+
+class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', args_len=1):
+    program: Type[MichelsonProgram]
+
+    @classmethod
+    def create_type(cls,
+                    args: List[Type['MichelsonPrimitive']],
+                    annots: Optional[list] = None,
+                    **kwargs) -> Type['MichelsonInstruction']:
+        seq = args[0]
+        assert issubclass(seq, MichelsonSequence), f'expected sequence {{ parameter ; storage ; code }}'
+        return MichelsonInstruction.create_type(args=args,
+                                                annots=annots,
+                                                program=MichelsonProgram.match(seq))
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        delegate, amount, initial_storage = cast(Tuple[OptionType, MutezType, MichelsonType], stack.pop3())
+        delegate.assert_equal_types(OptionType.create_type(args=[KeyHashType]))
+        amount.assert_equal_types(MutezType)
+        initial_storage.assert_equal_types(cls.program.storage.args[0])
+
+        originated_address = AddressType.from_value(context.get_originated_address())
+        context.spend_balance(int(amount))
+        origination = OperationType.origination(
+            source=context.get_self_address(),
+            program=cls.program,
+            storage=initial_storage,
+            balance=int(amount),
+            delegate=None if delegate.is_none() else str(delegate.get_some())
+        )
+
+        stack.push(originated_address)
+        stack.push(origination)
+        stdout.append(format_stdout(cls.prim, [delegate, amount, initial_storage], [origination, originated_address]))
+        return cls()
+
+
+class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        delegate = cast(OptionType, stack.pop1())
+        delegate.assert_equal_types(OptionType.create_type(args=[KeyHashType]))
+
+        delegation = OperationType.delegation(
+            source=context.get_self_address(),
+            delegate=None if delegate.is_none() else str(delegate.get_some())
+        )
+        stack.push(delegation)
+        stdout.append(format_stdout(cls.prim, [delegate], [delegation]))
+        return cls()
+
+
+class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        parameter, amount, destination = cast(Tuple[MichelsonType, MutezType, ContractType], stack.pop3())
+        amount.assert_equal_types(MutezType)
+        assert isinstance(destination, ContractType), f'expected contract, got {destination.prim}'
+        parameter.assert_equal_types(destination.args[0])
+
+        transaction = OperationType.transaction(
+            source=context.get_self_address(),
+            destination=destination.get_address(),
+            amount=int(amount),
+            entrypoint=destination.get_entrypoint(),
+            parameter=parameter
+        )
+        stack.push(transaction)
+        stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))
+        return cls()

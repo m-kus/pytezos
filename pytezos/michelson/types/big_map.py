@@ -72,7 +72,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         return f'{{ {key}: {val}, ... }} || int /* Big_map ID */'
 
     @classmethod
-    def dummy(cls) -> 'BigMapType':
+    def dummy(cls, context: NodeContext) -> 'BigMapType':
         return cls(items=[])
 
     @classmethod
@@ -161,7 +161,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         else:
             context.register_big_map(self.ptr)
 
-    def get(self, key: MichelsonType, check_dup=True) -> Optional[MichelsonType]:
+    def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_equal_types(type(key))
         val = next((v for k, v in self if k == key), undefined())
         if isinstance(val, undefined):
@@ -180,7 +180,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     def update(self, key: MichelsonType, val: Optional[MichelsonType]) -> Tuple[Optional[MichelsonType], MichelsonType]:
         removed_keys = set(self.removed_keys)
-        prev_val = self.get(key, check_dup=False)
+        prev_val = self.get(key, dup=False)
         if prev_val is not None:
             if val is not None:
                 items = [(k, v if k != key else val) for k, v in self]
@@ -201,4 +201,4 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     def __getitem__(self, key_obj) -> Optional[MichelsonType]:
         key = self.args[0].from_python_object(key_obj)
-        return self.get(key, check_dup=False)
+        return self.get(key, dup=False)

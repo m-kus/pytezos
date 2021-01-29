@@ -39,7 +39,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         return cls(item)
 
     @classmethod
-    def dummy(cls) -> 'OptionType':
+    def dummy(cls, context: NodeContext) -> 'OptionType':
         return cls(None)
 
     @classmethod

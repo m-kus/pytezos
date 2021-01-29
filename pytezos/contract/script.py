@@ -1,6 +1,7 @@
+import json
 from typing import Type
 from functools import lru_cache
-from os.path import exists, expanduser
+from os.path import exists, expanduser, isfile
 
 from pytezos.jupyter import get_class_docstring, InlineDocstring
 from pytezos.michelson.format import micheline_to_michelson
@@ -98,7 +99,7 @@ class ContractStorage(metaclass=InlineDocstring):
 
         :returns: object
         """
-        return self.type.dummy().to_micheline_value()
+        return self.type.dummy(None).to_micheline_value()
 
 
 class ContractScript(metaclass=InlineDocstring):
@@ -185,29 +186,22 @@ class ContractScript(metaclass=InlineDocstring):
         with open(path, 'w+') as f:
             f.write(self.text)
 
-    def script(self, storage=None, original=True) -> dict:
+    def script(self, storage=None) -> dict:
         """ Generate script for contract origination.
 
         :param storage: Python object, leave None to generate empty
-        :param original: Keep the original code (initialized), which is default. \
-        Otherwise factory-specific changes may applied, e.g. different annotations
         :returns: {"code": $Micheline, "storage": $Micheline}
         """
         if storage is None:
             storage = self.storage.default()
         else:
+            if isinstance(storage, str) and isfile(storage):
+                with open(storage) as f:
+                    storage = f.read()
+                    if storage.endswith('.json'):
+                        storage = json.loads(storage)
             storage = self.storage.encode(storage)
-
-        if original:
-            code = self.code
-        else:
-            code = [
-                self.parameter.code,
-                self.storage.code,
-                self.code[-1]
-            ]
-
         return {
-            "code": code,
+            "code": self.code,
             "storage": storage
         }

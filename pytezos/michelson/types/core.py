@@ -1,5 +1,6 @@
 from pytezos.michelson.types.base import MichelsonType, unit
 from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack as blind_unpack
+from pytezos.context.base import NodeContext
 
 Unit = unit()
 
@@ -25,6 +26,9 @@ class StringType(MichelsonType, prim='string'):
     def __str__(self):
         return self.value
 
+    def __len__(self):
+        return len(self.value)
+
     @classmethod
     def from_value(cls, value: str) -> 'StringType':
         assert isinstance(value, str), f'expected string, got {type(value).__name__}'
@@ -32,7 +36,7 @@ class StringType(MichelsonType, prim='string'):
         return cls(value)
 
     @classmethod
-    def dummy(cls) -> 'StringType':
+    def dummy(cls, context: NodeContext) -> 'StringType':
         return cls()
 
     @classmethod
@@ -49,6 +53,13 @@ class StringType(MichelsonType, prim='string'):
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.value
+
+    def __getitem__(self, item):
+        assert isinstance(item, tuple)
+        start, stop = item
+        assert len(self.value) > 0, f'string is empty'
+        assert stop <= len(self.value), f'out of bounds {stop} <= {len(self.value)}'
+        return StringType(self.value[start:stop])
 
 
 class IntType(MichelsonType, prim='int'):
@@ -73,7 +84,7 @@ class IntType(MichelsonType, prim='int'):
         return self.value
 
     @classmethod
-    def dummy(cls) -> 'IntType':
+    def dummy(cls, context: NodeContext) -> 'IntType':
         return cls()
 
     @classmethod
@@ -136,8 +147,11 @@ class BytesType(MichelsonType, prim='bytes'):
     def __bytes__(self):
         return self.value
 
+    def __len__(self):
+        return len(self.value)
+
     @classmethod
-    def dummy(cls) -> 'BytesType':
+    def dummy(cls, context: NodeContext) -> 'BytesType':
         return cls()
 
     @classmethod
@@ -165,6 +179,12 @@ class BytesType(MichelsonType, prim='bytes'):
             return blind_unpack(self.value)
         return self.value
 
+    def __getitem__(self, item):
+        assert isinstance(item, tuple)
+        start, stop = item
+        assert stop <= len(self.value), f'index out of bounds'
+        return BytesType(self.value[start:stop])
+
 
 class BoolType(MichelsonType, prim='bool'):
 
@@ -188,7 +208,7 @@ class BoolType(MichelsonType, prim='bool'):
         return self.value
 
     @classmethod
-    def dummy(cls) -> 'BoolType':
+    def dummy(cls, context: NodeContext) -> 'BoolType':
         return cls(False)
 
     @classmethod
@@ -233,7 +253,7 @@ class UnitType(MichelsonType, prim='unit'):
         return 'Unit'
 
     @classmethod
-    def dummy(cls) -> 'UnitType':
+    def dummy(cls, context: NodeContext) -> 'UnitType':
         return cls()
 
     @classmethod

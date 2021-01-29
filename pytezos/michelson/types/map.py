@@ -51,7 +51,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         return f'{{ {key}: {val}, ... }}'
 
     @classmethod
-    def dummy(cls) -> 'MapType':
+    def dummy(cls, context: NodeContext) -> 'MapType':
         return cls([])
 
     @classmethod
@@ -109,17 +109,17 @@ class MapType(MichelsonType, prim='map', args_len=2):
         for _, val in self:
             val.attach_context(context)
 
-    def get(self, key: MichelsonType, check_dup=True) -> Optional[MichelsonType]:
+    def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_equal_types(type(key))
-        if check_dup:
-            assert self.args[1].is_duplicable(), f'use get and update instead'
+        if dup:
+            assert self.args[1].is_duplicable(), f'use GET_AND_UPDATE instead'
         return next((item[1] for item in self if item[0] == key), None)
 
     def contains(self, key: MichelsonType):
-        return self.get(key, check_dup=False) is not None
+        return self.get(key, dup=False) is not None
 
     def update(self, key: MichelsonType, val: Optional[MichelsonType]) -> Tuple[Optional[MichelsonType], MichelsonType]:
-        prev_val = self.get(key, check_dup=False)
+        prev_val = self.get(key, dup=False)
         if prev_val is not None:
             if val is not None:
                 items = [(k, v if k != key else val) for k, v in self]

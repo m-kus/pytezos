@@ -1,9 +1,7 @@
-from typing import List, Optional, Type, cast, Dict, Tuple, Any, Union
+from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
-from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.base import NodeContext
 
 
 def format_stdout(prim: str, inputs: list, outputs: list):
@@ -19,36 +17,27 @@ def dispatch_types(*args, mapping: Dict[Tuple[Type[MichelsonType], ...], Tuple[A
 class MichelsonInstruction(MichelsonPrimitive):
     args: List[Union[Type['MichelsonInstruction'], Any]] = []
     field_names: List[str] = []
-    context: Optional[NodeContext] = None
 
     @staticmethod
     def match(expr) -> Type['MichelsonInstruction']:
         return cast(Type['MichelsonInstruction'], MichelsonPrimitive.match(expr))
 
     @classmethod
-    def create_type(cls, args: List[Type['MichelsonPrimitive']],
-                    params: Optional[list] = None,
+    def create_type(cls,
+                    args: List[Type['MichelsonPrimitive']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
         field_names = [a[1:] for a in annots if a.startswith('%')] if annots else []
         assert len(field_names) == len(annots), f'only field annotations allowed'
         res = type(cls.__name__, (cls,), dict(args=args,
-                                              params=params,
                                               field_names=field_names,
                                               **kwargs))
         return cast(Type['MichelsonInstruction'], res)
 
     @classmethod
-    def attach_context(cls, context: NodeContext):
-        cls.context = context
-
-    @classmethod
     def as_micheline_expr(cls) -> dict:
-        args = [arg.as_micheline_expr() for arg in cls.args]
+        args = [arg.as_micheline_expr() if issubclass(arg, MichelsonPrimitive) else arg
+                for arg in cls.args]
         annots = [f'%{name}' for name in cls.field_names]
         expr = dict(prim=cls.prim, annots=annots, args=args)
         return {k: v for k, v in expr.items() if v}
-
-    @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
-        raise NotImplementedError

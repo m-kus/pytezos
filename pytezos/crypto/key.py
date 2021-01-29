@@ -157,10 +157,15 @@ class Key(metaclass=InlineDocstring):
             if not passphrase:
                 raise ValueError("Encrypted key provided without a passphrase.")
 
+            if isinstance(passphrase, str):
+                passphrase = passphrase.encode()
+            else:
+                assert isinstance(passphrase, bytes), f'expected bytes, got {type(passphrase)}'
+
             salt, encrypted_sk = key[:8], key[8:]
             encryption_key = hashlib.pbkdf2_hmac(
                 hash_name="sha512",
-                password=scrub_input(passphrase),
+                password=passphrase,
                 salt=salt,
                 iterations=32768,
                 dklen=32

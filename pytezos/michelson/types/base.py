@@ -55,19 +55,22 @@ class MichelsonType(MichelsonPrimitive):
         assert self.is_duplicable(), f'{self.prim} is not duplicable'
         return deepcopy(self)
 
+    def __getitem__(self, key):
+        assert False, f'forbidden'
+
     @classmethod
     def create_type(cls,
-                    args: List[Type['MichelsonPrimitive']],
+                    args: List[Union[Type['MichelsonPrimitive'], Any]],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonType']:
-        args = cast(List[Type['MichelsonType']], args)
+        type_args = [arg for arg in args if issubclass(arg, MichelsonType)]
         if cls.prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
-            for arg in args:
+            for arg in type_args:
                 assert arg.field_name is None, f'{cls.prim} argument type cannot be annotated: %{arg.field_name}'
         if cls.prim in ['set', 'map', 'big_map', 'ticket']:
-            assert args[0].is_comparable(), f'{cls.prim} key type has to be comparable (not {args[0].prim})'
+            assert type_args[0].is_comparable(), f'{cls.prim} key type has to be comparable (not {type_args[0].prim})'
         if cls.prim == 'big_map':
-            assert args[0].is_big_map_friendly(), f'impossible big_map value type'
+            assert type_args[0].is_big_map_friendly(), f'impossible big_map value type'
         res = type(cls.__name__, (cls,), dict(field_name=parse_name(annots, '%'),
                                               type_name=parse_name(annots, ':'),
                                               args=args,
@@ -99,8 +102,9 @@ class MichelsonType(MichelsonPrimitive):
             annots.append(f':{cls.type_name}')
         if cls.field_name is not None:
             annots.append(f'%{cls.field_name}')
-        type_args = [arg.as_micheline_expr() for arg in cls.args]
-        expr = dict(prim=cls.prim, annots=annots, args=type_args)
+        args = [arg.as_micheline_expr() if issubclass(arg, MichelsonPrimitive) else arg
+                for arg in cls.args]
+        expr = dict(prim=cls.prim, annots=annots, args=args)
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
@@ -155,14 +159,14 @@ class MichelsonType(MichelsonPrimitive):
         return all(map(lambda x: x.is_big_map_friendly(), cls.args))
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> 'MichelsonType':
+    def unpack(cls, data: bytes) -> 'MichelsonType':
         assert cls.is_packable(), f'{cls.prim} cannot be packed'
         assert data.startswith(b'\x05'), f'packed data should start with 05'
         val_expr = unforge_micheline(data[1:])
         return cls.from_micheline_value(val_expr)
 
     @classmethod
-    def dummy(cls):
+    def dummy(cls, context: NodeContext):
         raise NotImplementedError
 
     @classmethod

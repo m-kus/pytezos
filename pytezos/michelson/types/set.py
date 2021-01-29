@@ -42,7 +42,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         assert items == list(sorted(items)), f'set elements are not sorted'
 
     @classmethod
-    def dummy(cls):
+    def dummy(cls, context: NodeContext):
         return cls([])
 
     @classmethod

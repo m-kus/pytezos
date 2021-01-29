@@ -3,8 +3,10 @@ from typing import Tuple, Dict, Callable, List, Optional, Type, cast, Any, Union
 
 from pytezos import micheline_to_michelson, unforge_micheline
 from pytezos.michelson.forge import unforge_chain_id, unforge_address, unforge_public_key, unforge_signature
-
+from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.tags import prim_tags
+from pytezos.context.base import NodeContext
+from pytezos.michelson.interpreter.stack import MichelsonStack
 
 
 def is_micheline(value) -> bool:
@@ -117,13 +119,14 @@ def blind_unpack(data: bytes):
 
 
 class MichelsonPrimitive:
-    prim: str = ''
+    prim: str
     args: List[Union[Type['MichelsonPrimitive'], Any]] = []
     classes: Dict[Tuple[str, Optional[int]], Type['MichelsonPrimitive']] = {}
 
     @classmethod
-    def __init_subclass__(cls, prim: str = '', args_len: Optional[int] = 0, **kwargs):
+    def __init_subclass__(cls, prim: Optional[str] = None, args_len: Optional[int] = 0, **kwargs):
         super().__init_subclass__(**kwargs)
+        assert prim, f'undefined primitive'
         assert (prim, args_len) not in cls.classes, f'duplicate key {prim} ({args_len} args)'
         cls.classes[(prim, args_len)] = cls
         cls.prim = prim
@@ -137,14 +140,15 @@ class MichelsonPrimitive:
     @staticmethod
     def match(expr) -> Type['MichelsonPrimitive']:
         if isinstance(expr, list):
-            prim, args, annots = '', expr, []
+            args = [MichelsonPrimitive.match(arg) for arg in expr]
+            return MichelsonSequence.create_type(args=args)
         else:
             prim, args, annots = parse_micheline_prim(expr)
-        args_len = len(args)
-        assert (prim, args_len) in MichelsonPrimitive.classes, f'unregistered primitive {prim} ({args_len})'
-        cls, args_len = MichelsonPrimitive.classes[prim, args_len]
-        args = [MichelsonPrimitive.match(arg) if is_prim_expr(arg) else arg for arg in args]
-        return cls.create_type(args, annots)
+            args_len = len(args)
+            assert (prim, args_len) in MichelsonPrimitive.classes, f'unregistered primitive {prim} ({args_len} args)'
+            cls, args_len = MichelsonPrimitive.classes[prim, args_len]
+            args = [MichelsonPrimitive.match(arg) if is_prim_expr(arg) else arg for arg in args]
+            return cls.create_type(args, annots)
 
     @classmethod
     def create_type(cls,
@@ -156,6 +160,28 @@ class MichelsonPrimitive:
 
     @classmethod
     def as_micheline_expr(cls) -> dict:
-        args = [arg.as_micheline_expr() for arg in cls.args]
+        args = [arg.as_micheline_expr() if issubclass(arg, MichelsonPrimitive) else arg
+                for arg in cls.args]
         expr = dict(prim=cls.prim, args=args)
         return {k: v for k, v in expr.items() if v}
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        assert False, 'forbidden'
+
+
+class MichelsonSequence(MichelsonInstruction, args_len=None):
+
+    def __init__(self, items: List[MichelsonInstruction]):
+        super(MichelsonSequence, self).__init__()
+        self.items = items
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        items = [arg.execute(stack, stdout, context=context) if issubclass(arg, MichelsonInstruction) else arg
+                 for arg in cls.args]
+        return cls(items)
+
+    @classmethod
+    def as_micheline_expr(cls) -> list:
+        return [arg.as_micheline_expr() for arg in cls.args]

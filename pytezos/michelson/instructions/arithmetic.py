@@ -1,14 +1,15 @@
 from typing import List, Union, Tuple, Type, Callable, cast
 
-from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.interpreter.stack import MichelsonStack
 from pytezos.michelson.types import BoolType, IntType, NatType, TimestampType, MutezType, OptionType, PairType
 from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
+from pytezos.context.base import NodeContext
 
 
 class AbsInstruction(MichelsonInstruction, prim='ABS'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a = cast(IntType, stack.pop1())
         a.assert_equal_types(IntType)
         res = NatType.from_value(abs(int(a)))
@@ -20,7 +21,7 @@ class AbsInstruction(MichelsonInstruction, prim='ABS'):
 class AddInstruction(MichelsonInstruction, prim='ADD'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
         res_type, = dispatch_types(a, b, mapping={
             (NatType, NatType): (NatType,),
@@ -40,7 +41,7 @@ class AddInstruction(MichelsonInstruction, prim='ADD'):
 class CompareInstruction(MichelsonInstruction, prim='COMPARE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a, b = stack.pop2()
         a.assert_equal_types(type(b))
         res = IntType.from_value(a.__cmp__(b))
@@ -52,7 +53,7 @@ class CompareInstruction(MichelsonInstruction, prim='COMPARE'):
 class EdivInstruction(MichelsonInstruction, prim='EDIV'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
         q_type, r_type = dispatch_types(a, b, mapping={
             (NatType, NatType): (NatType, NatType),
@@ -87,7 +88,7 @@ def execute_zero_compare(prim: str, stack: MichelsonStack, stdout: List[str], co
 class EqInstruction(MichelsonInstruction, prim='EQ'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x == 0)
         return cls()
 
@@ -95,7 +96,7 @@ class EqInstruction(MichelsonInstruction, prim='EQ'):
 class GeInstruction(MichelsonInstruction, prim='GE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x >= 0)
         return cls()
 
@@ -103,7 +104,7 @@ class GeInstruction(MichelsonInstruction, prim='GE'):
 class GtInstruction(MichelsonInstruction, prim='GT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x > 0)
         return cls()
 
@@ -111,7 +112,7 @@ class GtInstruction(MichelsonInstruction, prim='GT'):
 class LeInstruction(MichelsonInstruction, prim='LE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x <= 0)
         return cls()
 
@@ -119,7 +120,7 @@ class LeInstruction(MichelsonInstruction, prim='LE'):
 class LtInstruction(MichelsonInstruction, prim='LT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x < 0)
         return cls()
 
@@ -127,7 +128,7 @@ class LtInstruction(MichelsonInstruction, prim='LT'):
 class NeqInstruction(MichelsonInstruction, prim='NEQ'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x != 0)
         return cls()
 
@@ -135,7 +136,7 @@ class NeqInstruction(MichelsonInstruction, prim='NEQ'):
 class IntInstruction(MichelsonInstruction, prim='INT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a = cast(NatType, stack.pop1())
         a.assert_equal_types(NatType)
         res = IntType.from_value(int(a))
@@ -147,7 +148,7 @@ class IntInstruction(MichelsonInstruction, prim='INT'):
 class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a = cast(IntType, stack.pop1())
         a.assert_equal_types(IntType)
         if int(a) >= 0:
@@ -172,7 +173,7 @@ def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Ca
 class LslInstruction(MichelsonInstruction, prim='LSL'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_shift(cls.prim, stack, stdout, lambda x: x[0] << x[1])
         return cls()
 
@@ -180,7 +181,7 @@ class LslInstruction(MichelsonInstruction, prim='LSL'):
 class LsrInstruction(MichelsonInstruction, prim='LSR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_shift(cls.prim, stack, stdout, lambda x: x[0] >> x[1])
         return cls()
 
@@ -188,7 +189,7 @@ class LsrInstruction(MichelsonInstruction, prim='LSR'):
 class MulInstruction(MichelsonInstruction, prim='MUL'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType], ...], stack.pop2())
         res_type, = dispatch_types(a, b, mapping={
             (NatType, NatType): (NatType,),
@@ -207,7 +208,7 @@ class MulInstruction(MichelsonInstruction, prim='MUL'):
 class NegInstruction(MichelsonInstruction, prim='NEG'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a = cast(Union[IntType, NatType], stack.pop1())
         _ = dispatch_types(a, mapping={
             (IntType,): (IntType,),
@@ -222,7 +223,7 @@ class NegInstruction(MichelsonInstruction, prim='NEG'):
 class SubInstruction(MichelsonInstruction, prim='SUB'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
         res_type = dispatch_types(a, b, mapping={
             (NatType, NatType): (IntType,),
@@ -254,7 +255,7 @@ def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add
 class OrInstruction(MichelsonInstruction, prim='OR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])
         return cls()
 
@@ -262,7 +263,7 @@ class OrInstruction(MichelsonInstruction, prim='OR'):
 class XorInstruction(MichelsonInstruction, prim='XOR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])
         return cls()
 
@@ -270,7 +271,7 @@ class XorInstruction(MichelsonInstruction, prim='XOR'):
 class AndInstruction(MichelsonInstruction, prim='AND'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a, b = cast(Tuple[Union[BoolType, NatType, IntType], ...], stack.pop2())
         res_type, convert = dispatch_types(a, b, mapping={
             (BoolType, BoolType): (BoolType, bool),
@@ -287,7 +288,7 @@ class AndInstruction(MichelsonInstruction, prim='AND'):
 class NotInstruction(MichelsonInstruction, prim='NOT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str]):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         a = cast(Union[IntType, NatType, BoolType], stack.pop1())
         res_type, convert = dispatch_types(a, mapping={
             (NatType,): (IntType, lambda x: ~int(x)),

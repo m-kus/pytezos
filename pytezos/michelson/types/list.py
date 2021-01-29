@@ -41,7 +41,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return f'[ {arg_doc}, ... ]'
 
     @classmethod
-    def dummy(cls) -> 'ListType':
+    def dummy(cls, context: NodeContext) -> 'ListType':
         return cls([])
 
     @classmethod

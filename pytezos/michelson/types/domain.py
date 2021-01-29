@@ -4,14 +4,16 @@ from typing import Type
 from pytezos.crypto.encoding import is_address, is_public_key, is_pkh, \
     is_sig, \
     is_kt, is_chain_id
-from pytezos.michelson.forge import forge_public_key, unforge_public_key, unforge_chain_id, unforge_signature, forge_address, \
-    unforge_address, unforge_contract, forge_base58, forge_timestamp, forge_contract
+from pytezos.michelson.forge import forge_public_key, unforge_public_key, unforge_chain_id, unforge_signature, \
+    forge_address, unforge_address, unforge_contract, forge_base58, optimize_timestamp, forge_contract
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
 from pytezos.michelson.types.core import NatType, IntType, StringType
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.control import FailwithInstruction
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.context.base import NodeContext
 
 
 class TimestampType(IntType, prim='timestamp'):
@@ -24,7 +26,7 @@ class TimestampType(IntType, prim='timestamp'):
     def from_micheline_value(cls, val_expr) -> 'TimestampType':
         value = parse_micheline_literal(val_expr, {
             'int': int,
-            'string': forge_timestamp
+            'string': optimize_timestamp
         })
         return cls.from_value(value)
 
@@ -33,7 +35,7 @@ class TimestampType(IntType, prim='timestamp'):
         if isinstance(py_obj, int):
             value = py_obj
         elif isinstance(py_obj, str):
-            value = forge_timestamp(py_obj)
+            value = optimize_timestamp(py_obj)
         else:
             assert False, f'unexpected value type {py_obj}'
         return cls.from_value(value)
@@ -82,11 +84,13 @@ class AddressType(StringType, prim='address'):
             return self.value < other.value
 
     @classmethod
-    def dummy(cls) -> 'AddressType':
-        return cls(unforge_address(b'\x00' * 22))
+    def dummy(cls, context: NodeContext) -> 'AddressType':
+        return cls.from_value(context.get_dummy_address())
 
     @classmethod
     def from_value(cls, value: str) -> 'AddressType':
+        if value.endswith('%default'):
+            value = value.split('%')[0]
         assert is_address(value), f'expected tz/KT address, got {value}'
         return cls(value)
 
@@ -117,8 +121,8 @@ class AddressType(StringType, prim='address'):
 class KeyType(StringType, prim='key'):
 
     @classmethod
-    def dummy(cls) -> 'KeyType':
-        return cls(unforge_public_key(b'\x00' * 33))
+    def dummy(cls, context: NodeContext) -> 'KeyType':
+        return cls.from_value(context.get_dummy_public_key())
 
     @classmethod
     def from_value(cls, value: str) -> 'KeyType':
@@ -152,8 +156,8 @@ class KeyType(StringType, prim='key'):
 class KeyHashType(StringType, prim='key_hash'):
 
     @classmethod
-    def dummy(cls) -> 'KeyHashType':
-        return cls(unforge_address(b'\x00' * 21))
+    def dummy(cls, context: NodeContext) -> 'KeyHashType':
+        return cls.from_value(context.get_dummy_key_hash())
 
     @classmethod
     def from_value(cls, value: str) -> 'KeyHashType':
@@ -187,8 +191,8 @@ class KeyHashType(StringType, prim='key_hash'):
 class SignatureType(StringType, prim='signature'):
 
     @classmethod
-    def dummy(cls) -> 'SignatureType':
-        return cls(unforge_signature(b'\x00' * 64))
+    def dummy(cls, context: NodeContext) -> 'SignatureType':
+        return cls.from_value(context.get_dummy_signature())
 
     @classmethod
     def from_value(cls, value: str) -> 'SignatureType':
@@ -222,8 +226,8 @@ class SignatureType(StringType, prim='signature'):
 class ChainIdType(StringType, prim='chain_id'):
 
     @classmethod
-    def dummy(cls) -> 'ChainIdType':
-        return cls(unforge_chain_id(b'\x00' * 4))
+    def dummy(cls, context: NodeContext) -> 'ChainIdType':
+        return cls.from_value(context.get_dummy_chain_id())
 
     @classmethod
     def from_value(cls, value: str) -> 'ChainIdType':
@@ -267,6 +271,13 @@ class ContractType(AddressType, prim='contract', args_len=1):
         else:
             return f'contract ({param_expr})'
 
+    def get_address(self) -> str:
+        return self.value.split('%')[0]
+
+    def get_entrypoint(self) -> str:
+        res = self.value.split('%')
+        return res[1] if len(res) == 2 else 'default'
+
 
 class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
@@ -292,8 +303,8 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         return f'lambda ({expr["param"]} -> {expr["return"]})'
 
     @classmethod
-    def dummy(cls) -> 'LambdaType':
-        return cls(MichelsonInstruction.match([]))
+    def dummy(cls, context: NodeContext) -> 'LambdaType':
+        return cls(FailwithInstruction)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'LambdaType':

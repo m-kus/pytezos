@@ -59,7 +59,7 @@ def get_type_layout(flat_args: List[Tuple[str, Type[MichelsonType]]], force_name
     return keys, paths
 
 
-class Struct:
+class ADT:
 
     def __init__(self, prim: str, path_to_key: Optional[Dict[str, str]], key_to_path: Dict[Union[str, int], str]):
         self.prim = prim
@@ -98,7 +98,7 @@ class Struct:
 
     @classmethod
     def from_nested_type(cls, nested_type: Type[MichelsonType],
-                         ignore_annots=False, force_named=False, force_recurse=False) -> 'Struct':
+                         ignore_annots=False, force_named=False, force_recurse=False) -> 'ADT':
         flat_args = list(iter_type_args(nested_type, ignore_annots=ignore_annots, force_recurse=force_recurse))
         keys, paths = get_type_layout(flat_args, force_named=force_named)
         return cls(prim=nested_type.prim, path_to_key=keys, key_to_path=paths)

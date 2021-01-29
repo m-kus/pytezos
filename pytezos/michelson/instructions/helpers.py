@@ -3,7 +3,7 @@ from os.path import isfile
 from pytezos import Contract
 from pytezos.interop import Interop
 from pytezos.crypto.encoding import is_kt
-from pytezos.michelson.forge import forge_timestamp
+from pytezos.michelson.forge import optimize_timestamp
 from pytezos.michelson.instructions.control import instruction, do_interpret
 from pytezos.michelson.interpreter.context import Context
 from pytezos.micheline.types import get_int, get_string, get_bool, parse_prim_expr, restore_entry_expr, assert_expr_equal, \
@@ -125,7 +125,7 @@ def do_patch(ctx: Context, prim, args, annots):
     if key in ['AMOUNT', 'BALANCE']:
         res = Mutez(get_int(args[1]))
     elif key == 'NOW':
-        res = Timestamp(dispatch_core_map(args[1], {'int': int, 'string': forge_timestamp}))
+        res = Timestamp(dispatch_core_map(args[1], {'int': int, 'string': optimize_timestamp}))
     elif key in ['SOURCE', 'SENDER']:
         res = Address.new(get_string(args[1]))
     elif key == 'CHAIN_ID':

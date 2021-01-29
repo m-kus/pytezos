@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 
 class NodeContext:
@@ -25,4 +25,61 @@ class NodeContext:
         raise NotImplementedError
 
     def get_originated_address(self) -> str:
+        raise NotImplementedError
+
+    def get_self_address(self) -> str:
+        raise NotImplementedError
+
+    def get_operation_amount(self) -> int:
+        raise NotImplementedError
+
+    def get_operation_sender(self) -> str:
+        raise NotImplementedError
+
+    def get_operation_source(self) -> str:
+        raise NotImplementedError
+
+    def get_now(self) -> int:
+        raise NotImplementedError
+
+    def get_balance(self) -> int:
+        raise NotImplementedError
+
+    def get_chain_id(self) -> str:
+        raise NotImplementedError
+
+    def get_parameter_expr(self, address=None) -> Optional:
+        raise NotImplementedError
+
+    def get_storage_expr(self):
+        raise NotImplementedError
+
+    def get_code_expr(self):
+        raise NotImplementedError
+
+    def get_dummy_address(self) -> str:
+        raise NotImplementedError
+
+    def get_dummy_public_key(self) -> str:
+        raise NotImplementedError
+
+    def get_dummy_key_hash(self) -> str:
+        raise NotImplementedError
+
+    def get_dummy_signature(self) -> str:
+        raise NotImplementedError
+
+    def get_dummy_chain_id(self) -> str:
+        raise NotImplementedError
+
+    def set_storage_expr(self, type_expr):
+        raise NotImplementedError
+
+    def set_parameter_expr(self, type_expr):
+        raise NotImplementedError
+
+    def set_code_expr(self, code_expr):
+        raise NotImplementedError
+
+    def spend_balance(self, amount: int):
         raise NotImplementedError

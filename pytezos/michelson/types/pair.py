@@ -3,7 +3,7 @@ from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.base import NodeContext
-from pytezos.michelson.types.struct import Struct
+from pytezos.michelson.types.adt import ADT
 
 
 class PairType(MichelsonType, prim='pair', args_len=None):
@@ -56,7 +56,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        flat_args = Struct.get_flat_args(cls)
+        flat_args = ADT.get_flat_args(cls)
         if isinstance(flat_args, dict):
             fields = [
                 (name, arg.generate_pydoc(definitions, inferred_name=name))
@@ -76,8 +76,8 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return f'${name}'
 
     @classmethod
-    def dummy(cls) -> 'PairType':
-        return cls(tuple(arg.dummy() for arg in cls.args))
+    def dummy(cls, context: NodeContext) -> 'PairType':
+        return cls(tuple(arg.dummy(context) for arg in cls.args))
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'PairType':
@@ -106,15 +106,29 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             value = tuple(cls.args[i].from_python_object(py_obj[i]) for i in [0, 1])
             return cls(value)
         else:
-            struct = Struct.from_nested_type(cls)
+            struct = ADT.from_nested_type(cls)
             return cls.from_python_object(struct.normalize_python_object(py_obj))
 
-    def iter_comb(self) -> Generator[MichelsonType, None, None]:
+    def iter_comb_leaves(self) -> Generator[MichelsonType, None, None]:
         for i, item in enumerate(self):
             if i == 1 and isinstance(item, PairType) and item.field_name is None and item.type_name is None:
-                yield from item.iter_comb()
+                yield from item.iter_comb_leaves()
             else:
                 yield item
+
+    def iter_sub_combs(self) -> Generator['PairType', None, None]:
+        yield self
+        right = self.items[1]
+        if isinstance(right, PairType) and right.field_name is None and right.type_name is None:
+            yield from right.iter_sub_combs()
+
+    def get_comb_leaf(self, idx: int) -> MichelsonType:
+        assert idx % 2 == 1, f'expected odd index'
+        return next(item for i, item in enumerate(self.iter_comb_leaves()) if 2 * i + 1 == idx)
+
+    def get_sub_comb(self, idx: int) -> 'PairType':
+        assert idx % 2 == 0, f'expected even index'
+        return next(item for i, item in enumerate(self.iter_sub_combs()) if 2 * i == idx)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self]
@@ -135,7 +149,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         #     assert False, f'unsupported mode {mode}'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False) -> Union[dict, tuple]:
-        struct = Struct.from_nested_type(type(self))
+        struct = ADT.from_nested_type(type(self))
         flat_values = struct.get_flat_values(self.items)
         if isinstance(flat_values, dict):
             return {
@@ -161,8 +175,5 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             item.attach_context(context)
 
     def __getitem__(self, key: Union[int, str]) -> MichelsonType:
-        if isinstance(key, int) and 0 <= key <= 1:
-            return self.items[key]
-        else:
-            struct = Struct.from_nested_type(type(self))
-            return struct.get_value(self.items, key)
+        struct = ADT.from_nested_type(type(self))
+        return struct.get_value(self.items, key)

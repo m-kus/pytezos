@@ -1,10 +1,10 @@
-from typing import Generator, Tuple, Optional, List, Union
+from typing import Generator, Tuple, Optional, List, Union, Type
 from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value
 from pytezos.context.base import NodeContext
-from pytezos.michelson.types.struct import Struct
+from pytezos.michelson.types.adt import ADT
 
 
 class OrType(MichelsonType, prim='or', args_len=2):
@@ -31,10 +31,20 @@ class OrType(MichelsonType, prim='or', args_len=2):
     def resolve(self) -> MichelsonType:
         return next(item for item in self if item is not None)
 
+    @staticmethod
+    def from_left(left: MichelsonType, right_type: Type[MichelsonType]):
+        cls = OrType.create_type(args=[type(left), right_type])
+        return cls((left, None))
+
+    @staticmethod
+    def from_right(right: MichelsonType, left_type: Type[MichelsonType]):
+        cls = OrType.create_type(args=[left_type, type(right)])
+        return cls((None, right))
+
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        flat_args = Struct.get_flat_args(cls, ignore_annots=True, force_named=True)
+        flat_args = ADT.get_flat_args(cls, ignore_annots=True, force_named=True)
         assert isinstance(flat_args, dict)
         variants = [
             (name, arg.generate_pydoc(definitions, inferred_name=name))
@@ -45,7 +55,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
         return f'${name}'
 
     @classmethod
-    def dummy(cls):
+    def dummy(cls, context: NodeContext):
         assert False, 'forbidden'
 
     @classmethod
@@ -67,7 +77,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
             )
             return cls(value)
         elif isinstance(py_obj, dict):
-            struct = Struct.from_nested_type(cls, ignore_annots=True, force_named=True)
+            struct = ADT.from_nested_type(cls, ignore_annots=True, force_named=True)
             return cls.from_python_object(struct.normalize_python_object(py_obj))
         else:
             assert False, f'expected tuple or dict, got {type(py_obj).__name__}'
@@ -79,7 +89,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
         assert False, f'unexpected value {self.items}'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
-        struct = Struct.from_nested_type(type(self), ignore_annots=True, force_named=True)
+        struct = ADT.from_nested_type(type(self), ignore_annots=True, force_named=True)
         flat_values = struct.get_flat_values(self.items, ignore_annots=True, allow_nones=True)
         assert isinstance(flat_values, dict) and len(flat_values) == 1
         return {
@@ -105,5 +115,5 @@ class OrType(MichelsonType, prim='or', args_len=2):
         if isinstance(key, int) and 0 <= key <= 1:
             return self.items[key]
         else:
-            struct = Struct.from_nested_type(type(self), ignore_annots=True, force_named=True)
+            struct = ADT.from_nested_type(type(self), ignore_annots=True, force_named=True)
             return struct.get_value(self.items, key, ignore_annots=True, allow_nones=True)

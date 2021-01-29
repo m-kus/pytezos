@@ -57,4 +57,8 @@ class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len
 
 
 class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
-    pass
+
+    @staticmethod
+    def empty(memo_size: int):
+        cls = SaplingStateType.create_type(args=[memo_size])
+        return cls()

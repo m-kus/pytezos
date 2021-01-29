@@ -1,41 +1,50 @@
-from typing import Type, cast, List
+from typing import Type, List
 
+from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.base import NodeContext
+from pytezos.michelson.interpreter.stack import MichelsonStack
 
 
-class StorageType(MichelsonType, prim='storage', args_len=1):
+class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
 
     def __init__(self, item: MichelsonType):
-        super(MichelsonType, self).__init__()
+        super(MichelsonPrimitive, self).__init__()
         self.item = item
 
     def __repr__(self):
         return repr(self.item)
 
     @staticmethod
-    def match(type_expr) -> Type['StorageType']:
-        return cast(Type['StorageType'], MichelsonType.match(type_expr))
+    def match(type_expr) -> Type['StorageSection']:
+        cls = MichelsonPrimitive.match(type_expr)
+        if not issubclass(cls, StorageSection):
+            cls = StorageSection.create_type(args=[cls])
+        return cls
 
     @classmethod
-    def generate_pydoc(cls, definitions=None, inferred_name=None):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        context.set_storage_expr(cls.as_micheline_expr())
+
+    @classmethod
+    def generate_pydoc(cls) -> str:
         definitions = []
-        res = cls.args[0].generate_pydoc(definitions, inferred_name or cls.prim)
+        res = cls.args[0].generate_pydoc(definitions, cls.prim)
         if res != f'${cls.prim}':
             definitions.insert(0, (cls.prim, res))
         return '\n'.join(f'${var}:\n\t{doc}\n' for var, doc in definitions)
 
     @classmethod
-    def dummy(cls):
-        return cls(cls.args[0].dummy())
+    def dummy(cls, context: NodeContext):
+        return cls(cls.args[0].dummy(context))
 
     @classmethod
-    def from_micheline_value(cls, val_expr) -> 'StorageType':
+    def from_micheline_value(cls, val_expr) -> 'StorageSection':
         item = cls.args[0].from_micheline_value(val_expr)
         return cls(item)
 
     @classmethod
-    def from_python_object(cls, py_obj) -> 'StorageType':
+    def from_python_object(cls, py_obj) -> 'StorageSection':
         item = cls.args[0].from_python_object(py_obj)
         return cls(item)
 
@@ -46,17 +55,13 @@ class StorageType(MichelsonType, prim='storage', args_len=1):
         return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
 
     def attach_context(self, context: NodeContext):
-        super(StorageType, self).attach_context(context)
+        self.item.attach_context(context)
 
-    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'StorageType':
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'StorageSection':
         item = self.item.merge_lazy_diff(lazy_diff)
         return type(self)(item)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict] = (), mode='readable'):
+    def aggregate_lazy_diff(self, mode='readable') -> List[dict]:
         lazy_diff = list()
         self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
         return lazy_diff
-
-    def __getitem__(self, key):
-        assert hasattr(self.item, '__getitem__'), f'index access is not implemented for {self.item.prim}'
-        return self.item[key]

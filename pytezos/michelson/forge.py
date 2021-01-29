@@ -85,7 +85,7 @@ def forge_nat(value) -> bytes:
     return bytes(buf)
 
 
-def unforge_chain_id(data: bytes):
+def unforge_chain_id(data: bytes) -> str:
     """ Decode chain id from byte form.
 
     :param data: encoded chain id.
@@ -94,7 +94,7 @@ def unforge_chain_id(data: bytes):
     return base58_encode(data, b'Net').decode()
 
 
-def unforge_signature(data: bytes):
+def unforge_signature(data: bytes) -> str:
     """ Decode signature from byte form.
 
     :param data: encoded signature.
@@ -117,7 +117,7 @@ def forge_base58(value: str) -> bytes:
     return base58_decode(value.encode())
 
 
-def forge_timestamp(value: str) -> int:
+def optimize_timestamp(value: str) -> int:
     """ Encode timestamp into bytes.
 
     :param value: RFC3339 time string

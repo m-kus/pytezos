@@ -5,6 +5,7 @@ from pprint import pformat
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types.pair import PairType
 from pytezos.michelson.types.domain import NatType, AddressType
+from pytezos.context.base import NodeContext
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):
@@ -25,15 +26,21 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
     def __repr__(self):
         return pformat((self.ticketer, repr(self.item), self.amount))
 
+    @staticmethod
+    def init(ticketer: str, item: MichelsonType, amount: int) -> 'TicketType':
+        cls = TicketType.create_type(args=[type(item)])
+        return cls(ticketer, item, amount)
+
     @classmethod
     def from_comb(cls, comb: PairType) -> 'TicketType':
-        ticketer, item, amount = tuple(comb.iter_comb())  # type: AddressType, MichelsonType, NatType
+        ticketer, item, amount = tuple(comb.iter_comb_leaves())  # type: AddressType, MichelsonType, NatType
         return cls(item=item,
                    ticketer=str(ticketer),
                    amount=int(amount))
 
     @staticmethod
     def join(left: 'TicketType', right: 'TicketType') -> Optional['TicketType']:
+        left.assert_equal_types(type(right))
         if left.ticketer != right.ticketer or left.item != right.item:
             return None
         else:
@@ -61,7 +68,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         return f'${name}'
 
     @classmethod
-    def dummy(cls):
+    def dummy(cls, context: NodeContext):
         assert False, 'forbidden'
 
     @classmethod
