@@ -183,7 +183,7 @@ class MichelsonType(MichelsonPrimitive):
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         raise NotImplementedError
 
-    def attach_context(self, context: NodeContext):  # NOTE: mutation
+    def attach_context(self, context: NodeContext, big_map_copy=False):  # NOTE: mutation
         assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket']
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':

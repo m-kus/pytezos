@@ -15,7 +15,7 @@ class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        amount = context.get_operation_amount()
+        amount = context.get_amount()
         res = NatType.from_value(amount)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -86,7 +86,7 @@ class SenderInstruction(MichelsonInstruction, prim='SENDER'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        sender = context.get_operation_sender()
+        sender = context.get_sender()
         res = AddressType.from_value(sender)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -97,7 +97,7 @@ class SourceInstruction(MichelsonInstruction, prim='SENDER'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        source = context.get_operation_source()
+        source = context.get_source()
         res = AddressType.from_value(source)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -121,7 +121,7 @@ class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         contract = cast(ContractType, stack.pop1())
         assert isinstance(contract, ContractType), f'expected contract, got {contract.prim}'
-        res = AddressType.from_value(str(contract))  # TODO: strip field annotation?
+        res = AddressType.from_value(contract.get_address())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [contract], [res]))
         return cls()

@@ -95,6 +95,6 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         if not self.is_none():
             self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         if not self.is_none():
-            self.item.attach_context(context)
+            self.item.attach_context(context, big_map_copy=big_map_copy)

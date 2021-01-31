@@ -106,10 +106,10 @@ class OrType(MichelsonType, prim='or', args_len=2):
             if item is not None:
                 item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         for item in self:
             if item is not None:
-                item.attach_context(context)
+                item.attach_context(context, big_map_copy=big_map_copy)
 
     def __getitem__(self, key: Union[int, str]):
         if isinstance(key, int) and 0 <= key <= 1:

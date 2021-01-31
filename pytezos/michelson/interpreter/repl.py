@@ -5,8 +5,7 @@ from pprint import pformat
 from pytezos.michelson.parse import MichelsonParser, MichelsonParserError
 from pytezos.michelson.converter import michelson_to_micheline, micheline_to_michelson
 from pytezos.micheline.types import MichelsonRuntimeError
-from pytezos.michelson.instructions.helpers import *
-from pytezos.michelson.instructions.struct import *
+from pytezos.michelson.interpreter.helpers import *
 from pytezos.michelson.instructions.tezos import *
 
 

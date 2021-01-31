@@ -105,9 +105,9 @@ class MapType(MichelsonType, prim='map', args_len=2):
         for _, val in self:
             val.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         for _, val in self:
-            val.attach_context(context)
+            val.attach_context(context, big_map_copy=big_map_copy)
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_equal_types(type(key))

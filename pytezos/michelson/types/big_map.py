@@ -129,7 +129,10 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         assert self.ptr is not None, f'Big_map id is not defined'
-        ptr, action = self.storage.get_big_map_action(self.ptr) if self.storage else (self.ptr, 'update')
+        if self.storage:
+            src_ptr, dst_ptr, action = self.storage.get_big_map_diff(self.ptr)
+        else:
+            src_ptr, dst_ptr, action = self.ptr, self.ptr, 'update'
         key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
 
         def make_update(key: MichelsonType, val: Optional[MichelsonType]) -> dict:
@@ -148,33 +151,32 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         if action == 'alloc':
             diff['key_type'] = key_type
             diff['value_type'] = val_type
+        elif action == 'copy':
+            pass  # TODO:
 
         lazy_diff.append({
             'kind': 'big_map',
-            'id': str(ptr),
+            'id': str(dst_ptr),
             'diff': diff
         })
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         if self.ptr is None:
             self.ptr = context.get_tmp_big_map_id()
         else:
-            context.register_big_map(self.ptr)
+            self.ptr = context.register_big_map(self.ptr, copy=big_map_copy)
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_equal_types(type(key))
-        val = next((v for k, v in self if k == key), undefined())
+        val = next((v for k, v in self if k == key), undefined())  # search in diff
         if isinstance(val, undefined):
-            if self.is_allocated():
-                assert self.storage, f'lazy storage is not attached'
-                key_hash = forge_script_expr(key.pack())
-                val_expr = self.storage.get_big_map_value(self.ptr, key_hash)
-                if val_expr is None:
-                    return None
-                else:
-                    return self.args[1].from_micheline_value(val_expr)
-            else:
+            assert self.storage, f'lazy storage is not attached'
+            key_hash = forge_script_expr(key.pack())
+            val_expr = self.storage.get_big_map_value(self.ptr, key_hash)
+            if val_expr is None:
                 return None
+            else:
+                return self.args[1].from_micheline_value(val_expr)
         else:
             return val
 

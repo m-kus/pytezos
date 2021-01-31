@@ -101,7 +101,7 @@ class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
         return type(self)(item)
 
     def attach_context(self, context: NodeContext):
-        self.item.attach_context(context)
+        self.item.attach_context(context, big_map_copy=True)
 
     def aggregate_lazy_diff(self, mode='readable') -> List[dict]:
         lazy_diff = []

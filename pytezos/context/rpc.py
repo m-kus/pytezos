@@ -1,27 +1,20 @@
-from typing import Tuple
+from typing import Optional
 
 from pytezos import RpcError
-from pytezos.context.base import NodeContext
+from pytezos.context.fake import FakeContext
 from pytezos.interop import Interop
+from pytezos.michelson.forge import optimize_timestamp
 
 
-class RPCNodeContext(Interop, NodeContext):
+class RPCNodeContext(Interop, FakeContext):
 
-    def __init__(self, block_id='head', **kwargs):
+    def __init__(self, block_id='head', address=None, **kwargs):
         super(RPCNodeContext, self).__init__(**kwargs)
         self.block_id = block_id
+        self.self_address = address
 
     def _spawn(self, **kwargs):
-        return RPCNodeContext(block_id=self.block_id, **kwargs)
-
-    def register_big_map(self, ptr: int, action: str):
-        assert ptr >= 0
-
-    def get_tmp_big_map_id(self):
-        assert False
-
-    def get_big_map_action(self, ptr: int) -> Tuple[int, str]:
-        return ptr, 'update'
+        return RPCNodeContext(**kwargs)
 
     def get_big_map_value(self, ptr: int, key_hash: str):
         try:
@@ -29,11 +22,27 @@ class RPCNodeContext(Interop, NodeContext):
         except RpcError:
             return None
 
-    def register_sapling_state(self, ptr: int):
-        raise NotImplementedError
+    def get_now(self) -> int:
+        header = self.shell.blocks[self.block_id].header()
+        return optimize_timestamp(header['timestamp'])
 
-    def get_tmp_sapling_state_id(self) -> int:
-        raise NotImplementedError
+    def get_balance(self) -> int:
+        contract = self.shell.contracts[self.get_self_address()]()
+        return int(contract['balance'])
 
-    def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> list:
-        raise NotImplementedError
+    def get_chain_id(self) -> str:
+        return self.shell.chains.main.chain_id()
+
+    def get_parameter_expr(self, address=None) -> Optional:
+        if address:
+            contract = self.shell.contracts[address]()
+            return next(section for section in contract['script']['code'] if section['prim'] == 'parameter')
+
+    def get_dummy_public_key(self) -> str:
+        return self.key.public_key()
+
+    def get_dummy_key_hash(self) -> str:
+        return self.key.public_key_hash()
+
+    def get_dummy_chain_id(self) -> str:
+        return self.get_chain_id()

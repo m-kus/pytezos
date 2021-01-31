@@ -70,9 +70,9 @@ class ListType(MichelsonType, prim='list', args_len=1):
         for item in self:
             item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         for item in self:
-            item.attach_context(context)
+            item.attach_context(context, big_map_copy=big_map_copy)
 
     def split_head(self) -> Tuple[MichelsonType, 'ListType']:
         assert len(self) > 0, f'cannot split empty list'

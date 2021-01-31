@@ -170,9 +170,9 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         for item in self:
             item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         for item in self:
-            item.attach_context(context)
+            item.attach_context(context, big_map_copy=big_map_copy)
 
     def __getitem__(self, key: Union[int, str]) -> MichelsonType:
         struct = ADT.from_nested_type(type(self))

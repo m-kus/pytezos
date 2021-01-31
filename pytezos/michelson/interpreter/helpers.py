@@ -1,5 +1,7 @@
 from os.path import isfile
 
+from pytezos.michelson.instructions.base import MichelsonInstruction
+
 from pytezos import Contract
 from pytezos.interop import Interop
 from pytezos.crypto.encoding import is_kt
@@ -18,6 +20,11 @@ patch_prim = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
 def is_prim(val_expr, prim):
     return isinstance(val_expr, dict) and val_expr.get('prim') == prim
+
+
+class DumpnHelper(MichelsonInstruction, prim='DUMP', args_len=1):
+    pass
+
 
 
 @instruction('DUMP', args_len=1)

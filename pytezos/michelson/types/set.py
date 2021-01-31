@@ -76,7 +76,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         pass  # Big_map is not comparable
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: NodeContext, big_map_copy=False):
         pass  # Big_map is not comparable
 
     def contains(self, item: MichelsonType) -> bool:
