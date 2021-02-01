@@ -1,14 +1,15 @@
 from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
+from pytezos.context.base import NodeContext
 from pytezos.michelson.micheline import MichelsonPrimitive
-from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.interpreter.stack import MichelsonStack
 
 
 def format_stdout(prim: str, inputs: list, outputs: list):
     return f'{prim} / {" : ".join(map(repr, inputs))} => {" : ".join(map(repr, outputs))}'
 
 
-def dispatch_types(*args, mapping: Dict[Tuple[Type[MichelsonType], ...], Tuple[Any, ...]]):
+def dispatch_types(*args, mapping: Dict[Tuple[Type[MichelsonPrimitive], ...], Tuple[Any, ...]]):
     key = tuple(type(arg) for arg in args)
     assert key in mapping, f'unexpected arguments {", ".join(map(lambda x: x.__name__, key))}'
     return mapping[key]
@@ -41,3 +42,7 @@ class MichelsonInstruction(MichelsonPrimitive):
         annots = [f'%{name}' for name in cls.field_names]
         expr = dict(prim=cls.prim, annots=annots, args=args)
         return {k: v for k, v in expr.items() if v}
+
+    @classmethod
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: NodeContext):
+        raise NotImplementedError

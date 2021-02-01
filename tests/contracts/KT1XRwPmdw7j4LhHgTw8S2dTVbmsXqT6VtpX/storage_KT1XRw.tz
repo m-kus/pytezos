@@ -1,1 +1,0 @@
-Pair {} (Pair 1 (Pair 1000000 (Pair "tz1XEKgRQtqV2XamF9CR7avwNq1V2hPDgNbL" { Elt "my_vote" (Pair "2019-06-24T00:00:00Z" (Pair "2019-06-24T15:50:00Z" (Pair {} (Pair 1000 { Elt "TF" { RENAME @__slash_1_slash_1 ; NIL operation ; PUSH key_hash "tz1XEKgRQtqV2XamF9CR7avwNq1V2hPDgNbL" ; IMPLICIT_ACCOUNT ; PUSH mutez 50000000 ; UNIT ; TRANSFER_TOKENS ; CONS ; DIP { DROP } } })))) })))

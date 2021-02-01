@@ -96,3 +96,6 @@ class NodeContext:
 
     def get_dummy_chain_id(self) -> str:
         raise NotImplementedError
+
+    def get_dummy_lambda(self):
+        raise NotImplementedError

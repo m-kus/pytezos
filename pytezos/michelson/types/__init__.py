@@ -1,6 +1,7 @@
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.core import *
-from pytezos.michelson.types.domain import *
+from pytezos.michelson.types.core import IntType, StringType, BoolType, BytesType, UnitType, NatType, NeverType
+from pytezos.michelson.types.domain import AddressType, TimestampType, KeyType, KeyHashType, LambdaType, ContractType, \
+    MutezType, ChainIdType, SignatureType
 from pytezos.michelson.types.big_map import BigMapType
 from pytezos.michelson.types.operation import OperationType
 from pytezos.michelson.types.list import ListType

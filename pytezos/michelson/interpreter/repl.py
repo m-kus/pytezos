@@ -3,17 +3,11 @@ from copy import deepcopy
 from pprint import pformat
 
 from pytezos.michelson.parse import MichelsonParser, MichelsonParserError
-from pytezos.michelson.converter import michelson_to_micheline, micheline_to_michelson
-from pytezos.micheline.types import MichelsonRuntimeError
-from pytezos.michelson.interpreter.helpers import *
-from pytezos.michelson.instructions.tezos import *
-
-
-def get_content(obj: dict):
-    content = obj.get('_content')
-    if content:
-        return format_content(content)
-    return {}
+from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.format import micheline_to_michelson
+from pytezos.context.fake import FakeContext
+from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.instructions.base import MichelsonInstruction
 
 
 def format_stack_item(item: StackItem):
@@ -153,8 +147,9 @@ class Interpreter:
     """
 
     def __init__(self, debug=True):
-        self.ctx = Context()
-        self.parser = MichelsonParser(extra_primitives=helpers_prim)
+        self.stack = MichelsonStack()
+        self.context = FakeContext()
+        self.parser = MichelsonParser(extra_primitives=[])
         self.debug = debug
 
     def execute(self, code):
@@ -164,10 +159,12 @@ class Interpreter:
         :returns: {"success": True|False, "stdout": "", "stderr": {}, "result": {"value": "", ...}}
         """
         int_res = {'success': False}
+        stdout = []
 
         try:
             code_expr = michelson_to_micheline(code, parser=self.parser)
-        except MichelsonParserError as e:
+            code = MichelsonInstruction.match(code_expr)
+        except (MichelsonParserError, AssertionError) as e:
             if self.debug:
                 raise e
             int_res['stderr'] = format_stderr(e)
@@ -176,12 +173,12 @@ class Interpreter:
         backup = deepcopy(self.ctx)
 
         try:
-            res = do_interpret(self.ctx, code_expr)
+            res = code.execute(self.stack, stdout, self.context)
             if res is None and self.ctx.pushed:
                 res = {'kind': 'stack', 'stack': self.ctx.dump(count=1)}
 
             int_res['result'] = format_result(res)
-            int_res['stdout'] = format_stdout(self.ctx.stdout)
+            int_res['stdout'] = format_stdout(stdout)
             int_res['success'] = True
             self.ctx.reset()
         except MichelsonRuntimeError as e:

@@ -1,1 +1,0 @@
-Pair { Elt "Alice" 1 ; Elt "Bob" 3 ; Elt "Mary" 0 ; Elt "Peter" 0 } (Pair {} False)

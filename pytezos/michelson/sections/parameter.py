@@ -1,11 +1,8 @@
 from typing import List, Type, cast, Dict, Any
 
-from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types import *
 from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.context.base import NodeContext
-from pytezos.michelson.types.sum import OrType
-from pytezos.michelson.types.adt import ADT
-from pytezos.michelson.interpreter.stack import MichelsonStack
 
 
 class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
@@ -25,7 +22,7 @@ class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack, stdout: List[str], context: NodeContext):
         context.set_parameter_expr(cls.as_micheline_expr())
 
     @classmethod

@@ -9,8 +9,7 @@ from pytezos.michelson.forge import forge_public_key, unforge_public_key, unforg
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
 from pytezos.michelson.types.core import NatType, IntType, StringType
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.control import FailwithInstruction
+from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.context.base import NodeContext
@@ -281,7 +280,7 @@ class ContractType(AddressType, prim='contract', args_len=1):
 
 class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
-    def __init__(self, value: Type[MichelsonInstruction]):
+    def __init__(self, value: Type[MichelsonPrimitive]):
         super(LambdaType, self).__init__()
         self.value = value
 
@@ -304,12 +303,12 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
     @classmethod
     def dummy(cls, context: NodeContext) -> 'LambdaType':
-        return cls(FailwithInstruction)
+        return cls(MichelsonPrimitive.match(context.get_dummy_lambda()))
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'LambdaType':
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
-        return cls(MichelsonInstruction.match(val_expr))
+        return cls(MichelsonPrimitive.match(val_expr))
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'LambdaType':

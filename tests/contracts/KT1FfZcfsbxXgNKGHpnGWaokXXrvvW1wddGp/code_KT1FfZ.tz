@@ -1,4 +1,0 @@
-parameter (pair nat string);
-storage (map nat string);
-code { {  } ;
-       { { { { DUP } ; CAR } ; { { { { DIP { DUP } ; SWAP } } ; CDR } ; { { {  } ; { { DUP ; { { { DIP { { DIP { DUP } ; SWAP } } ; SWAP } } ; CDR } ; { { { DIP { { DIP { { DIP { DUP } ; SWAP } } ; SWAP } } ; SWAP } } ; CAR } } ; { DIP { SOME } ; UPDATE } } ; {  } ; { DIP { DUP } ; SWAP } ; {  } ; SWAP ; {  } ; DIP { DROP } ; {  } ; DIP { DROP } ; {  } ; PUSH unit Unit } ; DROP ; { { DUP ; NIL operation } ; PAIR } } ; {  } ; DIP { { DIP { DIP { DIP { {  } } } } ; DROP } } } ; {  } ; DIP { { DIP { DIP { {  } } } ; DROP } } } ; DIP { { DIP { {  } } ; DROP } } } }

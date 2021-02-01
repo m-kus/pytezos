@@ -85,8 +85,7 @@ class PyTezosClient(Interop, ContentMixin):
         return ContractInterface(
             address=contract_id,
             shell=self.shell,
-            key=self.key,
-            factory=factory
+            key=self.key
         )
 
     def contract(self, contract_id) -> ContractInterface:
@@ -96,12 +95,3 @@ class PyTezosClient(Interop, ContentMixin):
         :rtype: ContractInterface
         """
         return self._get_contract_interface(contract_id)
-
-    def nft_app(self, contract_id) -> ContractInterface:
-        """ Get a high-level NFT interface for a given smart contract id.
-
-        Read more at https://nft.stove-labs.com/
-        :param contract_id: KT address of a smart contract
-        :rtype: ContractInterface
-        """
-        return self._get_contract_interface(contract_id, factory=NonFungibleTokenImpl)

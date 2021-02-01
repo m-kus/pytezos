@@ -21,6 +21,7 @@ def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],
 
 
 class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
+    depth: int
 
     def __init__(self, item: MichelsonInstruction):
         super(DipnInstruction, self).__init__()
@@ -29,12 +30,12 @@ class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
     @classmethod
     def create_type(cls, args: List[Any], **kwargs) -> Type['DipnInstruction']:
         depth = parse_micheline_literal(args[0], {'int': int})
-        res = type(cls.__name__, (cls,), dict(args=[depth, args[1]], **kwargs))
+        res = type(cls.__name__, (cls,), dict(args=args, depth=depth, **kwargs))
         return cast(Type['DipnInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        item = execute_dip(cls.prim, stack, stdout, count=cls.args[0], body=cls.args[1], context=context)
+        item = execute_dip(cls.prim, stack, stdout, count=cls.depth, body=cls.args[1], context=context)
         return cls(item)
 
 
@@ -46,7 +47,7 @@ class DipInstruction(MichelsonInstruction, prim='DIP'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        item = execute_dip(cls.prim, stack, stdout, count=1, body=cls.args[1])
+        item = execute_dip(cls.prim, stack, stdout, count=1, body=cls.args[1], context=context)
         return cls(item)
 
 
@@ -72,7 +73,8 @@ class ExecInstruction(MichelsonInstruction, prim='EXEC', args_len=3):
         param.assert_equal_types(sub.args[0])
         sub_stack = MichelsonStack.from_items([param])
         sub_stdout = []
-        item = sub.value.execute(sub_stack, sub_stdout, context=context)
+        sub_body = cast(MichelsonInstruction, sub.value)
+        item = sub_body.execute(sub_stack, sub_stdout, context=context)
         res = sub_stack.pop1()
         res.assert_equal_types(sub.args[1])
         assert len(sub_stack) == 0, f'lambda stack is not empty {sub_stack}'
@@ -246,7 +248,7 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
-                elt = PairType.from_items(list(elt))
+                elt = PairType.from_comb_leaves(list(elt))
             stack.push(elt)
             stdout.append(format_stdout(cls.prim, popped, [elt]))
             execution = cls.args[0].execute(stack, stdout, context=context)
@@ -257,7 +259,7 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
             else:
                 items.append(new_elt)
             popped = [new_elt]
-        res = type(src).from_items(items)
+        res = type(src).from_comb_leaves(items)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, popped, [res]))
         return cls(executions)
@@ -276,7 +278,7 @@ class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
-                elt = PairType.from_items(list(elt))
+                elt = PairType.from_comb_leaves(list(elt))
             stack.push(elt)
             stdout.append(format_stdout(cls.prim, popped, [elt]))
             execution = cls.args[0].execute(stack, stdout, context=context)

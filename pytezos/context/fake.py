@@ -129,3 +129,6 @@ class FakeContext(NodeContext):
 
     def get_dummy_chain_id(self) -> str:
         return base58_encode(b'\x00' * 4, b'Net').decode()
+
+    def get_dummy_lambda(self):
+        return {'prim': 'FAILWITH'}

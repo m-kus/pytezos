@@ -97,15 +97,17 @@ class PairingCheckInstruction(MichelsonInstruction, prim='PAIRING_CHECK'):
 
 
 class SaplingEmptyStateInstruction(MichelsonInstruction, prim='SAPLING_EMPTY_STATE', args_len=1):
+    memo_size: int
 
     @classmethod
     def create_type(cls, args: List[Any], **kwargs) -> Type['SaplingEmptyStateInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
+        memo_size = parse_micheline_literal(args[0], {'int': int})
+        res = type(cls.__name__, (cls,), dict(args=args, memo_size=memo_size, **kwargs))
         return cast(Type['SaplingEmptyStateInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        res = SaplingStateType.empty(cls.args[0])
+        res = SaplingStateType.empty(cls.memo_size)
         res.attach_context(context)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))

@@ -34,7 +34,9 @@ class unit(object):
         return isinstance(other, unit)
 
 
-def parse_name(annots: List[str], prefix: str) -> str:
+def parse_name(annots: List[str], prefix: str) -> Optional[str]:
+    if annots is None:
+        return None
     sub_annots = [x[1:] for x in annots if x.startswith(prefix)]
     assert len(sub_annots) <= 1, f'multiple "{prefix}" annotations are not allowed: {sub_annots}'
     return sub_annots[0] if sub_annots else None

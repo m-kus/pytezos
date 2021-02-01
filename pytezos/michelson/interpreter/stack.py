@@ -1,13 +1,13 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from pprint import pformat
 
-from pytezos.michelson.types import MichelsonType
+from pytezos.michelson.types.base import MichelsonType
 
 
 class MichelsonStack:
 
-    def __init__(self, items: List[MichelsonType] = []):
-        self.items = items
+    def __init__(self, items: Optional[List[MichelsonType]] = None):
+        self.items = items or []
         self.protected = 0
 
     @classmethod

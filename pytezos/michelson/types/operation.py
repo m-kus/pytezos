@@ -1,7 +1,7 @@
 from typing import Type, Optional
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.micheline import MichelsonSequence
 
 
 class OperationType(MichelsonType, prim='operation'):
@@ -16,7 +16,7 @@ class OperationType(MichelsonType, prim='operation'):
     @classmethod
     def origination(cls,
                     source: str,
-                    program: Type[MichelsonProgram],
+                    script: Type[MichelsonSequence],
                     storage: Optional[MichelsonType] = None,
                     balance: int = 0,
                     delegate: Optional[str] = None) -> 'OperationType':
@@ -24,7 +24,7 @@ class OperationType(MichelsonType, prim='operation'):
             'kind': 'origination',
             'source': source,
             'script': {
-                'code': program.as_micheline_expr(),
+                'code': script.as_micheline_expr(),
                 'storage': storage.to_micheline_value()
             },
             'balance': str(balance)

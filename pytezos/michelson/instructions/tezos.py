@@ -1,9 +1,8 @@
 from typing import List, cast, Tuple, Optional, Type
 
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
-from pytezos.michelson.micheline import MichelsonSequence
 from pytezos.michelson.interpreter.stack import MichelsonStack
-from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.micheline import MichelsonSequence
 from pytezos.michelson.sections import ParameterSection
 from pytezos.michelson.types.base import MichelsonType, MichelsonPrimitive
 from pytezos.michelson.types import NatType, StringType, ContractType, AddressType, TimestampType, \
@@ -171,31 +170,34 @@ class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
 
 
 class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', args_len=1):
-    program: Type[MichelsonProgram]
+    storage_type: Type[MichelsonType]
 
     @classmethod
     def create_type(cls,
                     args: List[Type['MichelsonPrimitive']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
-        seq = args[0]
-        assert issubclass(seq, MichelsonSequence), f'expected sequence {{ parameter ; storage ; code }}'
+        sequence = args[0]
+        assert issubclass(sequence, MichelsonSequence), f'expected sequence {{ parameter ; storage ; code }}'
+        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
+        assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
+        storage = next(arg for arg in sequence.args if arg.prim == 'storage')
         return MichelsonInstruction.create_type(args=args,
                                                 annots=annots,
-                                                program=MichelsonProgram.match(seq))
+                                                storage_type=storage.args[0])
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         delegate, amount, initial_storage = cast(Tuple[OptionType, MutezType, MichelsonType], stack.pop3())
         delegate.assert_equal_types(OptionType.create_type(args=[KeyHashType]))
         amount.assert_equal_types(MutezType)
-        initial_storage.assert_equal_types(cls.program.storage.args[0])
+        initial_storage.assert_equal_types(cls.storage_type)
 
         originated_address = AddressType.from_value(context.get_originated_address())
         context.spend_balance(int(amount))
         origination = OperationType.origination(
             source=context.get_self_address(),
-            program=cls.program,
+            script=cls.args[0],
             storage=initial_storage,
             balance=int(amount),
             delegate=None if delegate.is_none() else str(delegate.get_some())

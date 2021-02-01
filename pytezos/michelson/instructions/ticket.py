@@ -52,7 +52,7 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
         if res is None:
             res = OptionType.none(PairType.create_type(args=[type(ticket), type(ticket)]))
         else:
-            res = OptionType.from_some(PairType.from_items(list(res)))
+            res = OptionType.from_some(PairType.from_comb_leaves(list(res)))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [ticket, amounts], [res]))
         return cls()

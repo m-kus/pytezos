@@ -5,8 +5,9 @@ from functools import update_wrapper
 
 
 def is_interactive():
-    import __main__ as main
-    return not hasattr(main, '__file__')
+    return True
+    # import __main__ as main
+    # return not hasattr(main, '__file__')
 
 
 def get_attr_docstring(class_type, attr_name):

@@ -1,1 +1,0 @@
-Right (Left (Right { PUSH (lambda (pair (pair string bytes) (big_map bytes bytes)) (pair (list operation) (big_map bytes bytes))) { CAR ; CAR ; PUSH string "NoSuchEntryPoint" ; PAIR ; FAILWITH } ; PACK ; SOME ; PUSH string "fallback" ; PACK ; UPDATE }))

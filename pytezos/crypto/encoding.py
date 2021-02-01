@@ -98,7 +98,7 @@ def base58_decode(v: bytes) -> bytes:
     return base58.b58decode_check(v)[prefix_len:]
 
 
-def base58_encode(v: bytes, prefix: bytes) -> bytes:
+def     base58_encode(v: bytes, prefix: bytes) -> bytes:
     """ Encode data using Base58 with checksum and add an according binary prefix in the end.
 
     :param v: Array of bytes

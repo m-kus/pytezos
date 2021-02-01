@@ -1,6 +1,7 @@
-from typing import Generator, Tuple, List, Union, Type, Optional, cast
+from typing import Generator, Tuple, List, Union, Type, Optional, cast, Any
 from pprint import pformat
 
+from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.base import NodeContext
 from pytezos.michelson.types.adt import ADT
@@ -24,11 +25,6 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
 
-    @staticmethod
-    def from_items(items: List[MichelsonType]) -> 'PairType':
-        cls = PairType.create_type(args=[type(item) for item in items])
-        return cls.init(items)
-
     @classmethod
     def init(cls, items: List[MichelsonType]) -> 'PairType':
         if len(items) > 2:
@@ -38,19 +34,21 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             items = tuple(items)
         return cls(items)
 
+    @staticmethod
+    def from_comb_leaves(items: List[MichelsonType]) -> 'PairType':
+        cls = PairType.create_type(args=[type(item) for item in items])
+        return cls.init(items)
+
     @classmethod
     def create_type(cls,
-                    args: List[Type['MichelsonType']],
-                    field_name: Optional[str] = None,
-                    type_name: Optional[str] = None,
+                    args: List[Union[Type['MichelsonPrimitive'], Any]],
+                    annots: Optional[list] = None,
                     **kwargs) -> Type['PairType']:
         if len(args) > 2:  # comb
             args = [args[0], PairType.create_type(args=args[1:])]
         else:
             assert len(args) == 2, f'unexpected number of args: {len(args)}'
-        type_class = super(PairType, cls).create_type(args=args,
-                                                      field_name=field_name,
-                                                      type_name=type_name)
+        type_class = super(PairType, cls).create_type(args=args, annots=annots)
         return cast(Type['PairType'], type_class)
 
     @classmethod
@@ -129,6 +127,17 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     def get_sub_comb(self, idx: int) -> 'PairType':
         assert idx % 2 == 0, f'expected even index'
         return next(item for i, item in enumerate(self.iter_sub_combs()) if 2 * i == idx)
+
+    def update_comb_leaf(self, idx: int, leaf: MichelsonType) -> 'PairType':
+        assert idx % 2 == 1, f'expected odd index'
+        leaves = [leaf if 2 * i + 1 == idx else item for i, item in enumerate(self.iter_comb_leaves())]
+        return type(self).from_comb_leaves(leaves)
+
+    def update_sub_comb(self, idx: int, sub_comb: 'PairType') -> 'PairType':
+        assert idx % 2 == 0, f'expected even index'
+        leaves = [item for i, item in enumerate(self.iter_comb_leaves()) if 2 * i + 1 < idx]
+        leaves.extend(sub_comb.iter_comb_leaves())
+        return type(self).from_comb_leaves(leaves)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self]

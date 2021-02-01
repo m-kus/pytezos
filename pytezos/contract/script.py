@@ -6,7 +6,8 @@ from os.path import exists, expanduser, isfile
 from pytezos.jupyter import get_class_docstring, InlineDocstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.michelson.types import ParameterType, StorageType, MichelsonType
+from pytezos.michelson.sections import ParameterSection, StorageSection
+from pytezos.context.fake import FakeContext
 
 
 class ContractParameter(metaclass=InlineDocstring):
@@ -15,7 +16,7 @@ class ContractParameter(metaclass=InlineDocstring):
 
     def __init__(self, section):
         self.code = section
-        self.type = ParameterType.match(section)
+        self.type = ParameterSection.match(section)
         self.__doc__ = self.type.generate_pydoc()
 
     def __repr__(self):
@@ -51,7 +52,7 @@ class ContractParameter(metaclass=InlineDocstring):
         :returns: [("name", "docstring"), ...]
         """
 
-        def make_doc(name, ty: Type[MichelsonType]):
+        def make_doc(name, ty: Type):
             definitions = []
             return ty.generate_pydoc(definitions, inferred_name=name)
 
@@ -64,7 +65,7 @@ class ContractStorage(metaclass=InlineDocstring):
 
     def __init__(self, section):
         self.code = section
-        self.type = StorageType.match(section)
+        self.type = StorageSection.match(section)
         self.__doc__ = self.type.generate_pydoc()
 
     def __repr__(self):
@@ -99,7 +100,7 @@ class ContractStorage(metaclass=InlineDocstring):
 
         :returns: object
         """
-        return self.type.dummy(None).to_micheline_value()
+        return self.type.dummy(FakeContext()).to_micheline_value()
 
 
 class ContractScript(metaclass=InlineDocstring):

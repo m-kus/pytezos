@@ -1,9 +1,0 @@
-{
-  "prim": "Pair",
-  "args": [
-    [],
-    {
-      "prim": "Unit"
-    }
-  ]
-}

@@ -1,9 +1,9 @@
-from typing import List, cast, Any, Type
+from typing import List, cast, Any, Type, Tuple
 
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.interpreter.stack import MichelsonStack
-from pytezos.michelson.types import PairType, OrType
+from pytezos.michelson.types import PairType, OrType, MichelsonType
 from pytezos.context.base import NodeContext
 
 
@@ -32,22 +32,47 @@ class CdrInstruction(MichelsonInstruction, prim='CDR'):
 
 
 class GetnInstruction(MichelsonInstruction, prim='GET', args_len=1):
+    index: int
 
     @classmethod
     def create_type(cls, args: List[Any], **kwargs) -> Type['GetnInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
+        index = parse_micheline_literal(args[0], {'int': int})
+        res = type(cls.__name__, (cls,), dict(args=args, index=index, **kwargs))
         return cast(Type['GetnInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         pair = cast(PairType, stack.pop1())
         assert isinstance(pair, PairType), f'expected pair, got {pair.prim}'
-        if cls.args[0] % 2 == 0:
-            res = pair.get_sub_comb(cls.args[0])
+        if cls.index % 2 == 0:
+            res = pair.get_sub_comb(cls.index)
         else:
-            res = pair.get_comb_leaf(cls.args[0])
+            res = pair.get_comb_leaf(cls.index)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [pair], [res]))
+        return cls()
+
+
+class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
+    index: int
+
+    @classmethod
+    def create_type(cls, args: List[Any], **kwargs) -> Type['UpdatenInstruction']:
+        index = parse_micheline_literal(args[0], {'int': int})
+        res = type(cls.__name__, (cls,), dict(args=args, index=index, **kwargs))
+        return cast(Type['UpdatenInstruction'], res)
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        element, pair = cast(Tuple[MichelsonType, PairType], stack.pop2())
+        assert isinstance(pair, PairType), f'expected pair, got {pair.prim}'
+        if cls.index % 2 == 0:
+            assert isinstance(element, PairType), f'expected pair, got {pair.prim}'
+            res = pair.update_sub_comb(cls.index, element)
+        else:
+            res = pair.update_comb_leaf(cls.index, element)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [element, pair], [res]))
         return cls()
 
 
@@ -78,7 +103,7 @@ class PairInstruction(MichelsonInstruction, prim='PAIR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         left, right = stack.pop2()
-        res = PairType.from_items([left, right])
+        res = PairType.from_comb_leaves([left, right])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [left, right], [res]))
         return cls()
@@ -97,33 +122,42 @@ class UnpairInstruction(MichelsonInstruction, prim='UNPAIR'):
         return cls()
 
 
+class PairnInstruction(MichelsonInstruction, prim='PAIR', args_len=1):
+    count: int
+
+    @classmethod
+    def create_type(cls, args: List[Any], **kwargs) -> Type['PairnInstruction']:
+        count = parse_micheline_literal(args[0], {'int': int})
+        assert count >= 2, f'invalid n == {count}'
+        res = type(cls.__name__, (cls,), dict(args=args, count=count, **kwargs))
+        return cast(Type['PairnInstruction'], res)
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        leaves = stack.pop(count=cls.count)
+        res = PairType.from_comb_leaves(leaves)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, leaves, [res]))
+        return cls()
+
+
 class UnpairnInstruction(MichelsonInstruction, prim='UNPAIR', args_len=1):
+    count: int
 
     @classmethod
     def create_type(cls, args: List[Any], **kwargs) -> Type['UpdatenInstruction']:
-        n = parse_micheline_literal(args[0], {'int': int})
-        assert n >= 2, f'invalid n == {n}'
-        res = type(cls.__name__, (cls,), dict(args=[n], **kwargs))
+        count = parse_micheline_literal(args[0], {'int': int})
+        assert count >= 2, f'invalid n == {count}'
+        res = type(cls.__name__, (cls,), dict(args=args, count=count, **kwargs))
         return cast(Type['UpdatenInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
         pair = cast(PairType, stack.pop1())
         assert isinstance(pair, PairType), f'expected pair, got {pair.prim}'
-        left, right = tuple(iter(pair))
-        stack.push(right)
-        stack.push(left)
-        stdout.append(format_stdout(cls.prim, [pair], [left, right]))
+        leaves = list(pair.iter_comb_leaves())
+        assert len(leaves) == cls.count, f'expected {cls.count} leaves, got {len(leaves)}'
+        for leaf in reversed(leaves):
+            stack.push(leaf)
+        stdout.append(format_stdout(cls.prim, [pair], leaves))
         return cls()
-
-
-class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
-
-    @classmethod
-    def create_type(cls, args: List[Any], **kwargs) -> Type['UpdatenInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
-        return cast(Type['UpdatenInstruction'], res)
-
-    @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        pass

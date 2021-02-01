@@ -1,9 +1,8 @@
 from typing import Type, List
 
+from pytezos.michelson.types import *
 from pytezos.michelson.micheline import MichelsonPrimitive
-from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.base import NodeContext
-from pytezos.michelson.interpreter.stack import MichelsonStack
 
 
 class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
@@ -23,7 +22,7 @@ class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack, stdout: List[str], context: NodeContext):
         context.set_storage_expr(cls.as_micheline_expr())
 
     @classmethod

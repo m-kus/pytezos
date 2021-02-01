@@ -97,3 +97,10 @@ class UnitInstruction(MichelsonInstruction, prim='UNIT'):
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
+
+
+class NeverInstruction(MichelsonInstruction, prim='NEVER'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+        pass
