@@ -60,6 +60,10 @@ class MichelsonType(MichelsonPrimitive):
     def __getitem__(self, key):
         assert False, f'forbidden'
 
+    @staticmethod
+    def match(expr) -> Type['MichelsonType']:
+        return cast(Type['MichelsonType'], MichelsonPrimitive.match(expr))
+
     @classmethod
     def create_type(cls,
                     args: List[Union[Type['MichelsonPrimitive'], Any]],

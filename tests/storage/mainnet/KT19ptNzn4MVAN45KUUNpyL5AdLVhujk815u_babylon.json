@@ -1,1 +1,0 @@
-{"balance":"0","script":{"code":[{"prim":"parameter","args":[{"prim":"nat"}]},{"prim":"storage","args":[{"prim":"nat"}]},{"prim":"code","args":[[{"prim":"CDR"},{"prim":"NIL","args":[{"prim":"operation"}]},{"prim":"PAIR"}]]}],"storage":{"int":"0"}}}

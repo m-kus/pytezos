@@ -3,6 +3,7 @@ from typing import List, Type, cast, Dict, Any
 from pytezos.michelson.types import *
 from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.context.base import NodeContext
+from pytezos.michelson.types.adt import ADT
 
 
 class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
@@ -42,7 +43,7 @@ class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
     def from_parameters(cls, parameters: Dict[str, Any]) -> 'ParameterSection':
         if not parameters:
             parameters = {'entrypoint': 'default', 'value': {'prim': 'Unit'}}
-        assert isinstance(parameters, dict) and list(parameters.keys()) == ['entrypoint', 'value'], \
+        assert isinstance(parameters, dict) and parameters.keys() == {'entrypoint', 'value'}, \
             f'expected {{entrypoint, value}}, got {parameters}'
         entry_point = parameters['entrypoint']
         if cls.args[0].prim == 'or':

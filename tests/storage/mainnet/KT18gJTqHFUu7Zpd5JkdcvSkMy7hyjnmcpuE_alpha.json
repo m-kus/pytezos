@@ -1,1 +1,0 @@
-{"manager":"tz1hr3irfch7ZhadeLfc2dxEDFjXzNr2sYGC","balance":"0","spendable":true,"delegate":{"setable":false},"script":{"code":[{"prim":"parameter","args":[{"prim":"string"}]},{"prim":"storage","args":[{"prim":"string"}]},{"prim":"code","args":[[{"prim":"CAR"},{"prim":"NIL","args":[{"prim":"operation"}]},{"prim":"PAIR"}]]}],"storage":{"string":"build test"}},"counter":"0"}

@@ -1,1 +1,0 @@
-{"balance":"1000000","script":{"code":[{"prim":"parameter","args":[{"prim":"unit"}]},{"prim":"storage","args":[{"prim":"string"}]},{"prim":"code","args":[[{"prim":"DROP"},{"prim":"PUSH","args":[{"prim":"string"},{"string":"Master KT1"}]},{"prim":"NIL","args":[{"prim":"operation"}]},{"prim":"PAIR"}]]}],"storage":{"string":"master"}}}

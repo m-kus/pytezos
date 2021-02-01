@@ -8,7 +8,8 @@ import re
 from unittest import TestCase
 
 from tests import get_data
-from pytezos.michelson.converter import michelson_to_micheline, micheline_to_michelson
+from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.format import micheline_to_michelson
 
 
 class MacrosTest(TestCase):

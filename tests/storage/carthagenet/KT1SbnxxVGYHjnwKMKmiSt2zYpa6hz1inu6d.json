@@ -1,1 +1,0 @@
-{"balance":"1000000","script":{"code":[{"prim":"parameter","args":[{"prim":"unit"}]},{"prim":"storage","args":[{"prim":"unit"}]},{"prim":"code","args":[[{"prim":"PUSH","args":[{"prim":"string"},{"string":"test"}]},{"prim":"FAILWITH"}]]}],"storage":{"prim":"Unit"}}}
