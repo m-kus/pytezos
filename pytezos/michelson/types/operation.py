@@ -2,6 +2,7 @@ from typing import Type, Optional
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import MichelsonSequence
+from pytezos.michelson.format import micheline_to_michelson
 
 
 class OperationType(MichelsonType, prim='operation'):
@@ -11,7 +12,27 @@ class OperationType(MichelsonType, prim='operation'):
         self.content = content
 
     def __repr__(self):
-        return self.content.get('kind')
+        return ''
+        # if content['kind'] == 'transaction':
+        #     return {'kind': content['kind'],
+        #             'target': content['destination'],
+        #             'amount': content['amount'],
+        #             'entrypoint': content['parameters']['entrypoint'],
+        #             'parameters': micheline_to_michelson(content['parameters']['value'])}
+        # elif content['kind'] == 'origination':
+        #     res = {'kind': content['kind'],
+        #            'target': content['originated_contract'],
+        #            'amount': content['balance'],
+        #            'storage': micheline_to_michelson(content['script']['storage']),
+        #            'code': micheline_to_michelson(content['script']['code'])}
+        #     if content.get('delegate'):
+        #         res['delegate'] = content['delegate']
+        #     return res
+        # elif content['kind'] == 'delegation':
+        #     return {'kind': content['kind'],
+        #             'target': content['delegate']}
+        # else:
+        #     assert False, content['kind']
 
     @classmethod
     def origination(cls,
@@ -63,10 +84,12 @@ class OperationType(MichelsonType, prim='operation'):
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'OperationType':
-        pass
+        assert isinstance(py_obj, dict)
+        assert 'kind' in py_obj
+        return cls(content=py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         assert False, 'forbidden'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
-        pass
+        return self.content

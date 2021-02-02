@@ -2,7 +2,7 @@ from typing import Tuple, Generator, List, Type
 from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class ListType(MichelsonType, prim='list', args_len=1):
@@ -41,7 +41,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return f'[ {arg_doc}, ... ]'
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'ListType':
+    def dummy(cls, context: ExecutionContext) -> 'ListType':
         return cls([])
 
     @classmethod
@@ -70,7 +70,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         for item in self:
             item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for item in self:
             item.attach_context(context, big_map_copy=big_map_copy)
 

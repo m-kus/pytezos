@@ -3,7 +3,7 @@ from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class MapType(MichelsonType, prim='map', args_len=2):
@@ -51,7 +51,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         return f'{{ {key}: {val}, ... }}'
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'MapType':
+    def dummy(cls, context: ExecutionContext) -> 'MapType':
         return cls([])
 
     @classmethod
@@ -105,7 +105,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         for _, val in self:
             val.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for _, val in self:
             val.attach_context(context, big_map_copy=big_map_copy)
 

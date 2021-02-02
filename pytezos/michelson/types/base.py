@@ -3,7 +3,7 @@ from typing import Tuple, List, Optional, Type, cast, Union, Any
 
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.micheline import MichelsonPrimitive
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
@@ -52,10 +52,6 @@ class MichelsonType(MichelsonPrimitive):
 
     def __eq__(self, other: 'MichelsonType'):  # for contains
         assert not self.is_comparable(), f'must be implemented for comparable types'
-
-    def __deepcopy__(self, memodict={}):
-        assert self.is_duplicable(), f'{self.prim} is not duplicable'
-        return deepcopy(self)
 
     def __getitem__(self, key):
         assert False, f'forbidden'
@@ -172,7 +168,7 @@ class MichelsonType(MichelsonPrimitive):
         return cls.from_micheline_value(val_expr)
 
     @classmethod
-    def dummy(cls, context: NodeContext):
+    def dummy(cls, context: ExecutionContext):
         raise NotImplementedError
 
     @classmethod
@@ -189,7 +185,7 @@ class MichelsonType(MichelsonPrimitive):
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         raise NotImplementedError
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):  # NOTE: mutation
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):  # NOTE: mutation
         assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket']
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
@@ -207,3 +203,7 @@ class MichelsonType(MichelsonPrimitive):
         assert self.is_packable(), f'{self.prim} cannot be packed'
         data = self.forge(mode='optimized')
         return b'\x05' + data
+
+    def duplicate(self):
+        assert self.is_duplicable(), f'{self.prim} is not duplicable'
+        return deepcopy(self)

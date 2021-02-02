@@ -4,13 +4,13 @@ from pytezos.michelson.instructions.base import MichelsonInstruction, format_std
 from pytezos.michelson.types import MichelsonType, BoolType, ListType, OptionType, \
     MapType, SetType, BigMapType
 from pytezos.michelson.interpreter.stack import MichelsonStack
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class ConsInstruction(MichelsonInstruction, prim='CONS'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         elt, lst = cast(Tuple[MichelsonType, ListType], stack.pop2())
         assert isinstance(lst, ListType), f'expected list, got {lst.prim}'
         res = lst.prepend(elt)
@@ -22,7 +22,7 @@ class ConsInstruction(MichelsonInstruction, prim='CONS'):
 class NilInstruction(MichelsonInstruction, prim='NIL', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = ListType.empty(cls.args[0])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -32,7 +32,7 @@ class NilInstruction(MichelsonInstruction, prim='NIL', args_len=1):
 class EmptyBigMapInstruction(MichelsonInstruction, prim='EMPTY_BIG_MAP', args_len=2):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = BigMapType.empty(key_type=cls.args[0], val_type=cls.args[1])
         res.attach_context(context)
         stack.push(res)
@@ -43,7 +43,7 @@ class EmptyBigMapInstruction(MichelsonInstruction, prim='EMPTY_BIG_MAP', args_le
 class EmptyMapInstruction(MichelsonInstruction, prim='EMPTY_MAP', args_len=2):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = MapType.empty(key_type=cls.args[0], val_type=cls.args[1])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -53,7 +53,7 @@ class EmptyMapInstruction(MichelsonInstruction, prim='EMPTY_MAP', args_len=2):
 class EmptySetInstruction(MichelsonInstruction, prim='EMPTY_SET', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = SetType.empty(item_type=cls.args[0])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -63,7 +63,7 @@ class EmptySetInstruction(MichelsonInstruction, prim='EMPTY_SET', args_len=1):
 class GetInstruction(MichelsonInstruction, prim='GET'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         key, src = cast(Tuple[MichelsonType, Union[MapType, BigMapType]], stack.pop2())
         assert type(src) in [MapType, BigMapType], f'unexpected {cls.prim}'
         val = src.get(key, dup=True)
@@ -79,7 +79,7 @@ class GetInstruction(MichelsonInstruction, prim='GET'):
 class GetAndUpdateInstruction(MichelsonInstruction, prim='GET_AND_UPDATE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         key, val, src = cast(Tuple[MichelsonType, OptionType, Union[MapType, BigMapType]], stack.pop3())
         assert type(src) in [MapType, BigMapType], f'unexpected {cls.prim}'
         prev_val, dst = src.update(key, None if val.is_none() else val.get_some())
@@ -93,7 +93,7 @@ class GetAndUpdateInstruction(MichelsonInstruction, prim='GET_AND_UPDATE'):
 class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         key, val, src = cast(Tuple[MichelsonType, OptionType, Union[MapType, BigMapType]], stack.pop3())
         assert type(src) in [MapType, BigMapType], f'unexpected {cls.prim}'
         _, dst = src.update(key, None if val.is_none() else val.get_some())
@@ -105,7 +105,7 @@ class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
 class MemInstruction(MichelsonInstruction, prim='MEM'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         key, src = cast(Tuple[MichelsonType, Union[SetType, MapType, BigMapType]], stack.pop2())
         assert type(src) in [SetType, MapType, BigMapType], f'unexpected {src.prim}'
         res = BoolType.from_value(src.contains(key))
@@ -117,7 +117,7 @@ class MemInstruction(MichelsonInstruction, prim='MEM'):
 class NoneInstruction(MichelsonInstruction, prim='NONE', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = OptionType.none(cls.args[0])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -127,7 +127,7 @@ class NoneInstruction(MichelsonInstruction, prim='NONE', args_len=1):
 class SomeInstruction(MichelsonInstruction, prim='SOME'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         some = stack.pop1()
         res = OptionType.from_some(some)
         stack.push(res)

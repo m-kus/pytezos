@@ -26,13 +26,6 @@ class MacrosTest(TestCase):
         res = micheline_to_michelson(micheline)
         self.assertScriptEqual(expanded, res)
 
-    def test_unpair_macro(self):
-        source = get_data(path='macros/unpair_macro/source.tz')
-        expanded = get_data(path='macros/unpair_macro/expanded.tz')
-        micheline = michelson_to_micheline(source)
-        res = micheline_to_michelson(micheline)
-        self.assertScriptEqual(expanded, res)
-
     def test_set_cadadr_macro(self):
         source = get_data(path='macros/set_cadadr/source.tz')
         expanded = get_data(path='macros/set_cadadr/expanded.tz')

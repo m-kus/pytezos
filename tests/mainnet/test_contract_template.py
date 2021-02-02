@@ -2,8 +2,11 @@ from unittest import TestCase
 from os.path import dirname, join
 import json
 
+from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.parse import michelson_to_micheline
 
 folder = 'dexter_usdtz_xtz'
 
@@ -26,7 +29,10 @@ class MainnetContractTestCaseTemplate(TestCase):
 
     def test_parameter_type_template(self):
         type_expr = self.program.parameter.as_micheline_expr()
-        self.assertEqual(self.script['code'][0], type_expr, 'micheline -> type -> micheline')
+        self.assertEqual(
+            get_script_section(self.script, 'parameter'),
+            type_expr,
+            'micheline -> type -> micheline')
 
     def test_entrypoints_template(self):
         ep_types = self.program.parameter.list_entry_points()
@@ -38,7 +44,10 @@ class MainnetContractTestCaseTemplate(TestCase):
 
     def test_storage_type_template(self):
         type_expr = self.program.storage.as_micheline_expr()
-        self.assertEqual(self.script['code'][1], type_expr, 'micheline -> type -> micheline')
+        self.assertEqual(
+            get_script_section(self.script, 'storage'),
+            type_expr,
+            'micheline -> type -> micheline')
 
     def test_storage_encoding_template(self):
         val = self.program.storage.from_micheline_value(self.script['storage'])
@@ -48,3 +57,7 @@ class MainnetContractTestCaseTemplate(TestCase):
         val_ = self.program.storage.from_python_object(val.to_python_object())
         val_expr_ = val_.to_micheline_value(mode='optimized')
         self.assertEqual(self.script['storage'], val_expr_, 'value -> pyobj -> value -> micheline')
+
+    def test_script_parsing_formatting(self):
+        actual = michelson_to_micheline(micheline_to_michelson(self.script['code']))
+        self.assertEqual(self.script['code'], actual)

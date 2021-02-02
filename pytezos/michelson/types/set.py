@@ -3,7 +3,7 @@ from copy import copy
 from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class SetType(MichelsonType, prim='set', args_len=1):
@@ -42,7 +42,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         assert items == list(sorted(items)), f'set elements are not sorted'
 
     @classmethod
-    def dummy(cls, context: NodeContext):
+    def dummy(cls, context: ExecutionContext):
         return cls([])
 
     @classmethod
@@ -76,7 +76,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         pass  # Big_map is not comparable
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
         pass  # Big_map is not comparable
 
     def contains(self, item: MichelsonType) -> bool:

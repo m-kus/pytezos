@@ -135,7 +135,7 @@ class RpcNode:
 
 class RpcMultiNode(RpcNode):
 
-    def __init__(self, uri, network, caching):
+    def __init__(self, uri, network, caching=False):
         super(RpcMultiNode, self).__init__(uri=uri, network=network, caching=caching)
         if not isinstance(uri, list):
             self.uri = [uri]

@@ -2,7 +2,7 @@ from typing import Type, List
 
 from pytezos.michelson.types import *
 from pytezos.michelson.micheline import MichelsonPrimitive
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
@@ -22,8 +22,9 @@ class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack, stdout: List[str], context: ExecutionContext):
         context.set_storage_expr(cls.as_micheline_expr())
+        stdout.append(f'storage: updated')
 
     @classmethod
     def generate_pydoc(cls) -> str:
@@ -34,7 +35,7 @@ class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
         return '\n'.join(f'${var}:\n\t{doc}\n' for var, doc in definitions)
 
     @classmethod
-    def dummy(cls, context: NodeContext):
+    def dummy(cls, context: ExecutionContext):
         return cls(cls.args[0].dummy(context))
 
     @classmethod
@@ -53,7 +54,7 @@ class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: ExecutionContext):
         self.item.attach_context(context)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'StorageSection':
@@ -61,6 +62,6 @@ class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
         return type(self)(item)
 
     def aggregate_lazy_diff(self, mode='readable') -> List[dict]:
-        lazy_diff = list()
+        lazy_diff = []
         self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
         return lazy_diff

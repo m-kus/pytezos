@@ -3,7 +3,7 @@ from typing import Generator, Optional, Tuple, List, Union, Type
 
 from pytezos.michelson.types.base import MichelsonType, undefined
 from pytezos.michelson.micheline import parse_micheline_literal
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.types.map import MapType
 from pytezos.michelson.forge import forge_script_expr
 
@@ -42,7 +42,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         super(BigMapType, self).__init__(items=items)
         self.ptr = ptr
         self.removed_keys = removed_keys or []
-        self.storage: Optional[NodeContext] = None
+        self.storage: Optional[ExecutionContext] = None
 
     def __len__(self):
         return len(self.items) + len(self.removed_keys)
@@ -72,7 +72,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         return f'{{ {key}: {val}, ... }} || int /* Big_map ID */'
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'BigMapType':
+    def dummy(cls, context: ExecutionContext) -> 'BigMapType':
         return cls(items=[])
 
     @classmethod
@@ -160,7 +160,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             'diff': diff
         })
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
         if self.ptr is None:
             self.ptr = context.get_tmp_big_map_id()
         else:

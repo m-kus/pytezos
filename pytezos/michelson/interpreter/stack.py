@@ -23,7 +23,6 @@ class MichelsonStack:
         self.protected -= count
 
     def push(self, item: MichelsonType):
-        assert item.is_pushable(), f'{item.prim} is not pushable'
         self.items.insert(self.protected, item)
 
     def peek(self) -> MichelsonType:

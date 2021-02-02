@@ -1,6 +1,6 @@
 from pytezos.michelson.types.base import MichelsonType, unit
 from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack as blind_unpack
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 Unit = unit()
 
@@ -36,7 +36,7 @@ class StringType(MichelsonType, prim='string'):
         return cls(value)
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'StringType':
+    def dummy(cls, context: ExecutionContext) -> 'StringType':
         return cls()
 
     @classmethod
@@ -74,6 +74,14 @@ class IntType(MichelsonType, prim='int'):
     def __eq__(self, other: 'IntType'):
         return self.value == other.value
 
+    def __cmp__(self, other: 'IntType'):
+        if self.value == other.value:
+            return 0
+        elif self.value < other.value:
+            return -1
+        else:
+            return 1
+
     def __hash__(self):
         return hash(self.value)
 
@@ -84,7 +92,7 @@ class IntType(MichelsonType, prim='int'):
         return self.value
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'IntType':
+    def dummy(cls, context: ExecutionContext) -> 'IntType':
         return cls()
 
     @classmethod
@@ -151,7 +159,7 @@ class BytesType(MichelsonType, prim='bytes'):
         return len(self.value)
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'BytesType':
+    def dummy(cls, context: ExecutionContext) -> 'BytesType':
         return cls()
 
     @classmethod
@@ -208,7 +216,7 @@ class BoolType(MichelsonType, prim='bool'):
         return self.value
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'BoolType':
+    def dummy(cls, context: ExecutionContext) -> 'BoolType':
         return cls(False)
 
     @classmethod
@@ -253,7 +261,7 @@ class UnitType(MichelsonType, prim='unit'):
         return 'Unit'
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'UnitType':
+    def dummy(cls, context: ExecutionContext) -> 'UnitType':
         return cls()
 
     @classmethod

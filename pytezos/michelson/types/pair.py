@@ -3,7 +3,7 @@ from pprint import pformat
 
 from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.types.adt import ADT
 
 
@@ -74,7 +74,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return f'${name}'
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'PairType':
+    def dummy(cls, context: ExecutionContext) -> 'PairType':
         return cls(tuple(arg.dummy(context) for arg in cls.args))
 
     @classmethod
@@ -179,7 +179,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         for item in self:
             item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for item in self:
             item.attach_context(context, big_map_copy=big_map_copy)
 

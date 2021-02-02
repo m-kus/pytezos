@@ -1,18 +1,18 @@
-from copy import deepcopy
 from typing import List, Any, Type, cast
 
 from pytezos.michelson.types import MichelsonType
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.interpreter.stack import MichelsonStack
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class PushInstruction(MichelsonInstruction, prim='PUSH', args_len=2):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res_type, val_expr = cls.args  # type: Type[MichelsonType], Any
+        assert res_type.is_pushable(), f'{res_type.prim} contains non-pushable arguments'
         res = res_type.from_micheline_value(val_expr)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -27,7 +27,7 @@ class DropnInstruction(MichelsonInstruction, prim='DROP', args_len=1):
         return cast(Type['DropnInstruction'], res)
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         dropped = stack.pop(count=cls.args[0])
         stdout.append(format_stdout(cls.prim, dropped, []))
         return cls()
@@ -36,7 +36,7 @@ class DropnInstruction(MichelsonInstruction, prim='DROP', args_len=1):
 class DropInstruction(MichelsonInstruction, prim='DROP'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         dropped = stack.pop1()
         stdout.append(format_stdout(cls.prim, [dropped], []))
         return cls()
@@ -50,9 +50,9 @@ class DupnInstruction(MichelsonInstruction, prim='DUP', args_len=1):
         return cast(Type['DupnInstruction'], res)
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         stack.protect(count=cls.args[0])
-        res = deepcopy(stack.peek())
+        res = stack.peek().duplicate()
         stack.restore(count=cls.args[0])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -62,8 +62,8 @@ class DupnInstruction(MichelsonInstruction, prim='DUP', args_len=1):
 class DupInstruction(MichelsonInstruction, prim='DUP'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
-        res = deepcopy(stack.peek())
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+        res = stack.peek().duplicate()
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -72,7 +72,7 @@ class DupInstruction(MichelsonInstruction, prim='DUP'):
 class SwapInstruction(MichelsonInstruction, prim='SWAP'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = stack.pop2()
         stack.push(a)
         stack.push(b)
@@ -88,7 +88,7 @@ class DigInstruction(MichelsonInstruction, prim='DIG', args_len=1):
         return cast(Type['DigInstruction'], res)
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         stack.protect(count=cls.args[0])
         res = stack.pop1()
         stack.restore(count=cls.args[0])
@@ -105,7 +105,7 @@ class DugInstruction(MichelsonInstruction, prim='DUG', args_len=1):
         return cast(Type['DugInstruction'], res)
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = stack.pop1()
         stack.protect(count=cls.args[0])
         stack.push(res)
@@ -117,7 +117,7 @@ class DugInstruction(MichelsonInstruction, prim='DUG', args_len=1):
 class CastIntruction(MichelsonInstruction, prim='CAST', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         top = stack.pop1()
         cast_type = cast(Type[MichelsonType], cls.args[0])
         res = cast_type.from_micheline_value(top.to_micheline_value())
@@ -129,5 +129,5 @@ class CastIntruction(MichelsonInstruction, prim='CAST', args_len=1):
 class RenameInstruction(MichelsonInstruction, prim='RENAME', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         return cls()

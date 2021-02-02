@@ -1,16 +1,20 @@
 from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.interpreter.stack import MichelsonStack
 
 
 def format_stdout(prim: str, inputs: list, outputs: list):
-    return f'{prim} / {" : ".join(map(repr, inputs))} => {" : ".join(map(repr, outputs))}'
+    pop = " : ".join(map(repr, inputs)) if inputs else '_'
+    push = " : ".join(map(repr, outputs)) if outputs else '_'
+    return f'{prim} / {pop} => {push}'
 
 
-def dispatch_types(*args, mapping: Dict[Tuple[Type[MichelsonPrimitive], ...], Tuple[Any, ...]]):
-    key = tuple(type(arg) for arg in args)
+def dispatch_types(*args: Type[MichelsonPrimitive],
+                   mapping: Dict[Tuple[Type[MichelsonPrimitive], ...], Tuple[Any, ...]]):
+    key = tuple(arg.prim for arg in args)
+    mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}
     assert key in mapping, f'unexpected arguments {", ".join(map(lambda x: x.__name__, key))}'
     return mapping[key]
 
@@ -44,5 +48,5 @@ class MichelsonInstruction(MichelsonPrimitive):
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
-    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: NodeContext):
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
         raise NotImplementedError

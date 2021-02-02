@@ -7,7 +7,7 @@ from pytezos.jupyter import get_class_docstring, InlineDocstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.sections import ParameterSection, StorageSection
-from pytezos.context.fake import FakeContext
+from pytezos.context.repl import FakeContext
 
 
 class ContractParameter(metaclass=InlineDocstring):

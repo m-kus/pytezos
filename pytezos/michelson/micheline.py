@@ -24,9 +24,12 @@ def is_micheline(value) -> bool:
 
 
 def is_prim_expr(type_expr) -> bool:
-    return isinstance(type_expr, dict) \
-            and isinstance(type_expr.get('prim'), str) \
-            and type_expr['prim'] == type_expr['prim'].lower()
+    if isinstance(type_expr, list):
+        return True
+    elif isinstance(type_expr, dict):
+        return isinstance(type_expr.get('prim'), str)
+    else:
+        return False
 
 
 def get_script_section(script, section_name):
@@ -139,7 +142,7 @@ class MichelsonPrimitive:
     def match(expr) -> Type['MichelsonPrimitive']:
         if isinstance(expr, list):
             args = [MichelsonPrimitive.match(arg) for arg in expr]
-            return MichelsonSequence.create_type(args)
+            return MichelsonSequence.create_type(args=args)
         else:
             prim, args, annots = parse_micheline_prim(expr)
             args_len = len(args)
@@ -160,10 +163,14 @@ class MichelsonPrimitive:
 
     @classmethod
     def as_micheline_expr(cls) -> dict:
-        args = [arg.as_micheline_expr() if issubclass(arg, MichelsonPrimitive) else arg
+        args = [arg.as_micheline_expr() if isinstance(arg, type) and issubclass(arg, MichelsonPrimitive) else arg
                 for arg in cls.args]
         expr = dict(prim=cls.prim, args=args)
         return {k: v for k, v in expr.items() if v}
+
+    @classmethod
+    def execute(cls, stack, stdout, context):
+        assert False
 
 
 class MichelsonSequence(MichelsonPrimitive):
@@ -175,3 +182,7 @@ class MichelsonSequence(MichelsonPrimitive):
     @classmethod
     def as_micheline_expr(cls) -> list:
         return [arg.as_micheline_expr() for arg in cls.args]
+
+    @classmethod
+    def execute(cls, stack, stdout, context):
+        return cls([arg.execute(stack, stdout, context) for arg in cls.args])

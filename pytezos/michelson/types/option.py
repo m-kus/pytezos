@@ -2,7 +2,7 @@ from typing import List, Optional, Type
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class OptionType(MichelsonType, prim='option', args_len=1):
@@ -39,7 +39,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         return cls(item)
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'OptionType':
+    def dummy(cls, context: ExecutionContext) -> 'OptionType':
         return cls(None)
 
     @classmethod
@@ -95,6 +95,6 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         if not self.is_none():
             self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
 
-    def attach_context(self, context: NodeContext, big_map_copy=False):
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
         if not self.is_none():
             self.item.attach_context(context, big_map_copy=big_map_copy)

@@ -12,7 +12,7 @@ from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import MichelsonPrimitive
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class TimestampType(IntType, prim='timestamp'):
@@ -83,7 +83,7 @@ class AddressType(StringType, prim='address'):
             return self.value < other.value
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'AddressType':
+    def dummy(cls, context: ExecutionContext) -> 'AddressType':
         return cls.from_value(context.get_dummy_address())
 
     @classmethod
@@ -120,7 +120,7 @@ class AddressType(StringType, prim='address'):
 class KeyType(StringType, prim='key'):
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'KeyType':
+    def dummy(cls, context: ExecutionContext) -> 'KeyType':
         return cls.from_value(context.get_dummy_public_key())
 
     @classmethod
@@ -155,7 +155,7 @@ class KeyType(StringType, prim='key'):
 class KeyHashType(StringType, prim='key_hash'):
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'KeyHashType':
+    def dummy(cls, context: ExecutionContext) -> 'KeyHashType':
         return cls.from_value(context.get_dummy_key_hash())
 
     @classmethod
@@ -190,7 +190,7 @@ class KeyHashType(StringType, prim='key_hash'):
 class SignatureType(StringType, prim='signature'):
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'SignatureType':
+    def dummy(cls, context: ExecutionContext) -> 'SignatureType':
         return cls.from_value(context.get_dummy_signature())
 
     @classmethod
@@ -225,7 +225,7 @@ class SignatureType(StringType, prim='signature'):
 class ChainIdType(StringType, prim='chain_id'):
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'ChainIdType':
+    def dummy(cls, context: ExecutionContext) -> 'ChainIdType':
         return cls.from_value(context.get_dummy_chain_id())
 
     @classmethod
@@ -302,7 +302,7 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         return f'lambda ({expr["param"]} -> {expr["return"]})'
 
     @classmethod
-    def dummy(cls, context: NodeContext) -> 'LambdaType':
+    def dummy(cls, context: ExecutionContext) -> 'LambdaType':
         return cls(MichelsonPrimitive.match(context.get_dummy_lambda()))
 
     @classmethod

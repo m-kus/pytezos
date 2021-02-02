@@ -7,11 +7,11 @@ from pytezos.michelson.instructions.base import MichelsonInstruction, format_std
 from pytezos.michelson.types import MichelsonType, LambdaType, PairType, BoolType, ListType, OrType, OptionType, \
     MapType, SetType
 from pytezos.michelson.interpreter.stack import MichelsonStack
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],
-                count: int, body: Type[MichelsonInstruction], context: NodeContext) -> MichelsonInstruction:
+                count: int, body: Type[MichelsonInstruction], context: ExecutionContext) -> MichelsonInstruction:
     stdout.append(format_stdout(prim, [f'<{count}>'], []))
     stack.protect(count=count)
     item = body.execute(stack, stdout, context=context)
@@ -34,19 +34,19 @@ class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
         return cast(Type['DipnInstruction'], res)
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         item = execute_dip(cls.prim, stack, stdout, count=cls.depth, body=cls.args[1], context=context)
         return cls(item)
 
 
-class DipInstruction(MichelsonInstruction, prim='DIP'):
+class DipInstruction(MichelsonInstruction, prim='DIP', args_len=1):
 
     def __init__(self, item: MichelsonInstruction):
         super(DipInstruction, self).__init__()
         self.item = item
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         item = execute_dip(cls.prim, stack, stdout, count=1, body=cls.args[1], context=context)
         return cls(item)
 
@@ -54,7 +54,7 @@ class DipInstruction(MichelsonInstruction, prim='DIP'):
 class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = LambdaType.create_type(args=cls.args[:2]).from_micheline_value(cls.args[2])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
@@ -67,7 +67,7 @@ class ExecInstruction(MichelsonInstruction, prim='EXEC', args_len=3):
         self.item = item
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         param, sub = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
         assert isinstance(sub, LambdaType), f'expected lambda, got {sub.prim}'
         param.assert_equal_types(sub.args[0])
@@ -87,7 +87,7 @@ class ExecInstruction(MichelsonInstruction, prim='EXEC', args_len=3):
 class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         left, sub = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
         assert isinstance(sub, LambdaType), f'expected lambda, got {sub.prim}'
         assert isinstance(sub.args[0], PairType), f'expected pair, got {sub.args[0].prim}'
@@ -107,7 +107,7 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
 class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = stack.pop1()
         assert a.is_packable(), f'expected packable type, got {a.prim}'
         assert False, a
@@ -120,7 +120,7 @@ class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
         self.item = item
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         cond = cast(BoolType, stack.pop1())
         cond.assert_equal_types(BoolType)
         stdout.append(format_stdout(cls.prim, [cond], []))
@@ -136,7 +136,7 @@ class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
         self.item = item
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         lst = cast(ListType, stack.pop1())
         assert isinstance(lst, ListType), f'expected list, got {lst.prim}'
         if len(lst) > 0:
@@ -159,7 +159,7 @@ class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
         self.item = item
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         or_ = cast(OrType, stack.pop1())
         assert isinstance(or_, OrType), f'expected or, got {or_.prim}'
         stdout.append(format_stdout(cls.prim, [or_], []))
@@ -175,7 +175,7 @@ class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
         self.item = item
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         opt = cast(OptionType, stack.pop1())
         assert isinstance(opt, OptionType), f'expected option, got {opt.prim}'
         if opt.is_none():
@@ -197,7 +197,7 @@ class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
         self.items = items
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         items = []
         while True:
             cond = cast(BoolType, stack.pop1())
@@ -218,7 +218,7 @@ class LoopLeftInstruction(MichelsonInstruction, prim='LOOP_LEFT', args_len=1):
         self.items = items
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         items = []
         while True:
             or_ = cast(OrType, stack.pop1())
@@ -241,7 +241,7 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
         self.items = items
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         src = cast(Union[ListType, MapType], stack.pop1())
         executions = []
         items = []
@@ -272,7 +272,7 @@ class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
         self.items = items
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         src = cast(Union[ListType, MapType, SetType], stack.pop1())
         executions = []
         popped = [src]

@@ -11,7 +11,7 @@ def write_test_data(folder, name, data):
 
 
 def fetch_bcd_search_results(since=1590969600, offset=0):
-    return requests.get('https://api.better-call.dev/v1/search', params={
+    return requests.get('https://you.better-call.dev/v1/search', params={
         'q': 'KT1',
         'i': 'contract',
         'n': 'mainnet',
@@ -61,10 +61,13 @@ def fetch_operation_result(level, opg_hash, counter, internal, address):
 
 
 def fetch_bcd_operation(address, entrypoint):
-    res = requests.get(
-        f'https://api.better-call.dev/v1/contract/mainnet/{address}/operations?status=applied&entrypoints={entrypoint}&size=1'
-    ).json()
-    return next((op for op in res['operations'] if op['destination'] == address and op['entrypoint'] == entrypoint), None)
+    res = requests.get(f'https://you.better-call.dev/v1/contract/mainnet/{address}/operations', params={
+        'status': 'applied',
+        'entrypoints': entrypoint,
+        'size': 1
+    }).json()
+    return next((op for op in res['operations'] if op['destination'] == address and op['entrypoint'] == entrypoint),
+                None)
 
 
 def normalize_alias(alias):
@@ -98,4 +101,4 @@ def fetch_mainnet_samples(max_count=100):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    fetch_mainnet_samples(10)
+    fetch_mainnet_samples(100)

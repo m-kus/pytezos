@@ -2,7 +2,7 @@ from typing import List, Type, cast, Dict, Any
 
 from pytezos.michelson.types import *
 from pytezos.michelson.micheline import MichelsonPrimitive
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.types.adt import ADT
 
 
@@ -23,8 +23,9 @@ class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack, stdout: List[str], context: NodeContext):
+    def execute(cls, stack, stdout: List[str], context: ExecutionContext):
         context.set_parameter_expr(cls.as_micheline_expr())
+        stdout.append(f'parameter: updated')
 
     @classmethod
     def list_entry_points(cls) -> Dict[str, Type[MichelsonType]]:
@@ -98,7 +99,7 @@ class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
         item = self.item.merge_lazy_diff(lazy_diff)
         return type(self)(item)
 
-    def attach_context(self, context: NodeContext):
+    def attach_context(self, context: ExecutionContext):
         self.item.attach_context(context, big_map_copy=True)
 
     def aggregate_lazy_diff(self, mode='readable') -> List[dict]:

@@ -5,7 +5,7 @@ from pprint import pformat
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types.pair import PairType
 from pytezos.michelson.types.domain import NatType, AddressType
-from pytezos.context.base import NodeContext
+from pytezos.context.execution import ExecutionContext
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):
@@ -18,9 +18,6 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         self.amount = amount
 
     def __copy__(self):
-        assert False, 'forbidden'
-
-    def __deepcopy__(self, memodict={}):
         assert False, 'forbidden'
 
     def __repr__(self):
@@ -68,7 +65,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         return f'${name}'
 
     @classmethod
-    def dummy(cls, context: NodeContext):
+    def dummy(cls, context: ExecutionContext):
         assert False, 'forbidden'
 
     @classmethod
