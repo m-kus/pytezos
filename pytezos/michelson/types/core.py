@@ -21,7 +21,7 @@ class StringType(MichelsonType, prim='string'):
         return hash(self.value)
 
     def __repr__(self):
-        return self.value
+        return f'\'{self.value}\''
 
     def __str__(self):
         return self.value
@@ -55,11 +55,10 @@ class StringType(MichelsonType, prim='string'):
         return self.value
 
     def __getitem__(self, item):
-        assert isinstance(item, tuple)
-        start, stop = item
+        assert isinstance(item, slice), f'expected start:end, got {item}'
         assert len(self.value) > 0, f'string is empty'
-        assert stop <= len(self.value), f'out of bounds {stop} <= {len(self.value)}'
-        return StringType(self.value[start:stop])
+        assert item.stop <= len(self.value), f'out of bounds {item.stop} <= {len(self.value)}'
+        return StringType(self.value[item.start:item.stop])
 
 
 class IntType(MichelsonType, prim='int'):
@@ -150,8 +149,7 @@ class BytesType(MichelsonType, prim='bytes'):
         return hash(self.value)
 
     def __repr__(self):
-        return self.value.hex()
-
+        return f'0x{self.value.hex()}'
     def __bytes__(self):
         return self.value
 
@@ -188,10 +186,9 @@ class BytesType(MichelsonType, prim='bytes'):
         return self.value
 
     def __getitem__(self, item):
-        assert isinstance(item, tuple)
-        start, stop = item
-        assert stop <= len(self.value), f'index out of bounds'
-        return BytesType(self.value[start:stop])
+        assert isinstance(item, slice), f'expected start:stop, got {item}'
+        assert item.stop <= len(self.value), f'index out of bounds'
+        return BytesType(self.value[item.start:item.stop])
 
 
 class BoolType(MichelsonType, prim='bool'):

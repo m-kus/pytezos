@@ -31,8 +31,8 @@ class MapType(MichelsonType, prim='map', args_len=2):
         assert len(items) > 0, 'cannot instantiate from empty list'
         key_type, val_type = type(items[0][0]), type(items[0][1])
         for key, val in items[1:]:
-            key_type.assert_equal_types(type(key))
-            val_type.assert_equal_types(type(val))
+            key_type.assert_type_equal(type(key))
+            val_type.assert_type_equal(type(val))
         cls = MapType.create_type(args=[key_type, val_type])
         cls.check_constraints(items)
         return cls(items=items)
@@ -110,7 +110,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
             val.attach_context(context, big_map_copy=big_map_copy)
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
-        self.args[0].assert_equal_types(type(key))
+        self.args[0].assert_type_equal(type(key))
         if dup:
             assert self.args[1].is_duplicable(), f'use GET_AND_UPDATE instead'
         return next((item[1] for item in self if item[0] == key), None)

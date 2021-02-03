@@ -15,11 +15,11 @@ class MichelsonStack:
         return cls(items)
 
     def protect(self, count: int):
-        assert len(self.items) >= count, f'got {len(self.items)} items, wanted to protect {count}'
+        assert len(self.items) >= count, f'got {len(self.items)} items on the stack, want to protect {count}'
         self.protected += count
 
     def restore(self, count: int):
-        assert self.protected >= count, f'wanted to restore {count}, only {self.protected} protected'
+        assert self.protected >= count, f'want to restore {count} items, but only {self.protected} are protected'
         self.protected -= count
 
     def push(self, item: MichelsonType):
@@ -31,7 +31,7 @@ class MichelsonStack:
 
     def pop(self, count: int) -> List[MichelsonType]:
         assert len(self.items) - self.protected >= count, \
-            f'got {len(self.items) - self.protected} items, requested {count} '
+            f'got {len(self.items) - self.protected} items on the stack, want to pop {count}'
         return [self.items.pop(self.protected) for _ in range(count)]
 
     def pop1(self) -> MichelsonType:

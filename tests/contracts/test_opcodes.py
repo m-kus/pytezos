@@ -2,11 +2,28 @@ from unittest import TestCase
 from os.path import dirname, join
 from parameterized import parameterized
 
-from pytezos.michelson.interpreter.repl import Interpreter
+from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.parse import michelson_to_micheline
 
 
 class OpcodesTestCase(TestCase):
+
+    def test_single_opcode(self):
+        filename, storage, parameter, result = ('and.tz', 'None', '(Pair False False)', '(Some False)')
+
+        with open(join(dirname(__file__), 'opcodes', filename)) as f:
+            script = f.read()
+
+        _, storage, stdout, error = Interpreter.run_code(
+            parameter=michelson_to_micheline(parameter),
+            storage=michelson_to_micheline(storage),
+            script=michelson_to_micheline(script)
+        )
+        print('\n'.join(stdout))
+        if error:
+            raise error
+        self.assertIsNotNone(storage)
+        self.assertEqual(michelson_to_micheline(result), storage.to_micheline_value())
 
     @parameterized.expand([
         # FORMAT: assert_output contract_file storage input expected_result
@@ -1440,9 +1457,12 @@ class OpcodesTestCase(TestCase):
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
             script = f.read()
 
-        _, storage, _ = Interpreter.run_code(
+        _, storage, stdout, error = Interpreter.run_code(
             parameter=michelson_to_micheline(parameter),
             storage=michelson_to_micheline(storage),
             script=michelson_to_micheline(script)
         )
+        if storage is None:
+            print('\n'.join(stdout))
+        self.assertIsNotNone(storage)
         self.assertEqual(michelson_to_micheline(result), storage.to_micheline_value())

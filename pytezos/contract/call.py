@@ -5,7 +5,7 @@ from pytezos.contract.script import ContractScript
 from pytezos.jupyter import get_class_docstring
 from pytezos.interop import Interop
 from pytezos.michelson.format import micheline_to_michelson
-from pytezos.michelson.interpreter.repl import Interpreter
+from pytezos.michelson.repl import Interpreter
 from pytezos.operation.content import format_tez, format_mutez
 from pytezos.operation.result import OperationResult
 

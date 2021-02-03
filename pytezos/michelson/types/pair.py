@@ -20,7 +20,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return hash(self.items)
 
     def __repr__(self):
-        return pformat(tuple(map(repr, self.items)))
+        return f'({", ".join(map(repr, self.items))})'
 
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)

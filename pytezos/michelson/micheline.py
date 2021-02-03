@@ -1,10 +1,55 @@
 from pprint import pformat
+from functools import wraps
 from typing import Tuple, Dict, Callable, List, Optional, Type, cast, Any, Union
 
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.forge import unforge_chain_id, unforge_address, unforge_public_key, unforge_signature, \
     unforge_micheline
 from pytezos.michelson.tags import prim_tags
+
+
+class MichelsonError(Exception):
+
+    def format_stderr(self):
+        prim, message = self.args[-2:] if len(self.args) > 1 else ('ERROR', ' '.join(self.args))
+        return f'{prim}: {message}'
+
+
+def catch(prim, func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            e_args = [prim, *e.args] if prim else e.args
+            raise MichelsonError(*e_args)
+    return wrapper
+
+
+def try_catch(prim):
+    def _catch(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                raise MichelsonError(prim, *e.args)
+        return wrapper
+    return _catch
+
+
+class ErrorTrace(type):
+
+    def __new__(mcs, name, bases, attrs, **kwargs):
+        wrapped_attrs = {}
+        for attr_name, attr in attrs.items():
+            prim = kwargs.get('prim')
+            if type(attr) in [classmethod, staticmethod] and not attr_name.startswith('_'):
+                attr = type(attr)(catch(prim, attr.__func__))
+            elif callable(attr) and not attr_name.startswith('_'):
+                attr = catch(prim, attr)
+            wrapped_attrs[attr_name] = attr
+        return type.__new__(mcs, name, bases, wrapped_attrs, **kwargs)
 
 
 def is_micheline(value) -> bool:
@@ -33,8 +78,8 @@ def is_prim_expr(type_expr) -> bool:
 
 
 def get_script_section(script, section_name):
-    assert isinstance(script, dict)
-    assert isinstance(script['code'], list)
+    assert isinstance(script, dict), f'expected dict, got {script}'
+    assert isinstance(script['code'], list), f'expected list, got {script.get("code")}'
     return next(section for section in script['code'] if section['prim'] == section_name)
 
 
@@ -119,7 +164,7 @@ def blind_unpack(data: bytes):
     return data
 
 
-class MichelsonPrimitive:
+class MichelsonPrimitive(metaclass=ErrorTrace):
     prim: str
     args: List[Union[Type['MichelsonPrimitive'], Any]] = []
     classes: Dict[Tuple[str, Optional[int]], Type['MichelsonPrimitive']] = {}
@@ -150,8 +195,11 @@ class MichelsonPrimitive:
                 args_len = None
             assert (prim, args_len) in MichelsonPrimitive.classes, f'unregistered primitive {prim} ({args_len} args)'
             cls = MichelsonPrimitive.classes[prim, args_len]
-            args = [MichelsonPrimitive.match(arg) if is_prim_expr(arg) else arg for arg in args]
-            return cls.create_type(args=args, annots=annots)
+            try:
+                args = [MichelsonPrimitive.match(arg) if is_prim_expr(arg) else arg for arg in args]
+                return cls.create_type(args=args, annots=annots)
+            except MichelsonError as e:
+                raise MichelsonError(cls.prim, *e.args)
 
     @classmethod
     def create_type(cls,

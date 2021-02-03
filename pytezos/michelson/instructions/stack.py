@@ -3,7 +3,7 @@ from typing import List, Any, Type, cast
 from pytezos.michelson.types import MichelsonType
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.micheline import parse_micheline_literal
-from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.stack import MichelsonStack
 from pytezos.context.execution import ExecutionContext
 
 

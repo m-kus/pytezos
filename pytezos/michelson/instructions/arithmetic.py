@@ -1,6 +1,6 @@
 from typing import List, Union, Tuple, Type, Callable, cast
 
-from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BoolType, IntType, NatType, TimestampType, MutezType, OptionType, PairType
 from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
 from pytezos.context.execution import ExecutionContext
@@ -11,7 +11,7 @@ class AbsInstruction(MichelsonInstruction, prim='ABS'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(IntType, stack.pop1())
-        a.assert_equal_types(IntType)
+        a.assert_type_equal(IntType)
         res = NatType.from_value(abs(int(a)))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))
@@ -43,7 +43,7 @@ class CompareInstruction(MichelsonInstruction, prim='COMPARE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = stack.pop2()
-        a.assert_equal_types(type(b))
+        a.assert_type_equal(type(b))
         res = IntType.from_value(a.__cmp__(b))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))
@@ -79,7 +79,7 @@ class EdivInstruction(MichelsonInstruction, prim='EDIV'):
 
 def execute_zero_compare(prim: str, stack: MichelsonStack, stdout: List[str], compare: Callable[[int], bool]):
     a = cast(IntType, stack.pop1())
-    a.assert_equal_types(IntType)
+    a.assert_type_equal(IntType)
     res = BoolType(compare(int(a)))
     stack.push(res)
     stdout.append(format_stdout(prim, [a], [res]))
@@ -138,7 +138,7 @@ class IntInstruction(MichelsonInstruction, prim='INT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(NatType, stack.pop1())
-        a.assert_equal_types(NatType)
+        a.assert_type_equal(NatType)
         res = IntType.from_value(int(a))
         stack.push(res)
         stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
@@ -150,7 +150,7 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(IntType, stack.pop1())
-        a.assert_equal_types(IntType)
+        a.assert_type_equal(IntType)
         if int(a) >= 0:
             res = OptionType.from_some(NatType.from_value(int(a)))
         else:
@@ -162,8 +162,8 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
 
 def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Callable[[int, int], int]):
     a, b = cast(Tuple[NatType, NatType], stack.pop2())
-    a.assert_equal_types(NatType)
-    b.assert_equal_types(NatType)
+    a.assert_type_equal(NatType)
+    b.assert_type_equal(NatType)
     assert int(b) < 257, f'shift overflow {int(b)}, should not exceed 256'
     res = NatType.from_value(shift(int(a), int(b)))
     stack.push(res)
@@ -242,11 +242,11 @@ class SubInstruction(MichelsonInstruction, prim='SUB'):
 
 def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add: Callable):
     a, b = cast(Tuple[Union[BoolType, NatType], ...], stack.pop2())
-    res_type, convert = dispatch_types(a, b, mapping={
+    res_type, convert = dispatch_types(type(a), type(b), mapping={
         (BoolType, BoolType): (BoolType, bool),
         (NatType, NatType): (NatType, int)
     })
-    val = add(convert(a), convert(b))
+    val = add((convert(a), convert(b)))
     res = res_type.from_value(val)
     stack.push(res)
     stdout.append(format_stdout(prim, [a, b], [res]))

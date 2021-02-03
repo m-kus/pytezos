@@ -1,7 +1,7 @@
 from typing import List, cast, Union, Tuple
 
 from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
-from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import StringType, BytesType, ListType, SetType, MapType, NatType, OptionType, UnitType, \
     NeverType
 from pytezos.context.execution import ExecutionContext
@@ -21,7 +21,7 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
             res = res_type.from_value(convert(a) + convert(b))
             stdout.append(format_stdout(cls.prim, [a, b], [res]))
         else:
-            assert isinstance(a, ListType), f'unexpected {a.prim}'
+            a.assert_type_in(ListType)
             res_type, convert, delim = dispatch_types(a.args[0], mapping={
                 (StringType,): (StringType, str, ''),
                 (BytesType,): (BytesType, bytes, b'')
@@ -48,7 +48,7 @@ class UnpackInstruction(MichelsonInstruction, prim='UNPACK', args_len=1):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(BytesType, stack.pop1())
-        a.assert_equal_types(BytesType)
+        a.assert_type_equal(BytesType)
         try:
             some = cls.args[0].unpack(bytes(a))
             res = OptionType.from_some(some)
@@ -65,7 +65,7 @@ class SizeInstruction(MichelsonInstruction, prim='SIZE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         src = cast(Union[StringType, BytesType, ListType, SetType, MapType], stack.pop1())
-        assert type(src) in [StringType, BytesType, ListType, SetType, MapType], f'unexpected {src.prim}'
+        src.assert_type_in(StringType, BytesType, ListType, SetType, MapType)
         res = NatType.from_value(len(src))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [src], [res]))
@@ -77,11 +77,11 @@ class SliceInstruction(MichelsonInstruction, prim='SLICE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         offset, length, s = cast(Tuple[NatType, NatType, Union[StringType, BytesType]], stack.pop3())
-        offset.assert_equal_types(NatType)
-        length.assert_equal_types(NatType)
-        assert type(s) in [StringType, BytesType], f'unexpected {s.prim}'
+        offset.assert_type_equal(NatType)
+        length.assert_type_equal(NatType)
+        s.assert_type_in(StringType, BytesType)
         start, stop = int(offset), int(offset) + int(length)
-        if 0 < stop <= len(s):
+        if 0 <= start <= stop <= len(s):
             res = OptionType.from_some(s[start:stop])
         else:
             res = OptionType.none(type(s))
@@ -105,6 +105,6 @@ class NeverInstruction(MichelsonInstruction, prim='NEVER'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         never = cast(NeverType, stack.pop1())
-        never.assert_equal_types(NeverType)
+        never.assert_type_equal(NeverType)
         stdout.append(format_stdout(cls.prim, [never], []))
         return cls()

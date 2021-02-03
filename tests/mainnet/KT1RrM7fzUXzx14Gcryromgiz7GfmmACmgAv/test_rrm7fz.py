@@ -4,7 +4,7 @@ import json
 
 from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 
@@ -40,7 +40,7 @@ class MainnetContractTestCaseRRM7FZ(TestCase):
         for name, ep_type in ep_types.items():
             if name not in ['default', 'root']:
                 expected_type = MichelsonType.match(self.entrypoints['entrypoints'][name])
-                expected_type.assert_equal_types(ep_type)
+                expected_type.assert_type_equal(ep_type)
 
     def test_storage_type_rrm7fz(self):
         type_expr = self.program.storage.as_micheline_expr()

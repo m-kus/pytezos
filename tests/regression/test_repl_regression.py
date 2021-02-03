@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pytezos.michelson.interpreter.repl import Interpreter, StackItem, MichelsonRuntimeError
+from pytezos.michelson.repl import Interpreter, StackItem, MichelsonRuntimeError
 from pytezos.michelson.instructions.control import assert_stack_type
 from pytezos.michelson.instructions.types import Option
 from pytezos.michelson.pack import unpack, pack

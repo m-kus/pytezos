@@ -30,7 +30,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         assert len(items) > 0, 'cannot instantiate from empty list'
         item_type = type(items[0])
         for item in items[1:]:
-            item_type.assert_equal_types(type(item))
+            item_type.assert_type_equal(type(item))
         cls = ListType.create_type(args=[item_type])
         return cls(items)
 
@@ -81,7 +81,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return head, tail
 
     def prepend(self, item: MichelsonType) -> 'ListType':
-        self.args[0].assert_equal_types(type(item))
+        self.args[0].assert_type_equal(type(item))
         return type(self)([item] + self.items)
 
     def __getitem__(self, idx: int) -> MichelsonType:

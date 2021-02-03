@@ -1,9 +1,8 @@
 from unittest import TestCase
 from os.path import dirname, join
-from pprint import pprint
 import json
 
-from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types.big_map import big_map_diff_to_lazy_diff
 
 folder = 'dexter_usdtz_xtz'

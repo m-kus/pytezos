@@ -80,18 +80,25 @@ class MichelsonType(MichelsonPrimitive):
         return cast(Type['MichelsonType'], res)
 
     @classmethod
-    def assert_equal_types(cls, other: Type['MichelsonType']):
-        assert cls.prim == other.prim, f'primitive: "{cls.prim}" vs "{other.prim}"'
+    def assert_type_equal(cls, other: Type['MichelsonType'], path='', message=''):
+        comment = f' [{message}]' if message else ''
+        assert cls.prim == other.prim, f'expected {other.prim}, got {cls.prim} at `{path}{comment}`'
         if cls.type_name and other.type_name:
             assert cls.type_name == other.type_name, \
-                f'{cls.prim}: type annotations: "{cls.type_name}" vs "{other.type_name}"'
+                f'expected "{other.type_name}", got "{cls.type_name}" at `{path}{comment}`'
         if cls.field_name and other.field_name:
             assert cls.field_name == other.field_name,  \
-                f'{cls.prim}: field annotations: "{cls.field_name}" vs "{other.field_name}"'
+                f'expected "{other.field_name}", got "{cls.field_name}" at `{path}{comment}`'
         assert len(cls.args) == len(other.args), \
-            f'{cls.prim}: args len: {len(cls.args)} vs {len(other.args)}'
+            f'expected {len(other.args)} args, got {len(cls.args)} at `{path}{comment}`'
         for i, arg in enumerate(other.args):
-            cls.args[i].assert_equal_types(arg)
+            cls.args[i].assert_type_equal(arg, path=f'{path}/{i}', message=message)
+
+    @classmethod
+    def assert_type_in(cls, *others: Type['MichelsonType'], message=''):
+        comment = f' [{message}]' if message else ''
+        expected = [ty.prim for ty in others]
+        assert any(issubclass(cls, ty) for ty in others), f'expected one of {expected}, got {cls.prim}{comment}'
 
     @classmethod
     def get_anon_type(cls) -> Type['MichelsonType']:

@@ -167,7 +167,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             self.ptr = context.register_big_map(self.ptr, copy=big_map_copy)
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
-        self.args[0].assert_equal_types(type(key))
+        self.args[0].assert_type_equal(type(key))
         val = next((v for k, v in self if k == key), undefined())  # search in diff
         if isinstance(val, undefined):
             assert self.storage, f'lazy storage is not attached'

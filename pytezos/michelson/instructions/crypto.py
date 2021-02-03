@@ -4,7 +4,7 @@ from typing import List, Tuple, Callable, cast, Any, Type
 
 from pytezos.crypto.key import blake2b_32, Key
 
-from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BytesType, KeyType, SignatureType, BoolType, KeyHashType, SaplingStateType
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
@@ -13,7 +13,7 @@ from pytezos.context.execution import ExecutionContext
 
 def execute_hash(prim: str, stack: MichelsonStack, stdout: List[str], hash_digest: Callable[[bytes], bytes]):
     a = cast(BytesType, stack.pop1())
-    a.assert_equal_types(BytesType)
+    a.assert_type_equal(BytesType)
     res = BytesType.unpack(hash_digest(bytes(a)))
     stack.push(res)
     stdout.append(format_stdout(prim, [a], [res]))
@@ -64,9 +64,9 @@ class CheckSignatureInstruction(MichelsonInstruction, prim='CHECK_SIGNATURE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         pk, sig, msg = cast(Tuple[KeyType, SignatureType, BytesType], stack.pop3())
-        pk.assert_equal_types(KeyType)
-        sig.assert_equal_types(SignatureType)
-        msg.assert_equal_types(BytesType)
+        pk.assert_type_equal(KeyType)
+        sig.assert_type_equal(SignatureType)
+        msg.assert_type_equal(BytesType)
         key = Key.from_encoded_key(str(pk))
         try:
             key.verify(signature=str(sig), message=bytes(msg))
@@ -84,7 +84,7 @@ class HashKeyInstruction(MichelsonInstruction, prim='HASH_KEY'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(KeyType, stack.pop1())
-        a.assert_equal_types(KeyType)
+        a.assert_type_equal(KeyType)
         key = Key.from_encoded_key(str(a))
         res = KeyHashType.from_value(key.public_key_hash())
         stack.push(res)

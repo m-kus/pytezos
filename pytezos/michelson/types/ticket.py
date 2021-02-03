@@ -37,7 +37,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     @staticmethod
     def join(left: 'TicketType', right: 'TicketType') -> Optional['TicketType']:
-        left.assert_equal_types(type(right))
+        left.assert_type_equal(type(right))
         if left.ticketer != right.ticketer or left.item != right.item:
             return None
         else:

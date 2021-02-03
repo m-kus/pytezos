@@ -1,7 +1,7 @@
 from typing import List, cast, Tuple, Optional, Type
 
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
-from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.micheline import MichelsonSequence
 from pytezos.michelson.sections import ParameterSection
 from pytezos.michelson.types.base import MichelsonType, MichelsonPrimitive
@@ -119,7 +119,7 @@ class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         contract = cast(ContractType, stack.pop1())
-        assert isinstance(contract, ContractType), f'expected contract, got {contract.prim}'
+        contract.assert_type_in(ContractType)
         res = AddressType.from_value(contract.get_address())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [contract], [res]))
@@ -141,14 +141,14 @@ class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         address = cast(AddressType, stack.pop1())
-        assert isinstance(address, AddressType), f'expected address, got {address.prim}'
+        address.assert_type_in(AddressType)
         entry_type = get_entry_point_type(context, cls.entry_point, address=str(address))
         contract_type = ContractType.create_type(args=cls.args)
         try:
             if entry_type is None:
                 stdout.append(f'{cls.prim}: skip type checking for {str(address)}')
             else:
-                entry_type.assert_equal_types(cls.args[0])
+                entry_type.assert_type_equal(cls.args[0])
             res = OptionType.from_some(contract_type.from_value(f'{str(address)}%{cls.entry_point}'))
         except AssertionError:
             res = OptionType.none(contract_type)
@@ -162,7 +162,7 @@ class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         key_hash = cast(KeyHashType, stack.pop1())
-        key_hash.assert_equal_types(KeyHashType)
+        key_hash.assert_type_equal(KeyHashType)
         res = ContractType.create_type(args=[UnitType]).from_value(str(key_hash))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [key_hash], [res]))
@@ -189,9 +189,9 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         delegate, amount, initial_storage = cast(Tuple[OptionType, MutezType, MichelsonType], stack.pop3())
-        delegate.assert_equal_types(OptionType.create_type(args=[KeyHashType]))
-        amount.assert_equal_types(MutezType)
-        initial_storage.assert_equal_types(cls.storage_type)
+        delegate.assert_type_equal(OptionType.create_type(args=[KeyHashType]))
+        amount.assert_type_equal(MutezType)
+        initial_storage.assert_type_equal(cls.storage_type)
 
         originated_address = AddressType.from_value(context.get_originated_address())
         context.spend_balance(int(amount))
@@ -214,7 +214,7 @@ class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         delegate = cast(OptionType, stack.pop1())
-        delegate.assert_equal_types(OptionType.create_type(args=[KeyHashType]))
+        delegate.assert_type_equal(OptionType.create_type(args=[KeyHashType]))
 
         delegation = OperationType.delegation(
             source=context.get_self_address(),
@@ -230,9 +230,9 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         parameter, amount, destination = cast(Tuple[MichelsonType, MutezType, ContractType], stack.pop3())
-        amount.assert_equal_types(MutezType)
+        amount.assert_type_equal(MutezType)
         assert isinstance(destination, ContractType), f'expected contract, got {destination.prim}'
-        parameter.assert_equal_types(destination.args[0])
+        parameter.assert_type_equal(destination.args[0])
 
         transaction = OperationType.transaction(
             source=context.get_self_address(),

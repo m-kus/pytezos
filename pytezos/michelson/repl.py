@@ -1,16 +1,10 @@
-import yaml
-from typing import Tuple, Any, List
-from copy import deepcopy
-from pprint import pformat
+from typing import Tuple, List, Optional, Any
 
-from pytezos.michelson.parse import MichelsonParser, MichelsonParserError
-from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import MichelsonError
+from pytezos.michelson.parse import MichelsonParser
 from pytezos.context.repl import REPLContext
-from pytezos.michelson.interpreter.stack import MichelsonStack
-from pytezos.michelson.micheline import MichelsonPrimitive, MichelsonSequence
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.interpreter.program import MichelsonProgram
+from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types import OperationType
 from pytezos.michelson.sections.storage import StorageSection
 
@@ -107,14 +101,10 @@ class Interpreter:
 
     @staticmethod
     def run_code(parameter, storage, script, entrypoint='default',
-                 amount=None, chain_id=None, source=None, sender=None, balance=None,
-                 block_id=None) -> Tuple[List[OperationType], StorageSection, List[str]]:
-        program = MichelsonProgram.match(script)
-        res = program.instantiate(
-            entrypoint=entrypoint,
-            parameter=parameter,
-            storage=storage
-        )
+                 amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None) \
+            -> Tuple[List[OperationType], Optional[StorageSection], List[str], Optional[Exception]]:
+        stack = MichelsonStack()
+        stdout = []
         context = REPLContext(
             amount=amount,
             chain_id=chain_id,
@@ -123,12 +113,21 @@ class Interpreter:
             balance=balance,
             block_id=block_id
         )
-        stack = MichelsonStack()
-        stdout = []
-        res.begin(stack, stdout)
-        res.execute(stack, stdout, context)
-        operations, storage = res.end(stack, stdout)
-        return operations, storage, stdout
+        try:
+            program = MichelsonProgram.match(script)
+            res = program.instantiate(
+                entrypoint=entrypoint,
+                parameter=parameter,
+                storage=storage
+            )
+            res.begin(stack, stdout)
+            res.execute(stack, stdout, context)
+            operations, storage = res.end(stack, stdout)
+            return operations, storage, stdout, None
+        except MichelsonError as e:
+            stdout.append(e.format_stderr())
+            return [], None, stdout, e
+
     #
     # def execute(self, code):
     #     """ Execute Michelson instructions (note that stack is not cleared after execution).

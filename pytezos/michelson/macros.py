@@ -222,21 +222,10 @@ def expand_pxr(prim, annots, args) -> list:
     return traverse_pxr_tree(prim, get_field_annots(annots), produce)
 
 
-@macro(r'^UNPAIR$')
-def expand_unpair(prim, annots, args) -> list:
-    assert not args
-    assert len(annots) <= 2, f'invalid number of annotations: {annots}'
-    car_annots = seq(annots[0]) if len(annots) > 0 else []
-    cdr_annots = seq(annots[1]) if len(annots) > 1 else []
-    return [DUP,
-            expr(prim='CAR', annots=car_annots),
-            dip_n(expr(prim='CDR', annots=cdr_annots))]
-
-
 @macro(r'^UN(P[PAI]{3,}R)$')
 def expand_unpxr(prim, annots, args) -> list:
     def produce(node: PxrNode):
-        return expand_unpair(prim=None, annots=node.annots, args=[])
+        return [expr(prim='UNPAIR', annots=node.annots)]
 
     assert not args
     return list(reversed(traverse_pxr_tree(prim, annots, produce)))

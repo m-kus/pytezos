@@ -31,7 +31,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         assert len(items) > 0, 'cannot instantiate from empty list'
         item_type = type(items[0])
         for item in items[1:]:
-            item_type.assert_equal_types(type(item))
+            item_type.assert_type_equal(type(item))
         cls = SetType.create_type(args=[item_type])
         cls.check_constraints(items)
         return cls(items)
@@ -80,7 +80,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         pass  # Big_map is not comparable
 
     def contains(self, item: MichelsonType) -> bool:
-        self.args[0].assert_equal_types(type(item))
+        self.args[0].assert_type_equal(type(item))
         return item in self.items
 
     def add(self, item: MichelsonType) -> MichelsonType:

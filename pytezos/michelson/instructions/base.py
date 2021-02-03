@@ -2,7 +2,7 @@ from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
 from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.micheline import MichelsonPrimitive
-from pytezos.michelson.interpreter.stack import MichelsonStack
+from pytezos.michelson.stack import MichelsonStack
 
 
 def format_stdout(prim: str, inputs: list, outputs: list):
@@ -22,6 +22,7 @@ def dispatch_types(*args: Type[MichelsonPrimitive],
 class MichelsonInstruction(MichelsonPrimitive):
     args: List[Union[Type['MichelsonInstruction'], Any]] = []
     field_names: List[str] = []
+    var_names: List[str] = []
 
     @staticmethod
     def match(expr) -> Type['MichelsonInstruction']:
@@ -33,9 +34,10 @@ class MichelsonInstruction(MichelsonPrimitive):
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
         field_names = [a[1:] for a in annots if a.startswith('%')] if annots else []
-        assert len(field_names) == len(annots), f'only field annotations allowed'
+        var_names = [a[1:] for a in annots if a.startswith('@')] if annots else []
         res = type(cls.__name__, (cls,), dict(args=args,
                                               field_names=field_names,
+                                              var_names=var_names,
                                               **kwargs))
         return cast(Type['MichelsonInstruction'], res)
 
