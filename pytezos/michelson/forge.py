@@ -10,7 +10,7 @@ prim_int = {v[0]: k for k, v in prim_tags.items()}
 
 def get_tag(args_len: int, annots_len: int) -> bytes:
     tag = min(args_len * 2 + 3 + (1 if annots_len > 0 else 0), 9)
-    return tag.to_bytes(1, 'big')
+    return bytes([tag])
 
 
 def forge_int(value: int) -> bytes:
@@ -266,7 +266,7 @@ def forge_micheline(data) -> bytes:
             args_len = len(data.get('args', []))
             annots_len = len(data.get('annots', []))
 
-            res.extend(get_tag(args_len, annots_len))
+            res.append(get_tag(args_len, annots_len))
             res.append(prim_tags[data['prim']])
 
             if args_len > 0:

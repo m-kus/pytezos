@@ -6,6 +6,7 @@ from pytezos.context.execution import ExecutionContext
 
 
 class StorageSection(Micheline, prim='storage', args_len=1):
+    args: List[Type[MichelsonType]]
 
     def __init__(self, item: MichelsonType):
         super(Micheline, self).__init__()

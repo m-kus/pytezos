@@ -225,7 +225,7 @@ def expand_pxr(prim, annots, args) -> list:
 @macro(r'^UN(P[PAI]{3,}R)$')
 def expand_unpxr(prim, annots, args) -> list:
     def produce(node: PxrNode):
-        return [expr(prim='UNPAIR', annots=node.annots)]
+        return [expr(prim='UNPAIR', annots=skip_nones(node.annots))]
 
     assert not args
     return list(reversed(traverse_pxr_tree(prim, annots, produce)))

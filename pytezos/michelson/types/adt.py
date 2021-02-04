@@ -78,8 +78,11 @@ class ADT:
             assert self.is_named(), f'{self.prim} is not named'
         else:
             assert isinstance(key, int), f'expected int or string, got {type(key).__name__}'
-        assert key in self.key_to_path, f'cannot find key {key}'
+        assert key in self.key_to_path, f'cannot find key `{key}`'
         return self.key_to_path[key]
+
+    def has_path(self, key) -> bool:
+        return self.is_named() and key in self.key_to_path
 
     @classmethod
     def get_flat_args(cls, nested_type: Type[MichelsonType],

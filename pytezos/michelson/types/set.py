@@ -86,14 +86,14 @@ class SetType(MichelsonType, prim='set', args_len=1):
         self.args[0].assert_type_equal(type(item))
         return item in self.items
 
-    def add(self, item: MichelsonType) -> MichelsonType:
+    def add(self, item: MichelsonType) -> 'SetType':
         if self.contains(item):
             return copy(self)
         else:
             items = [item] + self.items
             return type(self)(list(sorted(items)))
 
-    def remove(self, item: MichelsonType) -> MichelsonType:
+    def remove(self, item: MichelsonType) -> 'SetType':
         if self.contains(item):
             items = list(filter(lambda x: x != item, self.items))
             return type(self)(items)

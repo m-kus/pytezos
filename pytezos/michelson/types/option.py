@@ -36,6 +36,16 @@ class OptionType(MichelsonType, prim='option', args_len=1):
     def __repr__(self):
         return f'{repr(self.item)}?' if self.item else 'None'
 
+    def __cmp__(self, other: 'OptionType') -> int:
+        if self.is_none() and other.is_none():
+            return 0
+        elif self.is_none():
+            return -1
+        elif other.is_none():
+            return 1
+        else:
+            return self.item.__cmp__(other.item)
+
     @staticmethod
     def none(some_type: Type[MichelsonType]) -> 'OptionType':
         cls = OptionType.create_type(args=[some_type])

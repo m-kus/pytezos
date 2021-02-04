@@ -14,7 +14,12 @@ TOTAL_VOTING_POWER = 0
 class OpcodesTestCase(TestCase):
 
     def test_single_opcode(self):
-        filename, storage, parameter, result = ('dup-n.tz', 'Unit', 'Unit', 'Unit')
+        filename, storage, parameter, result = (
+            'contract.tz',
+            'Unit',
+            '"tz1cxcwwnzENRdhe2Kb8ZdTrdNy4bFNyScx5"',
+            'Unit',
+        )
 
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
             script = f.read()

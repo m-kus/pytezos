@@ -7,6 +7,7 @@ from pytezos.michelson.types.adt import ADT
 
 
 class ParameterSection(Micheline, prim='parameter', args_len=1):
+    args: List[Type[MichelsonType]]
 
     def __init__(self, item: MichelsonType):
         super(Micheline, self).__init__()
@@ -49,7 +50,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         entry_point = parameters['entrypoint']
         if cls.args[0].prim == 'or':
             struct = ADT.from_nested_type(cls.args[0], force_recurse=True)
-            if struct.is_named() and struct.get_path(entry_point):
+            if struct.has_path(entry_point):
                 val_expr = struct.normalize_micheline_value(entry_point, parameters['value'])
                 item = cls.args[0].from_micheline_value(val_expr)
                 return cls(item)

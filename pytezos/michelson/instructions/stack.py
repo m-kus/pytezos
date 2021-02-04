@@ -42,7 +42,7 @@ class DupnInstruction(MichelsonInstruction, prim='DUP', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        depth = cls.args[0].cast(int)
+        depth = cls.args[0].cast(int) - 1
         stack.protect(count=depth)
         res = stack.peek().duplicate()
         stack.restore(count=depth)
@@ -110,7 +110,7 @@ class CastIntruction(MichelsonInstruction, prim='CAST', args_len=1):
         return cls()
 
 
-class RenameInstruction(MichelsonInstruction, prim='RENAME', args_len=1):
+class RenameInstruction(MichelsonInstruction, prim='RENAME'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):

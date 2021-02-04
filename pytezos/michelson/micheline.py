@@ -16,7 +16,7 @@ class MichelsonError(Exception):
             for i, arg in enumerate(reversed(self.args))
             if str(arg).isupper()
         ), (0, 'ERROR'))
-        message = ' '.join(self.args[offset:])
+        message = ' -> '.join(self.args[offset:])
         return f'{instruction}: {message}'
 
 
@@ -26,8 +26,11 @@ def catch(prim, func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            e_args = [prim, *e.args] if prim else e.args
-            raise MichelsonError(*e_args)
+            if not e.args:
+                e.args = (type(e).__name__,)
+            if prim:
+                e.args = (prim, *e.args)
+            raise MichelsonError(*e.args)
     return wrapper
 
 

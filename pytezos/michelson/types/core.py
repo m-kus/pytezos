@@ -8,6 +8,15 @@ from pytezos.context.execution import ExecutionContext
 Unit = unit()
 
 
+def compare(a, b) -> int:
+    if a == b:
+        return 0
+    elif a < b:
+        return -1
+    else:
+        return 1
+
+
 class TrueLiteral(Micheline, prim='True'):
     pass
 
@@ -43,6 +52,9 @@ class StringType(MichelsonType, prim='string'):
 
     def __len__(self):
         return len(self.value)
+
+    def __cmp__(self, other: 'StringType'):
+        return compare(self.value, other.value)
 
     @classmethod
     def from_value(cls, value: str) -> 'StringType':
@@ -92,12 +104,7 @@ class IntType(MichelsonType, prim='int'):
         return self.value == other.value
 
     def __cmp__(self, other: 'IntType'):
-        if self.value == other.value:
-            return 0
-        elif self.value < other.value:
-            return -1
-        else:
-            return 1
+        return compare(self.value, other.value)
 
     def __hash__(self):
         return hash(self.value)
@@ -178,6 +185,9 @@ class BytesType(MichelsonType, prim='bytes'):
     def __len__(self):
         return len(self.value)
 
+    def __cmp__(self, other: 'BytesType'):
+        return compare(self.value, other.value)
+
     @classmethod
     def dummy(cls, context: ExecutionContext) -> 'BytesType':
         return cls()
@@ -241,6 +251,14 @@ class BoolType(MichelsonType, prim='bool'):
     def __bool__(self):
         return self.value
 
+    def __cmp__(self, other: 'BoolType'):
+        if self.value == other.value:
+            return 0
+        elif self.value is False:
+            return -1
+        else:
+            return 1
+
     @classmethod
     def dummy(cls, context: ExecutionContext) -> 'BoolType':
         return cls(False)
@@ -289,6 +307,9 @@ class UnitType(MichelsonType, prim='unit'):
     def __repr__(self):
         return 'Unit'
 
+    def __cmp__(self, other: 'UnitType') -> int:
+        return 0
+
     @classmethod
     def dummy(cls, context: ExecutionContext) -> 'UnitType':
         return cls()
@@ -314,4 +335,6 @@ class UnitType(MichelsonType, prim='unit'):
 
 
 class NeverType(MichelsonType, prim='never'):
-    pass
+
+    def __cmp__(self, other: 'NeverType') -> int:
+        return 0

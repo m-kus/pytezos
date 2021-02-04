@@ -43,8 +43,11 @@ class MichelsonInstruction(Micheline):
                     args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
-        field_names = [a[1:] for a in annots if a.startswith('%')] if annots else []
-        var_names = [a[1:] for a in annots if a.startswith('@')] if annots else []
+        if annots:
+            field_names = [a[1:] for a in annots if a.startswith('%')]
+            var_names = [a[1:] for a in annots if a.startswith('@')]
+        else:
+            field_names, var_names = [], []
         res = type(cls.__name__, (cls,), dict(args=args,
                                               field_names=field_names,
                                               var_names=var_names,

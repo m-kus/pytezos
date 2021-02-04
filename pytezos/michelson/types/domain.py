@@ -259,6 +259,9 @@ class ChainIdType(StringType, prim='chain_id'):
 
 class ContractType(AddressType, prim='contract', args_len=1):
 
+    def __repr__(self):
+        return self.value
+
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None):
         param_expr = micheline_to_michelson(cls.args[0].as_micheline_expr())

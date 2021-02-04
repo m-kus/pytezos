@@ -44,9 +44,10 @@ class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
 
 
 def get_entry_point_type(context: ExecutionContext, name: str, address=None) -> Optional[Type[MichelsonType]]:
-    parameter = ParameterSection.match(context.get_parameter_expr(address))
-    if parameter is None:
+    expr = context.get_parameter_expr(address)
+    if expr is None:
         return None
+    parameter = ParameterSection.match(expr)
     entry_points = parameter.list_entry_points()
     assert name in entry_points, f'unknown entrypoint {name}'
     return entry_points[name]
@@ -68,14 +69,16 @@ class SelfInstruction(MichelsonInstruction, prim='SELF'):
                     args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
-        return MichelsonInstruction.create_type(args, annots, entry_point=get_entry_point_name(annots))
+        res = type(cls.__name__, (cls,), dict(entry_point=get_entry_point_name(annots)))
+        return cast(Type['MichelsonInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         self_type = get_entry_point_type(context, cls.entry_point)
         assert self_type, f'parameter type is not defined'
         self_address = context.get_self_address()
-        res = ContractType.create_type(args=[self_type]).from_value(self_address)
+        res_type = ContractType.create_type(args=[self_type])
+        res = res_type.from_value(f'{self_address}%{cls.entry_point}')
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -144,9 +147,8 @@ class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
                     args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
-        entry_point = get_entry_point_name(annots)
-        assert issubclass(args[0], MichelsonType), f'expected Michelson type, got {args[0]}'
-        return MichelsonInstruction.create_type(args, annots, entry_point=entry_point)
+        res = type(cls.__name__, (cls,), dict(entry_point=get_entry_point_name(annots)))
+        return cast(Type['MichelsonInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):

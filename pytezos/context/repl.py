@@ -22,7 +22,7 @@ class REPLContext(ExecutionContext):
         self.voting_power = voting_power or 0
         self.total_voting_power = total_voting_power or 0
         self.now = 0
-        self.level = 0
+        self.level = 1
         self.sender = sender or self.get_dummy_key_hash()
         self.source = source or self.get_dummy_key_hash()
         self.chain_id = chain_id or self.get_dummy_chain_id()
@@ -86,7 +86,7 @@ class REPLContext(ExecutionContext):
             script = ctx.shell.contracts[address].script()
             return get_script_section(script, 'parameter')
         else:
-            return self.parameter_expr if address else None
+            return None if address else self.parameter_expr
 
     def get_storage_expr(self):
         return self.storage_expr
@@ -94,14 +94,14 @@ class REPLContext(ExecutionContext):
     def get_code_expr(self):
         return self.code_expr
 
-    def set_storage_expr(self, type_expr):
-        self.storage_expr = type_expr
+    def set_storage_expr(self, expr):
+        self.storage_expr = expr
 
-    def set_parameter_expr(self, type_expr):
-        self.parameter_expr = type_expr
+    def set_parameter_expr(self, expr):
+        self.parameter_expr = expr
 
-    def set_code_expr(self, code_expr):
-        self.code_expr = code_expr
+    def set_code_expr(self, expr):
+        self.code_expr = expr
 
     def get_big_map_value(self, ptr: int, key_hash: str):
         assert self.network, f'network is undefined'

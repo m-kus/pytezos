@@ -1,6 +1,6 @@
 import sha3
 from hashlib import sha256, sha512
-from typing import List, Tuple, Callable, cast, Any, Type
+from typing import List, Tuple, Callable, cast
 
 from pytezos.crypto.key import blake2b_32, Key
 
@@ -13,7 +13,7 @@ from pytezos.context.execution import ExecutionContext
 def execute_hash(prim: str, stack: MichelsonStack, stdout: List[str], hash_digest: Callable[[bytes], bytes]):
     a = cast(BytesType, stack.pop1())
     a.assert_type_equal(BytesType)
-    res = BytesType.unpack(hash_digest(bytes(a)))
+    res = BytesType.from_value(hash_digest(bytes(a)))
     stack.push(res)
     stdout.append(format_stdout(prim, [a], [res]))
 

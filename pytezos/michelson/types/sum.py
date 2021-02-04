@@ -32,6 +32,16 @@ class OrType(MichelsonType, prim='or', args_len=2):
     def __hash__(self):
         return hash(self.items)
 
+    def __cmp__(self, other: 'OrType'):
+        if self.is_left() and not other.is_left():
+            return -1
+        elif not self.is_left() and other.is_left():
+            return 1
+        elif self.is_left() and other.is_left():
+            return self.items[0].__cmp__(other.items[0])
+        else:
+            return self.items[1].__cmp__(other.items[1])
+
     def is_left(self) -> bool:
         return self.items[0] is not None
 

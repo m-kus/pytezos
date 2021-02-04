@@ -28,6 +28,13 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
 
+    def __cmp__(self, other: 'PairType') -> int:
+        for i, item in enumerate(self.items):
+            res = item.__cmp__(other.items[i])
+            if res != 0:
+                return res
+        return 0
+
     @classmethod
     def init(cls, items: List[MichelsonType]) -> 'PairType':
         if len(items) > 2:

@@ -1,6 +1,6 @@
-from typing import Tuple, List, Optional, Any
+from typing import Tuple, List, Optional
 
-from pytezos.michelson.micheline import MichelsonError
+from pytezos.michelson.micheline import MichelsonError, get_script_section
 from pytezos.michelson.parse import MichelsonParser
 from pytezos.context.repl import REPLContext
 from pytezos.michelson.stack import MichelsonStack
@@ -113,6 +113,10 @@ class Interpreter:
             balance=balance,
             block_id=block_id
         )
+        context.set_parameter_expr(get_script_section(dict(code=script), 'parameter'))
+        context.set_storage_expr(get_script_section(dict(code=script), 'storage'))
+        context.set_code_expr(get_script_section(dict(code=script), 'code'))
+
         try:
             program = MichelsonProgram.match(script)
             res = program.instantiate(

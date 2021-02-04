@@ -38,7 +38,7 @@ class PackInstruction(MichelsonInstruction, prim='PACK'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = stack.pop1()
-        res = BytesType.unpack(a.pack())
+        res = BytesType.from_value(a.pack())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))
         return cls()

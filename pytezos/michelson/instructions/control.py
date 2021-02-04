@@ -64,19 +64,17 @@ class ExecInstruction(MichelsonInstruction, prim='EXEC'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        param, sub = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
-        assert isinstance(sub, LambdaType), f'expected lambda, got {sub.prim}'
-        param.assert_type_equal(sub.args[0])
-        sub_stack = MichelsonStack.from_items([param])
-        sub_stdout = []
-        sub_body = cast(MichelsonInstruction, sub.value)
-        item = sub_body.execute(sub_stack, sub_stdout, context=context)
-        res = sub_stack.pop1()
-        res.assert_type_equal(sub.args[1])
-        assert len(sub_stack) == 0, f'lambda stack is not empty {sub_stack}'
+        param, lambda_ = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
+        assert isinstance(lambda_, LambdaType), f'expected lambda, got {lambda_.prim}'
+        param.assert_type_equal(lambda_.args[0])
+        stdout.append(format_stdout(cls.prim, [param, lambda_], []))
+        lambda_stack = MichelsonStack.from_items([param])
+        lambda_body = cast(MichelsonInstruction, lambda_.value)
+        item = lambda_body.execute(lambda_stack, stdout, context=context)
+        res = lambda_stack.pop1()
+        res.assert_type_equal(lambda_.args[1])
+        assert len(lambda_stack) == 0, f'lambda stack is not empty {lambda_stack}'
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [param, sub], [res]))
-        stdout.extend(sub_stdout)
         return cls(item)
 
 
@@ -98,6 +96,7 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
         res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [left, lambda_], [res]))
+        return cls()
 
 
 class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):

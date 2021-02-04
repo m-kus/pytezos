@@ -15,7 +15,8 @@ class MichelsonProgram:
     storage: Type[StorageSection]
     code: Type[CodeSection]
 
-    def __init__(self, parameter: ParameterSection, storage: StorageSection):
+    def __init__(self, entrypoint: str, parameter: ParameterSection, storage: StorageSection):
+        self.entrypoint = entrypoint
         self.parameter_value = parameter
         self.storage_value = storage
 
@@ -55,13 +56,13 @@ class MichelsonProgram:
     def instantiate(cls, entrypoint: str, parameter, storage) -> 'MichelsonProgram':
         parameter_value = cls.parameter.from_parameters(dict(entrypoint=entrypoint, value=parameter))
         storage_value = cls.storage.from_micheline_value(storage)
-        return cls(parameter_value, storage_value)
+        return cls(entrypoint, parameter_value, storage_value)
 
     @try_catch('BEGIN')
     def begin(self, stack: MichelsonStack, stdout: List[str]):
         res = PairType.from_comb_leaves([self.parameter_value.item, self.storage_value.item])
         stack.push(res)
-        stdout.append(format_stdout('BEGIN', [], [res]))
+        stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
         return self.code.args[0].execute(stack, stdout, context)
@@ -74,5 +75,5 @@ class MichelsonProgram:
         operations, storage_value = res.items
         operations.assert_type_equal(ListType.create_type([OperationType]), message='list of operations')
         storage_value.assert_type_equal(self.storage.args[0], message='resulting storage')
-        stdout.append(format_stdout('END', [res], []))
+        stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
         return list(operations), StorageSection(storage_value)
