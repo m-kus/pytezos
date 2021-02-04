@@ -2,11 +2,11 @@ from typing import List, cast, Tuple, Optional, Type
 
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.micheline import MichelsonSequence
+from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.sections import ParameterSection
-from pytezos.michelson.types.base import MichelsonType, MichelsonPrimitive
-from pytezos.michelson.types import NatType, StringType, ContractType, AddressType, TimestampType, \
-    OptionType, KeyHashType, UnitType, MutezType, OperationType
+from pytezos.michelson.types.base import MichelsonType, Micheline
+from pytezos.michelson.types import NatType, ContractType, AddressType, TimestampType, \
+    OptionType, KeyHashType, UnitType, MutezType, OperationType, ChainIdType
 from pytezos.context.execution import ExecutionContext
 
 
@@ -15,7 +15,7 @@ class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         amount = context.get_amount()
-        res = NatType.from_value(amount)
+        res = MutezType.from_value(amount)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -26,7 +26,7 @@ class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         balance = context.get_balance()
-        res = NatType.from_value(balance)
+        res = MutezType.from_value(balance)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -37,7 +37,7 @@ class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         chain_id = context.get_chain_id()
-        res = StringType.from_value(chain_id)
+        res = ChainIdType.from_value(chain_id)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -65,7 +65,7 @@ class SelfInstruction(MichelsonInstruction, prim='SELF'):
 
     @classmethod
     def create_type(cls,
-                    args: List[Type['MichelsonPrimitive']],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
         return MichelsonInstruction.create_type(args, annots, entry_point=get_entry_point_name(annots))
@@ -76,6 +76,16 @@ class SelfInstruction(MichelsonInstruction, prim='SELF'):
         assert self_type, f'parameter type is not defined'
         self_address = context.get_self_address()
         res = ContractType.create_type(args=[self_type]).from_value(self_address)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
+
+
+class SelfAddressInstruction(MichelsonInstruction, prim='SELF_ADDRESS'):
+
+    @classmethod
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+        res = AddressType.from_value(context.get_self_address())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -131,7 +141,7 @@ class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
 
     @classmethod
     def create_type(cls,
-                    args: List[Type['MichelsonPrimitive']],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
         entry_point = get_entry_point_name(annots)
@@ -174,11 +184,11 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
 
     @classmethod
     def create_type(cls,
-                    args: List[Type['MichelsonPrimitive']],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
         sequence = args[0]
-        assert issubclass(sequence, MichelsonSequence), f'expected sequence {{ parameter ; storage ; code }}'
+        assert issubclass(sequence, MichelineSequence), f'expected sequence {{ parameter ; storage ; code }}'
         assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
         assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
         storage = next(arg for arg in sequence.args if arg.prim == 'storage')
@@ -243,4 +253,36 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
         )
         stack.push(transaction)
         stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))
+        return cls()
+
+
+class VotingPowerInstruction(MichelsonInstruction, prim='VOTING_POWER'):
+
+    @classmethod
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+        address = cast(KeyHashType, stack.pop1())
+        address.assert_type_equal(KeyHashType)
+        res = NatType.from_value(context.get_voting_power(str(address)))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [address], [res]))
+        return cls()
+
+
+class TotalVotingPowerInstruction(MichelsonInstruction, prim='TOTAL_VOTING_POWER'):
+
+    @classmethod
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+        res = NatType.from_value(context.get_total_voting_power())
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
+        return cls()
+
+
+class LevelInstruction(MichelsonInstruction, prim='LEVEL'):
+
+    @classmethod
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+        res = NatType.from_value(context.get_level())
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()

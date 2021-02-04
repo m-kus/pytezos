@@ -1,8 +1,23 @@
+from typing import Type
+
 from pytezos.michelson.types.base import MichelsonType, unit
-from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack as blind_unpack
+from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack, Micheline, \
+    MichelineLiteral
 from pytezos.context.execution import ExecutionContext
 
 Unit = unit()
+
+
+class TrueLiteral(Micheline, prim='True'):
+    pass
+
+
+class FalseLiteral(Micheline, prim='False'):
+    pass
+
+
+class UnitLiteral(Micheline, prim='Unit'):
+    pass
 
 
 class StringType(MichelsonType, prim='string'):
@@ -47,6 +62,9 @@ class StringType(MichelsonType, prim='string'):
     @classmethod
     def from_python_object(cls, py_obj) -> 'StringType':
         return cls.from_value(py_obj)
+
+    def to_literal(self) -> Type[Micheline]:
+        return MichelineLiteral.create(self.value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'string': self.value}
@@ -108,6 +126,9 @@ class IntType(MichelsonType, prim='int'):
         assert isinstance(py_obj, int), f'expected integer, got {type(py_obj).__name__}'
         return cls(py_obj)
 
+    def to_literal(self) -> Type[Micheline]:
+        return MichelineLiteral.create(self.value)
+
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'int': str(self.value)}
 
@@ -150,6 +171,7 @@ class BytesType(MichelsonType, prim='bytes'):
 
     def __repr__(self):
         return f'0x{self.value.hex()}'
+
     def __bytes__(self):
         return self.value
 
@@ -159,6 +181,10 @@ class BytesType(MichelsonType, prim='bytes'):
     @classmethod
     def dummy(cls, context: ExecutionContext) -> 'BytesType':
         return cls()
+
+    @classmethod
+    def from_value(cls, value: bytes):
+        return cls(value)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'BytesType':
@@ -176,6 +202,9 @@ class BytesType(MichelsonType, prim='bytes'):
         else:
             assert False, f'unexpected value type {py_obj}'
         return cls(value)
+
+    def to_literal(self) -> Type[Micheline]:
+        return MichelineLiteral.create(self.value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'bytes': self.value.hex()}
@@ -233,6 +262,9 @@ class BoolType(MichelsonType, prim='bool'):
         assert isinstance(py_obj, bool), f'expected boolean, got {type(py_obj).__name__}'
         return cls(py_obj)
 
+    def to_literal(self) -> Type[Micheline]:
+        return TrueLiteral if self.value else FalseLiteral
+
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'prim': 'True' if self.value else 'False'}
 
@@ -270,6 +302,9 @@ class UnitType(MichelsonType, prim='unit'):
     def from_python_object(cls, py_obj) -> 'UnitType':
         assert py_obj is None or isinstance(py_obj, unit), f'expected None or Unit, got {type(py_obj).__name__}'
         return cls()
+
+    def to_literal(self) -> Type[Micheline]:
+        return UnitLiteral
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'prim': 'Unit'}

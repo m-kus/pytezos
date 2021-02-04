@@ -1,41 +1,36 @@
-from typing import List, cast, Tuple, Union, Type, Any
+from typing import List, cast, Tuple, Union, Type
 
 from pytezos.michelson.instructions.stack import PushInstruction
 from pytezos.michelson.instructions.adt import PairInstruction
-from pytezos.michelson.micheline import parse_micheline_literal, MichelsonSequence
+from pytezos.michelson.micheline import MichelineSequence, MichelsonError, Micheline
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.types import MichelsonType, LambdaType, PairType, BoolType, ListType, OrType, OptionType, \
     MapType, SetType
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.context.execution import ExecutionContext
+from pytezos.michelson.instructions.base import Wildcard
 
 
 def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],
                 count: int, body: Type[MichelsonInstruction], context: ExecutionContext) -> MichelsonInstruction:
-    stdout.append(format_stdout(prim, [f'<{count}>'], []))
+    stdout.append(format_stdout(prim, [*Wildcard.n(count)], []))
     stack.protect(count=count)
     item = body.execute(stack, stdout, context=context)
     stack.restore(count=count)
-    stdout.append(format_stdout(prim, [], [f'<{count}>']))
+    stdout.append(format_stdout(prim, [], [*Wildcard.n(count)]))
     return item
 
 
 class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
-    depth: int
 
     def __init__(self, item: MichelsonInstruction):
         super(DipnInstruction, self).__init__()
         self.item = item
 
     @classmethod
-    def create_type(cls, args: List[Any], **kwargs) -> Type['DipnInstruction']:
-        depth = parse_micheline_literal(args[0], {'int': int})
-        res = type(cls.__name__, (cls,), dict(args=args, depth=depth, **kwargs))
-        return cast(Type['DipnInstruction'], res)
-
-    @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        item = execute_dip(cls.prim, stack, stdout, count=cls.depth, body=cls.args[1], context=context)
+        depth = cls.args[0].cast(int)
+        item = execute_dip(cls.prim, stack, stdout, count=depth, body=cls.args[1], context=context)
         return cls(item)
 
 
@@ -55,12 +50,13 @@ class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        res = LambdaType.create_type(args=cls.args[:2]).from_micheline_value(cls.args[2])
+        lambda_type = LambdaType.create_type(args=cls.args[:2])
+        res = lambda_type(cls.args[2])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
 
 
-class ExecInstruction(MichelsonInstruction, prim='EXEC', args_len=3):
+class ExecInstruction(MichelsonInstruction, prim='EXEC'):
 
     def __init__(self, item: MichelsonInstruction):
         super(ExecInstruction, self).__init__()
@@ -88,20 +84,20 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        left, sub = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
-        sub.assert_type_in(LambdaType)
-        sub.args[0].assert_type_in(PairType)
-        left_type, right_type = sub.args[0].args
+        left, lambda_ = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
+        lambda_.assert_type_in(LambdaType)
+        lambda_.args[0].assert_type_in(PairType)
+        left_type, right_type = lambda_.args[0].args
         left.assert_type_equal(left_type)
 
-        value = MichelsonSequence.create_type(args=[
-            PushInstruction.create_type(args=[left_type, left]),
+        new_value = MichelineSequence.create_type(args=[
+            PushInstruction.create_type(args=[left_type, left.to_literal()]),
             PairInstruction,
-            sub.value
+            lambda_.value
         ])
-        res = LambdaType.create_type(args=[right_type, sub.args[1]])(value)
+        res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [left, sub], [res]))
+        stdout.append(format_stdout(cls.prim, [left, lambda_], [res]))
 
 
 class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
@@ -110,7 +106,7 @@ class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = stack.pop1()
         assert a.is_packable(), f'expected packable type, got {a.prim}'
-        assert False, a
+        raise MichelsonError(repr(a))
 
 
 class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
@@ -162,8 +158,10 @@ class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         or_ = cast(OrType, stack.pop1())
         or_.assert_type_in(OrType)
-        stdout.append(format_stdout(cls.prim, [or_], []))
         branch = cls.args[0] if or_.is_left() else cls.args[1]
+        res = or_.resolve()
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [or_], [res]))
         item = branch.execute(stack, stdout, context=context)
         return cls(item)
 

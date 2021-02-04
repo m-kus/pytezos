@@ -67,6 +67,12 @@ class ExecutionContext:
     def get_amount(self) -> int:
         raise NotImplementedError
 
+    def get_voting_power(self, address: str) -> int:
+        raise NotImplementedError
+
+    def get_total_voting_power(self) -> int:
+        raise NotImplementedError
+
     def get_sender(self) -> str:
         raise NotImplementedError
 
@@ -74,6 +80,9 @@ class ExecutionContext:
         raise NotImplementedError
 
     def get_now(self) -> int:
+        raise NotImplementedError
+
+    def get_level(self) -> int:
         raise NotImplementedError
 
     def get_balance(self) -> int:

@@ -1,14 +1,14 @@
 from typing import Type, List
 
 from pytezos.michelson.types import *
-from pytezos.michelson.micheline import MichelsonPrimitive
+from pytezos.michelson.micheline import Micheline
 from pytezos.context.execution import ExecutionContext
 
 
-class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
+class StorageSection(Micheline, prim='storage', args_len=1):
 
     def __init__(self, item: MichelsonType):
-        super(MichelsonPrimitive, self).__init__()
+        super(Micheline, self).__init__()
         self.item = item
 
     def __repr__(self):
@@ -16,7 +16,7 @@ class StorageSection(MichelsonPrimitive, prim='storage', args_len=1):
 
     @staticmethod
     def match(type_expr) -> Type['StorageSection']:
-        cls = MichelsonPrimitive.match(type_expr)
+        cls = Micheline.match(type_expr)
         if not issubclass(cls, StorageSection):
             cls = StorageSection.create_type(args=[cls])
         return cls

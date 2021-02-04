@@ -1,14 +1,14 @@
 from typing import List, Type
 
-from pytezos.michelson.micheline import MichelsonPrimitive
+from pytezos.michelson.micheline import Micheline
 from pytezos.context.execution import ExecutionContext
 
 
-class CodeSection(MichelsonPrimitive, prim='code', args_len=1):
+class CodeSection(Micheline, prim='code', args_len=1):
 
     @staticmethod
     def match(code_expr) -> Type['CodeSection']:
-        cls = MichelsonPrimitive.match(code_expr)
+        cls = Micheline.match(code_expr)
         if not issubclass(cls, CodeSection):
             cls = CodeSection.create_type(args=[cls])
         return cls

@@ -11,8 +11,13 @@ from pytezos.michelson.tags import prim_tags
 class MichelsonError(Exception):
 
     def format_stderr(self):
-        prim, message = self.args[-2:] if len(self.args) > 1 else ('ERROR', ' '.join(self.args))
-        return f'{prim}: {message}'
+        offset, instruction = next((
+            (len(self.args) - i, arg)
+            for i, arg in enumerate(reversed(self.args))
+            if str(arg).isupper()
+        ), (0, 'ERROR'))
+        message = ' '.join(self.args[offset:])
+        return f'{instruction}: {message}'
 
 
 def catch(prim, func):
@@ -64,15 +69,6 @@ def is_micheline(value) -> bool:
     elif isinstance(value, dict):
         primitives = list(prim_tags.keys())
         return any(map(lambda x: x in value, ['prim', 'args', 'annots', *primitives]))
-    else:
-        return False
-
-
-def is_prim_expr(type_expr) -> bool:
-    if isinstance(type_expr, list):
-        return True
-    elif isinstance(type_expr, dict):
-        return isinstance(type_expr.get('prim'), str)
     else:
         return False
 
@@ -164,10 +160,11 @@ def blind_unpack(data: bytes):
     return data
 
 
-class MichelsonPrimitive(metaclass=ErrorTrace):
-    prim: str
-    args: List[Union[Type['MichelsonPrimitive'], Any]] = []
-    classes: Dict[Tuple[str, Optional[int]], Type['MichelsonPrimitive']] = {}
+class Micheline(metaclass=ErrorTrace):
+    prim: Optional[str] = None
+    literal: Optional[Union[int, str, bytes, bool]] = None
+    args: List[Type['Micheline']] = []
+    classes: Dict[Tuple[str, Optional[int]], Type['Micheline']] = {}
 
     @classmethod
     def __init_subclass__(cls, prim: Optional[str] = None, args_len: Optional[int] = 0, **kwargs):
@@ -178,53 +175,66 @@ class MichelsonPrimitive(metaclass=ErrorTrace):
             cls.prim = prim
 
     def __str__(self):
-        assert False, 'has to be explicitly defined'
+        assert False, '__str__ has to be explicitly defined'
 
     def __repr__(self):
-        assert False, 'has to be explicitly defined'
+        assert False, '__repr__ has to be explicitly defined'
 
     @staticmethod
-    def match(expr) -> Type['MichelsonPrimitive']:
+    def match(expr) -> Type['Micheline']:
         if isinstance(expr, list):
-            args = [MichelsonPrimitive.match(arg) for arg in expr]
-            return MichelsonSequence.create_type(args=args)
+            args = [Micheline.match(arg) for arg in expr]
+            return MichelineSequence.create_type(args=args)
+        elif isinstance(expr, dict):
+            if expr.get('prim'):
+                prim, args, annots = parse_micheline_prim(expr)
+                args_len = len(args)
+                if (prim, args_len) not in Micheline.classes:
+                    args_len = None
+                assert (prim, args_len) in Micheline.classes, f'unregistered primitive {prim} ({args_len} args)'
+                cls = Micheline.classes[prim, args_len]
+                try:
+                    return cls.create_type(args=list(map(Micheline.match, args)), annots=annots)
+                except Exception as e:
+                    raise MichelsonError(cls.prim, *e.args)
+            else:
+                literal = parse_micheline_literal(expr, {
+                    'int': int,
+                    'string': str,
+                    'bytes': lambda x: bytes.fromhex(x)
+                })
+                return MichelineLiteral.create(literal=literal)
         else:
-            prim, args, annots = parse_micheline_prim(expr)
-            args_len = len(args)
-            if (prim, args_len) not in MichelsonPrimitive.classes:
-                args_len = None
-            assert (prim, args_len) in MichelsonPrimitive.classes, f'unregistered primitive {prim} ({args_len} args)'
-            cls = MichelsonPrimitive.classes[prim, args_len]
-            try:
-                args = [MichelsonPrimitive.match(arg) if is_prim_expr(arg) else arg for arg in args]
-                return cls.create_type(args=args, annots=annots)
-            except MichelsonError as e:
-                raise MichelsonError(cls.prim, *e.args)
+            raise MichelsonError(f'malformed expression `{expr}`')
 
     @classmethod
     def create_type(cls,
-                    args: List[Union[Type['MichelsonPrimitive'], Any]],
+                    args: List[Union[Type['Micheline'], Any]],
                     annots: Optional[list] = None,
-                    **kwargs) -> Type['MichelsonPrimitive']:
+                    **kwargs) -> Type['Micheline']:
         res = type(cls.__name__, (cls,), dict(args=args, **kwargs))
         return cast(Type['MichelsonPrimitive'], res)
 
     @classmethod
     def as_micheline_expr(cls) -> dict:
-        args = [arg.as_micheline_expr() if isinstance(arg, type) and issubclass(arg, MichelsonPrimitive) else arg
-                for arg in cls.args]
+        args = [arg.as_micheline_expr() for arg in cls.args]
         expr = dict(prim=cls.prim, args=args)
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
     def execute(cls, stack, stdout, context):
-        assert False
+        assert False, f'`execute` has to be explicitly defined'
+
+    @classmethod
+    def cast(cls, ty: type):
+        assert isinstance(cls.literal, ty), f'trying to cast {cls.literal} to {ty.__name__}'
+        return cls.literal
 
 
-class MichelsonSequence(MichelsonPrimitive):
+class MichelineSequence(Micheline):
 
-    def __init__(self, items: List[MichelsonPrimitive]):
-        super(MichelsonSequence, self).__init__()
+    def __init__(self, items: List[Micheline]):
+        super(MichelineSequence, self).__init__()
         self.items = items
 
     @classmethod
@@ -234,3 +244,21 @@ class MichelsonSequence(MichelsonPrimitive):
     @classmethod
     def execute(cls, stack, stdout, context):
         return cls([arg.execute(stack, stdout, context) for arg in cls.args])
+
+
+class MichelineLiteral(Micheline):
+
+    @classmethod
+    def create(cls, literal: Union[int, str, bytes]):
+        return cls.create_type(args=[], annots=[], literal=literal)
+
+    @classmethod
+    def as_micheline_expr(cls) -> dict:
+        if isinstance(cls.literal, int):
+            return {'int': str(cls.literal)}
+        elif isinstance(cls.literal, str):
+            return {'string': cls.literal}
+        elif isinstance(cls.literal, bytes):
+            return {'bytes': cls.literal.hex()}
+        else:
+            assert False, f'unexpected value `{cls.literal}`'

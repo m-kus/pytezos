@@ -1,8 +1,18 @@
 from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
 from pytezos.context.execution import ExecutionContext
-from pytezos.michelson.micheline import MichelsonPrimitive
+from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.stack import MichelsonStack
+
+
+class Wildcard:
+
+    @staticmethod
+    def n(count: int) -> List['Wildcard']:
+        return [Wildcard() for _ in range(count)]
+
+    def __repr__(self):
+        return '*'
 
 
 def format_stdout(prim: str, inputs: list, outputs: list):
@@ -11,26 +21,26 @@ def format_stdout(prim: str, inputs: list, outputs: list):
     return f'{prim} / {pop} => {push}'
 
 
-def dispatch_types(*args: Type[MichelsonPrimitive],
-                   mapping: Dict[Tuple[Type[MichelsonPrimitive], ...], Tuple[Any, ...]]):
+def dispatch_types(*args: Type[Micheline],
+                   mapping: Dict[Tuple[Type[Micheline], ...], Tuple[Any, ...]]):
     key = tuple(arg.prim for arg in args)
     mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}
-    assert key in mapping, f'unexpected arguments {", ".join(map(lambda x: x.__name__, key))}'
+    assert key in mapping, f'unexpected types {", ".join(map(lambda x: x.__name__, key))}'
     return mapping[key]
 
 
-class MichelsonInstruction(MichelsonPrimitive):
+class MichelsonInstruction(Micheline):
     args: List[Union[Type['MichelsonInstruction'], Any]] = []
     field_names: List[str] = []
     var_names: List[str] = []
 
     @staticmethod
     def match(expr) -> Type['MichelsonInstruction']:
-        return cast(Type['MichelsonInstruction'], MichelsonPrimitive.match(expr))
+        return cast(Type['MichelsonInstruction'], Micheline.match(expr))
 
     @classmethod
     def create_type(cls,
-                    args: List[Type['MichelsonPrimitive']],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonInstruction']:
         field_names = [a[1:] for a in annots if a.startswith('%')] if annots else []
@@ -43,9 +53,12 @@ class MichelsonInstruction(MichelsonPrimitive):
 
     @classmethod
     def as_micheline_expr(cls) -> dict:
-        args = [arg.as_micheline_expr() if issubclass(arg, MichelsonPrimitive) else arg
-                for arg in cls.args]
-        annots = [f'%{name}' for name in cls.field_names]
+        annots = []
+        if cls.var_names is not None:
+            annots.extend([f'@{x}' for x in cls.var_names])
+        if cls.field_names is not None:
+            annots.extend([f'%{x}' for x in cls.field_names])
+        args = [arg.as_micheline_expr() for arg in cls.args]
         expr = dict(prim=cls.prim, annots=annots, args=args)
         return {k: v for k, v in expr.items() if v}
 

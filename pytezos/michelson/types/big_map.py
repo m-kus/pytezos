@@ -2,9 +2,9 @@ from copy import copy
 from typing import Generator, Optional, Tuple, List, Union, Type
 
 from pytezos.michelson.types.base import MichelsonType, undefined
-from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.micheline import parse_micheline_literal, Micheline, MichelineLiteral, MichelineSequence
 from pytezos.context.execution import ExecutionContext
-from pytezos.michelson.types.map import MapType
+from pytezos.michelson.types.map import MapType, EltLiteral
 from pytezos.michelson.forge import forge_script_expr
 
 
@@ -52,6 +52,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         for key in self.removed_keys:
             yield key, None
 
+    def __repr__(self):
+        return f'${self.ptr}'
+
     def is_allocated(self) -> bool:
         return self.ptr and self.ptr >= 0
 
@@ -91,6 +94,15 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         else:
             items = super(BigMapType, cls).parse_python_object(py_obj)
             return cls(items=items)
+
+    def to_literal(self) -> Type[Micheline]:
+        if self.ptr is not None:
+            return MichelineLiteral.create(self.ptr)
+        else:
+            return MichelineSequence.create_type(args=[
+                EltLiteral.create_type(args=[k.to_literal(), v.to_literal()])
+                for k, v in self.items
+            ])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if lazy_diff:

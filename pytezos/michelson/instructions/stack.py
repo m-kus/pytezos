@@ -1,8 +1,8 @@
-from typing import List, Any, Type, cast
+from typing import List, Type, cast
 
+from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types import MichelsonType
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout, Wildcard
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.context.execution import ExecutionContext
 
@@ -11,9 +11,9 @@ class PushInstruction(MichelsonInstruction, prim='PUSH', args_len=2):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        res_type, val_expr = cls.args  # type: Type[MichelsonType], Any
+        res_type, literal = cls.args  # type: Type[MichelsonType], Type[Micheline]
         assert res_type.is_pushable(), f'{res_type.prim} contains non-pushable arguments'
-        res = res_type.from_micheline_value(val_expr)
+        res = res_type.from_literal(literal)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -22,13 +22,9 @@ class PushInstruction(MichelsonInstruction, prim='PUSH', args_len=2):
 class DropnInstruction(MichelsonInstruction, prim='DROP', args_len=1):
 
     @classmethod
-    def create_type(cls, args: List[Any], **kwargs) -> Type['DropnInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
-        return cast(Type['DropnInstruction'], res)
-
-    @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        dropped = stack.pop(count=cls.args[0])
+        count = cls.args[0].cast(int)
+        dropped = stack.pop(count=count)
         stdout.append(format_stdout(cls.prim, dropped, []))
         return cls()
 
@@ -45,17 +41,13 @@ class DropInstruction(MichelsonInstruction, prim='DROP'):
 class DupnInstruction(MichelsonInstruction, prim='DUP', args_len=1):
 
     @classmethod
-    def create_type(cls, args: List[Any], **kwargs) -> Type['DupnInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
-        return cast(Type['DupnInstruction'], res)
-
-    @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        stack.protect(count=cls.args[0])
+        depth = cls.args[0].cast(int)
+        stack.protect(count=depth)
         res = stack.peek().duplicate()
-        stack.restore(count=cls.args[0])
+        stack.restore(count=depth)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth), res]))
         return cls()
 
 
@@ -65,7 +57,7 @@ class DupInstruction(MichelsonInstruction, prim='DUP'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         res = stack.peek().duplicate()
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [res], [res, res]))
         return cls()
 
 
@@ -83,34 +75,26 @@ class SwapInstruction(MichelsonInstruction, prim='SWAP'):
 class DigInstruction(MichelsonInstruction, prim='DIG', args_len=1):
 
     @classmethod
-    def create_type(cls, args: List[Any], **kwargs) -> Type['DigInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
-        return cast(Type['DigInstruction'], res)
-
-    @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        stack.protect(count=cls.args[0])
+        depth = cls.args[0].cast(int)
+        stack.protect(count=depth)
         res = stack.pop1()
-        stack.restore(count=cls.args[0])
+        stack.restore(count=depth)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [f'<{cls.args[0]}>', res], [res]))
+        stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth)]))
         return cls()
 
 
 class DugInstruction(MichelsonInstruction, prim='DUG', args_len=1):
 
     @classmethod
-    def create_type(cls, args: List[Any], **kwargs) -> Type['DugInstruction']:
-        res = type(cls.__name__, (cls,), dict(args=[parse_micheline_literal(args[0], {'int': int})], **kwargs))
-        return cast(Type['DugInstruction'], res)
-
-    @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+        depth = cls.args[0].cast(int)
         res = stack.pop1()
-        stack.protect(count=cls.args[0])
+        stack.protect(count=depth)
         stack.push(res)
-        stack.restore(count=cls.args[0])
-        stdout.append(format_stdout(cls.prim, [res], [f'<{cls.args[0]}>', res]))
+        stack.restore(count=depth)
+        stdout.append(format_stdout(cls.prim, [res, *Wildcard.n(depth)], [*Wildcard.n(depth), res]))
         return cls()
 
 

@@ -1,8 +1,8 @@
 from typing import Tuple, Generator, List, Type
-from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.execution import ExecutionContext
+from pytezos.michelson.micheline import Micheline, MichelineSequence
 
 
 class ListType(MichelsonType, prim='list', args_len=1):
@@ -12,7 +12,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         self.items = items
 
     def __repr__(self):
-        return pformat([repr(x) for x in self.items])
+        return f'[{", ".join(map(repr, self.items))}]'
 
     def __len__(self):
         return len(self.items)
@@ -55,6 +55,9 @@ class ListType(MichelsonType, prim='list', args_len=1):
         assert isinstance(py_obj, list), f'expected list, got {type(py_obj).__name__}'
         items = list(map(cls.args[0].from_python_object, py_obj))
         return cls(items)
+
+    def to_literal(self) -> Type[Micheline]:
+        return MichelineSequence.create_type(args=[item.to_literal() for item in self.items])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return list(map(lambda x: x.to_micheline_value(mode=mode, lazy_diff=lazy_diff), self))

@@ -1,7 +1,8 @@
 from typing import List, Union, Tuple, Type, Callable, cast
 
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BoolType, IntType, NatType, TimestampType, MutezType, OptionType, PairType
+from pytezos.michelson.types import BoolType, IntType, NatType, TimestampType, MutezType, OptionType, PairType, \
+    BLS12_381_G1Type, BLS12_381_G2Type, BLS12_381_FrType
 from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
 from pytezos.context.execution import ExecutionContext
 
@@ -22,16 +23,24 @@ class AddInstruction(MichelsonInstruction, prim='ADD'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
-        res_type, = dispatch_types(a, b, mapping={
+        a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType,
+                                BLS12_381_G1Type, BLS12_381_G2Type, BLS12_381_FrType], ...],
+                    stack.pop2())
+        res_type, = dispatch_types(type(a), type(b), mapping={
             (NatType, NatType): (NatType,),
             (NatType, IntType): (IntType,),
             (IntType, NatType): (IntType,),
             (IntType, IntType): (IntType,),
             (TimestampType, IntType): (TimestampType,),
             (IntType, TimestampType): (TimestampType,),
-            (MutezType, MutezType): (MutezType,)
-        })  # type: Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType]]
+            (MutezType, MutezType): (MutezType,),
+            (BLS12_381_G1Type, BLS12_381_G1Type): (BLS12_381_G1Type,),
+            (BLS12_381_G2Type, BLS12_381_G2Type): (BLS12_381_G2Type,),
+            (BLS12_381_FrType, BLS12_381_FrType): (BLS12_381_FrType,)
+        })
+        res_type = cast(Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType],
+                              Type[BLS12_381_G1Type], Type[BLS12_381_G2Type], Type[BLS12_381_FrType]],
+                        res_type)
         res = res_type.from_value(int(a) + int(b))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))
@@ -55,7 +64,7 @@ class EdivInstruction(MichelsonInstruction, prim='EDIV'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
-        q_type, r_type = dispatch_types(a, b, mapping={
+        q_type, r_type = dispatch_types(type(a), type(b), mapping={
             (NatType, NatType): (NatType, NatType),
             (NatType, IntType): (IntType, NatType),
             (IntType, NatType): (IntType, NatType),
@@ -160,12 +169,13 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
         return cls()
 
 
-def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Callable[[int, int], int]):
+def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Callable[[Tuple[int, int]], int]):
     a, b = cast(Tuple[NatType, NatType], stack.pop2())
     a.assert_type_equal(NatType)
     b.assert_type_equal(NatType)
     assert int(b) < 257, f'shift overflow {int(b)}, should not exceed 256'
-    res = NatType.from_value(shift(int(a), int(b)))
+    c = shift((int(a), int(b)))
+    res = NatType.from_value(c)
     stack.push(res)
     stdout.append(format_stdout(prim, [a, b], [res]))
 
@@ -191,7 +201,7 @@ class MulInstruction(MichelsonInstruction, prim='MUL'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType], ...], stack.pop2())
-        res_type, = dispatch_types(a, b, mapping={
+        res_type, = dispatch_types(type(a), type(b), mapping={
             (NatType, NatType): (NatType,),
             (NatType, IntType): (IntType,),
             (IntType, NatType): (IntType,),
@@ -210,7 +220,7 @@ class NegInstruction(MichelsonInstruction, prim='NEG'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(Union[IntType, NatType], stack.pop1())
-        _ = dispatch_types(a, mapping={
+        _ = dispatch_types(type(a), mapping={
             (IntType,): (IntType,),
             (NatType,): (IntType,)
         })
@@ -225,7 +235,7 @@ class SubInstruction(MichelsonInstruction, prim='SUB'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
-        res_type = dispatch_types(a, b, mapping={
+        res_type, = dispatch_types(type(a), type(b), mapping={
             (NatType, NatType): (IntType,),
             (NatType, IntType): (IntType,),
             (IntType, NatType): (IntType,),
@@ -273,7 +283,7 @@ class AndInstruction(MichelsonInstruction, prim='AND'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = cast(Tuple[Union[BoolType, NatType, IntType], ...], stack.pop2())
-        res_type, convert = dispatch_types(a, b, mapping={
+        res_type, convert = dispatch_types(type(a), type(b), mapping={
             (BoolType, BoolType): (BoolType, bool),
             (NatType, NatType): (NatType, int),
             (NatType, IntType): (NatType, int),
@@ -290,7 +300,7 @@ class NotInstruction(MichelsonInstruction, prim='NOT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(Union[IntType, NatType, BoolType], stack.pop1())
-        res_type, convert = dispatch_types(a, mapping={
+        res_type, convert = dispatch_types(type(a), mapping={
             (NatType,): (IntType, lambda x: ~int(x)),
             (IntType,): (IntType, lambda x: ~int(x)),
             (BoolType,): (BoolType, lambda x: not bool(x))

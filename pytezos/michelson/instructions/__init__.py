@@ -19,6 +19,7 @@ from pytezos.michelson.instructions.struct import EmptyMapInstruction, EmptySetI
     GetInstruction, NilInstruction
 from pytezos.michelson.instructions.tezos import AddressInstruction, AmountInstruction, BalanceInstruction, \
     ContractInstruction, SenderInstruction, CreateContractInstruction, ChainIdInstruction, SourceInstruction, \
-    NowInstruction, SelfInstruction, SetDelegateInstruction, ImplicitAccountInstruction, TransferTokensInstruction
+    NowInstruction, SelfInstruction, SetDelegateInstruction, ImplicitAccountInstruction, TransferTokensInstruction, \
+    SelfAddressInstruction
 from pytezos.michelson.instructions.ticket import TicketInstruction, SplitTicketInstruction, ReadTicketInstruction, \
     JoinTicketsInstruction

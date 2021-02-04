@@ -1,9 +1,9 @@
 from typing import Generator, List, Type
 from copy import copy
-from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.execution import ExecutionContext
+from pytezos.michelson.micheline import Micheline, MichelineSequence
 
 
 class SetType(MichelsonType, prim='set', args_len=1):
@@ -13,7 +13,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         self.items = items
 
     def __repr__(self):
-        return pformat({repr(x) for x in self.items})
+        return f'{{{", ".join(map(repr, self.items))}}}'
 
     def __len__(self):
         return len(self.items)
@@ -58,6 +58,9 @@ class SetType(MichelsonType, prim='set', args_len=1):
         items = list(map(cls.args[0].from_python_object, py_obj))
         items = list(sorted(items))
         return cls(items)
+
+    def to_literal(self) -> Type[Micheline]:
+        return MichelineSequence.create_type(args=[item.to_literal() for item in self.items])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return list(map(lambda x: x.to_micheline_value(mode=mode, lazy_diff=lazy_diff), self))

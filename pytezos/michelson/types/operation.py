@@ -1,8 +1,7 @@
 from typing import Type, Optional
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import MichelsonSequence
-from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import MichelineSequence, Micheline
 
 
 class OperationType(MichelsonType, prim='operation'):
@@ -37,7 +36,7 @@ class OperationType(MichelsonType, prim='operation'):
     @classmethod
     def origination(cls,
                     source: str,
-                    script: Type[MichelsonSequence],
+                    script: Type[MichelineSequence],
                     storage: Optional[MichelsonType] = None,
                     balance: int = 0,
                     delegate: Optional[str] = None) -> 'OperationType':
@@ -87,6 +86,9 @@ class OperationType(MichelsonType, prim='operation'):
         assert isinstance(py_obj, dict)
         assert 'kind' in py_obj
         return cls(content=py_obj)
+
+    def to_literal(self) -> Type[Micheline]:
+        assert False, 'forbidden'
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         assert False, 'forbidden'

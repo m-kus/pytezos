@@ -1,9 +1,12 @@
 from typing import Optional, Tuple, Generator, List, Type
-from pprint import pformat
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.micheline import parse_micheline_value, Micheline, MichelineSequence
 from pytezos.context.execution import ExecutionContext
+
+
+class EltLiteral(Micheline, prim='Elt', args_len=2):
+    pass
 
 
 class MapType(MichelsonType, prim='map', args_len=2):
@@ -13,7 +16,8 @@ class MapType(MichelsonType, prim='map', args_len=2):
         self.items = items
 
     def __repr__(self):
-        return pformat({repr(k): repr(v) for k, v in self.items})
+        elements = [f'{repr(k)}: {repr(v)}' for k, v in self.items]
+        return f'{{{", ".join(elements)}}}'
 
     def __len__(self):
         return len(self.items)
@@ -83,6 +87,12 @@ class MapType(MichelsonType, prim='map', args_len=2):
     @classmethod
     def from_python_object(cls, py_obj) -> 'MapType':
         return cls(cls.parse_python_object(py_obj))
+
+    def to_literal(self) -> Type[Micheline]:
+        return MichelineSequence.create_type(args=[
+            EltLiteral.create_type(args=[k.to_literal(), v.to_literal()])
+            for k, v in self.items
+        ])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return [

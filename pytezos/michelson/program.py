@@ -1,7 +1,7 @@
 from typing import Type, List, Tuple, cast
 
 from pytezos.michelson.sections.parameter import ParameterSection
-from pytezos.michelson.micheline import MichelsonSequence, try_catch
+from pytezos.michelson.micheline import MichelineSequence, try_catch
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.context.execution import ExecutionContext
@@ -28,7 +28,7 @@ class MichelsonProgram:
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
-    def create(sequence: Type[MichelsonSequence]) -> Type['MichelsonProgram']:
+    def create(sequence: Type[MichelineSequence]) -> Type['MichelsonProgram']:
         assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
         assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
         parameter = next(arg for arg in sequence.args if issubclass(arg, ParameterSection))
@@ -39,8 +39,8 @@ class MichelsonProgram:
 
     @staticmethod
     def match(expr) -> Type['MichelsonProgram']:
-        seq = cast(Type[MichelsonSequence], MichelsonSequence.match(expr))
-        assert issubclass(seq, MichelsonSequence), f'expected sequence, got {seq.prim}'
+        seq = cast(Type[MichelineSequence], MichelineSequence.match(expr))
+        assert issubclass(seq, MichelineSequence), f'expected sequence, got {seq.prim}'
         return MichelsonProgram.create(seq)
 
     @classmethod

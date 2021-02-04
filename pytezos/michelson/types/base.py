@@ -2,7 +2,7 @@ from copy import copy, deepcopy
 from typing import Tuple, List, Optional, Type, cast, Union, Any
 
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
-from pytezos.michelson.micheline import MichelsonPrimitive
+from pytezos.michelson.micheline import Micheline
 from pytezos.context.execution import ExecutionContext
 
 type_mappings = {
@@ -42,7 +42,7 @@ def parse_name(annots: List[str], prefix: str) -> Optional[str]:
     return sub_annots[0] if sub_annots else None
 
 
-class MichelsonType(MichelsonPrimitive):
+class MichelsonType(Micheline):
     field_name: Optional[str] = None
     type_name: Optional[str] = None
     args: List[Union[Type['MichelsonType'], Any]] = []
@@ -58,11 +58,11 @@ class MichelsonType(MichelsonPrimitive):
 
     @staticmethod
     def match(expr) -> Type['MichelsonType']:
-        return cast(Type['MichelsonType'], MichelsonPrimitive.match(expr))
+        return cast(Type['MichelsonType'], Micheline.match(expr))
 
     @classmethod
     def create_type(cls,
-                    args: List[Union[Type['MichelsonPrimitive'], Any]],
+                    args: List[Union[Type['Micheline'], Any]],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonType']:
         type_args = [arg for arg in args if issubclass(arg, MichelsonType)]
@@ -82,15 +82,15 @@ class MichelsonType(MichelsonPrimitive):
     @classmethod
     def assert_type_equal(cls, other: Type['MichelsonType'], path='', message=''):
         comment = f' [{message}]' if message else ''
-        assert cls.prim == other.prim, f'expected {other.prim}, got {cls.prim} at `{path}{comment}`'
+        assert cls.prim == other.prim, f'expected {other.prim}, got {cls.prim} at `{path}`{comment}'
         if cls.type_name and other.type_name:
             assert cls.type_name == other.type_name, \
-                f'expected "{other.type_name}", got "{cls.type_name}" at `{path}{comment}`'
+                f'expected "{other.type_name}", got "{cls.type_name}" at `{path}`{comment}'
         if cls.field_name and other.field_name:
             assert cls.field_name == other.field_name,  \
-                f'expected "{other.field_name}", got "{cls.field_name}" at `{path}{comment}`'
+                f'expected "{other.field_name}", got "{cls.field_name}" at `{path}`{comment}'
         assert len(cls.args) == len(other.args), \
-            f'expected {len(other.args)} args, got {len(cls.args)} at `{path}{comment}`'
+            f'expected {len(other.args)} args, got {len(cls.args)} at `{path}`{comment}'
         for i, arg in enumerate(other.args):
             cls.args[i].assert_type_equal(arg, path=f'{path}/{i}', message=message)
 
@@ -111,8 +111,7 @@ class MichelsonType(MichelsonPrimitive):
             annots.append(f':{cls.type_name}')
         if cls.field_name is not None:
             annots.append(f'%{cls.field_name}')
-        args = [arg.as_micheline_expr() if issubclass(arg, MichelsonPrimitive) else arg
-                for arg in cls.args]
+        args = [arg.as_micheline_expr() for arg in cls.args]
         expr = dict(prim=cls.prim, annots=annots, args=args)
         return {k: v for k, v in expr.items() if v}
 
@@ -175,6 +174,11 @@ class MichelsonType(MichelsonPrimitive):
         return cls.from_micheline_value(val_expr)
 
     @classmethod
+    def from_literal(cls, literal: Type[Micheline]) -> 'MichelsonType':
+        expr = literal.as_micheline_expr()
+        return cls.from_micheline_value(expr)
+
+    @classmethod
     def dummy(cls, context: ExecutionContext):
         raise NotImplementedError
 
@@ -190,6 +194,9 @@ class MichelsonType(MichelsonPrimitive):
         raise NotImplementedError
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
+        raise NotImplementedError
+
+    def to_literal(self) -> Type[Micheline]:
         raise NotImplementedError
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):  # NOTE: mutation

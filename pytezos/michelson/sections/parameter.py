@@ -1,15 +1,15 @@
 from typing import List, Type, cast, Dict, Any
 
 from pytezos.michelson.types import *
-from pytezos.michelson.micheline import MichelsonPrimitive
+from pytezos.michelson.micheline import Micheline
 from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.types.adt import ADT
 
 
-class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
+class ParameterSection(Micheline, prim='parameter', args_len=1):
 
     def __init__(self, item: MichelsonType):
-        super(MichelsonPrimitive, self).__init__()
+        super(Micheline, self).__init__()
         self.item = item
 
     def __repr__(self):
@@ -17,7 +17,7 @@ class ParameterSection(MichelsonPrimitive, prim='parameter', args_len=1):
 
     @staticmethod
     def match(type_expr) -> Type['ParameterSection']:
-        cls = MichelsonPrimitive.match(type_expr)
+        cls = Micheline.match(type_expr)
         if not issubclass(cls, ParameterSection):
             cls = ParameterSection.create_type(args=[cls])
         return cls

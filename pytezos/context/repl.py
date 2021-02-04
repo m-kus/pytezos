@@ -10,7 +10,8 @@ from pytezos.michelson.micheline import get_script_section
 
 class REPLContext(ExecutionContext):
 
-    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None):
+    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
+                 voting_power=None, total_voting_power=None, block_id=None):
         self.origination_index = 1
         self.tmp_big_map_index = 1
         self.alloc_big_map_index = 0
@@ -18,7 +19,10 @@ class REPLContext(ExecutionContext):
         self.big_maps = dict()
         self.balance = balance or 0
         self.amount = amount or 0
+        self.voting_power = voting_power or 0
+        self.total_voting_power = total_voting_power or 0
         self.now = 0
+        self.level = 0
         self.sender = sender or self.get_dummy_key_hash()
         self.source = source or self.get_dummy_key_hash()
         self.chain_id = chain_id or self.get_dummy_chain_id()
@@ -136,6 +140,14 @@ class REPLContext(ExecutionContext):
         else:
             return self.now
 
+    def get_level(self) -> int:
+        if self.network:
+            ctx = AccountContext(shell=self.network)
+            header = ctx.shell.blocks[self.block_id].header()
+            return int(header['level'])
+        else:
+            return self.level
+
     def get_balance(self) -> int:
         if self.network:
             ctx = AccountContext(shell=self.network)
@@ -144,6 +156,18 @@ class REPLContext(ExecutionContext):
         else:
             balance = self.balance
         return balance + self.balance_update
+
+    def get_voting_power(self, address: str) -> int:
+        if self.network:
+            raise NotImplementedError
+        else:
+            return self.voting_power
+
+    def get_total_voting_power(self) -> int:
+        if self.network:
+            raise NotImplementedError
+        else:
+            return self.total_voting_power
 
     def get_chain_id(self) -> str:
         if self.network:

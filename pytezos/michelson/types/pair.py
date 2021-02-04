@@ -1,10 +1,13 @@
 from typing import Generator, Tuple, List, Union, Type, Optional, cast, Any
-from pprint import pformat
 
-from pytezos.michelson.micheline import MichelsonPrimitive
+from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.execution import ExecutionContext
 from pytezos.michelson.types.adt import ADT
+
+
+class PairLiteral(Micheline, prim='Pair', args_len=None):
+    pass
 
 
 class PairType(MichelsonType, prim='pair', args_len=None):
@@ -20,7 +23,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return hash(self.items)
 
     def __repr__(self):
-        return f'({", ".join(map(repr, self.items))})'
+        return f'({" * ".join(map(repr, self.items))})'
 
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
@@ -41,7 +44,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
 
     @classmethod
     def create_type(cls,
-                    args: List[Union[Type['MichelsonPrimitive'], Any]],
+                    args: List[Union[Type['Micheline'], Any]],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['PairType']:
         if len(args) > 2:  # comb
@@ -138,6 +141,9 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         leaves = [item for i, item in enumerate(self.iter_comb_leaves()) if 2 * i + 1 < idx]
         leaves.extend(sub_comb.iter_comb_leaves())
         return type(self).from_comb_leaves(leaves)
+
+    def to_literal(self) -> Type[Micheline]:
+        return PairLiteral.create_type(args=[item.to_literal() for item in self.items])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self]

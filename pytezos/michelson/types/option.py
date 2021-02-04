@@ -1,8 +1,16 @@
 from typing import List, Optional, Type
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.micheline import parse_micheline_value, Micheline
 from pytezos.context.execution import ExecutionContext
+
+
+class NoneLiteral(Micheline, prim='None'):
+    pass
+
+
+class SomeLiteral(Micheline, prim='Some', args_len=1):
+    pass
 
 
 class OptionType(MichelsonType, prim='option', args_len=1):
@@ -70,6 +78,12 @@ class OptionType(MichelsonType, prim='option', args_len=1):
     def get_some(self) -> MichelsonType:
         assert not self.is_none()
         return self.item
+
+    def to_literal(self) -> Type[Micheline]:
+        if self.is_none():
+            return NoneLiteral
+        else:
+            return SomeLiteral.create_type(args=[self.item.to_literal()])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if self.is_none():

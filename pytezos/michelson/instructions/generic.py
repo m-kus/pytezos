@@ -12,15 +12,8 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a = cast(Union[StringType, BytesType, ListType], stack.pop1())
-        if type(a) in [StringType, BytesType]:
-            b = cast(Union[StringType, BytesType], stack.pop1())
-            res_type, convert = dispatch_types(a, b, mapping={
-                (StringType, StringType): (StringType, str),
-                (BytesType, BytesType): (BytesType, bytes)
-            })
-            res = res_type.from_value(convert(a) + convert(b))
-            stdout.append(format_stdout(cls.prim, [a, b], [res]))
-        else:
+        a.assert_type_in(StringType, BytesType, ListType)
+        if isinstance(a, ListType):
             a.assert_type_in(ListType)
             res_type, convert, delim = dispatch_types(a.args[0], mapping={
                 (StringType,): (StringType, str, ''),
@@ -28,6 +21,14 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
             })
             res = res_type.from_value(delim.join(map(convert, a)))
             stdout.append(format_stdout(cls.prim, [a], [res]))
+        else:
+            b = cast(Union[StringType, BytesType], stack.pop1())
+            res_type, convert = dispatch_types(type(a), type(b), mapping={
+                (StringType, StringType): (StringType, str),
+                (BytesType, BytesType): (BytesType, bytes)
+            })
+            res = res_type.from_value(convert(a) + convert(b))
+            stdout.append(format_stdout(cls.prim, [a, b], [res]))
         stack.push(res)
         return cls()
 

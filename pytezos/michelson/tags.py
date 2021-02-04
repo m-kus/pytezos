@@ -139,5 +139,6 @@ prim_tags = {
     'TICKET': b'\x88',
     'READ_TICKET': b'\x89',
     'SPLIT_TICKET': b'\x8A',
-    'JOIN_TICKETS': b'\x8B'
+    'JOIN_TICKETS': b'\x8B',
+    'GET_AND_UPDATE': b'\x8C'
 }

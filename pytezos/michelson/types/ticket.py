@@ -2,8 +2,9 @@ from typing import List, Type, Optional, Tuple, cast
 from copy import copy
 from pprint import pformat
 
+from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.pair import PairType
+from pytezos.michelson.types.pair import PairType, PairLiteral
 from pytezos.michelson.types.domain import NatType, AddressType
 from pytezos.context.execution import ExecutionContext
 
@@ -80,6 +81,9 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     def to_comb(self) -> PairType:
         return self.type_impl.init(items=[AddressType(self.ticketer), self.item, NatType(self.amount)])
+
+    def to_literal(self) -> Type[Micheline]:
+        return self.to_comb().to_literal()
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return self.to_comb().to_micheline_value(mode=mode)
