@@ -70,8 +70,8 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return type(self)(items)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        for item in self:
-            item.aggregate_lazy_diff(lazy_diff, mode=mode)
+        items = [item.aggregate_lazy_diff(lazy_diff, mode=mode) for item in self]
+        return type(self)(items)
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for item in self:

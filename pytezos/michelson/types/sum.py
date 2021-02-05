@@ -67,7 +67,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
             (name, arg.generate_pydoc(definitions, inferred_name=name))
             for name, arg in flat_args.items()
         ]
-        doc = ' ||\n\t'.join(f'{{ "{entry_point}": {arg_doc} }}' for entry_point, arg_doc in variants)
+        doc = ' ||\n\t'.join(f'{{ "{entrypoint}": {arg_doc} }}' for entrypoint, arg_doc in variants)
         definitions.insert(0, (name, doc))
         return f'${name}'
 
@@ -121,13 +121,12 @@ class OrType(MichelsonType, prim='or', args_len=2):
         }
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'OrType':
-        value = tuple(item.merge_lazy_diff(lazy_diff) if item else None for item in self)
-        return type(self)(value)
+        items = tuple(None if item is None else item.merge_lazy_diff(lazy_diff) for item in self)
+        return type(self)(items)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        for item in self:
-            if item is not None:
-                item.aggregate_lazy_diff(lazy_diff, mode=mode)
+        items = tuple(None if item is None else item.aggregate_lazy_diff(lazy_diff, mode=mode) for item in self)
+        return type(self)(items)
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for item in self:

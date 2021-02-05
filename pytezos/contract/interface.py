@@ -91,7 +91,7 @@ class ContractInterface(Interop):
         :returns: object
         """
 
-        storage_expr = self.shell.blocks[block_id].context.contracts[self.address].storage()
+        storage_expr = self.shell.blocks[block_id].context.contracts[self.address].context()
         storage = self.script.storage.type.from_micheline_value(storage_expr)
         storage.attach_context(RPCNodeContext(shell=self.shell, block_id=block_id))
 
@@ -111,7 +111,7 @@ class ContractInterface(Interop):
         :param block_id: Block height / hash / offset to use, default is `head`
         :returns: object
         """
-        storage = self.shell.blocks[block_id].context.contracts[self.address].storage()
+        storage = self.shell.blocks[block_id].context.contracts[self.address].context()
         return self.script.storage.decode(storage)
 
     def operation_result(self, operation_group: dict) -> List[ContractCallResult]:

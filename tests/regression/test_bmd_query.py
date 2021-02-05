@@ -134,8 +134,8 @@ class TestBmdQuery(TestCase):
 
     def test_bmd_path(self):
         ci = ContractInterface.create_from(code)
-        ci.script.storage.big_map_init(michelson_to_micheline(storage))
-        query = ci.script.storage.big_map_query('big_map_0/tz1bHzftcTKZMTZgLLtnrXydCm6UEqf4ivca')
+        ci.script.context.big_map_init(michelson_to_micheline(storage))
+        query = ci.script.context.big_map_query('big_map_0/tz1bHzftcTKZMTZgLLtnrXydCm6UEqf4ivca')
         self.assertEqual(
             {'big_map_id': 17, 'script_expr': 'expruGu4fvT7wyJYm2Rdz7jssqBZyoSmi3kub6Us3guARnzR9HBQCe'}, query)
 

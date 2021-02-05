@@ -33,5 +33,5 @@ class CounterContractTest(TestCase):
 
     def test_increment(self):
         res = self.ci.call('deadbeef').result(storage=[{}, 0])
-        self.assertEqual(1, res.storage[1])
+        self.assertEqual(1, res.context[1])
         self.assertIn('deadbeef', res.big_map_diff)

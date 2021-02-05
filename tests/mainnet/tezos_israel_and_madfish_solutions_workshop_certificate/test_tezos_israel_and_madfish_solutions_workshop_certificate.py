@@ -35,7 +35,7 @@ class MainnetContractTestCaseTEZOS_ISRAEL_AND_MADFISH_SOLUTIONS_WORKSHOP_CERTIFI
             'micheline -> type -> micheline')
 
     def test_entrypoints_tezos_israel_and_madfish_solutions_workshop_certificate(self):
-        ep_types = self.program.parameter.list_entry_points()
+        ep_types = self.program.parameter.list_entrypoints()
         self.assertEqual(len(self.entrypoints['entrypoints']) + 1, len(ep_types))
         for name, ep_type in ep_types.items():
             if name not in ['default', 'root']:

@@ -45,7 +45,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return cls(items)
 
     @staticmethod
-    def from_comb_leaves(items: List[MichelsonType]) -> 'PairType':
+    def from_comb(items: List[MichelsonType]) -> 'PairType':
         cls = PairType.create_type(args=[type(item) for item in items])
         return cls.init(items)
 
@@ -117,58 +117,47 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             struct = ADT.from_nested_type(cls)
             return cls.from_python_object(struct.normalize_python_object(py_obj))
 
-    def iter_comb_leaves(self) -> Generator[MichelsonType, None, None]:
+    def iter_comb(self, include_nodes=False) -> Generator[MichelsonType, None, None]:
+        if include_nodes:
+            yield self
         for i, item in enumerate(self):
             if i == 1 and isinstance(item, PairType) and item.field_name is None and item.type_name is None:
-                yield from item.iter_comb_leaves()
+                yield from item.iter_comb(include_nodes=include_nodes)
             else:
                 yield item
 
-    def iter_sub_combs(self) -> Generator['PairType', None, None]:
-        yield self
-        right = self.items[1]
-        if isinstance(right, PairType) and right.field_name is None and right.type_name is None:
-            yield from right.iter_sub_combs()
+    def access_comb(self, idx: int) -> MichelsonType:
+        return next(item for i, item in enumerate(self.iter_comb(include_nodes=True)) if i == idx)
 
-    def get_comb_leaf(self, idx: int) -> MichelsonType:
-        assert idx % 2 == 1, f'expected odd index'
-        return next(item for i, item in enumerate(self.iter_comb_leaves()) if 2 * i + 1 == idx)
-
-    def get_sub_comb(self, idx: int) -> 'PairType':
-        assert idx % 2 == 0, f'expected even index'
-        return next(item for i, item in enumerate(self.iter_sub_combs()) if 2 * i == idx)
-
-    def update_comb_leaf(self, idx: int, leaf: MichelsonType) -> 'PairType':
-        assert idx % 2 == 1, f'expected odd index'
-        leaves = [leaf if 2 * i + 1 == idx else item for i, item in enumerate(self.iter_comb_leaves())]
-        return type(self).from_comb_leaves(leaves)
-
-    def update_sub_comb(self, idx: int, sub_comb: 'PairType') -> 'PairType':
-        assert idx % 2 == 0, f'expected even index'
-        leaves = [item for i, item in enumerate(self.iter_comb_leaves()) if 2 * i + 1 < idx]
-        leaves.extend(sub_comb.iter_comb_leaves())
-        return type(self).from_comb_leaves(leaves)
+    def update_comb(self, idx: int, element: MichelsonType) -> 'PairType':
+        if idx % 2 == 1:
+            leaves = [element if 2 * i + 1 == idx else item for i, item in enumerate(self.iter_comb())]
+        else:
+            leaves = [item for i, item in enumerate(self.iter_comb()) if 2 * i + 1 < idx]
+            if isinstance(element, PairType):
+                leaves.extend(element.iter_comb())
+            else:
+                leaves.append(element)
+        return type(self).from_comb(leaves)
 
     def to_literal(self) -> Type[Micheline]:
         return PairLiteral.create_type(args=[item.to_literal() for item in self.items])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self]
-        return {'prim': 'Pair', 'args': args}
-        # args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self.iter_comb()]
-        # if mode == 'readable':
-        #     return {'prim': 'Pair', 'args': args}
-        # elif mode == 'optimized':
-        #     if len(args) == 2:
-        #         return {'prim': 'Pair', 'args': args}
-        #     elif len(args) == 3:
-        #         return {'prim': 'Pair', 'args': [args[0], {'prim': 'Pair', 'args': args[1:]}]}
-        #     elif len(args) >= 4:
-        #         return args
-        #     else:
-        #         assert False, f'unexpected args len {len(args)}'
-        # else:
-        #     assert False, f'unsupported mode {mode}'
+        args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self.iter_comb()]
+        if mode == 'readable':
+            return {'prim': 'Pair', 'args': args}
+        elif mode == 'optimized':
+            if len(args) == 2:
+                return {'prim': 'Pair', 'args': args}
+            elif len(args) == 3:
+                return {'prim': 'Pair', 'args': [args[0], {'prim': 'Pair', 'args': args[1:]}]}
+            elif len(args) >= 4:
+                return args
+            else:
+                assert False, f'unexpected args len {len(args)}'
+        else:
+            assert False, f'unsupported mode {mode}'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False) -> Union[dict, tuple]:
         struct = ADT.from_nested_type(type(self))
@@ -185,12 +174,12 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             )
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'PairType':
-        value = tuple(item.merge_lazy_diff(lazy_diff) for item in self)
-        return type(self)(value)
+        items = tuple(item.merge_lazy_diff(lazy_diff) for item in self)
+        return type(self)(items)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        for item in self:
-            item.aggregate_lazy_diff(lazy_diff, mode=mode)
+        items = tuple(item.aggregate_lazy_diff(lazy_diff, mode=mode) for item in self)
+        return type(self)(items)
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for item in self:

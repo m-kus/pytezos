@@ -23,9 +23,9 @@ class DropnInstruction(MichelsonInstruction, prim='DROP', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        count = cls.args[0].cast(int)
+        count = cls.args[0].get_int()
         dropped = stack.pop(count=count)
-        stdout.append(format_stdout(cls.prim, dropped, []))
+        stdout.append(format_stdout(cls.prim, dropped, [], count))
         return cls()
 
 
@@ -42,12 +42,12 @@ class DupnInstruction(MichelsonInstruction, prim='DUP', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        depth = cls.args[0].cast(int) - 1
+        depth = cls.args[0].get_int() - 1
         stack.protect(count=depth)
         res = stack.peek().duplicate()
         stack.restore(count=depth)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth), res]))
+        stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth), res], depth))
         return cls()
 
 
@@ -76,12 +76,12 @@ class DigInstruction(MichelsonInstruction, prim='DIG', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        depth = cls.args[0].cast(int)
+        depth = cls.args[0].get_int()
         stack.protect(count=depth)
         res = stack.pop1()
         stack.restore(count=depth)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth)]))
+        stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth)], depth))
         return cls()
 
 
@@ -89,12 +89,12 @@ class DugInstruction(MichelsonInstruction, prim='DUG', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        depth = cls.args[0].cast(int)
+        depth = cls.args[0].get_int()
         res = stack.pop1()
         stack.protect(count=depth)
         stack.push(res)
         stack.restore(count=depth)
-        stdout.append(format_stdout(cls.prim, [res, *Wildcard.n(depth)], [*Wildcard.n(depth), res]))
+        stdout.append(format_stdout(cls.prim, [res, *Wildcard.n(depth)], [*Wildcard.n(depth), res], depth))
         return cls()
 
 

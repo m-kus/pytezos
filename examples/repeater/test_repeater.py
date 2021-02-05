@@ -19,4 +19,4 @@ class RepeaterContractTest(TestCase):
 
     def test_increment(self):
         result = self.ci.call(3).result(storage=0)
-        self.assertEqual(3, result.storage)
+        self.assertEqual(3, result.context)

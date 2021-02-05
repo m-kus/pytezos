@@ -109,15 +109,12 @@ class OptionType(MichelsonType, prim='option', args_len=1):
             return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        if self.is_none():
-            item = None
-        else:
-            item = self.item.merge_lazy_diff(lazy_diff)
+        item = None if self.is_none() else self.item.merge_lazy_diff(lazy_diff)
         return type(self)(item)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        if not self.is_none():
-            self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'MichelsonType':
+        item = None if self.is_none() else self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
+        return type(self)(item)
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
         if not self.is_none():

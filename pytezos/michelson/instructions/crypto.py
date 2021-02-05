@@ -99,11 +99,11 @@ class SaplingEmptyStateInstruction(MichelsonInstruction, prim='SAPLING_EMPTY_STA
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        memo_size = cls.args[0].cast(int)
+        memo_size = cls.args[0].get_int()
         res = SaplingStateType.empty(memo_size)
         res.attach_context(context)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res], memo_size))
         return cls()
 
 

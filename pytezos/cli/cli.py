@@ -49,9 +49,9 @@ class PyTezosCli:
         """
         contract = get_contract(path)
         if action == 'schema':
-            print(generate_docstring(contract.storage.schema, title='storage'))
+            print(generate_docstring(contract.context.schema, title='storage'))
         elif action == 'default':
-            pprint(contract.storage.default())
+            pprint(contract.context.default())
         else:
             assert False, action
 
@@ -118,7 +118,7 @@ class PyTezosCli:
 
         contract = get_contract(path)
         if storage is not None:
-            storage = contract.storage.encode(storage)
+            storage = contract.context.encode(storage)
 
         try:
             opg = ptz.origination(script=contract.script(storage=storage)).autofill().sign()

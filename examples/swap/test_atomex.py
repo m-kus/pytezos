@@ -41,8 +41,8 @@ class AtomexContractTest(TestCase):
             }
         }
         self.assertDictEqual(big_map_diff, res.big_map_diff)
-        self.assertIsInstance(res.storage[0], int)
-        self.assertIsNone(res.storage[1])
+        self.assertIsInstance(res.context[0], int)
+        self.assertIsNone(res.context[1])
         self.assertEqual([], res.operations)
 
     def test_initiate_proxy(self):
@@ -68,8 +68,8 @@ class AtomexContractTest(TestCase):
             }
         }
         self.assertDictEqual(big_map_diff, res.big_map_diff)
-        self.assertIsInstance(res.storage[0], int)
-        self.assertIsNone(res.storage[1])
+        self.assertIsInstance(res.context[0], int)
+        self.assertIsNone(res.context[1])
         self.assertEqual([], res.operations)
 
     def test_initiate_same_secret(self):

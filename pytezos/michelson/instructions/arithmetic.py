@@ -80,7 +80,7 @@ class EdivInstruction(MichelsonInstruction, prim='EDIV'):
                 r += abs(int(b))
                 q += 1
             items = [q_type.from_value(q), r_type.from_value(r)]
-            res = OptionType.from_some(PairType.from_comb_leaves(items))
+            res = OptionType.from_some(PairType.from_comb(items))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))
         return cls()

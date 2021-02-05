@@ -5,8 +5,7 @@ from pytezos.michelson.parse import MichelsonParser
 from pytezos.context.repl import REPLContext
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.types import OperationType
-from pytezos.michelson.sections.storage import StorageSection
+from pytezos.michelson.types import OperationType, MichelsonType
 
 
 # def format_diff(diff: dict):
@@ -102,7 +101,7 @@ class Interpreter:
     @staticmethod
     def run_code(parameter, storage, script, entrypoint='default',
                  amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None) \
-            -> Tuple[List[OperationType], Optional[StorageSection], List[str], Optional[Exception]]:
+            -> Tuple[List[OperationType], Optional[MichelsonType], List[dict], List[str], Optional[Exception]]:
         stack = MichelsonStack()
         stdout = []
         context = REPLContext(
@@ -124,13 +123,13 @@ class Interpreter:
                 parameter=parameter,
                 storage=storage
             )
-            res.begin(stack, stdout)
+            res.begin(stack, stdout, context)
             res.execute(stack, stdout, context)
-            operations, storage = res.end(stack, stdout)
-            return operations, storage, stdout, None
+            operations, storage, lazy_diff = res.end(stack, stdout)
+            return operations, storage, lazy_diff, stdout, None
         except MichelsonError as e:
             stdout.append(e.format_stderr())
-            return [], None, stdout, e
+            return [], None, [], stdout, e
 
     #
     # def execute(self, code):

@@ -29,17 +29,17 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         stdout.append(f'parameter: updated')
 
     @classmethod
-    def list_entry_points(cls) -> Dict[str, Type[MichelsonType]]:
-        entry_points = dict()
+    def list_entrypoints(cls) -> Dict[str, Type[MichelsonType]]:
+        entrypoints = dict()
         if cls.args[0].prim == 'or':
             flat_args = ADT.get_flat_args(cls.args[0], force_recurse=True, fields_only=True)
             if isinstance(flat_args, dict):
                 for name, arg in flat_args.items():
-                    entry_points[name] = arg.get_anon_type()
-        root_name = 'root' if 'default' in entry_points else 'default'
-        assert root_name not in entry_points
-        entry_points[root_name] = cls.args[0]
-        return entry_points
+                    entrypoints[name] = arg.get_anon_type()
+        root_name = 'root' if 'default' in entrypoints else 'default'
+        assert root_name not in entrypoints
+        entrypoints[root_name] = cls.args[0]
+        return entrypoints
 
     @classmethod
     def from_parameters(cls, parameters: Dict[str, Any]) -> 'ParameterSection':
@@ -47,19 +47,19 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             parameters = {'entrypoint': 'default', 'value': {'prim': 'Unit'}}
         assert isinstance(parameters, dict) and parameters.keys() == {'entrypoint', 'value'}, \
             f'expected {{entrypoint, value}}, got {parameters}'
-        entry_point = parameters['entrypoint']
+        entrypoint = parameters['entrypoint']
         if cls.args[0].prim == 'or':
             struct = ADT.from_nested_type(cls.args[0], force_recurse=True)
-            if struct.has_path(entry_point):
-                val_expr = struct.normalize_micheline_value(entry_point, parameters['value'])
+            if struct.has_path(entrypoint):
+                val_expr = struct.normalize_micheline_value(entrypoint, parameters['value'])
                 item = cls.args[0].from_micheline_value(val_expr)
                 return cls(item)
-        assert entry_point in ['default', 'root'], f'unexpected entrypoint {entry_point}'
+        assert entrypoint in ['default', 'root'], f'unexpected entrypoint {entrypoint}'
         res = cls.from_micheline_value(parameters['value'])
         return cast(ParameterSection, res)
 
     def to_parameters(self, mode='readable') -> Dict[str, Any]:
-        entry_point, item = 'default', self.item
+        entrypoint, item = 'default', self.item
         if isinstance(self.item, OrType):
             struct = ADT.from_nested_type(self.args[0], force_recurse=True)
             if struct.is_named():
@@ -68,8 +68,8 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
                                                      allow_nones=True,
                                                      fields_only=True)
                 assert isinstance(flat_values, dict) and len(flat_values) == 1
-                entry_point, item = next(iter(flat_values.items()))
-        return {'entrypoint': entry_point,
+                entrypoint, item = next(iter(flat_values.items()))
+        return {'entrypoint': entrypoint,
                 'value': item.to_micheline_value(mode=mode)}
 
     @classmethod

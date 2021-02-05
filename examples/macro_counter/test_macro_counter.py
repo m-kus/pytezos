@@ -33,7 +33,7 @@ class CounterContractTest(TestCase):
         result = self.contract.increaseCounterBy(increase_value).result(storage=0)
 
         # Then
-        self.assertEqual(result.storage, 5)
+        self.assertEqual(result.context, 5)
 
     def test_decreaseCounterBy_should_decrease_counter_in_storage_by_decrease_value(self):
         # Given
@@ -43,4 +43,4 @@ class CounterContractTest(TestCase):
         result = self.contract.decreaseCounterBy(decrease_value).result(storage=0)
 
         # Then
-        self.assertEqual(result.storage, -5)
+        self.assertEqual(result.context, -5)

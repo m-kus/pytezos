@@ -51,7 +51,7 @@ class TestMac(TestCase):
             storage=initial_storage,
             source=pytezos.key.public_key_hash(),
             sender=pytezos.key.public_key_hash())
-        self.assertTrue(res.storage['admin']['paused'])
+        self.assertTrue(res.context['admin']['paused'])
 
     def test_is_operator_callback(self):
         res = self.mac.is_operator(callback='KT1V4jijVy1HfVWde6HBVD1cCygZDtFJK4Xz',  # does not matter

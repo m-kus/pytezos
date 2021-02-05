@@ -17,7 +17,7 @@ def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],
     stack.protect(count=count)
     item = body.execute(stack, stdout, context=context)
     stack.restore(count=count)
-    stdout.append(format_stdout(prim, [], [*Wildcard.n(count)]))
+    stdout.append(format_stdout(prim, [], [*Wildcard.n(count)], count))
     return item
 
 
@@ -29,7 +29,7 @@ class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        depth = cls.args[0].cast(int)
+        depth = cls.args[0].get_int()
         item = execute_dip(cls.prim, stack, stdout, count=depth, body=cls.args[1], context=context)
         return cls(item)
 
@@ -245,7 +245,7 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
-                elt = PairType.from_comb_leaves(list(elt))
+                elt = PairType.from_comb(list(elt))
             stack.push(elt)
             stdout.append(format_stdout(cls.prim, popped, [elt]))
             execution = cls.args[0].execute(stack, stdout, context=context)
@@ -279,7 +279,7 @@ class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
-                elt = PairType.from_comb_leaves(list(elt))
+                elt = PairType.from_comb(list(elt))
             stack.push(elt)
             stdout.append(format_stdout(cls.prim, popped, [elt]))
             execution = cls.args[0].execute(stack, stdout, context=context)

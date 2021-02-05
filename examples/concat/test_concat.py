@@ -13,4 +13,4 @@ class ConcatContractTest(TestCase):
 
     def test_concat(self):
         res = self.concat.call('bar').result(storage='foo')
-        self.assertEqual('foobar', res.storage)
+        self.assertEqual('foobar', res.context)

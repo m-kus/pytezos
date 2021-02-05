@@ -15,10 +15,11 @@ class Wildcard:
         return '*'
 
 
-def format_stdout(prim: str, inputs: list, outputs: list):
+def format_stdout(prim: str, inputs: list, outputs: list, arg=None):
+    arg = f' {arg}' if arg else ''
     pop = " : ".join(map(repr, inputs)) if inputs else '_'
     push = " : ".join(map(repr, outputs)) if outputs else '_'
-    return f'{prim} / {pop} => {push}'
+    return f'{prim}{arg} / {pop} => {push}'
 
 
 def dispatch_types(*args: Type[Micheline],

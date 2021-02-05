@@ -18,16 +18,16 @@ class TimeContractTest(TestCase):
         contract = ContractInterface.create_from(code)
         now = format_timestamp(pytezos.now())
         res = contract.call().result(storage=0)
-        self.assertEqual(now, res.storage)
+        self.assertEqual(now, res.context)
 
     def test_now_mainnet(self):
         contract = ContractInterface.create_from(code, shell='mainnet')
         now = format_timestamp(pytezos.using('mainnet').now())
         res = contract.call().result(storage=0)
-        self.assertEqual(now, res.storage)
+        self.assertEqual(now, res.context)
 
     def test_now_delphinet(self):
         contract = ContractInterface.create_from(code, shell='delphinet')
         now = format_timestamp(pytezos.using('delphinet').now())
         res = contract.call().result(storage=0)
-        self.assertEqual(now, res.storage)
+        self.assertEqual(now, res.context)

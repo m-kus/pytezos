@@ -35,7 +35,7 @@ class MainnetContractTestCaseTPBH6J(TestCase):
             'micheline -> type -> micheline')
 
     def test_entrypoints_tpbh6j(self):
-        ep_types = self.program.parameter.list_entry_points()
+        ep_types = self.program.parameter.list_entrypoints()
         self.assertEqual(len(self.entrypoints['entrypoints']) + 1, len(ep_types))
         for name, ep_type in ep_types.items():
             if name not in ['default', 'root']:

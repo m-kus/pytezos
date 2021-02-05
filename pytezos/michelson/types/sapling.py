@@ -1,5 +1,6 @@
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types.core import IntType
+from pytezos.michelson.micheline import MichelineLiteral
 
 
 class BLS12_381_G1Type(IntType, prim='bls12_381_g1'):
@@ -80,7 +81,10 @@ class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len
 
 class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
 
+    def __repr__(self):
+        return ''
+
     @staticmethod
     def empty(memo_size: int):
-        cls = SaplingStateType.create_type(args=[memo_size])
+        cls = SaplingStateType.create_type(args=[MichelineLiteral.create(memo_size)])
         return cls()

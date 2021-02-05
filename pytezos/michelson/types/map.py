@@ -108,12 +108,12 @@ class MapType(MichelsonType, prim='map', args_len=2):
         }
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MapType':
-        value = [(key, val.merge_lazy_diff(lazy_diff)) for key, val in self]
-        return type(self)(value)
+        items = [(key, val.merge_lazy_diff(lazy_diff)) for key, val in self]
+        return type(self)(items)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        for _, val in self:
-            val.aggregate_lazy_diff(lazy_diff, mode=mode)
+        items = [(key, val.aggregate_lazy_diff(lazy_diff, mode=mode)) for key, val in self]
+        return type(self)(items)
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
         for _, val in self:

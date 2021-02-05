@@ -228,11 +228,6 @@ class Micheline(metaclass=ErrorTrace):
     def execute(cls, stack, stdout, context):
         assert False, f'`execute` has to be explicitly defined'
 
-    @classmethod
-    def cast(cls, ty: type):
-        assert isinstance(cls.literal, ty), f'trying to cast {cls.literal} to {ty.__name__}'
-        return cls.literal
-
 
 class MichelineSequence(Micheline):
 
@@ -265,3 +260,18 @@ class MichelineLiteral(Micheline):
             return {'bytes': cls.literal.hex()}
         else:
             assert False, f'unexpected value `{cls.literal}`'
+
+    @classmethod
+    def get_int(cls) -> int:
+        assert isinstance(cls.literal, int), f'expected int, got {cls.literal}'
+        return cls.literal
+
+    @classmethod
+    def get_string(cls) -> str:
+        assert isinstance(cls.literal, str), f'expected string, got {cls.literal}'
+        return cls.literal
+
+    @classmethod
+    def get_bytes(cls) -> bytes:
+        assert isinstance(cls.literal, bytes), f'expected bytes, got {cls.literal}'
+        return cls.literal

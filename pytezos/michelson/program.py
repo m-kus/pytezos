@@ -5,7 +5,7 @@ from pytezos.michelson.micheline import MichelineSequence, try_catch
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.context.execution import ExecutionContext
-from pytezos.michelson.types import PairType, OperationType, ListType
+from pytezos.michelson.types import PairType, OperationType, ListType, MichelsonType
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 
@@ -59,8 +59,10 @@ class MichelsonProgram:
         return cls(entrypoint, parameter_value, storage_value)
 
     @try_catch('BEGIN')
-    def begin(self, stack: MichelsonStack, stdout: List[str]):
-        res = PairType.from_comb_leaves([self.parameter_value.item, self.storage_value.item])
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+        self.parameter_value.attach_context(context)
+        self.storage_value.attach_context(context)
+        res = PairType.from_comb([self.parameter_value.item, self.storage_value.item])
         stack.push(res)
         stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
@@ -68,12 +70,15 @@ class MichelsonProgram:
         return self.code.args[0].execute(stack, stdout, context)
 
     @try_catch('END')
-    def end(self, stack: MichelsonStack, stdout: List[str]) -> Tuple[List[OperationType], StorageSection]:
+    def end(self, stack: MichelsonStack, stdout: List[str]) -> Tuple[List[OperationType], MichelsonType, List[dict]]:
         res = cast(PairType, stack.pop1())
-        res.assert_type_in(PairType, message='list of operations + resulting storage')
         assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
-        operations, storage_value = res.items
-        operations.assert_type_equal(ListType.create_type([OperationType]), message='list of operations')
-        storage_value.assert_type_equal(self.storage.args[0], message='resulting storage')
+        res.assert_type_equal(PairType.create_type(args=[
+            ListType.create_type([OperationType]),
+            self.storage.args[0]
+        ]), message='list of operations + resulting storage')
+        operations = list(res.items[0])
+        lazy_diff = []
+        storage = res.items[1].aggregate_lazy_diff(lazy_diff)
         stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
-        return list(operations), StorageSection(storage_value)
+        return operations, storage, lazy_diff

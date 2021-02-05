@@ -104,6 +104,8 @@ class REPLContext(ExecutionContext):
         self.code_expr = expr
 
     def get_big_map_value(self, ptr: int, key_hash: str):
+        if ptr < 0:
+            return None
         assert self.network, f'network is undefined'
         try:
             ctx = AccountContext(shell=self.network)

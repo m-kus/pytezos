@@ -73,15 +73,6 @@ class SetType(MichelsonType, prim='set', args_len=1):
         arg_doc = self.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
         return f'{{ {arg_doc}, ... }}'
 
-    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        return copy(self)  # Big_map is not comparable
-
-    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        pass  # Big_map is not comparable
-
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
-        pass  # Big_map is not comparable
-
     def contains(self, item: MichelsonType) -> bool:
         self.args[0].assert_type_equal(type(item))
         return item in self.items

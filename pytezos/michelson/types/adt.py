@@ -128,8 +128,8 @@ class ADT:
         assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
         assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
 
-        entry_point = next(py_obj)
-        assert entry_point in self.key_to_path, f'unknown entrypoint {entry_point}'
+        entrypoint = next(py_obj)
+        assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
 
         def wrap_tuple(obj, path):
             if len(path) == 0:
@@ -141,7 +141,7 @@ class ADT:
             else:
                 assert False, path
 
-        return wrap_tuple(py_obj, self.key_to_path[entry_point])
+        return wrap_tuple(py_obj, self.key_to_path[entrypoint])
 
     def normalize_python_object(self, py_obj):
         if self.prim == 'pair':
@@ -151,10 +151,10 @@ class ADT:
         else:
             assert False
 
-    def normalize_micheline_value(self, entry_point, val_expr):
+    def normalize_micheline_value(self, entrypoint, val_expr):
         assert self.prim == 'or'
         assert self.is_named(), f'sum type has to be named'
-        assert entry_point in self.key_to_path, f'unknown entrypoint {entry_point}'
+        assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
 
         def wrap_expr(expr, path):
             if len(path) == 0:
@@ -166,7 +166,7 @@ class ADT:
             else:
                 assert False, path
 
-        return wrap_expr(val_expr, self.get_path(entry_point))
+        return wrap_expr(val_expr, self.get_path(entrypoint))
 
     def get_flat_values(self, nested_item: Iterable[MichelsonType],
                         ignore_annots=False, allow_nones=False, fields_only=False) \

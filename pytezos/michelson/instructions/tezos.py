@@ -43,42 +43,26 @@ class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
         return cls()
 
 
-def get_entry_point_type(context: ExecutionContext, name: str, address=None) -> Optional[Type[MichelsonType]]:
+def get_entrypoint_type(context: ExecutionContext, name: str, address=None) -> Optional[Type[MichelsonType]]:
     expr = context.get_parameter_expr(address)
     if expr is None:
         return None
     parameter = ParameterSection.match(expr)
-    entry_points = parameter.list_entry_points()
-    assert name in entry_points, f'unknown entrypoint {name}'
-    return entry_points[name]
-
-
-def get_entry_point_name(annots: List[str]) -> str:
-    if annots:
-        assert len(annots) == 1 and annots[0].startswith('%'), f'single field annotation allowed'
-        return annots[0][1:]
-    else:
-        return 'default'
+    entrypoints = parameter.list_entrypoints()
+    assert name in entrypoints, f'unknown entrypoint {name}'
+    return entrypoints[name]
 
 
 class SelfInstruction(MichelsonInstruction, prim='SELF'):
-    entry_point: str
-
-    @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['MichelsonInstruction']:
-        res = type(cls.__name__, (cls,), dict(entry_point=get_entry_point_name(annots)))
-        return cast(Type['MichelsonInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        self_type = get_entry_point_type(context, cls.entry_point)
+        entrypoint = next(iter(cls.field_names), 'default')
+        self_type = get_entrypoint_type(context, entrypoint)
         assert self_type, f'parameter type is not defined'
         self_address = context.get_self_address()
         res_type = ContractType.create_type(args=[self_type])
-        res = res_type.from_value(f'{self_address}%{cls.entry_point}')
+        res = res_type.from_value(f'{self_address}%{entrypoint}')
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))
         return cls()
@@ -140,28 +124,20 @@ class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
 
 
 class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
-    entry_point: str
-
-    @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['MichelsonInstruction']:
-        res = type(cls.__name__, (cls,), dict(entry_point=get_entry_point_name(annots)))
-        return cast(Type['MichelsonInstruction'], res)
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+        entrypoint = next(iter(cls.field_names), 'default')
         address = cast(AddressType, stack.pop1())
         address.assert_type_in(AddressType)
-        entry_type = get_entry_point_type(context, cls.entry_point, address=str(address))
+        entrypoint_type = get_entrypoint_type(context, entrypoint, address=str(address))
         contract_type = ContractType.create_type(args=cls.args)
         try:
-            if entry_type is None:
+            if entrypoint_type is None:
                 stdout.append(f'{cls.prim}: skip type checking for {str(address)}')
             else:
-                entry_type.assert_type_equal(cls.args[0])
-            res = OptionType.from_some(contract_type.from_value(f'{str(address)}%{cls.entry_point}'))
+                entrypoint_type.assert_type_equal(cls.args[0])
+            res = OptionType.from_some(contract_type.from_value(f'{str(address)}%{entrypoint}'))
         except AssertionError:
             res = OptionType.none(contract_type)
         stack.push(res)
@@ -182,28 +158,18 @@ class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
 
 
 class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', args_len=1):
-    storage_type: Type[MichelsonType]
-
-    @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['MichelsonInstruction']:
-        sequence = args[0]
-        assert issubclass(sequence, MichelineSequence), f'expected sequence {{ parameter ; storage ; code }}'
-        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
-        assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
-        storage = next(arg for arg in sequence.args if arg.prim == 'storage')
-        return MichelsonInstruction.create_type(args=args,
-                                                annots=annots,
-                                                storage_type=storage.args[0])
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+        sequence = cast(MichelineSequence, cls.args[0])
+        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
+        assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
+        storage_type = cast(Type[MichelsonType], next(arg.args[0] for arg in sequence.args if arg.prim == 'storage'))
+
         delegate, amount, initial_storage = cast(Tuple[OptionType, MutezType, MichelsonType], stack.pop3())
         delegate.assert_type_equal(OptionType.create_type(args=[KeyHashType]))
         amount.assert_type_equal(MutezType)
-        initial_storage.assert_type_equal(cls.storage_type)
+        initial_storage.assert_type_equal(storage_type)
 
         originated_address = AddressType.from_value(context.get_originated_address())
         context.spend_balance(int(amount))

@@ -36,13 +36,10 @@ class GetnInstruction(MichelsonInstruction, prim='GET', args_len=1):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         pair = cast(PairType, stack.pop1())
         pair.assert_type_in(PairType)
-        index = cls.args[0].cast(int)
-        if index % 2 == 0:
-            res = pair.get_sub_comb(index)
-        else:
-            res = pair.get_comb_leaf(index)
+        index = cls.args[0].get_int()
+        res = pair.access_comb(index)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [pair], [res]))
+        stdout.append(format_stdout(cls.prim, [pair], [res], index))
         return cls()
 
 
@@ -52,15 +49,10 @@ class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         element, pair = cast(Tuple[MichelsonType, PairType], stack.pop2())
         pair.assert_type_in(PairType)
-        index = cls.args[0].cast(int)
-        if index % 2 == 0:
-            element.assert_type_in(PairType)
-            assert isinstance(element, PairType), f'expected pair, got {pair.prim}'
-            res = pair.update_sub_comb(index, element)
-        else:
-            res = pair.update_comb_leaf(index, element)
+        index = cls.args[0].get_int()
+        res = pair.update_comb(index, element)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [element, pair], [res]))
+        stdout.append(format_stdout(cls.prim, [element, pair], [res], index))
         return cls()
 
 
@@ -91,7 +83,7 @@ class PairInstruction(MichelsonInstruction, prim='PAIR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         left, right = stack.pop2()
-        res = PairType.from_comb_leaves([left, right])
+        res = PairType.from_comb([left, right])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [left, right], [res]))
         return cls()
@@ -114,12 +106,12 @@ class PairnInstruction(MichelsonInstruction, prim='PAIR', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        count = cls.args[0].cast(int)
+        count = cls.args[0].get_int()
         assert count >= 2, f'invalid argument, must be >= 2'
         leaves = stack.pop(count=count)
-        res = PairType.from_comb_leaves(leaves)
+        res = PairType.from_comb(leaves)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, leaves, [res]))
+        stdout.append(format_stdout(cls.prim, leaves, [res], count))
         return cls()
 
 
@@ -127,13 +119,13 @@ class UnpairnInstruction(MichelsonInstruction, prim='UNPAIR', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
-        count = cls.args[0].cast(int)
+        count = cls.args[0].get_int()
         assert count >= 2, f'invalid argument, must be >= 2'
         pair = cast(PairType, stack.pop1())
         pair.assert_type_in(PairType)
-        leaves = list(pair.iter_comb_leaves())
+        leaves = list(pair.iter_comb())
         assert len(leaves) == count, f'expected {count} leaves, got {len(leaves)}'
         for leaf in reversed(leaves):
             stack.push(leaf)
-        stdout.append(format_stdout(cls.prim, [pair], leaves))
+        stdout.append(format_stdout(cls.prim, [pair], leaves, count))
         return cls()

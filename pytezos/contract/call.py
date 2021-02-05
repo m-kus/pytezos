@@ -38,7 +38,7 @@ class ContractCallResult(OperationResult):
                     results.append(cls.from_origination(content))
 
         def decode_result(res):
-            storage = script.storage.type.from_micheline_value(res.storage)
+            storage = script.storage.type.from_micheline_value(res.context)
             kwargs = dict(storage=storage.to_python_object())
             if hasattr(res, 'lazy_diff'):
                 extended_storage = storage.merge_lazy_diff(res.lazy_diff)

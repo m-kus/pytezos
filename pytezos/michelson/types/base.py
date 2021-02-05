@@ -200,14 +200,15 @@ class MichelsonType(Micheline):
         raise NotImplementedError
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):  # NOTE: mutation
-        assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket']
+        assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket', 'set']
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        assert len(self.args) == 0 or self.prim in ['contract', 'lambda']
-        return copy(self)
+        assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket', 'set']
+        return deepcopy(self)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket']
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'MichelsonType':
+        assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket', 'set']
+        return deepcopy(self)
 
     def forge(self, mode='readable') -> bytes:
         val_expr = self.to_micheline_value(mode=mode)

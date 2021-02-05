@@ -56,7 +56,7 @@ class ContractParameter(metaclass=InlineDocstring):
             definitions = []
             return ty.generate_pydoc(definitions, inferred_name=name)
 
-        return [(name, make_doc(name, ty)) for name, ty in self.type.list_entry_points()]
+        return [(name, make_doc(name, ty)) for name, ty in self.type.list_entrypoints()]
 
 
 class ContractStorage(metaclass=InlineDocstring):

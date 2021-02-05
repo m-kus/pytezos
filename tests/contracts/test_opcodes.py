@@ -5,7 +5,8 @@ from parameterized import parameterized
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.parse import michelson_to_micheline
 
-PUBLIC_KEY = 'tz1NortRftucvAkD1J58L32EhSVrQEWJCEnB'
+CHAIN_ID = 'NetXdQprcVkpaWU'
+PUBLIC_KEY = 'edpktpPTi9MLK2wabnNny1kD5LvBmGtFdRjnCiUT3ZZgNDjjM4mpoh'
 BALANCE = 4000000000000
 VOTING_POWER = 0
 TOTAL_VOTING_POWER = 0
@@ -15,16 +16,16 @@ class OpcodesTestCase(TestCase):
 
     def test_single_opcode(self):
         filename, storage, parameter, result = (
-            'contract.tz',
-            'Unit',
-            '"tz1cxcwwnzENRdhe2Kb8ZdTrdNy4bFNyScx5"',
-            'Unit',
+            'xor.tz',
+            'None',
+            'Left (Pair False False)',
+            '(Some (Left False))',
         )
 
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
             script = f.read()
 
-        _, storage, stdout, error = Interpreter.run_code(
+        _, storage, lazy_diff, stdout, error = Interpreter.run_code(
             parameter=michelson_to_micheline(parameter),
             storage=michelson_to_micheline(storage),
             script=michelson_to_micheline(script)
@@ -1002,7 +1003,7 @@ class OpcodesTestCase(TestCase):
         (
             'voting_power.tz',
             '(Pair 0 0)',
-            f'{PUBLIC_KEY}',
+            f'"{PUBLIC_KEY}"',
             '(Pair 500 2500)',
         ),
         # Test KECCAK
@@ -1467,11 +1468,12 @@ class OpcodesTestCase(TestCase):
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
             script = f.read()
 
-        _, storage, stdout, error = Interpreter.run_code(
+        _, storage, lazy_diff, stdout, error = Interpreter.run_code(
             parameter=michelson_to_micheline(parameter),
             storage=michelson_to_micheline(storage),
             script=michelson_to_micheline(script),
-            balance=BALANCE
+            balance=BALANCE,
+            chain_id=CHAIN_ID
         )
         if storage is None:
             print('\n'.join(stdout))

@@ -42,7 +42,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         super(BigMapType, self).__init__(items=items)
         self.ptr = ptr
         self.removed_keys = removed_keys or []
-        self.storage: Optional[ExecutionContext] = None
+        self.context: Optional[ExecutionContext] = None
 
     def __len__(self):
         return len(self.items) + len(self.removed_keys)
@@ -53,7 +53,11 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             yield key, None
 
     def __repr__(self):
-        return f'${self.ptr}'
+        if self.ptr >= 0:
+            return f'<{self.ptr}>'
+        else:
+            elements = [f'{repr(k)}: {repr(v)}' for k, v in self]
+            return f'{{{", ".join(elements)}}}'
 
     def is_allocated(self) -> bool:
         return self.ptr and self.ptr >= 0
@@ -139,10 +143,10 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         else:
             return copy(self)
 
-    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'BigMapType':
         assert self.ptr is not None, f'Big_map id is not defined'
-        if self.storage:
-            src_ptr, dst_ptr, action = self.storage.get_big_map_diff(self.ptr)
+        if self.context:
+            src_ptr, dst_ptr, action = self.context.get_big_map_diff(self.ptr)
         else:
             src_ptr, dst_ptr, action = self.ptr, self.ptr, 'update'
         key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
@@ -171,8 +175,10 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             'id': str(dst_ptr),
             'diff': diff
         })
+        return type(self)(items=[], ptr=dst_ptr)
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
+        self.context = context
         if self.ptr is None:
             self.ptr = context.get_tmp_big_map_id()
         else:
@@ -182,9 +188,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         self.args[0].assert_type_equal(type(key))
         val = next((v for k, v in self if k == key), undefined())  # search in diff
         if isinstance(val, undefined):
-            assert self.storage, f'lazy storage is not attached'
+            assert self.context, f'lazy storage is not attached'
             key_hash = forge_script_expr(key.pack())
-            val_expr = self.storage.get_big_map_value(self.ptr, key_hash)
+            val_expr = self.context.get_big_map_value(self.ptr, key_hash)
             if val_expr is None:
                 return None
             else:

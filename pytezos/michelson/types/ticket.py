@@ -4,7 +4,7 @@ from pprint import pformat
 
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.pair import PairType, PairLiteral
+from pytezos.michelson.types.pair import PairType
 from pytezos.michelson.types.domain import NatType, AddressType
 from pytezos.context.execution import ExecutionContext
 
@@ -31,7 +31,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     @classmethod
     def from_comb(cls, comb: PairType) -> 'TicketType':
-        ticketer, item, amount = tuple(comb.iter_comb_leaves())  # type: AddressType, MichelsonType, NatType
+        ticketer, item, amount = tuple(comb.iter_comb())  # type: AddressType, MichelsonType, NatType
         return cls(item=item,
                    ticketer=str(ticketer),
                    amount=int(amount))
