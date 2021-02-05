@@ -1,0 +1,372 @@
+{
+  "entrypoints": {
+    "transfer": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%from"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%to"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%value"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "setPauseGuardian": {
+      "prim": "address"
+    },
+    "setPause": {
+      "prim": "bool"
+    },
+    "setAdministrator": {
+      "prim": "address"
+    },
+    "redeem": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%secret"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%swapInitiator"
+          ]
+        }
+      ]
+    },
+    "mint": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%to"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%value"
+          ]
+        }
+      ]
+    },
+    "lock": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bool",
+          "annots": [
+            "%confirmed"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%fee"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "timestamp",
+                  "annots": [
+                    "%releaseTime"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "bytes",
+                      "annots": [
+                        "%secretHash"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%to"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%value"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "getTotalSupply": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "unit",
+          "annots": [
+            "%u"
+          ]
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "nat"
+            }
+          ],
+          "annots": [
+            "%callback"
+          ]
+        }
+      ]
+    },
+    "getSwap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%secretHash"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%swapInitiator"
+              ]
+            },
+            {
+              "prim": "contract",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "bool",
+                              "annots": [
+                                "%confirmed"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%fee"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%from"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%releaseTime"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%to"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%value"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%callback"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "getBalance": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%owner"
+          ]
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "nat"
+            }
+          ],
+          "annots": [
+            "%callback"
+          ]
+        }
+      ]
+    },
+    "getAllowance": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%owner"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%spender"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "nat"
+            }
+          ],
+          "annots": [
+            "%callback"
+          ]
+        }
+      ]
+    },
+    "confirmSwap": {
+      "prim": "bytes"
+    },
+    "claimRefund": {
+      "prim": "bytes"
+    },
+    "burn": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%from"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%value"
+          ]
+        }
+      ]
+    },
+    "approveCAS": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%expected"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%spender"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%value"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "approve": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%spender"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%value"
+          ]
+        }
+      ]
+    }
+  }
+}

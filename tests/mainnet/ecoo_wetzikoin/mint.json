@@ -1,0 +1,145 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1MxeHqvM4jLUHcPpsQdXpsk3tQwwoZ6peN"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "25160000"
+                },
+                {
+                  "int": "0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "Wetzikon"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "string": "CHF"
+                },
+                {
+                  "int": "0"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "00004ae32bad7e239cb67bd077273424adfab5f2ee4f"
+          },
+          {
+            "int": "105"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "106"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00004ae32bad7e239cb67bd077273424adfab5f2ee4f"
+              },
+              {
+                "int": "107"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "107",
+      "key_hash": "exprtZBwZUeYYYfUs9B9Rg2ywHezVHnCCnmF9WsDQVrs582dSK63dC",
+      "key": {
+        "int": "0"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "0"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "CHF"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "string": "Wetzikon"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "0"
+                      },
+                      []
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "105",
+      "key_hash": "exprthbdWy6Hh5NBUS5ukDEFtA2sJiCStM6CTdCYVXccAdiJ7tJUCZ",
+      "key": {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "000019757486fceb7517770f199bf4b7885c8a90b653"
+          },
+          {
+            "int": "0"
+          }
+        ]
+      },
+      "value": {
+        "int": "25160000"
+      }
+    }
+  ]
+}

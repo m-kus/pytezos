@@ -1,0 +1,38 @@
+{
+  "parameters": {
+    "entrypoint": "command",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Right",
+          "args": [
+            {
+              "prim": "Left",
+              "args": [
+                {
+                  "prim": "None"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "string": "spsig1HNYe7rUaasoV1Crv8F3QqdcPC21tCC6YwBqkPxD7K1qq8nQg3ARLrrHhDpdTM2HxtZnKZKXP1Um85sEccjwuG8TMk5Afe"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "13"
+      },
+      {
+        "bytes": "0102faba12644b1e7404d8ebcc3b16512ec3736e3de537c26ca49f036f727d89f002"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

@@ -1,0 +1,90 @@
+{
+  "entrypoints": {
+    "tokens_received": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%amount"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%from_"
+              ]
+            },
+            {
+              "prim": "bool",
+              "annots": [
+                "%isReward"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "set_hook_registry": {
+      "prim": "unit"
+    },
+    "setFrozen": {
+      "prim": "bool"
+    },
+    "setClosed": {
+      "prim": "bool"
+    },
+    "setAssetToken": {
+      "prim": "address"
+    },
+    "execute": {
+      "prim": "unit"
+    },
+    "changeAssetOwner": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%assetOwner"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%assetToken"
+          ]
+        }
+      ]
+    },
+    "adjustPeriod": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%newEndTime"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%newStartTime"
+          ]
+        }
+      ]
+    },
+    "adjustMinInvestAmount": {
+      "prim": "nat"
+    },
+    "adjuctSoftCap": {
+      "prim": "nat"
+    },
+    "adjuctHardCap": {
+      "prim": "nat"
+    }
+  }
+}

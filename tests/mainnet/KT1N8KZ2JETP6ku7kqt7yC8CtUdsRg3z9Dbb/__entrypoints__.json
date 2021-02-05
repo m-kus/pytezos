@@ -1,0 +1,10 @@
+{
+  "entrypoints": {
+    "replace": {
+      "prim": "int"
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

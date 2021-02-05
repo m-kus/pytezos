@@ -1,0 +1,64 @@
+{
+  "parameters": {
+    "entrypoint": "setConfirmedAddress",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "edsigu72GQi9cw45fzX1ApUywEAPVPJU8GtdqEmwVivjzqwyZvEPRqWmX1LZBXUzbLhZhSL7SqVihq6LANASPwa2L2CTPMH9KQs"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1cxFDbfQT712csZ2xhdcd5dQAb8srZixm3"
+            },
+            {
+              "string": "edpktg4xkKrP8XMtqs6daR4Gnsgi3xkT6wL2GUbERewXMrsXMvz6Kd"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "bytes": "00007d8c1154b558b12a45fdf1d7a8012259540eb16b"
+      },
+      {
+        "int": "288"
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "288",
+      "key_hash": "exprv6Mz3KXNTwbi7XSAQGJCahaJf2Px7nBkrHd9bhhR2hAhFaDnWM",
+      "key": {
+        "bytes": "0000bdec14d6af5443358d52db4848a3583dc688b14b"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "True"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1"
+              },
+              {
+                "bytes": "fde2f3342b931360c759a54601de5e9afbec373447d20d0c1a97d7b2c31dbe540a5739e1663eb720ab4d60b0f45ff1faeb1de98e183b8f78e56059849339110f"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

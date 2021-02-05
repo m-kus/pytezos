@@ -1,0 +1,35 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%address"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%amount"
+          ]
+        }
+      ]
+    },
+    "set_delegate_node": {
+      "prim": "option",
+      "args": [
+        {
+          "prim": "key_hash"
+        }
+      ]
+    },
+    "process_reward": {
+      "prim": "address"
+    },
+    "deposit": {
+      "prim": "address"
+    }
+  }
+}

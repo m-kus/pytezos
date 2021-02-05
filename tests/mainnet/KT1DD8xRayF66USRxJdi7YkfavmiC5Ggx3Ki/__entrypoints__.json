@@ -1,0 +1,82 @@
+{
+  "entrypoints": {
+    "takeOrder": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%order_id"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%take_for"
+          ]
+        }
+      ]
+    },
+    "makeOrder": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amount_from"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amount_to"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "timestamp",
+                  "annots": [
+                    "%deadline"
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%sender"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%token_from"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%token_to"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

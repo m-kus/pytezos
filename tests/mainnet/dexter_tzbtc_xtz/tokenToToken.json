@@ -1,0 +1,108 @@
+{
+  "parameters": {
+    "entrypoint": "tokenToToken",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "KT1Puc9St8wdNoGtLiD2WXaHbWU7styaxYhD"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "554075172"
+                },
+                {
+                  "string": "tz1Zmb6ftRvASxgqXdao5euvjoNzmPDzx79V"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1Zmb6ftRvASxgqXdao5euvjoNzmPDzx79V"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "1649047"
+                },
+                {
+                  "string": "2021-02-01T20:27:16.697Z"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "123"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "67245535153"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "011b5edfd90cc62eaf4299bdc2eedae4306bea9fe200"
+                  },
+                  {
+                    "bytes": "01a3d0f58d8964bd1b37fb0a0c197b38cf46608d4900"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "907156080"
+                  },
+                  {
+                    "int": "107719298883"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

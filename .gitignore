@@ -9,5 +9,4 @@ docs/build
 *.ipynb
 site/
 *.html
-*.json
 *.zip

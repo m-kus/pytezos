@@ -1,0 +1,95 @@
+{
+  "entrypoints": {
+    "update": {
+      "prim": "big_map",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "timestamp"
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "timestamp"
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "nat"
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "prim": "nat"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "get": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "string"
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "timestamp"
+                    },
+                    {
+                      "prim": "nat"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

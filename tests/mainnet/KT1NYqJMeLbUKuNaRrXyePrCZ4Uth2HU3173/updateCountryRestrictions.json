@@ -1,0 +1,216 @@
+{
+  "parameters": {
+    "entrypoint": "updateCountryRestrictions",
+    "value": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "250"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "30"
+                  },
+                  {
+                    "int": "1"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  [],
+                  {
+                    "int": "1634386415"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "840"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "30"
+                  },
+                  {
+                    "int": "1"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  [],
+                  {
+                    "int": "1634386415"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  [],
+                  []
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  [
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "int": "250"
+                        },
+                        {
+                          "prim": "Pair",
+                          "args": [
+                            {
+                              "prim": "Pair",
+                              "args": [
+                                {
+                                  "int": "30"
+                                },
+                                {
+                                  "int": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "Pair",
+                              "args": [
+                                [],
+                                {
+                                  "int": "1634386415"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "int": "840"
+                        },
+                        {
+                          "prim": "Pair",
+                          "args": [
+                            {
+                              "prim": "Pair",
+                              "args": [
+                                {
+                                  "int": "30"
+                                },
+                                {
+                                  "int": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "Pair",
+                              "args": [
+                                [],
+                                {
+                                  "int": "1634386415"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  []
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "60"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  [
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "bytes": "01bb28fa8d8a6bbe6aaed61e2a3df8bc78d42fbc1a00"
+                        },
+                        {
+                          "prim": "False"
+                        }
+                      ]
+                    }
+                  ],
+                  {
+                    "string": "Equisafe"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000c15099776592bbc331599a069442dd4a2001c522"
+          },
+          []
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

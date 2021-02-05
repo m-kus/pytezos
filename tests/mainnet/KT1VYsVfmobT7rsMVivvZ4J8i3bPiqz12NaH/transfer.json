@@ -1,0 +1,134 @@
+{
+  "parameters": {
+    "entrypoint": "transfer",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "000032442899378b0370219e39c578ce92aae3227a4e"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "bytes": "01faebfac1468cf6c98c1b40b4d323f5998e09aafe00"
+            },
+            {
+              "int": "12397179"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00000cc84c2f6520dab375e8636d606671f3f5575abe"
+              },
+              {
+                "int": "254"
+              }
+            ]
+          },
+          {
+            "int": "255"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01e0a1035a390e9104b62439250043207bb4d4045000"
+                  },
+                  {
+                    "int": "256"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "257"
+                  },
+                  {
+                    "bytes": "0000521fc029738499f7961a65008b98e7532dbe84be"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "409505384369"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "257",
+      "key_hash": "exprvKU5H1BpoinRuawoLTJ5pfKSd7AJ3AaES2ArGw6rRDQBS1rzco",
+      "key": {
+        "bytes": "000032442899378b0370219e39c578ce92aae3227a4e"
+      },
+      "value": {
+        "int": "0"
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "257",
+      "key_hash": "exprvEigKF7P4V78GGTgo32vSsggSGN3HJJZ7vfeWrHJyRj2cR64u9",
+      "key": {
+        "bytes": "01faebfac1468cf6c98c1b40b4d323f5998e09aafe00"
+      },
+      "value": {
+        "int": "72697032060"
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "256",
+      "key_hash": "expruLH294PoPM3QnCgxXMzLbPnVQTrRkdM9ZiAg189yXvajj9DHLf",
+      "key": {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "000032442899378b0370219e39c578ce92aae3227a4e"
+          },
+          {
+            "bytes": "01faebfac1468cf6c98c1b40b4d323f5998e09aafe00"
+          }
+        ]
+      },
+      "value": {
+        "int": "0"
+      }
+    }
+  ]
+}

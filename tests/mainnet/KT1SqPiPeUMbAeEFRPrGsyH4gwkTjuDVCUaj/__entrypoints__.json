@@ -1,0 +1,520 @@
+{
+  "entrypoints": {
+    "update_operators": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%operator"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%token_id"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%add_operator"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%operator"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%token_id"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%remove_operator"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "transfer": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%from_"
+              ]
+            },
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%to_"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%token_id"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%amount"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%txs"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "token_metadata_registry": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "address"
+        }
+      ]
+    },
+    "mint": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "string",
+                      "annots": [
+                        "%symbol"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "string",
+                          "annots": [
+                            "%name"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%decimals"
+                              ]
+                            },
+                            {
+                              "prim": "map",
+                              "args": [
+                                {
+                                  "prim": "string"
+                                },
+                                {
+                                  "prim": "string"
+                                }
+                              ],
+                              "annots": [
+                                "%extras"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%metadata"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%owner"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "balance_of": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "list",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%requests"
+          ]
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%owner"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%token_id"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%request"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%balance"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%callback"
+          ]
+        }
+      ]
+    },
+    "assets": {
+      "prim": "or",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "list",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%owner"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%token_id"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    "%requests"
+                  ]
+                },
+                {
+                  "prim": "contract",
+                  "args": [
+                    {
+                      "prim": "list",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%owner"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%token_id"
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%request"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%balance"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    "%callback"
+                  ]
+                }
+              ],
+              "annots": [
+                "%balance_of"
+              ]
+            },
+            {
+              "prim": "contract",
+              "args": [
+                {
+                  "prim": "address"
+                }
+              ],
+              "annots": [
+                "%token_metadata_registry"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%from_"
+                      ]
+                    },
+                    {
+                      "prim": "list",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%to_"
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%token_id"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amount"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%txs"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%transfer"
+              ]
+            },
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%owner"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%operator"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%add_operator"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%owner"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%operator"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%remove_operator"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%update_operators"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

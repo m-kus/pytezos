@@ -1,0 +1,69 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "unit"
+    },
+    "win": {
+      "prim": "unit"
+    },
+    "setDelegate": {
+      "prim": "option",
+      "args": [
+        {
+          "prim": "key_hash"
+        }
+      ]
+    },
+    "setAdmin": {
+      "prim": "address"
+    },
+    "setActive": {
+      "prim": "bool"
+    },
+    "resetGame": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bool",
+              "annots": [
+                "%active"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%maxPlayers"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "mutez",
+              "annots": [
+                "%maxStake"
+              ]
+            },
+            {
+              "prim": "mutez",
+              "annots": [
+                "%minStake"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "play": {
+      "prim": "unit"
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

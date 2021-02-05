@@ -1,0 +1,96 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "000044c367bb7031958b795b0212ed1033c7ea6f6ab3"
+        },
+        {
+          "int": "718"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00000cc84c2f6520dab375e8636d606671f3f5575abe"
+              },
+              {
+                "int": "254"
+              }
+            ]
+          },
+          {
+            "int": "255"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01e0a1035a390e9104b62439250043207bb4d4045000"
+                  },
+                  {
+                    "int": "256"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "257"
+                  },
+                  {
+                    "bytes": "0000521fc029738499f7961a65008b98e7532dbe84be"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "656516380838"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "257",
+      "key_hash": "expruyCvQW96JWDNUi7yKsCP6MSRPK9ZK6PHTwXMZnZg6CMMfT3kE1",
+      "key": {
+        "bytes": "000044c367bb7031958b795b0212ed1033c7ea6f6ab3"
+      },
+      "value": {
+        "int": "500000718"
+      }
+    }
+  ]
+}

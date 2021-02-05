@@ -1,0 +1,68 @@
+{
+  "parameters": {
+    "entrypoint": "update_value",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "2021-01-11T11:15:00Z"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "239"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "89"
+                },
+                {
+                  "int": "213"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363700"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "239"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "89"
+                  },
+                  {
+                    "int": "213"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "bytes": "0000b4685dc0a9a5cc28942065288413ce5bea2f76a0"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

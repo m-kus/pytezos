@@ -1,0 +1,58 @@
+{
+  "parameters": {
+    "entrypoint": "transfer",
+    "value": []
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "01aa4318dfd0188f8eb56a2b95978f2c530b45e01a00"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "2"
+              },
+              {
+                "int": "151"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Unit"
+              },
+              {
+                "int": "152"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "153"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

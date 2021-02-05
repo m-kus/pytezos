@@ -1,0 +1,23 @@
+{
+  "entrypoints": {
+    "do": {
+      "prim": "lambda",
+      "args": [
+        {
+          "prim": "unit"
+        },
+        {
+          "prim": "list",
+          "args": [
+            {
+              "prim": "operation"
+            }
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

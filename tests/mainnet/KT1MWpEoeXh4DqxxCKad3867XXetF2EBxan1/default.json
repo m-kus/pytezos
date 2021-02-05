@@ -1,0 +1,43 @@
+{
+  "parameters": {},
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1000"
+          },
+          {
+            "int": "184"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "012b97b882dc8533e9b523ab82ef1d6248622e859a00"
+          },
+          {
+            "int": "13"
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "184",
+      "key_hash": "exprupCk3D72XNcRbbRorYvu53DoMXjUrpX3tPQA3AZaGUsgMK5zB4",
+      "key": {
+        "bytes": "0000c8d1ad5894b78ef9988295d18e7dde24a2896465"
+      },
+      "value": {
+        "prim": "True"
+      }
+    }
+  ]
+}

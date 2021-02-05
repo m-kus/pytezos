@@ -1,0 +1,18 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "nat"
+    },
+    "setDelegate": {
+      "prim": "option",
+      "args": [
+        {
+          "prim": "key_hash"
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

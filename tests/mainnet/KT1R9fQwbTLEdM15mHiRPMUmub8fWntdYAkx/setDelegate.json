@@ -1,0 +1,17 @@
+{
+  "parameters": {
+    "entrypoint": "setDelegate",
+    "value": {
+      "prim": "Some",
+      "args": [
+        {
+          "string": "tz1cYufsxHXJcvANhvS55h3aY32a9BAFB494"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "bytes": "01e0a1035a390e9104b62439250043207bb4d4045000"
+  },
+  "big_map_diff": []
+}

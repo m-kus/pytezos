@@ -1,0 +1,27 @@
+{
+  "entrypoints": {
+    "update_oracle_protocol": {
+      "prim": "address"
+    },
+    "update_admin": {
+      "prim": "address"
+    },
+    "set_baker_hicetnuncDAO": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "key_hash",
+          "annots": [
+            "%baker"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%hicetnuncDAO"
+          ]
+        }
+      ]
+    }
+  }
+}

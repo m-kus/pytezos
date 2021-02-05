@@ -1,0 +1,36 @@
+{
+  "parameters": {
+    "entrypoint": "update_oracle",
+    "value": {
+      "string": "KT1PdHb2tnTuyMo7JC8jcj1uw3A41QuWEeii"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0145dad57c1f4611a17096ea6dda97045ce9d88ccf00"
+          },
+          {
+            "int": "154"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "01a503c798682d5153a8c98f9d3f2eb1d044139e4c00"
+          },
+          {
+            "int": "1"
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

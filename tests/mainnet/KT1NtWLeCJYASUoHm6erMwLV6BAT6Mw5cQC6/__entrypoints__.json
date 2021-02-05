@@ -1,0 +1,406 @@
+{
+  "entrypoints": {
+    "update_owner": {
+      "prim": "address"
+    },
+    "update_operators": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%operator"
+                  ]
+                }
+              ],
+              "annots": [
+                "%add_operator"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%operator"
+                  ]
+                }
+              ],
+              "annots": [
+                "%remove_operator"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "transfer": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%from_"
+              ]
+            },
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%to_"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%token_id"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%amount"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%txs"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "token_metadata_registry": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "address"
+        }
+      ]
+    },
+    "set_pause": {
+      "prim": "bool"
+    },
+    "redeem": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat"
+        },
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "reassign": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address"
+        },
+        {
+          "prim": "option",
+          "args": [
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "modify_whitelisters": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%add"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%remove"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "modify_whitelist_admins": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%add"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%remove"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "issue": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat"
+        },
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "get_whitelisters": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "set",
+          "args": [
+            {
+              "prim": "address"
+            }
+          ]
+        }
+      ]
+    },
+    "get_whitelist_admins": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "set",
+          "args": [
+            {
+              "prim": "address"
+            }
+          ]
+        }
+      ]
+    },
+    "get_owner": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "address"
+        }
+      ]
+    },
+    "edit_whitelist": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%add"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%remove"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "balance_of": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "list",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%requests"
+          ]
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%owner"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%token_id"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%request"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%balance"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%callback"
+          ]
+        }
+      ]
+    },
+    "add_token": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%decimals"
+                  ]
+                },
+                {
+                  "prim": "map",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "prim": "string"
+                    }
+                  ],
+                  "annots": [
+                    "%extras"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "string",
+                  "annots": [
+                    "%name"
+                  ]
+                },
+                {
+                  "prim": "string",
+                  "annots": [
+                    "%symbol"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token_id"
+          ]
+        }
+      ]
+    },
+    "add_document": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "bytes"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "string": "f13f25b0c0103645940c2a30d0668d5353dbb230f8c3273540bc2b0e134d1c83"
+    }
+  },
+  "storage": {
+    "string": "f13f25b0c0103645940c2a30d0668d5353dbb230f8c3273540bc2b0e134d1c83"
+  },
+  "big_map_diff": []
+}

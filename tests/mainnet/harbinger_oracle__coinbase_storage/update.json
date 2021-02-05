@@ -1,0 +1,1285 @@
+{
+  "parameters": {
+    "entrypoint": "update",
+    "value": [
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "BAT-USDC"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1A8y3EjZYhPFJmpX39xak7DHmh4DG4cizQTQpkFCoQJQbuwxDeXv6qoMyLKevCBinMYLJC5JRRRSLPq2TBBewCxRL172tG"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "232926"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "232926"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "231449"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "231449"
+                                      },
+                                      {
+                                        "int": "11250000000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "BTC-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1BqueyvRZaSh9bE45GBPBNn5DB3q8trnzW5Emb4CpbUG6zrGsTm2qJN5x31yfSiGwEmkTbTQM9UNFFqzKDwRSSYfzE7FdQ"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "35001380000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "35001380000"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "34752590000"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "34778610000"
+                                      },
+                                      {
+                                        "int": "19949176"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "COMP-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1H4aSYYmMPvGLdcUgtvgNCXVzdJTXheXZXPEJLnGLAkLb1sGqEb4VYNnrv6WsiPCAf73oZqpjqpEAV7DCx7fD27E31ucqU"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "166900000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "166950000"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "165700000"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "165700000"
+                                      },
+                                      {
+                                        "int": "11301000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "DAI-USDC"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig18CuhwtCSqwReZLcTUrRrHjAjuRcEFreaU1AP91LtjZSCu4G3rM3bM1PYtd5VKUAZcC7ogGNfPmiVePnnUPmHwZ98M2NCD"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363400"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363460"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1002761"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "1002761"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "1002761"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "1002761"
+                                      },
+                                      {
+                                        "int": "110000000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "ETH-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1ELW8WHJ45ySUvMX2YL3JyHNEQMRipjPMhR4AspyKUWtnTVCt98qda8HZ1pQZHFMMAtxYgcTqZmem7cjSgqZXjCD8Aky8x"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1093750000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "1094510000"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "1084410000"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "1084410000"
+                                      },
+                                      {
+                                        "int": "592449113"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "KNC-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1AWjN4Qn6UshfkZqf5qUPFhM2M53PiWreoZSy6Njxgn3nrGNLWbx5yVpXkBzCsagaPK99BFPMazwLQ6zCPN9tTAe4TxCXV"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1021400"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "1021400"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "1017300"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "1017300"
+                                      },
+                                      {
+                                        "int": "2254900000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "LINK-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1AqPWWGUBvs24kkyfzZN8WNYNFcA7EJd3AUj8omH9EzvJqyBEkraM4neEQnkRXmW6h2C9mBD3MiUaowKuqWJEEXd1HP7bK"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "14599550"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "14599550"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "14431360"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "14431360"
+                                      },
+                                      {
+                                        "int": "9203760000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "REP-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1DpHaTb6JhDfW3yYuwoD3w99mVP3HxbodGzRRkKUSzkAtUaKHbowwxapLJhprdqm5YM4QikgnY5Xxoc7Gw5nEDoTtfk628"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "19050000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "19050000"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "19050000"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "19050000"
+                                      },
+                                      {
+                                        "int": "1000000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "XTZ-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1GQHYH9G51vdDdsy5hd1MfJsktB4zv2dbSuEwv8es3amsb6RncuyscZ4msXoWCrCAnBJoh97vjab8yh8Z5Ak6YRemn9aKe"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "2416000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "2417700"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "2403500"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "2403500"
+                                      },
+                                      {
+                                        "int": "9097100000"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "string": "ZRX-USD"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "spsig1DTumE4Yi7axngq13AJESWxqH1krdbvbb9uz8tw1nHj8SYZbTVmVc89gWJuMbAczR5f5ydhBveVqQXnhL1eNqtcnHoP4Uv"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1610363520"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1610363580"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "455255"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "455255"
+                              },
+                              {
+                                "prim": "Pair",
+                                "args": [
+                                  {
+                                    "int": "454175"
+                                  },
+                                  {
+                                    "prim": "Pair",
+                                    "args": [
+                                      {
+                                        "int": "454175"
+                                      },
+                                      {
+                                        "int": "2318238800"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "68"
+      },
+      {
+        "prim": "Some",
+        "args": [
+          {
+            "bytes": "01034170a2083dccbc2be253885a8d0e9f7ce859eb370d0c5cae3b6994af4cb9d666"
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "exprtqUntj1ohCsEQCP2ggwU5m5gWJD5aqGZVv8RshXA5zRhUrh3A1",
+      "key": {
+        "string": "BAT-USDC"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "232926"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "232926"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "231449"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "231449"
+                              },
+                              {
+                                "int": "11250000000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "expruDEDcy5nG4V1Up1HToC5wXZGtZXHCYNsYHBgZyUJKA44e2qnhV",
+      "key": {
+        "string": "BTC-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "35001380000"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "35001380000"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "34752590000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "34778610000"
+                              },
+                              {
+                                "int": "19949176"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "exprtkNNzcMRGPYAVQbdXkp8UCJbrX1JgFgCBYcrrff5svE3xdu3KY",
+      "key": {
+        "string": "COMP-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "166900000"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "166950000"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "165700000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "165700000"
+                              },
+                              {
+                                "int": "11301000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "exprus7Hrujrc3xz8RVUfekxTqiDFcG8xRUQUYv3eunLkxruvNBMeD",
+      "key": {
+        "string": "DAI-USDC"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363400"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363460"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1002761"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1002761"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1002761"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "1002761"
+                              },
+                              {
+                                "int": "110000000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "exprv9NLX1skZHFM1i6eXc7eAazz25T1BVjkDzc47fWEEjn6y2Zsay",
+      "key": {
+        "string": "ETH-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1093750000"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1094510000"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1084410000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "1084410000"
+                              },
+                              {
+                                "int": "592449113"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "exprtfywZSkNmyonkwgKvcuiR6xV7X9ymvofbEHwBzMJKA7QxAQLXp",
+      "key": {
+        "string": "KNC-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "1021400"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1021400"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1017300"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "1017300"
+                              },
+                              {
+                                "int": "2254900000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "expruN2dG6bWSAUNefFCdJ244bEekeGkUMCNhcQGhzJXmAYpcbgnVG",
+      "key": {
+        "string": "LINK-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "14599550"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "14599550"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "14431360"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "14431360"
+                              },
+                              {
+                                "int": "9203760000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "expru4Xom8ojhm2xgG7LGHjW3mMemUFErPG81murPbfC4aA45gN9Dh",
+      "key": {
+        "string": "REP-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "19050000"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "19050000"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "19050000"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "19050000"
+                              },
+                              {
+                                "int": "1000000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "exprukkbxD4rqiYFhFNSkLHfyEfbVEMirvDS9naHRjGKbzPsREJfmc",
+      "key": {
+        "string": "XTZ-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "2416000"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "2417700"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "2403500"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "2403500"
+                              },
+                              {
+                                "int": "9097100000"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "68",
+      "key_hash": "expruhMtUwed1qV2jRCfgdaoVLF4eHWcnE12jhYbqibWLCUeNjKBaH",
+      "key": {
+        "string": "ZRX-USD"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1610363520"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1610363580"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "455255"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "455255"
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "454175"
+                          },
+                          {
+                            "prim": "Pair",
+                            "args": [
+                              {
+                                "int": "454175"
+                              },
+                              {
+                                "int": "2318238800"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

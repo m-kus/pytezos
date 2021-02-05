@@ -1,0 +1,469 @@
+{
+  "code": [
+    {
+      "prim": "parameter",
+      "args": [
+        {
+          "prim": "unit"
+        }
+      ]
+    },
+    {
+      "prim": "storage",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "big_map",
+              "args": [
+                {
+                  "prim": "address"
+                },
+                {
+                  "prim": "bool"
+                }
+              ],
+              "annots": [
+                "%claimed"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa2"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "code",
+      "args": [
+        [
+          {
+            "prim": "CDR"
+          },
+          {
+            "prim": "DUP"
+          },
+          {
+            "prim": "CAR"
+          },
+          {
+            "prim": "SENDER"
+          },
+          {
+            "prim": "GET"
+          },
+          [
+            {
+              "prim": "IF_NONE",
+              "args": [
+                [
+                  {
+                    "prim": "PUSH",
+                    "args": [
+                      {
+                        "prim": "bool"
+                      },
+                      {
+                        "prim": "False"
+                      }
+                    ]
+                  }
+                ],
+                []
+              ]
+            }
+          ],
+          {
+            "prim": "IF",
+            "args": [
+              [
+                {
+                  "prim": "PUSH",
+                  "args": [
+                    {
+                      "prim": "string"
+                    },
+                    {
+                      "string": "WrongCondition: ~ self.data.claimed.get(sp.sender, default_value = False)"
+                    }
+                  ]
+                },
+                {
+                  "prim": "FAILWITH"
+                }
+              ],
+              []
+            ]
+          },
+          {
+            "prim": "DUP"
+          },
+          [
+            {
+              "prim": "CDR"
+            },
+            {
+              "prim": "CAR"
+            }
+          ],
+          {
+            "prim": "CONTRACT",
+            "args": [
+              {
+                "prim": "list",
+                "args": [
+                  {
+                    "prim": "pair",
+                    "args": [
+                      {
+                        "prim": "address",
+                        "annots": [
+                          "%from_"
+                        ]
+                      },
+                      {
+                        "prim": "list",
+                        "args": [
+                          {
+                            "prim": "pair",
+                            "args": [
+                              {
+                                "prim": "address",
+                                "annots": [
+                                  "%to_"
+                                ]
+                              },
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "nat",
+                                    "annots": [
+                                      "%token_id"
+                                    ]
+                                  },
+                                  {
+                                    "prim": "nat",
+                                    "annots": [
+                                      "%amount"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ],
+                        "annots": [
+                          "%txs"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "annots": [
+              "%transfer"
+            ]
+          },
+          {
+            "prim": "NIL",
+            "args": [
+              {
+                "prim": "operation"
+              }
+            ]
+          },
+          {
+            "prim": "SWAP"
+          },
+          [
+            {
+              "prim": "IF_NONE",
+              "args": [
+                [
+                  {
+                    "prim": "PUSH",
+                    "args": [
+                      {
+                        "prim": "int"
+                      },
+                      {
+                        "int": "52"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "FAILWITH"
+                  }
+                ],
+                []
+              ]
+            }
+          ],
+          {
+            "prim": "PUSH",
+            "args": [
+              {
+                "prim": "mutez"
+              },
+              {
+                "int": "0"
+              }
+            ]
+          },
+          {
+            "prim": "NIL",
+            "args": [
+              {
+                "prim": "pair",
+                "args": [
+                  {
+                    "prim": "address",
+                    "annots": [
+                      "%from_"
+                    ]
+                  },
+                  {
+                    "prim": "list",
+                    "args": [
+                      {
+                        "prim": "pair",
+                        "args": [
+                          {
+                            "prim": "address",
+                            "annots": [
+                              "%to_"
+                            ]
+                          },
+                          {
+                            "prim": "pair",
+                            "args": [
+                              {
+                                "prim": "nat",
+                                "annots": [
+                                  "%token_id"
+                                ]
+                              },
+                              {
+                                "prim": "nat",
+                                "annots": [
+                                  "%amount"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "annots": [
+                      "%txs"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "NIL",
+            "args": [
+              {
+                "prim": "pair",
+                "args": [
+                  {
+                    "prim": "address",
+                    "annots": [
+                      "%to_"
+                    ]
+                  },
+                  {
+                    "prim": "pair",
+                    "args": [
+                      {
+                        "prim": "nat",
+                        "annots": [
+                          "%token_id"
+                        ]
+                      },
+                      {
+                        "prim": "nat",
+                        "annots": [
+                          "%amount"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "PUSH",
+            "args": [
+              {
+                "prim": "nat"
+              },
+              {
+                "int": "100"
+              }
+            ]
+          },
+          {
+            "prim": "DIG",
+            "args": [
+              {
+                "int": "6"
+              }
+            ]
+          },
+          {
+            "prim": "DUP"
+          },
+          {
+            "prim": "DUG",
+            "args": [
+              {
+                "int": "7"
+              }
+            ]
+          },
+          [
+            {
+              "prim": "CDR"
+            },
+            {
+              "prim": "CDR"
+            }
+          ],
+          {
+            "prim": "PAIR",
+            "annots": [
+              "%token_id",
+              "%amount"
+            ]
+          },
+          {
+            "prim": "SENDER"
+          },
+          {
+            "prim": "PAIR",
+            "annots": [
+              "%to_"
+            ]
+          },
+          {
+            "prim": "CONS"
+          },
+          {
+            "prim": "SELF"
+          },
+          {
+            "prim": "ADDRESS"
+          },
+          {
+            "prim": "PAIR",
+            "annots": [
+              "%from_",
+              "%txs"
+            ]
+          },
+          {
+            "prim": "CONS"
+          },
+          {
+            "prim": "TRANSFER_TOKENS"
+          },
+          {
+            "prim": "CONS"
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "DUP"
+          },
+          {
+            "prim": "CDR"
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "CAR"
+          },
+          {
+            "prim": "PUSH",
+            "args": [
+              {
+                "prim": "option",
+                "args": [
+                  {
+                    "prim": "bool"
+                  }
+                ]
+              },
+              {
+                "prim": "Some",
+                "args": [
+                  {
+                    "prim": "True"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "SENDER"
+          },
+          {
+            "prim": "UPDATE"
+          },
+          {
+            "prim": "PAIR"
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "PAIR"
+          }
+        ]
+      ]
+    }
+  ],
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "183"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "012b97b882dc8533e9b523ab82ef1d6248622e859a00"
+          },
+          {
+            "int": "13"
+          }
+        ]
+      }
+    ]
+  }
+}

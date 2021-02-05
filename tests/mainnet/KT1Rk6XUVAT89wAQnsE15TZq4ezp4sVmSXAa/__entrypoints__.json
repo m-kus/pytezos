@@ -1,0 +1,35 @@
+{
+  "entrypoints": {
+    "setAdmin": {
+      "prim": "address"
+    },
+    "postExtract": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%date"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "string",
+              "annots": [
+                "%digest"
+              ]
+            },
+            {
+              "prim": "string",
+              "annots": [
+                "%retailer"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

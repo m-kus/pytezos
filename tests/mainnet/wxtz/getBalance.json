@@ -1,0 +1,84 @@
+{
+  "parameters": {
+    "entrypoint": "getBalance",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "tz1N2Hit8FBTbYtgUjh7mdQwy6DTT9T5pzmZ"
+        },
+        {
+          "string": "KT18bAxHmJh511Co2nuFJQn888JxYX939RU3"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00000cc84c2f6520dab375e8636d606671f3f5575abe"
+              },
+              {
+                "int": "254"
+              }
+            ]
+          },
+          {
+            "int": "255"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01e0a1035a390e9104b62439250043207bb4d4045000"
+                  },
+                  {
+                    "int": "256"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "257"
+                  },
+                  {
+                    "bytes": "0000521fc029738499f7961a65008b98e7532dbe84be"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "656501386282"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

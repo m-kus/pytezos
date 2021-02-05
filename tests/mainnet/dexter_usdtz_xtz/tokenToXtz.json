@@ -1,0 +1,100 @@
+{
+  "parameters": {
+    "entrypoint": "tokenToXtz",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "tz1SEEQNGjxP3SC8biDWMMHwgpYk1aeiQDyJ"
+            },
+            {
+              "string": "tz1SEEQNGjxP3SC8biDWMMHwgpYk1aeiQDyJ"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "528878792"
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "211472663"
+                },
+                {
+                  "string": "2021-01-11T10:14:53.722Z"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "124"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "46792263436"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "011b5edfd90cc62eaf4299bdc2eedae4306bea9fe200"
+                  },
+                  {
+                    "bytes": "01813a19aa1cb96fe5b039c0bfc1633e61daf0ae3f00"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "112096495545"
+                  },
+                  {
+                    "int": "45196612493"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

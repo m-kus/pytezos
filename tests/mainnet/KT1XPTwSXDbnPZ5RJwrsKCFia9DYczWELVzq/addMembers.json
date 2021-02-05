@@ -1,0 +1,192 @@
+{
+  "parameters": {
+    "entrypoint": "addMembers",
+    "value": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "string": "tz1TuFrTkcF4cSEahTTs7zsCNMZyUTVmZD35"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "bytes": "4a0000"
+                      },
+                      {
+                        "int": "100000"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "100"
+                      },
+                      {
+                        "int": "1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "prim": "False"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "string": "tz1RQyhtY3dp5LJop3h7hfHwWFYidorcWQaV"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "bytes": "4a0000"
+                      },
+                      {
+                        "int": "100000"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "100"
+                      },
+                      {
+                        "int": "1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "prim": "False"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "214"
+      },
+      {
+        "bytes": "00003f58daa0662379448585a652c9c36b44db4145ff"
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "214",
+      "key_hash": "exprvG5HzaweKgqA42Wzw1Mcaj9Xr8EENazNd7rB3npMAgctGkVuRw",
+      "key": {
+        "bytes": "00003f58daa0662379448585a652c9c36b44db4145ff"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "4a0000"
+                  },
+                  {
+                    "int": "100000"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "100"
+                  },
+                  {
+                    "int": "1"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "False"
+          }
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "214",
+      "key_hash": "expruT34xNhsk4XNga6dFZ6nS7a89SzRtfPc3xxyZQ1mnnuy14csfM",
+      "key": {
+        "bytes": "00005aa23b65704ba747ca86e6d80777326183357511"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "4a0000"
+                  },
+                  {
+                    "int": "100000"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "100"
+                  },
+                  {
+                    "int": "1"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "False"
+          }
+        ]
+      }
+    }
+  ]
+}

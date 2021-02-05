@@ -1,0 +1,71 @@
+{
+  "entrypoints": {
+    "tokens_transferred_hook": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%from_"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bool",
+              "annots": [
+                "%isReward"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%to_"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "setInterfaceImplementer": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%addr"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%implementer"
+              ]
+            },
+            {
+              "prim": "string",
+              "annots": [
+                "%name"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

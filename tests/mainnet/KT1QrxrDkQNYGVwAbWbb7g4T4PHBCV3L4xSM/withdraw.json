@@ -1,0 +1,28 @@
+{
+  "parameters": {
+    "entrypoint": "withdraw",
+    "value": {
+      "prim": "Unit"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "86346319"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000c14806d7339aa67805ac6e55a2ffc5580e1be5a7"
+          },
+          {
+            "int": "1608220685"
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

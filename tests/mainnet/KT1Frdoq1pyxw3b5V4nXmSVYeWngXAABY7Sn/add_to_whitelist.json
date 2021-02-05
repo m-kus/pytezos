@@ -1,0 +1,64 @@
+{
+  "parameters": {
+    "entrypoint": "add_to_whitelist",
+    "value": {
+      "string": "KT1VgXHLXRgh6J5iGw4zkk7vUfjLoPhRnt9L"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "329"
+              },
+              {
+                "prim": "None"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "False"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "0"
+              },
+              {
+                "int": "330"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "330",
+      "key_hash": "exprvHhkWCwqURuavVePBnoc9gMU44q39awJV1uaTYJb1qumLS9Pd1",
+      "key": {
+        "bytes": "01e77136d4944826e313279f1af539eaa379d533f200"
+      },
+      "value": {
+        "int": "1"
+      }
+    }
+  ]
+}

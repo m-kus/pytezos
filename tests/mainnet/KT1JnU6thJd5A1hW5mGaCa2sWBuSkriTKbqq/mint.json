@@ -1,0 +1,96 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "100"
+        },
+        {
+          "string": "tz1RQyhtY3dp5LJop3h7hfHwWFYidorcWQaV"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "219"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "220"
+                  },
+                  {
+                    "bytes": "015c43a88a875a7c071ab4318836a471f515b723f700"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "string": "Token"
+                  },
+                  {
+                    "bytes": "00003f58daa0662379448585a652c9c36b44db4145ff"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "string": "TK"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "int": "100"
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "220",
+      "key_hash": "exprvG5HzaweKgqA42Wzw1Mcaj9Xr8EENazNd7rB3npMAgctGkVuRw",
+      "key": {
+        "bytes": "00003f58daa0662379448585a652c9c36b44db4145ff"
+      },
+      "value": {
+        "int": "100"
+      }
+    }
+  ]
+}

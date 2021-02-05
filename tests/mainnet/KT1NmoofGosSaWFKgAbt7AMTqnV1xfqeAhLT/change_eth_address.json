@@ -1,0 +1,221 @@
+{
+  "parameters": {
+    "entrypoint": "change_eth_address",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "0000f29ea84ec77cfbd1cd63cafdd189865a85886d9b"
+        },
+        {
+          "string": "0x350b940f1a058daa2ccef62c324189394d66a9b6"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Some",
+                    "args": [
+                      {
+                        "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+                      }
+                    ]
+                  },
+                  {
+                    "int": "10"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "30"
+                  },
+                  {
+                    "int": "331"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  {
+                    "prim": "Some",
+                    "args": [
+                      {
+                        "bytes": "01e77136d4944826e313279f1af539eaa379d533f200"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "0"
+                      },
+                      {
+                        "int": "332"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "4"
+                  },
+                  {
+                    "int": "333"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Some",
+                    "args": [
+                      {
+                        "bytes": "019ba834bfff8afbfb8eb8eeabdf07a131a02cc68800"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "14000000"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "334"
+                      },
+                      {
+                        "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "333",
+      "key_hash": "exprvEjEex5hc9xmqHBhGCYQoZbQNALkspU26LTGYeNeD2GdEqyZoA",
+      "key": {
+        "bytes": "0000f29ea84ec77cfbd1cd63cafdd189865a85886d9b"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "0"
+              },
+              []
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "0"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "string": "0x350b940f1a058daa2ccef62c324189394d66a9b6"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

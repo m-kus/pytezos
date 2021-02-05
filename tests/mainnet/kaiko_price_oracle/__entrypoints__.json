@@ -1,0 +1,53 @@
+{
+  "unreachable": [
+    {
+      "path": [
+        "Left"
+      ]
+    }
+  ],
+  "entrypoints": {
+    "update_value": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%value_timestamp"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%value_xtzusd"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%value_usdchf"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%value_xtzchf"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "updateAdmin": {
+      "prim": "address"
+    }
+  }
+}

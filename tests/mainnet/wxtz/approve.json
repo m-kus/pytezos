@@ -1,0 +1,104 @@
+{
+  "parameters": {
+    "entrypoint": "approve",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "KT1XTXBsEauzcv3uPvVXW92mVqrx99UGsb9T"
+        },
+        {
+          "int": "1000000"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00000cc84c2f6520dab375e8636d606671f3f5575abe"
+              },
+              {
+                "int": "254"
+              }
+            ]
+          },
+          {
+            "int": "255"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "01e0a1035a390e9104b62439250043207bb4d4045000"
+                  },
+                  {
+                    "int": "256"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "257"
+                  },
+                  {
+                    "bytes": "0000521fc029738499f7961a65008b98e7532dbe84be"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "656515379250"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "256",
+      "key_hash": "exprueib3dANXpza5es9mA6RmiaHKYocveMJJnVZAgAiwDJBTwKZNe",
+      "key": {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000af6479596fa60213825bd5791e39ea0be451c2ca"
+          },
+          {
+            "bytes": "01faebfac1468cf6c98c1b40b4d323f5998e09aafe00"
+          }
+        ]
+      },
+      "value": {
+        "int": "1000000"
+      }
+    }
+  ]
+}

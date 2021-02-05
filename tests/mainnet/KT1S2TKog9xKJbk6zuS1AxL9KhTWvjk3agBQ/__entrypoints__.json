@@ -1,0 +1,70 @@
+{
+  "entrypoints": {
+    "default": {
+      "prim": "unit"
+    },
+    "command": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "mutez",
+                  "annots": [
+                    "%amount"
+                  ]
+                },
+                {
+                  "prim": "contract",
+                  "args": [
+                    {
+                      "prim": "unit"
+                    }
+                  ],
+                  "annots": [
+                    "%dest"
+                  ]
+                }
+              ],
+              "annots": [
+                ":transfer"
+              ]
+            },
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "key_hash"
+                    }
+                  ],
+                  "annots": [
+                    "%delegate"
+                  ]
+                },
+                {
+                  "prim": "key",
+                  "annots": [
+                    "%new_key"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            ":action"
+          ]
+        },
+        {
+          "prim": "signature"
+        }
+      ]
+    }
+  }
+}

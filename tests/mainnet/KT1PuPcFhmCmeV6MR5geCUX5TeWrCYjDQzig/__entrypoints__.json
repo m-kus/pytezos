@@ -1,0 +1,49 @@
+{
+  "entrypoints": {
+    "reject": {
+      "prim": "string"
+    },
+    "createProposal": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "int",
+              "annots": [
+                "%amount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%contractAddr"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "string",
+              "annots": [
+                "%operation"
+              ]
+            },
+            {
+              "prim": "string",
+              "annots": [
+                "%proposalId"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "accept": {
+      "prim": "string"
+    }
+  }
+}

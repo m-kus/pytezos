@@ -1,0 +1,34 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "unit"
+    },
+    "get_leadership_start_timestamp": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "timestamp"
+        }
+      ]
+    },
+    "get_leader": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "address"
+        }
+      ]
+    },
+    "get_countdown_milliseconds": {
+      "prim": "contract",
+      "args": [
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

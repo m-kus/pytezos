@@ -1,0 +1,143 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "bytes": "00005db799bf9b0dc319ba1cf21ab01461a9639043ca"
+            },
+            {
+              "int": "22"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "6"
+            },
+            [
+              {
+                "prim": "Elt",
+                "args": [
+                  {
+                    "string": ""
+                  },
+                  {
+                    "bytes": "697066733a2f2f516d537a43686d556b6b3965684e5952386347325a36433661474a5459783170676737696d6e615771684e594770"
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "019ff220aa17fbd721e4af0aa6eff65b94e3f6b73800"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "7"
+              },
+              {
+                "int": "359"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "360"
+              },
+              {
+                "int": "361"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "362"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "362",
+      "key_hash": "expruhrcC4osJigCeAywh27e6iYerzr5LnhYDwnWJc7VrLg7SxJbtm",
+      "key": {
+        "int": "6"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "6"
+          },
+          [
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "string": ""
+                },
+                {
+                  "bytes": "697066733a2f2f516d537a43686d556b6b3965684e5952386347325a36433661474a5459783170676737696d6e615771684e594770"
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "action": "update",
+      "big_map": "359",
+      "key_hash": "exprumwwh7yq7gd5EhYncT9VCpKhp96smjsvCAn5uVHKffL9t9FdTN",
+      "key": {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "00005db799bf9b0dc319ba1cf21ab01461a9639043ca"
+          },
+          {
+            "int": "6"
+          }
+        ]
+      },
+      "value": {
+        "int": "22"
+      }
+    }
+  ]
+}

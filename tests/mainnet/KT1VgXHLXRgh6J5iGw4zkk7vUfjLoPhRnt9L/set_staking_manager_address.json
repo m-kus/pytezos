@@ -1,0 +1,102 @@
+{
+  "parameters": {
+    "entrypoint": "set_staking_manager_address",
+    "value": {
+      "string": "KT1NmoofGosSaWFKgAbt7AMTqnV1xfqeAhLT"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+              },
+              {
+                "int": "326"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "prim": "False"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "327"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  {
+                    "int": "328"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Some",
+                "args": [
+                  {
+                    "bytes": "019ba834bfff8afbfb8eb8eeabdf07a131a02cc68800"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Some",
+                    "args": [
+                      {
+                        "bytes": "014fc90f6a3e502baa1bb929a81e54c822e187706900"
+                      }
+                    ]
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

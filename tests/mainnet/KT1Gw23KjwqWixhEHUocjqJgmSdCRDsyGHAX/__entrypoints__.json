@@ -1,0 +1,68 @@
+{
+  "entrypoints": {
+    "withdraw_fees": {
+      "prim": "unit"
+    },
+    "swap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%destination"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%tk_amount"
+          ]
+        }
+      ]
+    },
+    "originate_sell_order": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "mutez",
+              "annots": [
+                "%price_per_tk"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "int"
+                }
+              ],
+              "annots": [
+                "%timeframe"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%tk_amount"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%tk_id"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "parameters": {
+    "entrypoint": "modify_whitelist_admins",
+    "value": [
+      {
+        "prim": "Left",
+        "args": [
+          {
+            "string": "tz2X5cDUn2mtnVy6McgHeCEncC66srMPbDsx"
+          }
+        ]
+      },
+      {
+        "prim": "Right",
+        "args": [
+          {
+            "string": "tz2HYNLg3udWWx4gSYyuRdTGV2b85Trhg3mY"
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "string": "test.pdf"
+                    },
+                    [
+                      {
+                        "bytes": "1234567890abcdef1234567890123456789012345678901212341234123412341234"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              {
+                "int": "172"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+              },
+              {
+                "prim": "False"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "173"
+              },
+              {
+                "int": "174"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+                },
+                {
+                  "bytes": "0001f9b70fe5ad198eb7e78525aee90212ea79fe5204"
+                }
+              ],
+              [
+                {
+                  "bytes": "0001634f0505e6d04bb6dfa35ceea461b289bc5211a9"
+                },
+                {
+                  "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+                }
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

@@ -1,0 +1,48 @@
+{
+  "parameters": {
+    "entrypoint": "feedUserAccount",
+    "value": {
+      "string": "tz1PcpHf1kPRGnvXDEZF2k9zM4GPML6rToSF"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "bytes": "0093b6eb22497a177627477e63afcea2ef107f2a87e0542bbe8a6df6fd1816959f"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000b3067813bd71553336cb9d1a07ff2531fec6c58b"
+          },
+          {
+            "int": "65"
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "65",
+      "key_hash": "expru9VLcg7zjwDPy9BDLsKcLdMhvJiSB5TCTZHTXXCLqkMfzhMkSZ",
+      "key": {
+        "bytes": "002ba5bb7de399be4a9273e62f6662e8173d1ecd4f"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "95634509"
+          },
+          {
+            "int": "0"
+          }
+        ]
+      }
+    }
+  ]
+}

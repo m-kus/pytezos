@@ -1,0 +1,20 @@
+{
+  "parameters": {
+    "entrypoint": "setAdministrator",
+    "value": {
+      "string": "tz1QjiZwSpX56DkmwLybVL9iyxjcfMcRarES"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "bytes": "000037ebfee719fd00c4e3593c0ec44fe22e7973baef"
+      },
+      {
+        "int": "320"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

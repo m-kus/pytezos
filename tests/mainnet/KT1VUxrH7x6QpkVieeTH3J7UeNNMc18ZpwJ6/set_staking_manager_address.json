@@ -1,0 +1,134 @@
+{
+  "parameters": {
+    "entrypoint": "set_staking_manager_address",
+    "value": {
+      "string": "KT1GALBSRLbY3iNb1P1Dzbdrx1Phu9d9f4Xv"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "7"
+                  },
+                  {
+                    "int": "13"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  {
+                    "bytes": "000011b3b90908ab2e1a9854e8068a693fee0f650123"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "False"
+                  },
+                  {
+                    "int": "275"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  {
+                    "int": "276"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Some",
+                    "args": [
+                      {
+                        "bytes": "015321d5398ca0c6762914cf32328e7a1023e3b10900"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Some",
+                    "args": [
+                      {
+                        "bytes": "01d82955eb464b4a35bea69953d23043bb07f0498200"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

@@ -1,0 +1,113 @@
+{
+  "entrypoints": {
+    "transfer": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "int",
+          "annots": [
+            "%amount"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%f"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%t"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "setWhiteListing": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%address"
+          ]
+        },
+        {
+          "prim": "bool",
+          "annots": [
+            "%white"
+          ]
+        }
+      ]
+    },
+    "setReserve": {
+      "prim": "address"
+    },
+    "setPause": {
+      "prim": "bool"
+    },
+    "setMinter": {
+      "prim": "address"
+    },
+    "setLock": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%address"
+          ]
+        },
+        {
+          "prim": "bool",
+          "annots": [
+            "%lock"
+          ]
+        }
+      ]
+    },
+    "setAdministrator": {
+      "prim": "address"
+    },
+    "mint": {
+      "prim": "int"
+    },
+    "getOwner": {
+      "prim": "address"
+    },
+    "getMinter": {
+      "prim": "address"
+    },
+    "getCirculatingSupply": {
+      "prim": "address"
+    },
+    "getBalance": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%arg"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%target"
+          ]
+        }
+      ]
+    },
+    "getAdministrator": {
+      "prim": "address"
+    },
+    "burn": {
+      "prim": "int"
+    }
+  }
+}

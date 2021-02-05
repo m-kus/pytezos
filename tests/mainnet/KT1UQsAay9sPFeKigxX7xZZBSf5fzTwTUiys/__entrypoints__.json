@@ -1,0 +1,13 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "mutez"
+    },
+    "updateDelegator": {
+      "prim": "key_hash"
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

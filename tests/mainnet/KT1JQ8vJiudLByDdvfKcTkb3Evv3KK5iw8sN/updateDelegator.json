@@ -1,0 +1,20 @@
+{
+  "parameters": {
+    "entrypoint": "updateDelegator",
+    "value": {
+      "bytes": "005966786da3851c5b24ed3c9a80d83a2791588835"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "bytes": "01d2b76a4a0cc907a1cf1f5a3b5d975fa14ba237d000"
+      },
+      {
+        "bytes": "0000bac33304273ac54c6a2aa34f08a4628b2f78b78b"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

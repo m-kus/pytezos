@@ -1,0 +1,88 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "int": "100000"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0144412532058b541573d051a58abf05a70494bf3800"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "129"
+              },
+              {
+                "int": "100000"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "01a80f760faebb87adb5bca3aa002f91a41e32477c00"
+              },
+              {
+                "bytes": "0139b547c2c224116522ff1cc0730e0413ec75c6d400"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "bytes": "014c37ae5737557dd275abec0527abaff2a052c47100"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "129",
+      "key_hash": "exprvRRZdf3Qkz5uFrbzfnJs1PC8yL7Rbyxzu2QrjE1jWjFkku8Ent",
+      "key": {
+        "bytes": "014c37ae5737557dd275abec0527abaff2a052c47100"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "100000"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "prim": "False"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

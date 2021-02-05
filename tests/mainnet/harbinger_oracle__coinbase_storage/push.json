@@ -1,0 +1,31 @@
+{
+  "parameters": {
+    "entrypoint": "push",
+    "value": {
+      "string": "KT1AdbYiPYb5hDuEuVrfxmFehtnBCXv4Np7r%update"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "int": "68"
+      },
+      {
+        "prim": "Some",
+        "args": [
+          {
+            "bytes": "01034170a2083dccbc2be253885a8d0e9f7ce859eb370d0c5cae3b6994af4cb9d666"
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "copy",
+      "source_big_map": "68",
+      "destination_big_map": "-1"
+    }
+  ]
+}

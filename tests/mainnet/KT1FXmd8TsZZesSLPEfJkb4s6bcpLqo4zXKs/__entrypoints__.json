@@ -1,0 +1,60 @@
+{
+  "entrypoints": {
+    "reject": {
+      "prim": "string"
+    },
+    "createProposal": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "int",
+              "annots": [
+                "%amount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%contractAddr"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%f"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "string",
+                  "annots": [
+                    "%proposalId"
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%t"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "accept": {
+      "prim": "string"
+    }
+  }
+}

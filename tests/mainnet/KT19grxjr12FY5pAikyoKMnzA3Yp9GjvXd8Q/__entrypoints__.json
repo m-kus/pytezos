@@ -1,0 +1,116 @@
+{
+  "entrypoints": {
+    "main": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%counter"
+              ]
+            },
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "mutez",
+                      "annots": [
+                        "%amount"
+                      ]
+                    },
+                    {
+                      "prim": "contract",
+                      "args": [
+                        {
+                          "prim": "unit"
+                        }
+                      ],
+                      "annots": [
+                        "%dest"
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    ":transfer"
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "option",
+                      "args": [
+                        {
+                          "prim": "key_hash"
+                        }
+                      ],
+                      "annots": [
+                        "%delegate"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%threshold"
+                          ]
+                        },
+                        {
+                          "prim": "list",
+                          "args": [
+                            {
+                              "prim": "key"
+                            }
+                          ],
+                          "annots": [
+                            "%keys"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%change_keys"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                ":action"
+              ]
+            }
+          ],
+          "annots": [
+            ":payload"
+          ]
+        },
+        {
+          "prim": "list",
+          "args": [
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "signature"
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%sigs"
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

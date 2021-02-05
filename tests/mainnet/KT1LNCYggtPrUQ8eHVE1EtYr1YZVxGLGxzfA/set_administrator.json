@@ -1,0 +1,60 @@
+{
+  "parameters": {
+    "entrypoint": "set_administrator",
+    "value": {
+      "string": "KT1WLSwEjwQdBPJjYpTuyLmwduTZ6b4i8f8s"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "01ee9d647545cec5e3a85171bfc1af051851337a3b00"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "0"
+              },
+              {
+                "int": "310"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "311"
+              },
+              {
+                "int": "312"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "313"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}

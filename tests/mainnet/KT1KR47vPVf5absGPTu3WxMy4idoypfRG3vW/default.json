@@ -1,0 +1,158 @@
+{
+  "parameters": {
+    "entrypoint": "default",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Left",
+          "args": [
+            [
+              {
+                "prim": "DROP"
+              },
+              {
+                "prim": "PUSH",
+                "args": [
+                  {
+                    "prim": "address"
+                  },
+                  {
+                    "bytes": "0194913b48a0d9ca8195393bd067090be1da27e32200"
+                  }
+                ]
+              },
+              {
+                "prim": "CONTRACT",
+                "args": [
+                  {
+                    "prim": "int"
+                  }
+                ],
+                "annots": [
+                  "%replace"
+                ]
+              },
+              {
+                "prim": "IF_NONE",
+                "args": [
+                  [
+                    {
+                      "prim": "PUSH",
+                      "args": [
+                        {
+                          "prim": "string"
+                        },
+                        {
+                          "string": "invalidParamType"
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "FAILWITH"
+                    }
+                  ],
+                  []
+                ]
+              },
+              {
+                "prim": "PUSH",
+                "args": [
+                  {
+                    "prim": "mutez"
+                  },
+                  {
+                    "int": "0"
+                  }
+                ]
+              },
+              {
+                "prim": "PUSH",
+                "args": [
+                  {
+                    "prim": "int"
+                  },
+                  {
+                    "int": "14"
+                  }
+                ]
+              },
+              {
+                "prim": "TRANSFER_TOKENS"
+              }
+            ]
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "3"
+            },
+            [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "0082e4b7c310da11e631f6d488a23eb969c79912a7f084bdb86fc807708d1057f3"
+                  },
+                  {
+                    "bytes": "ed1dae659c45a5994f23f7e48615b3de16602d583b0a2d7e5604bd62d7b80df3c5fa0190ad54c88dd227a503e571cdae89d2ab8c55af518ed55f9e653ae35801"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "0067d6a2961a8df42771fa0669c9a90ce604e4565ff84e8e9bfd041f9248eb9305"
+                  },
+                  {
+                    "bytes": "1a72c72471e25d38be4ba497c7f2a4676111147dd658ada402254861aac90c1f5b9589fcb29883749e5a71c5759138489d0dea34679a07fc7b3fa561f637170f"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "bytes": "00e0395d836ce3d00db59cdbdcb0fcbcb45fc3d491b749f2911be47070910bbc88"
+                  },
+                  {
+                    "bytes": "ebd0a544cdf8701ee47109551e14075ff6e2c8e9ee978c1f28ec17f24c501d5fc7dad4cdff5a65b82439b1953304205fd9c4a9b10c6131d2449f005b99c25f01"
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      [
+        {
+          "bytes": "0005e890d67563a8423d08b85ebc27abe93df7c744"
+        },
+        {
+          "bytes": "00127ac954605170b94b758270a94501dd4fdec791"
+        },
+        {
+          "bytes": "003096b0df6978e616a6a748196ab0aa7f5e79f790"
+        },
+        {
+          "bytes": "004434e07c9a03c1e129d56e4547b4db2a748b2d21"
+        },
+        {
+          "bytes": "00faa023969534f343fbe024e7c46600e4b84e2bed"
+        }
+      ],
+      {
+        "int": "3"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

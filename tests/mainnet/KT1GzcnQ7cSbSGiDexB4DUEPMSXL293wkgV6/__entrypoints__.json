@@ -1,0 +1,226 @@
+{
+  "entrypoints": {
+    "updateGlobalLimit": {
+      "prim": "nat"
+    },
+    "updateCountryRestrictions": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bytes"
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%country_invest_limit"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%min_rating"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "map",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    },
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%rating_restrictions"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "updateCountryCounter": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "bytes",
+                  "annots": [
+                    "%country"
+                  ]
+                },
+                {
+                  "prim": "bool",
+                  "annots": [
+                    "%decrement"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "bool",
+                  "annots": [
+                    "%increment"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%rating"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "transferTokens": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%tr_from"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%tr_to"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bool",
+              "annots": [
+                "%receiver"
+              ]
+            },
+            {
+              "prim": "bool",
+              "annots": [
+                "%sender"
+              ]
+            }
+          ],
+          "annots": [
+            "%zero_balances"
+          ]
+        }
+      ]
+    },
+    "setToken": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address"
+        },
+        {
+          "prim": "bool"
+        }
+      ]
+    },
+    "setRegistrar": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address"
+        },
+        {
+          "prim": "bool"
+        }
+      ]
+    },
+    "setGlobalRestriction": {
+      "prim": "bool"
+    },
+    "setAccount": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address"
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%registrar"
+              ]
+            },
+            {
+              "prim": "bool",
+              "annots": [
+                "%restricted"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "removeCountryRestrictions": {
+      "prim": "bytes"
+    },
+    "modifyTokenTotalSupply": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%investor"
+              ]
+            },
+            {
+              "prim": "bool",
+              "annots": [
+                "%is_balance_zero"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "bool",
+          "annots": [
+            "%was_balance_zero"
+          ]
+        }
+      ]
+    },
+    "addToken": {
+      "prim": "address"
+    }
+  }
+}

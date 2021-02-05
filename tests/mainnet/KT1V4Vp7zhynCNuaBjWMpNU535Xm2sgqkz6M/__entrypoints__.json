@@ -1,0 +1,24 @@
+{
+  "entrypoints": {
+    "runEntrypointLambda": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%lambdaName"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%lambdaParameter"
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

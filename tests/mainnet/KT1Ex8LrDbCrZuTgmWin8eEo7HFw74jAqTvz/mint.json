@@ -1,0 +1,104 @@
+{
+  "parameters": {
+    "entrypoint": "mint",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "bytes": "0000096727d05e96b8b4806d1414b5c99a1bee604053"
+            },
+            {
+              "int": "5000000"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "hicetnuncDAO"
+            },
+            {
+              "int": "1"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "01aa4318dfd0188f8eb56a2b95978f2c530b45e01a00"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "2"
+              },
+              {
+                "int": "151"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Unit"
+              },
+              {
+                "int": "152"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "int": "153"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "151",
+      "key_hash": "expru68GMcqtNZX5Kr6cjw3bkoKU43hJhHcAE9c7VCX4qCvUycReTY",
+      "key": {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000096727d05e96b8b4806d1414b5c99a1bee604053"
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      "value": {
+        "int": "10000000"
+      }
+    }
+  ]
+}

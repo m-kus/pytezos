@@ -1,0 +1,134 @@
+{
+  "entrypoints": {
+    "withdrawDevFee": {
+      "prim": "unit"
+    },
+    "withdraw": {
+      "prim": "mutez"
+    },
+    "updateRewardPoolReleaseDayCount": {
+      "prim": "int"
+    },
+    "updateOwner": {
+      "prim": "address"
+    },
+    "updateInvestorBaker": {
+      "prim": "address"
+    },
+    "updateConfig": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%devFee"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%distributionPoolFee"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%referralFee"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%rewardPoolFee"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%deposit"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%devFee"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%distributionPoolFee"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%referralFee"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%rewardPoolFee"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%withdraw"
+          ]
+        }
+      ]
+    },
+    "updateBaker": {
+      "prim": "key_hash"
+    },
+    "register": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%investor"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%referrar"
+          ]
+        }
+      ]
+    },
+    "reRoll": {
+      "prim": "mutez"
+    },
+    "deposit": {
+      "prim": "unit"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "parameters": {
+    "entrypoint": "setConfirmedContract",
+    "value": {
+      "string": "KT1F25MTKpQJF8xJXVCNhweGmsxHtAjCDTFx"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "bytes": "00007d8c1154b558b12a45fdf1d7a8012259540eb16b"
+      },
+      {
+        "int": "288"
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "288",
+      "key_hash": "expruADcBN6j8JCFZwi6b7oLpX1Z8M44Lhsj9Dw8RQE12oWJpyF9QA",
+      "key": {
+        "bytes": "01469a0090d8956f9ef8c0d7352b451bb0bc09454c00"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "True"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1"
+              },
+              {
+                "bytes": "cf5e8ab9df8d9ef9fb8f19e3312f56ab277017367ea2a8ac99946b4d11f449583a701d35c746566ca31a37c1d2ca460c15886307385bb68519b2df98275dfc04"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "parameters": {
+    "entrypoint": "issue",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "0"
+        },
+        {
+          "int": "1000000000000000000000"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "string": "test.pdf"
+                    },
+                    [
+                      {
+                        "bytes": "1234567890abcdef1234567890123456789012345678901212341234123412341234"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              {
+                "int": "172"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+              },
+              {
+                "prim": "False"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "173"
+              },
+              {
+                "int": "174"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "bytes": "00016534f2f365cdd4fdc0bf5821c98a3870087bfbae"
+                },
+                {
+                  "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+                }
+              ],
+              [
+                {
+                  "bytes": "0001634f0505e6d04bb6dfa35ceea461b289bc5211a9"
+                },
+                {
+                  "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+                }
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "big_map_diff": [
+    {
+      "action": "update",
+      "big_map": "172",
+      "key_hash": "exprttxPYxhX3cVoWmkNoFreXqzcoTHymqb9ck9iGMqxAnMethsPkC",
+      "key": {
+        "bytes": "000185e321bf8ca847188c2cb1b334ccbb2e244f4ee2"
+      },
+      "value": {
+        "prim": "Pair",
+        "args": [
+          [],
+          [
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "int": "0"
+                },
+                {
+                  "int": "877142776543210987660001"
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

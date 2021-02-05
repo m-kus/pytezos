@@ -1,0 +1,48 @@
+{
+  "entrypoints": {
+    "flush": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat"
+        },
+        {
+          "prim": "contract",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    ":from"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        ":to"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        ":value"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "entrypoints": {
+    "signDocument": {
+      "prim": "string"
+    },
+    "notarizeDocument": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%documentHash"
+          ]
+        },
+        {
+          "prim": "set",
+          "args": [
+            {
+              "prim": "address"
+            }
+          ],
+          "annots": [
+            "%signees"
+          ]
+        }
+      ]
+    }
+  }
+}

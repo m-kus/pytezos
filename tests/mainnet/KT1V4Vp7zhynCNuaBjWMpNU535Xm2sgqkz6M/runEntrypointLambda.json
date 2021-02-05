@@ -1,0 +1,36 @@
+{
+  "parameters": {
+    "entrypoint": "runEntrypointLambda",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "onOvenSetDelegate"
+        },
+        {
+          "bytes": "050a000000160000a2209c7d0711c3a609f33ec71ebfc98271ee13ee"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "258"
+          },
+          {
+            "int": "259"
+          }
+        ]
+      },
+      {
+        "int": "260"
+      }
+    ]
+  },
+  "big_map_diff": []
+}

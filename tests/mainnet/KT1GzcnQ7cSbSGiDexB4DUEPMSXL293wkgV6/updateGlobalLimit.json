@@ -1,0 +1,134 @@
+{
+  "parameters": {
+    "entrypoint": "updateGlobalLimit",
+    "value": {
+      "int": "10"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "215"
+                  },
+                  {
+                    "int": "216"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "217"
+                  },
+                  {
+                    "int": "218"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "10"
+                  },
+                  {
+                    "prim": "False"
+                  }
+                ]
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "int": "0"
+                  },
+                  [
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "bytes": "00005aa23b65704ba747ca86e6d80777326183357511"
+                        },
+                        {
+                          "prim": "True"
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "Elt",
+                      "args": [
+                        {
+                          "bytes": "01fa279a9055665a0427dce6ec88c6bec53197b00600"
+                        },
+                        {
+                          "prim": "False"
+                        }
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "string": "Issuer"
+              },
+              {
+                "bytes": "00003f58daa0662379448585a652c9c36b44db4145ff"
+              }
+            ]
+          },
+          [
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "00005aa23b65704ba747ca86e6d80777326183357511"
+                },
+                {
+                  "prim": "False"
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "01fa279a9055665a0427dce6ec88c6bec53197b00600"
+                },
+                {
+                  "prim": "False"
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "big_map_diff": []
+}
