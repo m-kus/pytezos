@@ -36,7 +36,8 @@ def big_map_diff_to_lazy_diff(big_map_diff: List[dict]):
 
 class BigMapType(MapType, prim='big_map', args_len=2):
 
-    def __init__(self, items: List[Tuple[MichelsonType, MichelsonType]],
+    def __init__(self,
+                 items: List[Tuple[MichelsonType, MichelsonType]],
                  ptr: Optional[int] = None,
                  removed_keys: Optional[List[MichelsonType]] = None):
         super(BigMapType, self).__init__(items=items)
@@ -144,7 +145,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             return copy(self)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'BigMapType':
-        assert self.ptr is not None, f'Big_map id is not defined'
+        assert self.ptr is not None, f'Big_map ID is not defined'
         if self.context:
             src_ptr, dst_ptr, action = self.context.get_big_map_diff(self.ptr)
         else:

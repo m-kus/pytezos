@@ -1,78 +1,9 @@
+from copy import copy
+from typing import Optional, Type, List
+
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.core import IntType
-from pytezos.michelson.micheline import MichelineLiteral
-
-
-class BLS12_381_G1Type(IntType, prim='bls12_381_g1'):
-
-    def __init__(self, value: int):
-        super(BLS12_381_G1Type, self).__init__()
-        self.value = value
-
-    def __bytes__(self):
-        return self.value.to_bytes(48, 'big')
-
-    @classmethod
-    def from_python_object(cls, py_obj) -> 'BLS12_381_G1Type':
-        if isinstance(py_obj, int):
-            value = py_obj
-        elif isinstance(py_obj, bytes):
-            value = int.from_bytes(py_obj, 'big')
-        elif isinstance(py_obj, str):
-            if py_obj.startswith('0x'):
-                py_obj = py_obj[2:]
-            value = int.from_bytes(bytes.fromhex(py_obj), 'big')
-        else:
-            assert False, f'unexpected value {py_obj}'
-        return cls(value)
-
-
-class BLS12_381_G2Type(IntType, prim='bls12_381_g2'):
-
-    def __init__(self, value: int):
-        super(BLS12_381_G2Type, self).__init__()
-        self.value = value
-
-    def __bytes__(self):
-        return self.value.to_bytes(96, 'big')
-
-    @classmethod
-    def from_python_object(cls, py_obj) -> 'BLS12_381_G2Type':
-        if isinstance(py_obj, int):
-            value = py_obj
-        elif isinstance(py_obj, bytes):
-            value = int.from_bytes(py_obj, 'big')
-        elif isinstance(py_obj, str):
-            if py_obj.startswith('0x'):
-                py_obj = py_obj[2:]
-            value = int.from_bytes(bytes.fromhex(py_obj), 'big')
-        else:
-            assert False, f'unexpected value {py_obj}'
-        return cls(value)
-
-
-class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
-
-    def __init__(self, value: int):
-        super(BLS12_381_FrType, self).__init__()
-        self.value = value
-
-    def __bytes__(self):
-        return self.value.to_bytes(96, 'big')
-
-    @classmethod
-    def from_python_object(cls, py_obj) -> 'BLS12_381_FrType':
-        if isinstance(py_obj, int):
-            value = py_obj
-        elif isinstance(py_obj, bytes):
-            value = int.from_bytes(py_obj, 'big')
-        elif isinstance(py_obj, str):
-            if py_obj.startswith('0x'):
-                py_obj = py_obj[2:]
-            value = int.from_bytes(bytes.fromhex(py_obj), 'big')
-        else:
-            assert False, f'unexpected value {py_obj}'
-        return cls(value)
+from pytezos.michelson.micheline import MichelineLiteral, parse_micheline_literal, Micheline, MichelineSequence
+from pytezos.context.execution import ExecutionContext
 
 
 class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len=1):
@@ -81,10 +12,56 @@ class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len
 
 class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
 
+    def __init__(self, ptr: Optional[int] = None):
+        super(SaplingStateType, self).__init__()
+        self.ptr = ptr
+        self.context: Optional[ExecutionContext] = None
+
     def __repr__(self):
-        return ''
+        if self.ptr:
+            return f'<{self.ptr}>'
+        else:
+            return '{}'
 
     @staticmethod
     def empty(memo_size: int):
         cls = SaplingStateType.create_type(args=[MichelineLiteral.create(memo_size)])
         return cls()
+
+    @classmethod
+    def from_micheline_value(cls, val_expr) -> 'SaplingStateType':
+        if isinstance(val_expr, dict):
+            ptr = parse_micheline_literal(val_expr, {'int': int})
+            return cls(ptr=ptr)
+        elif isinstance(val_expr, list):
+            return cls()
+        else:
+            assert False, f'unexpected value {val_expr}'
+
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
+        if lazy_diff:
+            return []
+        else:
+            assert self.ptr is not None, f'Sapling_state id is not defined'
+            return {'int': str(self.ptr)}
+
+    def to_literal(self) -> Type[Micheline]:
+        if self.ptr is not None:
+            return MichelineLiteral.create(self.ptr)
+        else:
+            return MichelineSequence.create_type(args=[])
+
+    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+        self.context = context
+        self.ptr = context.get_tmp_sapling_state_id()
+
+    def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
+        return copy(self)
+
+    def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'MichelsonType':
+        assert self.ptr is not None, f'Sapling_state ID is not defined'
+        if self.context:
+            dst_ptr, _ = self.context.get_sapling_state_diff()
+        else:
+            dst_ptr = self.ptr
+        return type(self)(dst_ptr)

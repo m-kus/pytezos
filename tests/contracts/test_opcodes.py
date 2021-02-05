@@ -7,19 +7,21 @@ from pytezos.michelson.parse import michelson_to_micheline
 
 CHAIN_ID = 'NetXdQprcVkpaWU'
 PUBLIC_KEY = 'edpktpPTi9MLK2wabnNny1kD5LvBmGtFdRjnCiUT3ZZgNDjjM4mpoh'
+SIGNATURE = 'edsigu3QszDjUpeqYqbvhyRxMpVFamEnvm9FYnt7YiiNt9nmjYfh8ZTbsybZ5WnBkhA7zfHsRVyuTnRsGLR6fNHt1Up1FxgyRtF'
+KEY_HASH = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 BALANCE = 4000000000000
-VOTING_POWER = 0
-TOTAL_VOTING_POWER = 0
+VOTING_POWER = 500
+TOTAL_VOTING_POWER = 2500
 
 
 class OpcodesTestCase(TestCase):
 
     def test_single_opcode(self):
         filename, storage, parameter, result = (
-            'xor.tz',
-            'None',
-            'Left (Pair False False)',
-            '(Some (Left False))',
+            'sub_timestamp_delta.tz',
+            '111',
+            '(Pair 100 2000000000000000000)',
+            '-1999999999999999900',
         )
 
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
@@ -28,7 +30,7 @@ class OpcodesTestCase(TestCase):
         _, storage, lazy_diff, stdout, error = Interpreter.run_code(
             parameter=michelson_to_micheline(parameter),
             storage=michelson_to_micheline(storage),
-            script=michelson_to_micheline(script)
+            script=michelson_to_micheline(script),
         )
         print('\n'.join(stdout))
         if error:
@@ -1037,432 +1039,36 @@ class OpcodesTestCase(TestCase):
         ('dup-n.tz', 'Unit', 'Unit', 'Unit'),
         # Test Sapling
         ('sapling_empty_state.tz', '{}', 'Unit', '0'),
-        # Test building Fr element from nat.
-        # The initial storage is dropped then any value is valid.
-        # Random values can be generated using the following OCaml program.
-        # let r = Bls12_381.Fr.(random ()) in
-        # let x = Bls12_381.Fr.random () in
-        # Printf.printf "Param = (Pair %s 0x%s). Result = 0x%s"
-        #  (Bls12_381.Fr.to_string r)
-        #  (Hex.(show (of_bytes (Bls12_381.Fr.to_bytes x))))
-        #  (Hex.(show (of_bytes (Bls12_381.Fr.(to_bytes (mul r x))))))
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '0',
-        #     '0x00000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '1',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # # The natural is 1 in Fr.
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '524358751751261904794477405081859658376905525005276378226036'
-        #     '58699938581184514',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '2',
-        #     '0x02000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
-        #     + '5401f',
-        #     '3364491663033484423912034843462646864953418677080980279259699'
-        #     + '6408934105684394',
-        #     '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
-        #     + '8a221',
-        # ),
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
-        #     + 'dbe3f',
-        #     '2262028481792278490256467246991799299632821112798447289749169'
-        #     + '8543785655336309',
-        #     '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
-        #     + '77c62',
-        # ),
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '1718009307279455880617703583439793220591757728848373965251048'
-        #     + '2486858834123369',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # # Same than previous one, but we added the order to the natural to
-        # # verify the modulo is computed correctly and the multiplication
-        # # computation does not fail.
-        # (
-        #     'bls12_381_fr_z_nat.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '69615968247920749285624776342583898043608129789011377475114141'
-        #     + '186797415307882',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # # Test with (positive and negative) integers.
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '0',
-        #     '0x00000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '1',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '524358751751261904794477405081859658376905525005276378226036'
-        #     '58699938581184514',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '2',
-        #     '0x02000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
-        #     + '5401f',
-        #     '3364491663033484423912034843462646864953418677080980279259699'
-        #     + '6408934105684394',
-        #     '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
-        #     + '8a221',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
-        #     + 'dbe3f',
-        #     '2262028481792278490256467246991799299632821112798447289749169'
-        #     + '8543785655336309',
-        #     '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
-        #     + '77c62',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '1718009307279455880617703583439793220591757728848373965251048'
-        #     + '2486858834123369',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # # Same than previous one, but we added the order to the natural to
-        # # verify the modulo is computed correctly and the multiplication
-        # # computation does not fail.
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '69615968247920749285624776342583898043608129789011377475114141'
-        #     + '186797415307882',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '-1',
-        #     '0x00000000fffffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953'
-        #     + 'a7ed73',
-        # ),
-        # (
-        #     'bls12_381_fr_z_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '-42',
-        #     '0xd7fffffffefffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953a'
-        #     + '7ed73',
-        # ),
-        # # Test building Fr element from nat.
-        # # The initial storage is dropped then any value is valid.
-        # # Random values can be generated using the following OCaml program.
-        # # let r = Bls12_381.Fr.(random ()) in
-        # # let x = Bls12_381.Fr.random () in
-        # # Printf.printf "Param = (Pair %s 0x%s). Result = 0x%s"
-        # #  (Bls12_381.Fr.to_string r)
-        # #  (Hex.(show (of_bytes (Bls12_381.Fr.to_bytes x))))
-        # #  (Hex.(show (of_bytes (Bls12_381.Fr.(to_bytes (mul r x))))))
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '0',
-        #     '0x00000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '1',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # # The natural is 1 in Fr.
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '524358751751261904794477405081859658376905525005276378226036'
-        #     '58699938581184514',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '2',
-        #     '0x02000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
-        #     + '5401f',
-        #     '3364491663033484423912034843462646864953418677080980279259699'
-        #     + '6408934105684394',
-        #     '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
-        #     + '8a221',
-        # ),
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
-        #     + 'dbe3f',
-        #     '2262028481792278490256467246991799299632821112798447289749169'
-        #     + '8543785655336309',
-        #     '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
-        #     + '77c62',
-        # ),
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '1718009307279455880617703583439793220591757728848373965251048'
-        #     + '2486858834123369',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # # Same than previous one, but we added the order to the natural to
-        # # verify the modulo is computed correctly and the multiplication
-        # # computation does not fail.
-        # (
-        #     'bls12_381_z_fr_nat.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '69615968247920749285624776342583898043608129789011377475114141'
-        #     + '186797415307882',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # # Test with (positive and negative) integers.
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '0',
-        #     '0x00000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '1',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '524358751751261904794477405081859658376905525005276378226036'
-        #     '58699938581184514',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '2',
-        #     '0x02000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
-        #     + '5401f',
-        #     '3364491663033484423912034843462646864953418677080980279259699'
-        #     + '6408934105684394',
-        #     '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
-        #     + '8a221',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
-        #     + 'dbe3f',
-        #     '2262028481792278490256467246991799299632821112798447289749169'
-        #     + '8543785655336309',
-        #     '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
-        #     + '77c62',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '1718009307279455880617703583439793220591757728848373965251048'
-        #     + '2486858834123369',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '-1',
-        #     '0x00000000fffffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953'
-        #     + 'a7ed73',
-        # ),
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x01000000000000000000000000000000000000000000000000000000000'
-        #     + '00000',
-        #     '-42',
-        #     '0xd7fffffffefffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953a'
-        #     + '7ed73',
-        # ),
-        # # Same than previous one, but we added the order to the natural to
-        # # verify the modulo is computed correctly and the multiplication
-        # # computation does not fail.
-        # (
-        #     'bls12_381_z_fr_int.tz',
-        #     '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
-        #     + 'fcf2d',
-        #     '69615968247920749285624776342583898043608129789011377475114141'
-        #     + '186797415307882',
-        #     '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
-        #     + 'bf221',
-        # ),
-        # # Test Fr bytes can be pushed without being padded
-        # (
-        #     'add_bls12_381_fr.tz',
-        #     'None',
-        #     'Pair 0x00 0x00',
-        #     '(Some 0x000000000000000000000000000000000000000000000000000000'
-        #     + '0000000000)',
-        # ),
-        # (
-        #     'add_bls12_381_fr.tz',
-        #     'None',
-        #     'Pair 0x01 0x00',
-        #     '(Some 0x010000000000000000000000000000000000000000000000000000'
-        #     + '0000000000)',
-        # ),
-        # (
-        #     'add_bls12_381_fr.tz',
-        #     'None',
-        #     'Pair 0x010000 0x00',
-        #     '(Some 0x010000000000000000000000000000000000000000000000000000'
-        #     + '0000000000)',
-        # ),
-        # (
-        #     'add_bls12_381_fr.tz',
-        #     'None',
-        #     'Pair 0x010000 0x010000',
-        #     '(Some 0x020000000000000000000000000000000000000000000000000000'
-        #     + '0000000000)',
-        # ),
-        # (
-        #     'bls12_381_fr_push_bytes_not_padded.tz',
-        #     'None',
-        #     'Unit',
-        #     '(Some 0x000000000000000000000000000000000000000000000000000000'
-        #     + '0000000000)',
-        # ),
-        # (
-        #     'bls12_381_fr_push_nat.tz',
-        #     'None',
-        #     'Unit',
-        #     '(Some 0x100000000000000000000000000000000000000000000000000000'
-        #     + '0000000000)',
-        # ),
-        # ('bls12_381_fr_to_int.tz', '0', '0x00', '0'),
-        # ('bls12_381_fr_to_int.tz', '0', '0x01', '1'),
-        # # Generated using
-        # # let r = Bls12_381.Fr.(random ()) in
-        # # Printf.printf "%s = 0x%s"
-        # #   (Bls12_381.Fr.to_string r)
-        # #   (Hex.(show (of_bytes (Bls12_381.Fr.to_bytes r))))
-        # (
-        #     'bls12_381_fr_to_int.tz',
-        #     '0',
-        #     '0x28db8e57af88d9576acd181b89f24e50a89a6423f939026ed91349fc9'
-        #     + 'af16c27',
-        #     '1783268807701357777652478449446472851821391321341286660405373'
-        #     + '5695200962927400',
-        # ),
-        # (
-        #     'bls12_381_fr_to_int.tz',
-        #     '0',
-        #     '0xb9e8abf8dc324a010007addde986fe0f7c81fab16d26819d0534b7691c'
-        #     + '0b0719',
-        #     '1132026582925658583078152196614952946047676740821044523890286'
-        #     + '9222031333517497',
-        # ),
-        # # Mutez -> Fr
-        # (
-        #     'mutez_to_bls12_381_fr.tz',
-        #     '0x02',
-        #     '16',
-        #     '0x100000000000000000000000000000000000000000000000000000000'
-        #     + '0000000',
-        # ),
-        # # # would fail if trying to PACK mutez and UNPACK to Fr
-        # (
-        #     'mutez_to_bls12_381_fr.tz',
-        #     '0x00',
-        #     '257',
-        #     '0x010100000000000000000000000000000000000000000000000000000'
-        #     + '0000000',
-        # ),
-        # # Fr -> Mutez
-        # ('bls12_381_fr_to_mutez.tz', '0', '0x10', '16'),
+        # Mapping over maps
+        ('map_map_sideeffect.tz', '(Pair {} 0)', '10', '(Pair {} 0)'),
+        (
+            'map_map_sideeffect.tz',
+            '(Pair { Elt "foo" 1 } 1)',
+            '10',
+            '(Pair { Elt "foo" 11 } 11)',
+        ),
+        (
+            'map_map_sideeffect.tz',
+            '(Pair { Elt "bar" 5 ; Elt "foo" 1 } 6)',
+            '15',
+            '(Pair { Elt "bar" 20 ; Elt "foo" 16 } 36)',
+        ),
+        # Test PACK/UNPACK and binary format
+        (
+            'packunpack.tz',
+            'Unit',
+            '(Pair (Pair (Pair "toto" {3;7;9;1}) {1;2;3}) '
+            + '0x05070707070100000004746f746f020000000800030'
+            + '007000900010200000006000100020003)',
+            'Unit'
+        ),
+        # Test signature
+        (
+            'check_signature.tz',
+            f'(Pair "{SIGNATURE}" "hello")',
+            '"edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav"',
+            f'(Pair "{SIGNATURE}" "hello")'
+        )
     ])
     def test_opcodes(self, filename, storage, parameter, result):
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
@@ -1473,9 +1079,486 @@ class OpcodesTestCase(TestCase):
             storage=michelson_to_micheline(storage),
             script=michelson_to_micheline(script),
             balance=BALANCE,
-            chain_id=CHAIN_ID
+            chain_id=CHAIN_ID,
+            total_voting_power=TOTAL_VOTING_POWER,
+            voting_power={KEY_HASH: VOTING_POWER}
         )
-        if storage is None:
+        if error:
             print('\n'.join(stdout))
-        self.assertIsNotNone(storage)
+            raise error
         self.assertEqual(michelson_to_micheline(result), storage.to_micheline_value())
+
+    @parameterized.expand([
+        # Test building Fr element from nat.
+        # The initial storage is dropped then any value is valid.
+        # Random values can be generated using the following OCaml program.
+        # let r = Bls12_381.Fr.(random ()) in
+        # let x = Bls12_381.Fr.random () in
+        # Printf.printf "Param = (Pair %s 0x%s). Result = 0x%s"
+        #  (Bls12_381.Fr.to_string r)
+        #  (Hex.(show (of_bytes (Bls12_381.Fr.to_bytes x))))
+        #  (Hex.(show (of_bytes (Bls12_381.Fr.(to_bytes (mul r x))))))
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '0',
+            '0x00000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '1',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        # The natural is 1 in Fr.
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '524358751751261904794477405081859658376905525005276378226036'
+            '58699938581184514',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '2',
+            '0x02000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
+            + '5401f',
+            '3364491663033484423912034843462646864953418677080980279259699'
+            + '6408934105684394',
+            '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
+            + '8a221',
+        ),
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
+            + 'dbe3f',
+            '2262028481792278490256467246991799299632821112798447289749169'
+            + '8543785655336309',
+            '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
+            + '77c62',
+        ),
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '1718009307279455880617703583439793220591757728848373965251048'
+            + '2486858834123369',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        # Same than previous one, but we added the order to the natural to
+        # verify the modulo is computed correctly and the multiplication
+        # computation does not fail.
+        (
+            'bls12_381_fr_z_nat.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '69615968247920749285624776342583898043608129789011377475114141'
+            + '186797415307882',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        # Test with (positive and negative) integers.
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '0',
+            '0x00000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '1',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '524358751751261904794477405081859658376905525005276378226036'
+            '58699938581184514',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '2',
+            '0x02000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
+            + '5401f',
+            '3364491663033484423912034843462646864953418677080980279259699'
+            + '6408934105684394',
+            '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
+            + '8a221',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
+            + 'dbe3f',
+            '2262028481792278490256467246991799299632821112798447289749169'
+            + '8543785655336309',
+            '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
+            + '77c62',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '1718009307279455880617703583439793220591757728848373965251048'
+            + '2486858834123369',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        # Same than previous one, but we added the order to the natural to
+        # verify the modulo is computed correctly and the multiplication
+        # computation does not fail.
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '69615968247920749285624776342583898043608129789011377475114141'
+            + '186797415307882',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '-1',
+            '0x00000000fffffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953'
+            + 'a7ed73',
+        ),
+        (
+            'bls12_381_fr_z_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '-42',
+            '0xd7fffffffefffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953a'
+            + '7ed73',
+        ),
+        # Test building Fr element from nat.
+        # The initial storage is dropped then any value is valid.
+        # Random values can be generated using the following OCaml program.
+        # let r = Bls12_381.Fr.(random ()) in
+        # let x = Bls12_381.Fr.random () in
+        # Printf.printf "Param = (Pair %s 0x%s). Result = 0x%s"
+        #  (Bls12_381.Fr.to_string r)
+        #  (Hex.(show (of_bytes (Bls12_381.Fr.to_bytes x))))
+        #  (Hex.(show (of_bytes (Bls12_381.Fr.(to_bytes (mul r x))))))
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '0',
+            '0x00000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '1',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        # The natural is 1 in Fr.
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '524358751751261904794477405081859658376905525005276378226036'
+            '58699938581184514',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '2',
+            '0x02000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
+            + '5401f',
+            '3364491663033484423912034843462646864953418677080980279259699'
+            + '6408934105684394',
+            '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
+            + '8a221',
+        ),
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
+            + 'dbe3f',
+            '2262028481792278490256467246991799299632821112798447289749169'
+            + '8543785655336309',
+            '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
+            + '77c62',
+        ),
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '1718009307279455880617703583439793220591757728848373965251048'
+            + '2486858834123369',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        # Same than previous one, but we added the order to the natural to
+        # verify the modulo is computed correctly and the multiplication
+        # computation does not fail.
+        (
+            'bls12_381_z_fr_nat.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '69615968247920749285624776342583898043608129789011377475114141'
+            + '186797415307882',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        # Test with (positive and negative) integers.
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '0',
+            '0x00000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '1',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '524358751751261904794477405081859658376905525005276378226036'
+            '58699938581184514',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '2',
+            '0x02000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x5b0ecd0fa853810e356f1eb79721e80b30510fcc3a455f4fc02fdd9a90c'
+            + '5401f',
+            '3364491663033484423912034843462646864953418677080980279259699'
+            + '6408934105684394',
+            '0x2ef123703093cbbbd124e15f2054fa5781ed0b8d092ec3c6e5d76b4ca91'
+            + '8a221',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x4147a5ad0a633e4880d2296f08ec5c12d03e3fa4a6b49ecbd16a30a3cfc'
+            + 'dbe3f',
+            '2262028481792278490256467246991799299632821112798447289749169'
+            + '8543785655336309',
+            '0x4e387e0ebfb3d1633153c195036e0c0b672955c4a0e420f93ec20a76fe6'
+            + '77c62',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '1718009307279455880617703583439793220591757728848373965251048'
+            + '2486858834123369',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '-1',
+            '0x00000000fffffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953'
+            + 'a7ed73',
+        ),
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x01000000000000000000000000000000000000000000000000000000000'
+            + '00000',
+            '-42',
+            '0xd7fffffffefffffffe5bfeff02a4bd5305d8a10908d83933487d9d2953a'
+            + '7ed73',
+        ),
+        # Same than previous one, but we added the order to the natural to
+        # verify the modulo is computed correctly and the multiplication
+        # computation does not fail.
+        (
+            'bls12_381_z_fr_int.tz',
+            '0x8578be1766f92cd82c5e5135c374a03a8562e263ea953a3f9711b0153b7'
+            + 'fcf2d',
+            '69615968247920749285624776342583898043608129789011377475114141'
+            + '186797415307882',
+            '0xfaa60dacea8e26112e524d379720fe4f95fbc5a26f1b1a67e229e26ddec'
+            + 'bf221',
+        ),
+        # Test Fr bytes can be pushed without being padded
+        (
+            'add_bls12_381_fr.tz',
+            'None',
+            'Pair 0x00 0x00',
+            '(Some 0x000000000000000000000000000000000000000000000000000000'
+            + '0000000000)',
+        ),
+        (
+            'add_bls12_381_fr.tz',
+            'None',
+            'Pair 0x01 0x00',
+            '(Some 0x010000000000000000000000000000000000000000000000000000'
+            + '0000000000)',
+        ),
+        (
+            'add_bls12_381_fr.tz',
+            'None',
+            'Pair 0x010000 0x00',
+            '(Some 0x010000000000000000000000000000000000000000000000000000'
+            + '0000000000)',
+        ),
+        (
+            'add_bls12_381_fr.tz',
+            'None',
+            'Pair 0x010000 0x010000',
+            '(Some 0x020000000000000000000000000000000000000000000000000000'
+            + '0000000000)',
+        ),
+        (
+            'bls12_381_fr_push_bytes_not_padded.tz',
+            'None',
+            'Unit',
+            '(Some 0x000000000000000000000000000000000000000000000000000000'
+            + '0000000000)',
+        ),
+        (
+            'bls12_381_fr_push_nat.tz',
+            'None',
+            'Unit',
+            '(Some 0x100000000000000000000000000000000000000000000000000000'
+            + '0000000000)',
+        ),
+        ('bls12_381_fr_to_int.tz', '0', '0x00', '0'),
+        ('bls12_381_fr_to_int.tz', '0', '0x01', '1'),
+        # Generated using
+        # let r = Bls12_381.Fr.(random ()) in
+        # Printf.printf "%s = 0x%s"
+        #   (Bls12_381.Fr.to_string r)
+        #   (Hex.(show (of_bytes (Bls12_381.Fr.to_bytes r))))
+        (
+            'bls12_381_fr_to_int.tz',
+            '0',
+            '0x28db8e57af88d9576acd181b89f24e50a89a6423f939026ed91349fc9'
+            + 'af16c27',
+            '1783268807701357777652478449446472851821391321341286660405373'
+            + '5695200962927400',
+        ),
+        (
+            'bls12_381_fr_to_int.tz',
+            '0',
+            '0xb9e8abf8dc324a010007addde986fe0f7c81fab16d26819d0534b7691c'
+            + '0b0719',
+            '1132026582925658583078152196614952946047676740821044523890286'
+            + '9222031333517497',
+        ),
+        # Mutez -> Fr
+        (
+            'mutez_to_bls12_381_fr.tz',
+            '0x02',
+            '16',
+            '0x100000000000000000000000000000000000000000000000000000000'
+            + '0000000',
+        ),
+        # # would fail if trying to PACK mutez and UNPACK to Fr
+        (
+            'mutez_to_bls12_381_fr.tz',
+            '0x00',
+            '257',
+            '0x010100000000000000000000000000000000000000000000000000000'
+            + '0000000',
+        ),
+        # Fr -> Mutez
+        ('bls12_381_fr_to_mutez.tz', '0', '0x10', '16'),
+    ])
+    def test_bls_opcodes(self, filename, storage, parameter, result):
+        with open(join(dirname(__file__), 'opcodes', filename)) as f:
+            script = f.read()
+
+        _, storage, lazy_diff, stdout, error = Interpreter.run_code(
+            parameter=michelson_to_micheline(parameter),
+            storage=michelson_to_micheline(storage),
+            script=michelson_to_micheline(script)
+        )
+        if error:
+            print('\n'.join(stdout))
+            raise error
+        self.assertEqual(michelson_to_micheline(result), storage.to_micheline_value(mode='optimized'))
+
+    @parameterized.expand([
+        ('shifts.tz', 'None', '(Left (Pair 1 257))'),
+        ('shifts.tz', 'None', '(Left (Pair 123 257))'),
+        ('shifts.tz', 'None', '(Right (Pair 1 257))'),
+        ('shifts.tz', 'None', '(Right (Pair 123 257))'),
+        ('mul_overflow.tz', 'Unit', 'Left Unit'),
+        ('mul_overflow.tz', 'Unit', 'Right Unit'),
+        # Test PACK/UNPACK and binary format.
+        (
+            'packunpack.tz',
+            'Unit',
+            '(Pair (Pair (Pair "toto" {3;7;9;1}) {1;2;3}) '
+            + '0x05070707070100000004746f746f020000000800030'
+            + '0070009000102000000060001000200030004)'
+        ),
+        # Test signature
+        (
+            'check_signature.tz',
+            f'(Pair "{SIGNATURE}" "abcd")',
+            '"edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav"'
+        )
+    ])
+    def test_failed_opcodes(self, filename, storage, parameter):
+        with open(join(dirname(__file__), 'opcodes', filename)) as f:
+            script = f.read()
+
+        _, storage, lazy_diff, stdout, error = Interpreter.run_code(
+            parameter=michelson_to_micheline(parameter),
+            storage=michelson_to_micheline(storage),
+            script=michelson_to_micheline(script)
+        )
+        self.assertIsNotNone(error)

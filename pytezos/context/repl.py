@@ -10,17 +10,18 @@ from pytezos.michelson.micheline import get_script_section
 
 class REPLContext(ExecutionContext):
 
-    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
-                 voting_power=None, total_voting_power=None, block_id=None):
+    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None, **kwargs):
         self.origination_index = 1
         self.tmp_big_map_index = 1
+        self.tmp_sapling_index = 1
         self.alloc_big_map_index = 0
+        self.alloc_sapling_index = 0
         self.balance_update = 0
-        self.big_maps = dict()
+        self.big_maps = {}
         self.balance = balance or 0
         self.amount = amount or 0
-        self.voting_power = voting_power or 0
-        self.total_voting_power = total_voting_power or 0
+        self.voting_power = kwargs.get('voting_power', {})
+        self.total_voting_power = kwargs.get('total_voting_power', 0)
         self.now = 0
         self.level = 1
         self.sender = sender or self.get_dummy_key_hash()
@@ -36,7 +37,9 @@ class REPLContext(ExecutionContext):
     def reset(self):
         self.origination_index = 1
         self.tmp_big_map_index = 1
+        self.tmp_sapling_index = 1
         self.alloc_big_map_index = 0
+        self.alloc_sapling_index = 0
         self.balance_update = 0
         self.big_maps.clear()
 
@@ -117,10 +120,14 @@ class REPLContext(ExecutionContext):
         raise NotImplementedError
 
     def get_tmp_sapling_state_id(self) -> int:
-        raise NotImplementedError
+        res = -self.tmp_sapling_index
+        self.tmp_sapling_index += 1
+        return res
 
-    def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> list:
-        raise NotImplementedError
+    def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> Tuple[int, list]:
+        ptr = self.alloc_sapling_index
+        self.alloc_sapling_index += 1
+        return ptr, []
 
     def get_self_address(self) -> str:
         return self.self_address
@@ -163,7 +170,7 @@ class REPLContext(ExecutionContext):
         if self.network:
             raise NotImplementedError
         else:
-            return self.voting_power
+            return self.voting_power.get(address, 0)
 
     def get_total_voting_power(self) -> int:
         if self.network:
@@ -195,3 +202,9 @@ class REPLContext(ExecutionContext):
 
     def get_dummy_lambda(self):
         return {'prim': 'FAILWITH'}
+
+    def set_total_voting_power(self, total_voting_power: int):
+        self.total_voting_power = total_voting_power
+
+    def set_voting_power(self, address: str, voting_power: int):
+        self.voting_power[address] = voting_power

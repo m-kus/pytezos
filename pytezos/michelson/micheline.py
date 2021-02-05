@@ -10,7 +10,7 @@ from pytezos.michelson.tags import prim_tags
 
 class MichelsonError(Exception):
 
-    def format_stderr(self):
+    def format_stdout(self):
         offset, instruction = next((
             (len(self.args) - i, arg)
             for i, arg in enumerate(reversed(self.args))
@@ -165,8 +165,8 @@ def blind_unpack(data: bytes):
 
 class Micheline(metaclass=ErrorTrace):
     prim: Optional[str] = None
-    literal: Optional[Union[int, str, bytes, bool]] = None
     args: List[Type['Micheline']] = []
+    literal: Optional[Union[int, str, bytes]] = None
     classes: Dict[Tuple[str, Optional[int]], Type['Micheline']] = {}
 
     @classmethod
@@ -217,6 +217,23 @@ class Micheline(metaclass=ErrorTrace):
                     **kwargs) -> Type['Micheline']:
         res = type(cls.__name__, (cls,), dict(args=args, **kwargs))
         return cast(Type['MichelsonPrimitive'], res)
+
+    @classmethod
+    def assert_type_equal(cls, other: Type['Micheline'], path='', message=''):
+        comment = f' [{message}]' if message else ''
+        assert cls.prim == other.prim, f'expected {other.prim}, got {cls.prim} at `{path}`{comment}'
+        assert len(cls.args) == len(other.args), \
+            f'expected {len(other.args)} args, got {len(cls.args)} at `{path}`{comment}'
+        for i, arg in enumerate(other.args):
+            cls.args[i].assert_type_equal(arg, path=f'{path}/{i}', message=message)
+        assert cls.literal == other.literal, \
+            f'expected {other.literal}, got {cls.literal} at `{path}`{comment}'
+
+    @classmethod
+    def assert_type_in(cls, *others: Type['Micheline'], message=''):
+        comment = f' [{message}]' if message else ''
+        expected = [ty.prim for ty in others]
+        assert any(issubclass(cls, ty) for ty in others), f'expected one of {expected}, got {cls.prim}{comment}'
 
     @classmethod
     def as_micheline_expr(cls) -> dict:

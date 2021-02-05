@@ -58,7 +58,7 @@ class ExecutionContext:
     def get_tmp_sapling_state_id(self) -> int:
         raise NotImplementedError
 
-    def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> list:
+    def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> Tuple[int, list]:
         raise NotImplementedError
 
     def get_self_address(self) -> str:
@@ -107,4 +107,10 @@ class ExecutionContext:
         raise NotImplementedError
 
     def get_dummy_lambda(self):
+        raise NotImplementedError
+
+    def set_total_voting_power(self, total_voting_power: int):
+        raise NotImplementedError
+
+    def set_voting_power(self, address: str, voting_power: int):
         raise NotImplementedError

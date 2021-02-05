@@ -26,7 +26,7 @@ def dispatch_types(*args: Type[Micheline],
                    mapping: Dict[Tuple[Type[Micheline], ...], Tuple[Any, ...]]):
     key = tuple(arg.prim for arg in args)
     mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}
-    assert key in mapping, f'unexpected types {", ".join(map(lambda x: x.__name__, key))}'
+    assert key in mapping, f'unexpected types `{" * ".join(key)}`'
     return mapping[key]
 
 

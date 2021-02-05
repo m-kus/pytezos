@@ -10,6 +10,6 @@ from pytezos.michelson.types.map import MapType
 from pytezos.michelson.types.option import OptionType
 from pytezos.michelson.types.sum import OrType
 from pytezos.michelson.types.pair import PairType
-from pytezos.michelson.types.sapling import SaplingStateType, SaplingTransactionType, BLS12_381_G1Type, \
-    BLS12_381_G2Type, BLS12_381_FrType
+from pytezos.michelson.types.sapling import SaplingStateType, SaplingTransactionType
+from pytezos.michelson.types.bls import BLS12_381_G1Type, BLS12_381_G2Type, BLS12_381_FrType
 from pytezos.michelson.types.ticket import TicketType
