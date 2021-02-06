@@ -60,9 +60,6 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             elements = [f'{repr(k)}: {repr(v)}' for k, v in self]
             return f'{{{", ".join(elements)}}}'
 
-    def is_allocated(self) -> bool:
-        return self.ptr and self.ptr >= 0
-
     @staticmethod
     def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'BigMapType':
         cls = BigMapType.create_type(args=[key_type, val_type])
@@ -140,7 +137,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
                     items.append((key, value))
                 else:
                     removed_keys.append(key)
-            return type(self)(ptr=self.ptr, items=items, removed_keys=removed_keys)
+            res = type(self)(ptr=self.ptr, items=items, removed_keys=removed_keys)
+            res.context = self.context
+            return res
         else:
             return copy(self)
 
@@ -176,7 +175,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             'id': str(dst_ptr),
             'diff': diff
         })
-        return type(self)(items=[], ptr=dst_ptr)
+        res = type(self)(items=[], ptr=dst_ptr)
+        res.context = self.context
+        return res
 
     def attach_context(self, context: ExecutionContext, big_map_copy=False):
         self.context = context
@@ -211,10 +212,13 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         else:
             if val is not None:
                 items = list(sorted(self.items + [(key, val)], key=lambda x: x[0]))
-                removed_keys.remove(key)
+                if key in removed_keys:
+                    removed_keys.remove(key)
             else:  # do nothing
                 items = self.items
-        return prev_val, type(self)(items=items, ptr=self.ptr, removed_keys=list(removed_keys))
+        res = type(self)(items=items, ptr=self.ptr, removed_keys=list(removed_keys))
+        res.context = self.context
+        return prev_val, res
 
     def get_key_hash(self, key_obj):
         key = self.args[0].from_python_object(key_obj)

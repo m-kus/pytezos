@@ -5,12 +5,11 @@ from decimal import Decimal
 from pytezos.operation.group import OperationGroup
 from pytezos.operation.content import ContentMixin
 from pytezos.contract.interface import ContractInterface
-from pytezos.contract.script import ContractScript
-from pytezos.interop import Interop
+from pytezos.context.account import AccountContext
 from pytezos.jupyter import get_class_docstring
 
 
-class PyTezosClient(Interop, ContentMixin):
+class PyTezosClient(AccountContext, ContentMixin):
     """ Entry point for a developer, start your script with:
     `from pytezos import pytezos`
     """
@@ -81,7 +80,7 @@ class PyTezosClient(Interop, ContentMixin):
         return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
 
     @lru_cache(maxsize=None)
-    def _get_contract_interface(self, contract_id, factory=ContractScript):
+    def _get_contract_interface(self, contract_id):
         return ContractInterface(
             address=contract_id,
             shell=self.shell,

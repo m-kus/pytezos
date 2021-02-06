@@ -16,8 +16,17 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         super(PairType, self).__init__()
         self.items = items
 
-    def __eq__(self, other):
-        raise NotImplementedError
+    def __eq__(self, other: 'PairType'):
+        return all(
+            item == other.items[i]
+            for i, item in enumerate(self.items)
+        )
+
+    def __lt__(self, other: 'PairType'):
+        for i, item in enumerate(self.items):
+            if item < other.items[i]:
+                return True
+        return False
 
     def __hash__(self):
         return hash(self.items)
@@ -27,13 +36,6 @@ class PairType(MichelsonType, prim='pair', args_len=None):
 
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
-
-    def __cmp__(self, other: 'PairType') -> int:
-        for i, item in enumerate(self.items):
-            res = item.__cmp__(other.items[i])
-            if res != 0:
-                return res
-        return 0
 
     @classmethod
     def init(cls, items: List[MichelsonType]) -> 'PairType':

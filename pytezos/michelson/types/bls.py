@@ -16,6 +16,11 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
         super(BLS12_381_FrType, self).__init__()
         self.value = value
 
+    @staticmethod
+    def bytes_to_int(value: bytes) -> int:
+        assert len(value) <= 32, f'expected no more than 32 bytes, got {len(value)}'
+        return int.from_bytes(value, 'little')
+
     @classmethod
     def from_value(cls, value: int) -> 'BLS12_381_FrType':
         return cls(value % cls.modulus)
@@ -25,11 +30,11 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
         if isinstance(py_obj, int):
             value = py_obj
         elif isinstance(py_obj, bytes):
-            value = int.from_bytes(py_obj, 'little')
+            value = cls.bytes_to_int(py_obj)
         elif isinstance(py_obj, str):
             if py_obj.startswith('0x'):
                 py_obj = py_obj[2:]
-            value = int.from_bytes(bytes.fromhex(py_obj), 'little')
+            value = cls.bytes_to_int(bytes.fromhex(py_obj))
         else:
             assert False, f'unexpected value {py_obj}'
         return cls.from_value(value)
@@ -38,7 +43,7 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
     def from_micheline_value(cls, val_expr) -> 'IntType':
         value = parse_micheline_literal(val_expr, {
             'int': int,
-            'bytes': lambda x: int.from_bytes(bytes.fromhex(x), 'little')
+            'bytes': lambda x: cls.bytes_to_int(bytes.fromhex(x))
         })
         return cls.from_value(value)
 

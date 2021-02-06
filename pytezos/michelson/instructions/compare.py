@@ -6,13 +6,22 @@ from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import IntType, BoolType
 
 
+def compare(a, b) -> int:
+    if a == b:
+        return 0
+    elif a < b:
+        return -1
+    else:
+        return 1
+
+
 class CompareInstruction(MichelsonInstruction, prim='COMPARE'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         a, b = stack.pop2()
         a.assert_type_equal(type(b))
-        res = IntType.from_value(a.__cmp__(b))
+        res = IntType.from_value(compare(a, b))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))
         return cls()

@@ -1,6 +1,6 @@
 from pprint import pformat
 
-from pytezos import OperationGroup
+from pytezos.operation.group import OperationGroup
 from pytezos.contract.script import ContractScript
 from pytezos.jupyter import get_class_docstring
 from pytezos.interop import Interop

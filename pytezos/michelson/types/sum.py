@@ -26,24 +26,30 @@ class OrType(MichelsonType, prim='or', args_len=2):
     def __iter__(self) -> Generator[Optional[MichelsonType], None, None]:
         yield from self.items
 
-    def __eq__(self, other):
-        raise NotImplementedError
+    def __eq__(self, other: 'OrType'):
+        return all(
+            item == other.items[i]
+            for i, item in enumerate(self.items)
+        )
+
+    def __lt__(self, other: 'OrType'):
+        if self.is_left() and other.is_right():
+            return True
+        elif self.is_left() and other.is_left():
+            return self.items[0] < other.items[0]
+        elif self.is_right() and other.is_right():
+            return self.items[1] < other.items[1]
+        else:
+            return False
 
     def __hash__(self):
         return hash(self.items)
 
-    def __cmp__(self, other: 'OrType'):
-        if self.is_left() and not other.is_left():
-            return -1
-        elif not self.is_left() and other.is_left():
-            return 1
-        elif self.is_left() and other.is_left():
-            return self.items[0].__cmp__(other.items[0])
-        else:
-            return self.items[1].__cmp__(other.items[1])
-
     def is_left(self) -> bool:
         return self.items[0] is not None
+
+    def is_right(self) -> bool:
+        return self.items[1] is not None
 
     def resolve(self) -> MichelsonType:
         return next(item for item in self if item is not None)

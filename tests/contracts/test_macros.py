@@ -119,6 +119,25 @@ class MacrosTestCase(TestCase):
             '(Pair 0x34 0x33)',
             '{ False ; True ; False ; True ; False }',
         ),
+        # EXTRA
+        (
+            'pair_macro.tz',
+            'Unit',
+            'Unit',
+            'Unit'
+        ),
+        (
+            'unpair_macro.tz',
+            'Unit',
+            'Unit',
+            'Unit'
+        ),
+        (
+            'carn_and_cdrn.tz',
+            'Unit',
+            'Pair 1 2 3 Unit',
+            'Unit'
+        )
     ])
     def test_macros(self, filename, storage, parameter, result):
         with open(join(dirname(__file__), 'macros', filename)) as f:
@@ -154,6 +173,7 @@ class MacrosTestCase(TestCase):
         ('assert_cmpgt.tz', 'Unit', '(Pair 0 0)'),
         ('assert_cmpgt.tz', 'Unit', '(Pair -1 0)'),
         ('assert_cmpge.tz', 'Unit', '(Pair -1 0)'),
+        ('fail.tz', 'Unit', 'Unit')
     ])
     def test_failed_macros(self, filename, storage, parameter):
         with open(join(dirname(__file__), 'macros', filename)) as f:

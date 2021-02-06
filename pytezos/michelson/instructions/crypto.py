@@ -1,11 +1,13 @@
 import sha3
 from hashlib import sha256, sha512
 from typing import List, Tuple, Callable, cast
+from py_ecc import optimized_bls12_381 as bls12_381
+from py_ecc.fields import optimized_bls12_381_FQ12 as FQ12
 
 from pytezos.crypto.key import blake2b_32, Key
-
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BytesType, KeyType, SignatureType, BoolType, KeyHashType, SaplingStateType
+from pytezos.michelson.types import BytesType, KeyType, SignatureType, BoolType, KeyHashType, SaplingStateType, \
+    ListType, BLS12_381_G1Type, BLS12_381_G2Type, PairType
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.context.execution import ExecutionContext
 
@@ -92,7 +94,20 @@ class HashKeyInstruction(MichelsonInstruction, prim='HASH_KEY'):
 
 
 class PairingCheckInstruction(MichelsonInstruction, prim='PAIRING_CHECK'):
-    pass
+
+    @classmethod
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+        points = cast(ListType, stack.pop1())
+        points.assert_type_equal(ListType.create_type(
+            args=[PairType.create_type(args=[BLS12_381_G1Type, BLS12_381_G2Type])]))
+        prod = FQ12.one()
+        for pair in points:
+            g1, g2 = tuple(iter(pair))  # type: BLS12_381_G1Type, BLS12_381_G2Type
+            prod = prod * bls12_381.pairing(g2.to_point(), g1.to_point())
+        res = BoolType.from_value(FQ12.one() == prod)
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [points], [res]))
+        return cls()
 
 
 class SaplingEmptyStateInstruction(MichelsonInstruction, prim='SAPLING_EMPTY_STATE', args_len=1):
