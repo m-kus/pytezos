@@ -3,7 +3,7 @@ from typing import Optional, Type, List
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import MichelineLiteral, parse_micheline_literal, Micheline, MichelineSequence
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len=1):
@@ -15,7 +15,7 @@ class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
     def __init__(self, ptr: Optional[int] = None):
         super(SaplingStateType, self).__init__()
         self.ptr = ptr
-        self.context: Optional[ExecutionContext] = None
+        self.context: Optional[AbstractContext] = None
 
     def __repr__(self):
         if self.ptr:
@@ -51,7 +51,7 @@ class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
         else:
             return MichelineSequence.create_type(args=[])
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+    def attach_context(self, context: AbstractContext, big_map_copy=False):
         self.context = context
         self.ptr = context.get_tmp_sapling_state_id()
 

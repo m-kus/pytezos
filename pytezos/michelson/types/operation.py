@@ -87,11 +87,11 @@ class OperationType(MichelsonType, prim='operation'):
         assert 'kind' in py_obj
         return cls(content=py_obj)
 
-    def to_literal(self) -> Type[Micheline]:
-        assert False, 'forbidden'
+    def to_literal(self):
+        assert False, 'no literal representation'
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        assert False, 'forbidden'
+        assert False, 'no micheline representation'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.content

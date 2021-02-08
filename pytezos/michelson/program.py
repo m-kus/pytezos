@@ -4,7 +4,7 @@ from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.micheline import MichelineSequence, try_catch
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.sections.code import CodeSection
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.types import PairType, OperationType, ListType, MichelsonType
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
@@ -21,11 +21,13 @@ class MichelsonProgram:
         self.storage_value = storage
 
     @staticmethod
-    def load(context: ExecutionContext, with_code=False):
+    def load(context: AbstractContext, with_code=False):
         parameter = ParameterSection.match(context.get_parameter_expr())
         storage = StorageSection.match(context.get_storage_expr())
         code = CodeSection.match(context.get_code_expr() if with_code else [])
-        cls = type(MichelsonProgram.__name__, (MichelsonProgram,), dict(parameter=parameter, storage=storage, code=code))
+        cls = type(MichelsonProgram.__name__, (MichelsonProgram,), dict(parameter=parameter,
+                                                                        storage=storage,
+                                                                        code=code))
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
@@ -35,7 +37,9 @@ class MichelsonProgram:
         parameter = next(arg for arg in sequence.args if issubclass(arg, ParameterSection))
         storage = next(arg for arg in sequence.args if issubclass(arg, StorageSection))
         code = next(arg for arg in sequence.args if issubclass(arg, CodeSection))
-        cls = type(MichelsonProgram.__name__, (MichelsonProgram,), dict(parameter=parameter, storage=storage, code=code))
+        cls = type(MichelsonProgram.__name__, (MichelsonProgram,), dict(parameter=parameter,
+                                                                        storage=storage,
+                                                                        code=code))
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
@@ -59,14 +63,14 @@ class MichelsonProgram:
         return cls(entrypoint, parameter_value, storage_value)
 
     @try_catch('BEGIN')
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         self.parameter_value.attach_context(context)
         self.storage_value.attach_context(context)
         res = PairType.from_comb([self.parameter_value.item, self.storage_value.item])
         stack.push(res)
         stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
-    def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
+    def execute(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext) -> MichelsonInstruction:
         return self.code.args[0].execute(stack, stdout, context)
 
     @try_catch('END')

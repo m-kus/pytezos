@@ -1,5 +1,5 @@
 from pprint import pformat
-from itertools import count
+from typing import List
 
 from pytezos.crypto.key import blake2b_32
 from pytezos.operation.content import ContentMixin
@@ -9,7 +9,8 @@ from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.forge import forge_base58
-from pytezos.interop import Interop
+from pytezos.context.mixin import ContextMixin
+from pytezos.context.impl import ExecutionContext
 from pytezos.jupyter import get_class_docstring
 
 validation_passes = {
@@ -27,13 +28,14 @@ validation_passes = {
 }
 
 
-class OperationGroup(Interop, ContentMixin):
+class OperationGroup(ContextMixin, ContentMixin):
     """ Operation group representation: contents (single or multiple), signature, other fields,
     and also useful helpers for filling with precise fees, signing, forging, and injecting.
     """
 
-    def __init__(self, contents=None, protocol=None, chain_id=None, branch=None, signature=None, shell=None, key=None):
-        super(OperationGroup, self).__init__(shell=shell, key=key)
+    def __init__(self, context: ExecutionContext,
+                 contents=None, protocol=None, chain_id=None, branch=None, signature=None):
+        super(OperationGroup, self).__init__(context=context)
         self.contents = contents or []
         self.protocol = protocol
         self.chain_id = chain_id
@@ -52,13 +54,12 @@ class OperationGroup(Interop, ContentMixin):
 
     def _spawn(self, **kwargs):
         return OperationGroup(
+            context=self.context,
             contents=kwargs.get('contents', self.contents.copy()),
             protocol=kwargs.get('protocol', self.protocol),
             chain_id=kwargs.get('chain_id', self.chain_id),
             branch=kwargs.get('branch', self.branch),
-            signature=kwargs.get('signature', self.signature),
-            shell=kwargs.get('shell', self.shell),
-            key=kwargs.get('key', self.key)
+            signature=kwargs.get('signature', self.signature)
         )
 
     def json_payload(self) -> dict:
@@ -87,28 +88,28 @@ class OperationGroup(Interop, ContentMixin):
         """
         return self._spawn(contents=self.contents + [content])
 
-    def fill(self, counter=None):
+    def fill(self, counter=None, branch_offset=50):
         """ Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :param counter: Override counter value (for manual handling)
+        :param branch_offset: select head~offset block as branch, where offset is in range (0, 60)
         :rtype: OperationGroup
         """
-        chain_id = self.chain_id or self.shell.chains.main.chain_id()
-        branch = self.branch or self.shell.head.predecessor.hash()
+        assert 0 < branch_offset < 60, f'branch offset has to be in range (0, 60)'
+        chain_id = self.chain_id or self.context.get_chain_id()
+        branch = self.branch or self.shell.blocks[-branch_offset].hash()
         protocol = self.protocol or self.shell.head.header()['protocol']
         source = self.key.public_key_hash()
 
         if counter is not None:
-            counter = count(start=int(counter), step=1)
-        else:
-            counter = self.shell.contracts[source].count()
+            self.context.set_counter(counter)
 
         replace_map = {
             'pkh': source,
             'source': source,
             'delegate': source,  # self registration
-            'counter': lambda x: str(next(counter)),
+            'counter': lambda x: str(self.context.get_counter()),
             'secret': lambda x: self.key.activation_code,
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
@@ -176,7 +177,7 @@ class OperationGroup(Interop, ContentMixin):
         opg = self.fill(counter=counter)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
-            raise RpcError.from_errors(OperationResult.errors(opg_with_metadata)) from None
+            raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
         extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature)
 
@@ -244,13 +245,13 @@ class OperationGroup(Interop, ContentMixin):
         :param num_blocks_wait: number of blocks to wait for injection
         :returns: operation group with metadata (raw RPC response)
         """
+        self.context.reset()
         if preapply:
             opg_with_metadata = self.preapply()
             if not OperationResult.is_applied(opg_with_metadata):
-                raise RpcError.from_errors(OperationResult.errors(opg_with_metadata)) from None
+                raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
-        opg_hash = self.shell.injection.operation.post(
-            operation=self.binary_payload(), _async=False)
+        opg_hash = self.shell.injection.operation.post(operation=self.binary_payload(), _async=False)
 
         if _async:
             return {
@@ -264,20 +265,20 @@ class OperationGroup(Interop, ContentMixin):
                 try:
                     pending_opg = self.shell.mempool.pending_operations[opg_hash]
                     if not OperationResult.is_applied(pending_opg):
-                        raise RpcError.from_errors(OperationResult.errors(pending_opg)) from None
+                        raise RpcError.from_errors(OperationResult.errors(pending_opg))
                     print(f'Still in mempool: {opg_hash}')
                 except StopIteration:
                     res = self.shell.blocks[-(i + 1):].find_operation(opg_hash)
                     if check_result:
                         if not OperationResult.is_applied(res):
-                            raise RpcError.from_errors(OperationResult.errors(res)) from None
+                            raise RpcError.from_errors(OperationResult.errors(res))
                     return res
 
         raise TimeoutError(opg_hash)
 
-    def result(self):
+    def result(self) -> List[OperationResult]:
         """ Parse the preapply result.
 
-        :rtype: OperationResult
+        :rtype: List[OperationResult]
         """
         return OperationResult.from_operation_group(self.preapply())

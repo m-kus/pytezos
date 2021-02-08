@@ -1,6 +1,6 @@
 from typing import List, Callable, cast, Tuple, Union
 
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import dispatch_types, format_stdout, MichelsonInstruction
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BoolType, NatType, IntType
@@ -21,7 +21,7 @@ def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add
 class OrInstruction(MichelsonInstruction, prim='OR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])
         return cls()
 
@@ -29,7 +29,7 @@ class OrInstruction(MichelsonInstruction, prim='OR'):
 class XorInstruction(MichelsonInstruction, prim='XOR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])
         return cls()
 
@@ -37,7 +37,7 @@ class XorInstruction(MichelsonInstruction, prim='XOR'):
 class AndInstruction(MichelsonInstruction, prim='AND'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a, b = cast(Tuple[Union[BoolType, NatType, IntType], ...], stack.pop2())
         res_type, convert = dispatch_types(type(a), type(b), mapping={
             (BoolType, BoolType): (BoolType, bool),
@@ -54,7 +54,7 @@ class AndInstruction(MichelsonInstruction, prim='AND'):
 class NotInstruction(MichelsonInstruction, prim='NOT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = cast(Union[IntType, NatType, BoolType], stack.pop1())
         res_type, convert = dispatch_types(type(a), mapping={
             (NatType,): (IntType, lambda x: ~int(x)),

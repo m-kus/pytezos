@@ -3,7 +3,7 @@ from typing import Type
 from pytezos.michelson.types.base import MichelsonType, unit
 from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack, Micheline, \
     MichelineLiteral
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 Unit = unit()
 
@@ -51,7 +51,7 @@ class StringType(MichelsonType, prim='string'):
         return cls(value)
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'StringType':
+    def dummy(cls, context: AbstractContext) -> 'StringType':
         return cls()
 
     @classmethod
@@ -101,7 +101,7 @@ class IntType(MichelsonType, prim='int'):
         return self.value
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'IntType':
+    def dummy(cls, context: AbstractContext) -> 'IntType':
         return cls()
 
     @classmethod
@@ -171,7 +171,7 @@ class BytesType(MichelsonType, prim='bytes'):
         return len(self.value)
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'BytesType':
+    def dummy(cls, context: AbstractContext) -> 'BytesType':
         return cls()
 
     @classmethod
@@ -234,7 +234,7 @@ class BoolType(MichelsonType, prim='bool'):
         return self.value
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'BoolType':
+    def dummy(cls, context: AbstractContext) -> 'BoolType':
         return cls(False)
 
     @classmethod
@@ -282,7 +282,7 @@ class UnitType(MichelsonType, prim='unit'):
         return 'Unit'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'UnitType':
+    def dummy(cls, context: AbstractContext) -> 'UnitType':
         return cls()
 
     @classmethod

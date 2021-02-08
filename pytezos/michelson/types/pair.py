@@ -2,7 +2,7 @@ from typing import Generator, Tuple, List, Union, Type, Optional, cast, Any
 
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.types.adt import ADT
 
 
@@ -86,7 +86,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return f'${name}'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'PairType':
+    def dummy(cls, context: AbstractContext) -> 'PairType':
         return cls(tuple(arg.dummy(context) for arg in cls.args))
 
     @classmethod
@@ -183,7 +183,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         items = tuple(item.aggregate_lazy_diff(lazy_diff, mode=mode) for item in self)
         return type(self)(items)
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+    def attach_context(self, context: AbstractContext, big_map_copy=False):
         for item in self:
             item.attach_context(context, big_map_copy=big_map_copy)
 

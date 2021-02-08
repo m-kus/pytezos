@@ -2,7 +2,7 @@ from typing import List, Type, cast, Dict, Any
 
 from pytezos.michelson.types import *
 from pytezos.michelson.micheline import Micheline
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.types.adt import ADT
 
 
@@ -24,7 +24,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack, stdout: List[str], context: AbstractContext):
         context.set_parameter_expr(cls.as_micheline_expr())
         stdout.append(f'parameter: updated')
 
@@ -100,7 +100,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         item = self.item.merge_lazy_diff(lazy_diff)
         return type(self)(item)
 
-    def attach_context(self, context: ExecutionContext):
+    def attach_context(self, context: AbstractContext):
         self.item.attach_context(context, big_map_copy=True)
 
     def aggregate_lazy_diff(self, mode='readable') -> List[dict]:

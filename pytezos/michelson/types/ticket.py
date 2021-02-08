@@ -6,7 +6,7 @@ from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types.pair import PairType
 from pytezos.michelson.types.domain import NatType, AddressType
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):
@@ -66,7 +66,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         return f'${name}'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext):
+    def dummy(cls, context: AbstractContext):
         assert False, 'forbidden'
 
     @classmethod

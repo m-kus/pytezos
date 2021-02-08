@@ -2,7 +2,7 @@ from typing import Generator, Tuple, Optional, List, Union, Type
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, Micheline
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.types.adt import ADT
 
 
@@ -78,7 +78,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
         return f'${name}'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext):
+    def dummy(cls, context: AbstractContext):
         assert False, 'forbidden'
 
     @classmethod
@@ -134,7 +134,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
         items = tuple(None if item is None else item.aggregate_lazy_diff(lazy_diff, mode=mode) for item in self)
         return type(self)(items)
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+    def attach_context(self, context: AbstractContext, big_map_copy=False):
         for item in self:
             if item is not None:
                 item.attach_context(context, big_map_copy=big_map_copy)

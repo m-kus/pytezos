@@ -2,7 +2,7 @@ from typing import Optional, Tuple, Generator, List, Type
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, Micheline, MichelineSequence
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class EltLiteral(Micheline, prim='Elt', args_len=2):
@@ -52,10 +52,10 @@ class MapType(MichelsonType, prim='map', args_len=2):
         name = cls.field_name or cls.type_name or inferred_name
         arg_names = [f'{name}_key', f'{name}_value'] if name else [None, None]
         key, val = [arg.generate_pydoc(definitions, inferred_name=arg_names[i]) for i, arg in enumerate(cls.args)]
-        return f'{{ {key}: {val}, ... }}'
+        return f'{{ {key}: {val}, … }}'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'MapType':
+    def dummy(cls, context: AbstractContext) -> 'MapType':
         return cls([])
 
     @classmethod
@@ -115,7 +115,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
         items = [(key, val.aggregate_lazy_diff(lazy_diff, mode=mode)) for key, val in self]
         return type(self)(items)
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+    def attach_context(self, context: AbstractContext, big_map_copy=False):
         for _, val in self:
             val.attach_context(context, big_map_copy=big_map_copy)
 

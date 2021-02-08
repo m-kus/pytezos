@@ -3,7 +3,7 @@ from typing import Tuple, List, Optional, Type, cast, Union, Any
 
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.micheline import Micheline
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
@@ -158,7 +158,7 @@ class MichelsonType(Micheline):
         return cls.from_micheline_value(expr)
 
     @classmethod
-    def dummy(cls, context: ExecutionContext):
+    def dummy(cls, context: AbstractContext):
         raise NotImplementedError
 
     @classmethod
@@ -178,7 +178,7 @@ class MichelsonType(Micheline):
     def to_literal(self) -> Type[Micheline]:
         raise NotImplementedError
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):  # NOTE: mutation
+    def attach_context(self, context: AbstractContext, big_map_copy=False):  # NOTE: mutation
         assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket', 'set']
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
@@ -201,3 +201,9 @@ class MichelsonType(Micheline):
     def duplicate(self):
         assert self.is_duplicable(), f'{self.prim} is not duplicable'
         return deepcopy(self)
+
+
+def generate_pydoc(ty: Type[MichelsonType], title=None):
+    definitions = []
+    ty.generate_pydoc(definitions, inferred_name=title)
+    return '\n'.join(definitions)

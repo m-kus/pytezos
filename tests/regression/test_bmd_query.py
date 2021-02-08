@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from pytezos import ContractInterface
-from pytezos.contract.script import ContractStorage
+from pytezos.contract.data import ContractStorage
 from pytezos.michelson.converter import michelson_to_micheline
 
 code = """

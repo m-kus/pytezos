@@ -2,7 +2,7 @@ from typing import Type, List
 
 from pytezos.michelson.types import *
 from pytezos.michelson.micheline import Micheline
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class StorageSection(Micheline, prim='storage', args_len=1):
@@ -23,7 +23,7 @@ class StorageSection(Micheline, prim='storage', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack, stdout: List[str], context: AbstractContext):
         context.set_storage_expr(cls.as_micheline_expr())
         stdout.append(f'storage: updated')
 
@@ -36,7 +36,7 @@ class StorageSection(Micheline, prim='storage', args_len=1):
         return '\n'.join(f'${var}:\n\t{doc}\n' for var, doc in definitions)
 
     @classmethod
-    def dummy(cls, context: ExecutionContext):
+    def dummy(cls, context: AbstractContext):
         return cls(cls.args[0].dummy(context))
 
     @classmethod
@@ -55,7 +55,7 @@ class StorageSection(Micheline, prim='storage', args_len=1):
     def to_python_object(self, try_unpack=False, lazy_diff=False):
         return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
 
-    def attach_context(self, context: ExecutionContext):
+    def attach_context(self, context: AbstractContext):
         self.item.attach_context(context)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'StorageSection':

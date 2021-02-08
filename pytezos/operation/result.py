@@ -139,7 +139,7 @@ class OperationResult:
             assert False, content
 
     @classmethod
-    def from_operation_group(cls, operation_group: dict, **predicates):
+    def from_operation_group(cls, operation_group: dict, **predicates) -> List['OperationResult']:
         """ Initialize with operation group contents.
 
         :param operation_group: operation_group: {"branch": "B...", "contents": [...], ...} \

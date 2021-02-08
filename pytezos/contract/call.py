@@ -1,118 +1,33 @@
 from pprint import pformat
+from decimal import Decimal
+from typing import Union
+from deprecation import deprecated
 
+from pytezos.contract.result import ContractCallResult
 from pytezos.operation.group import OperationGroup
-from pytezos.contract.script import ContractScript
 from pytezos.jupyter import get_class_docstring
-from pytezos.interop import Interop
+from pytezos.context.mixin import ContextMixin
 from pytezos.michelson.format import micheline_to_michelson
-from pytezos.michelson.repl import Interpreter
 from pytezos.operation.content import format_tez, format_mutez
 from pytezos.operation.result import OperationResult
+from pytezos.context.impl import ExecutionContext
+from pytezos.michelson.repl import Interpreter
+from pytezos.michelson.sections.storage import StorageSection
+from pytezos.michelson.program import MichelsonProgram
 
 
 def skip_nones(**kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if v is not None}
 
 
-class ContractCallResult(OperationResult):
-    """ Encapsulates the result of a contract invocation.
-    """
-
-    @classmethod
-    def from_contract_call(cls, operation_group: dict, address, script: ContractScript) -> list:
-        """ Get a list of results from an operation group content with metadata.
-
-        :param operation_group: {..., "contents": [{..., kind: "transaction", ...}]}
-        :param address: address of the invoked contract
-        :param script: invoked contract
-        :rtype: List[ContractCallResult]
-        """
-        results = list()
-        for content in OperationResult.iter_contents(operation_group):
-            if content['kind'] == 'transaction':
-                if content['destination'] == address:
-                    results.append(cls.from_transaction(content))
-            elif content['kind'] == 'origination':
-                result = cls.get_result(content)
-                if address in result.get('originated_contracts', []):
-                    results.append(cls.from_origination(content))
-
-        def decode_result(res):
-            storage = script.storage.type.from_micheline_value(res.context)
-            kwargs = dict(storage=storage.to_python_object())
-            if hasattr(res, 'lazy_diff'):
-                extended_storage = storage.merge_lazy_diff(res.lazy_diff)
-                kwargs.update(storage_diff=extended_storage.to_python_object(lazy_diff=True))
-            if hasattr(res, 'parameters'):
-                kwargs.update(parameters=script.parameter.decode(data=res.parameters))
-            if hasattr(res, 'operations'):
-                kwargs.update(operations=res.operations)
-            return cls(**kwargs)
-
-        return list(map(decode_result, results))
-
-    @classmethod
-    def from_code_run(cls, code_run: dict, parameters, script: ContractScript):
-        """ Parse a result of `run_code` execution.
-
-        :param code_run: RPC response (json)
-        :param parameters: Micheline expression
-        :param script: invoked contract
-        :rtype: ContractCallResult
-        """
-        storage = script.storage.type.from_micheline_value(code_run['storage'])
-        extended_storage = storage.merge_lazy_diff(code_run.get('lazy_diff', []))
-        return cls(
-            parameters=script.parameter.decode(parameters),
-            storage=storage.to_python_object(),
-            storage_diff=extended_storage.to_python_object(lazy_diff=True),
-            operations=code_run.get('operations', [])
-        )
-
-    @classmethod
-    def from_repl_result(cls, res: dict, parameters, contract: ContractScript):
-        """ Parse an output of the builtin interpreter.
-
-        :param res: Interpreter output
-        :param parameters: Micheline expression
-        :param contract: invoked contract
-        :returns: ContractCallResult
-        """
-        contract.storage.big_map_init(res['result']['storage'].val_expr)
-        return cls(
-            parameters=contract.parameter.decode(parameters),
-            storage=contract.storage.decode(res['result']['storage'].val_expr),
-            big_map_diff=contract.storage.big_map_diff_decode(res['result']['big_map_diff']),
-            operations=[x.content for x in res['result']['operations']]
-        )
-
-
-class ContractCall(Interop):
+class ContractCall(ContextMixin):
     """ Proxy class encapsulating a contract call: contract type scheme, contract address, parameters, and amount
     """
 
-    def __init__(self, parameters,
-                 address=None, script: ContractScript = None, amount=0, shell=None, key=None):
-        super(ContractCall, self).__init__(shell=shell, key=key)
+    def __init__(self, context: ExecutionContext, parameters: dict, amount: Union[int, Decimal] = 0):
+        super(ContractCall, self).__init__(context=context)
         self.parameters = parameters
-        self.address = address
         self.amount = amount
-
-        if script is None:
-            assert address is not None
-            script = ContractScript.from_micheline(self.shell.contracts[address].code())
-
-        self.script = script
-
-    def _spawn(self, **kwargs):
-        return ContractCall(
-            parameters=self.parameters,
-            address=self.address,
-            script=self.script,
-            amount=kwargs.get('amount', self.amount),
-            shell=kwargs.get('shell', self.shell),
-            key=kwargs.get('key', self.key)
-        )
 
     def __repr__(self):
         res = [
@@ -126,13 +41,15 @@ class ContractCall(Interop):
         ]
         return '\n'.join(res)
 
-    def with_amount(self, amount):
+    def with_amount(self, amount: Union[int, Decimal]):
         """ Send funds to the contract too.
 
         :param amount: amount in microtez (int) or tez (Decimal)
         :rtype: ContractCall
         """
-        return self._spawn(amount=amount)
+        return ContractCall(context=self.context,
+                            parameters=self.parameters,
+                            amount=amount)
 
     @property
     def operation_group(self) -> OperationGroup:
@@ -140,7 +57,7 @@ class ContractCall(Interop):
 
         :rtype: OperationGroup
         """
-        return OperationGroup(shell=self.shell, key=self.key) \
+        return OperationGroup(context=self.get_generic_ctx()) \
             .transaction(destination=self.address,
                          amount=self.amount,
                          parameters=self.parameters) \
@@ -170,7 +87,9 @@ class ContractCall(Interop):
         return f'transfer {amount} from {source} to {self.address} ' \
                f'--entrypoint \'{entrypoint}\' --arg \'{arg}\''
 
-    def interpret(self, storage, source=None, sender=None, amount=None, balance=None, chain_id=None, now=None):
+    def interpret(self, storage,
+                  source=None, sender=None, amount=None, balance=None, chain_id=None, level=None, now=None) \
+            -> ContractCallResult:
         """ Run code in the builtin REPL (WARNING! Not recommended for critical tasks).
 
         :param storage: Python object
@@ -179,42 +98,75 @@ class ContractCall(Interop):
         :param amount: patch AMOUNT
         :param balance: patch BALANCE
         :param chain_id: patch CHAIN_ID
+        :param level: patch LEVEL
         :param now: patch NOW
-        :rtype: ContractCallResult
+        :rtype: pytezos.contract.result.ContractCallResult
         """
-        i = Interpreter()
-        i.execute(self.script.text)
+        storage_ty = StorageSection.match(self.context.storage_expr)
+        initial_storage = storage_ty.from_python_object(storage).to_micheline_value()
+        script = [self.context.parameter_expr, self.context.storage_expr, self.context.code_expr]
+        operations, res_storage, lazy_diff, stdout, error = Interpreter.run_code(
+            parameter=self.parameters['value'],
+            entrypoint=self.parameters['entrypoint'],
+            storage=initial_storage,
+            script=script,
+            source=source or self.context.get_source(),
+            sender=sender or self.context.get_sender(),
+            amount=amount or self.amount,
+            balance=balance or self.context.get_balance(),
+            chain_id=chain_id or self.context.get_chain_id(),
+            level=level or self.context.get_level(),
+            now=now or self.context.get_now()
+        )
+        if error:
+            print('\n'.join(stdout))
+            raise error
+        return ContractCallResult.from_repl_result(operations, res_storage, lazy_diff,
+                                                   parameters=self.parameters, context=self.context)
 
-        if source is None:
-            source = self.key.public_key_hash()
-        if sender is None:
-            sender = source
-        if amount is None:
-            amount = self.amount or 0
-        if balance is None:
-            balance = 0
+    def run_code(self, storage, source=None, sender=None, amount=None, balance=None, chain_id=None, gas_limit=None) \
+            -> ContractCallResult:
+        """
 
-        patch_map = {
-            'SOURCE': source,
-            'SENDER': sender,
-            'AMOUNT': amount,
-            'BALANCE': balance,
-            'CHAIN_ID': chain_id,
-            'NOW': now
-        }
-        for instr, value in patch_map.items():
-            if value is not None:
-                value = f'"{value}"' if isinstance(value, str) else value
-                i.execute(f'PATCH {instr} {value}')
+        :param storage:
+        :param source:
+        :param sender:
+        :param amount:
+        :param balance:
+        :param chain_id:
+        :param gas_limit:
+        :return:
+        """
+        storage_ty = StorageSection.match(self.context.storage_expr)
+        initial_storage = storage_ty.from_python_object(storage).to_micheline_value()
+        script = [self.context.parameter_expr, self.context.storage_expr, self.context.code_expr]
+        query = skip_nones(
+            script=script,
+            storage=initial_storage,
+            entrypoint=self.parameters['entrypoint'],
+            input=self.parameters['value'],
+            amount=format_mutez(amount or self.amount),
+            chain_id=chain_id or self.context.get_chain_id(),
+            source=sender or self.context.get_sender(),
+            payer=source or self.context.get_source(),
+            balance=balance or self.context.get_balance(),
+            gas=str(gas_limit) if gas_limit is not None else None
+        )
+        res = self.shell.head.helpers.scripts.run_code.post(query)
+        return ContractCallResult.from_run_code(res, parameters=self.parameters, context=self.context)
 
-        s_expr = micheline_to_michelson(self.script.storage.encode(storage), inline=True, wrap=True)
-        p_expr = micheline_to_michelson(self.parameters['value'], inline=True, wrap=True)
-        res = i.execute(f'RUN %{self.parameters["entrypoint"]} {p_expr} {s_expr}')
+    def run_operation(self) -> ContractCallResult:
+        """
 
-        return ContractCallResult.from_repl_result(
-            res, parameters=self.parameters, contract=self.script)
+        :return:
+        """
+        opg_with_metadata = self.operation_group.fill().run()
+        results = ContractCallResult.from_run_operation(opg_with_metadata, context=self.context)
+        assert len(results) == 1
+        return results[0]
 
-    def result(self, storage=None, source=None, sender=None, gas_limit=None):
+    @deprecated
+    def result(self, storage=None, source=None, sender=None, gas_limit=None) -> ContractCallResult:
         """ Simulate operation and parse the result.
 
         :param storage: Python object only. If storage is specified, `run_code` is called instead of `run_operation`.
@@ -224,27 +176,10 @@ class ContractCall(Interop):
         :param gas_limit: Specify gas limit (default is gas hard limit)
         :rtype: ContractCallResult
         """
-        chain_id = self.shell.chains.main.chain_id()
-        if storage is not None or source or sender or gas_limit:
-            query = skip_nones(
-                script=self.script.code,
-                storage=self.script.storage.encode(storage),
-                entrypoint=self.parameters['entrypoint'],
-                input=self.parameters['value'],
-                amount=format_mutez(self.amount),
-                chain_id=chain_id,
-                source=sender,
-                payer=source,
-                gas=str(gas_limit) if gas_limit is not None else None
-            )
-            code_run_res = self.shell.head.helpers.scripts.run_code.post(query)
-            return ContractCallResult.from_code_run(
-                code_run_res, parameters=self.parameters, script=self.script)
+        if storage or source or sender or gas_limit:
+            return self.run_code(storage=storage, source=source, sender=sender, gas_limit=gas_limit)
         else:
-            opg_with_metadata = self.operation_group.fill().run()
-            res = ContractCallResult.from_contract_call(
-                opg_with_metadata, address=self.address, script=self.script)
-            return res[0] if res else None
+            return self.run_operation()
 
     def view(self):
         """ Get return value of a view method.
@@ -253,5 +188,6 @@ class ContractCall(Interop):
         """
         opg_with_metadata = self.operation_group.fill().run()
         view_operation = OperationResult.get_contents(opg_with_metadata, source=self.address)[0]
-        view_contract = ContractScript.from_micheline(self.shell.contracts[view_operation['destination']].code())
-        return view_contract.parameter.decode(view_operation['parameters'])
+        view_script = self.shell.contracts[view_operation['destination']].code()
+        view = MichelsonProgram.match(view_script)
+        return view.parameter.from_parameters(view_operation['parameters']).to_python_object()

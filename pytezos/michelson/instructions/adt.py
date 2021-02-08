@@ -3,7 +3,7 @@ from typing import List, cast, Any, Type, Tuple
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import PairType, OrType, MichelsonType
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 def execute_cxr(prim: str, stack: MichelsonStack, stdout: List[str], idx: int):
@@ -17,7 +17,7 @@ def execute_cxr(prim: str, stack: MichelsonStack, stdout: List[str], idx: int):
 class CarInstruction(MichelsonInstruction, prim='CAR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_cxr(cls.prim, stack, stdout, 0)
         return cls()
 
@@ -25,7 +25,7 @@ class CarInstruction(MichelsonInstruction, prim='CAR'):
 class CdrInstruction(MichelsonInstruction, prim='CDR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_cxr(cls.prim, stack, stdout, 1)
         return cls()
 
@@ -33,7 +33,7 @@ class CdrInstruction(MichelsonInstruction, prim='CDR'):
 class GetnInstruction(MichelsonInstruction, prim='GET', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         pair = cast(PairType, stack.pop1())
         pair.assert_type_in(PairType)
         index = cls.args[0].get_int()
@@ -46,7 +46,7 @@ class GetnInstruction(MichelsonInstruction, prim='GET', args_len=1):
 class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         element, pair = cast(Tuple[MichelsonType, PairType], stack.pop2())
         pair.assert_type_in(PairType)
         index = cls.args[0].get_int()
@@ -59,7 +59,7 @@ class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
 class LeftInstruction(MichelsonInstruction, prim='LEFT', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         left = stack.pop1()
         res = OrType.from_left(left, cls.args[0])
         stack.push(res)
@@ -70,7 +70,7 @@ class LeftInstruction(MichelsonInstruction, prim='LEFT', args_len=1):
 class RightInstruction(MichelsonInstruction, prim='RIGHT', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         right = stack.pop1()
         res = OrType.from_right(right, cls.args[0])
         stack.push(res)
@@ -81,7 +81,7 @@ class RightInstruction(MichelsonInstruction, prim='RIGHT', args_len=1):
 class PairInstruction(MichelsonInstruction, prim='PAIR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         left, right = stack.pop2()
         res = PairType.from_comb([left, right])
         stack.push(res)
@@ -92,7 +92,7 @@ class PairInstruction(MichelsonInstruction, prim='PAIR'):
 class UnpairInstruction(MichelsonInstruction, prim='UNPAIR'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         pair = cast(PairType, stack.pop1())
         pair.assert_type_in(PairType)
         left, right = tuple(iter(pair))
@@ -105,7 +105,7 @@ class UnpairInstruction(MichelsonInstruction, prim='UNPAIR'):
 class PairnInstruction(MichelsonInstruction, prim='PAIR', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         count = cls.args[0].get_int()
         assert count >= 2, f'invalid argument, must be >= 2'
         leaves = stack.pop(count=count)
@@ -118,7 +118,7 @@ class PairnInstruction(MichelsonInstruction, prim='PAIR', args_len=1):
 class UnpairnInstruction(MichelsonInstruction, prim='UNPAIR', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         count = cls.args[0].get_int()
         assert count >= 2, f'invalid argument, must be >= 2'
         pair = cast(PairType, stack.pop1())

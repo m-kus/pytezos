@@ -2,7 +2,7 @@ from typing import Tuple, List, Optional
 
 from pytezos.michelson.micheline import MichelsonError, get_script_section
 from pytezos.michelson.parse import MichelsonParser
-from pytezos.context.repl import REPLContext
+from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types import OperationType, MichelsonType
@@ -15,7 +15,7 @@ class Interpreter:
 
     def __init__(self, debug=True):
         self.stack = MichelsonStack()
-        self.context = REPLContext()
+        self.context = ExecutionContext()
         self.parser = MichelsonParser(extra_primitives=[])
         self.debug = debug
 
@@ -23,7 +23,7 @@ class Interpreter:
     def run_code(parameter, storage, script, entrypoint='default',
                  amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None, **kwargs) \
             -> Tuple[List[OperationType], Optional[MichelsonType], List[dict], List[str], Optional[Exception]]:
-        context = REPLContext(
+        context = ExecutionContext(
             amount=amount,
             chain_id=chain_id,
             source=source,

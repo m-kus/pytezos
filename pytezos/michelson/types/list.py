@@ -1,7 +1,7 @@
 from typing import Tuple, Generator, List, Type
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline, MichelineSequence
 
 
@@ -38,10 +38,10 @@ class ListType(MichelsonType, prim='list', args_len=1):
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
         name = cls.field_name or cls.type_name or inferred_name
         arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
-        return f'[ {arg_doc}, ... ]'
+        return f'[ {arg_doc}, … ]'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'ListType':
+    def dummy(cls, context: AbstractContext) -> 'ListType':
         return cls([])
 
     @classmethod
@@ -73,7 +73,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         items = [item.aggregate_lazy_diff(lazy_diff, mode=mode) for item in self]
         return type(self)(items)
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+    def attach_context(self, context: AbstractContext, big_map_copy=False):
         for item in self:
             item.attach_context(context, big_map_copy=big_map_copy)
 

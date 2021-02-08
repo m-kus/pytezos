@@ -1,17 +1,40 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
-from pytezos.crypto.key import blake2b
-from pytezos.crypto.encoding import base58_encode, base58_decode
-
-
-def get_originated_address(index: int, opg_hash=None):
-    prefix = base58_decode(opg_hash) if opg_hash else b'\x00' * 32
-    nonce = prefix + index.to_bytes(4, 'big')
-    nonce_hash = blake2b(data=nonce, digest_size=20).digest()
-    return base58_encode(nonce_hash, b'KT1').decode()
+from pytezos.crypto.key import Key
+from pytezos.rpc.shell import ShellQuery
 
 
-class ExecutionContext:
+class KeyHash(Key):
+
+    def __init__(self, public_key_hash):
+        super(KeyHash, self).__init__(0)
+        self._pkh = public_key_hash
+
+    def __repr__(self):
+        res = [
+            super(Key, self).__repr__(),
+            f'\nPublic key hash',
+            self.public_key_hash()
+        ]
+        return '\n'.join(res)
+
+    def public_key_hash(self):
+        return self._pkh
+
+    def public_key(self):
+        raise NotImplementedError
+
+    def secret_key(self, passphrase=None, ed25519_seed=True):
+        raise NotImplementedError
+
+    def sign(self, message, generic=False):
+        raise NotImplementedError
+
+    def verify(self, signature, message):
+        raise NotImplementedError
+
+
+class AbstractContext:
 
     def reset(self):
         raise NotImplementedError

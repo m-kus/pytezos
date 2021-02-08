@@ -3,13 +3,13 @@ from typing import List, cast, Tuple
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import PairType, TicketType, OptionType, NatType, MichelsonType
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         pair = cast(PairType, stack.pop1())
         pair.assert_type_in(PairType)
         left, right = tuple(pair)
@@ -28,7 +28,7 @@ class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
 class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         ticket = cast(TicketType, stack.pop1())
         ticket.assert_type_in(TicketType)
         res = ticket.to_comb()
@@ -41,7 +41,7 @@ class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
 class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         ticket, amounts = cast(Tuple[TicketType, PairType], stack.pop2())
         ticket.assert_type_in(TicketType)
         amounts.assert_type_in(PairType)
@@ -61,7 +61,7 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
 class TicketInstruction(MichelsonInstruction, prim='TICKET'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         item, amount = cast(Tuple[MichelsonType, NatType], stack.pop2())
         amount.assert_type_equal(NatType)
         address = context.get_self_address()

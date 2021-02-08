@@ -1,6 +1,6 @@
 from typing import List, Callable, cast
 
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import IntType, BoolType
@@ -18,7 +18,7 @@ def compare(a, b) -> int:
 class CompareInstruction(MichelsonInstruction, prim='COMPARE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a, b = stack.pop2()
         a.assert_type_equal(type(b))
         res = IntType.from_value(compare(a, b))
@@ -38,7 +38,7 @@ def execute_zero_compare(prim: str, stack: MichelsonStack, stdout: List[str], co
 class EqInstruction(MichelsonInstruction, prim='EQ'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x == 0)
         return cls()
 
@@ -46,7 +46,7 @@ class EqInstruction(MichelsonInstruction, prim='EQ'):
 class GeInstruction(MichelsonInstruction, prim='GE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x >= 0)
         return cls()
 
@@ -54,7 +54,7 @@ class GeInstruction(MichelsonInstruction, prim='GE'):
 class GtInstruction(MichelsonInstruction, prim='GT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x > 0)
         return cls()
 
@@ -62,7 +62,7 @@ class GtInstruction(MichelsonInstruction, prim='GT'):
 class LeInstruction(MichelsonInstruction, prim='LE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x <= 0)
         return cls()
 
@@ -70,7 +70,7 @@ class LeInstruction(MichelsonInstruction, prim='LE'):
 class LtInstruction(MichelsonInstruction, prim='LT'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x < 0)
         return cls()
 
@@ -78,6 +78,6 @@ class LtInstruction(MichelsonInstruction, prim='LT'):
 class NeqInstruction(MichelsonInstruction, prim='NEQ'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_zero_compare(cls.prim, stack, stdout, lambda x: x != 0)
         return cls()

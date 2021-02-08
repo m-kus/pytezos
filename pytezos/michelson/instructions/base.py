@@ -1,6 +1,6 @@
 from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.stack import MichelsonStack
 
@@ -67,5 +67,5 @@ class MichelsonInstruction(Micheline):
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
-    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         raise NotImplementedError

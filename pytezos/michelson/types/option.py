@@ -2,7 +2,7 @@ from typing import List, Optional, Type
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, Micheline
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class NoneLiteral(Micheline, prim='None'):
@@ -47,7 +47,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         return cls(item)
 
     @classmethod
-    def dummy(cls, context: ExecutionContext) -> 'OptionType':
+    def dummy(cls, context: AbstractContext) -> 'OptionType':
         return cls(None)
 
     @classmethod
@@ -106,6 +106,6 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         item = None if self.is_none() else self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
         return type(self)(item)
 
-    def attach_context(self, context: ExecutionContext, big_map_copy=False):
+    def attach_context(self, context: AbstractContext, big_map_copy=False):
         if not self.is_none():
             self.item.attach_context(context, big_map_copy=big_map_copy)

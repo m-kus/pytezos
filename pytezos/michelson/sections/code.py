@@ -1,7 +1,7 @@
 from typing import List, Type
 
 from pytezos.michelson.micheline import Micheline
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 class CodeSection(Micheline, prim='code', args_len=1):
@@ -14,6 +14,6 @@ class CodeSection(Micheline, prim='code', args_len=1):
         return cls
 
     @classmethod
-    def execute(cls, stack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack, stdout: List[str], context: AbstractContext):
         context.set_code_expr(cls.as_micheline_expr())
         stdout.append(f'code: updated')

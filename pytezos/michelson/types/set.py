@@ -2,7 +2,7 @@ from typing import Generator, List, Type
 from copy import copy
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline, MichelineSequence
 
 
@@ -42,7 +42,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
         assert items == list(sorted(items)), f'set elements are not sorted'
 
     @classmethod
-    def dummy(cls, context: ExecutionContext):
+    def dummy(cls, context: AbstractContext):
         return cls([])
 
     @classmethod
@@ -71,7 +71,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def generate_pydoc(self, definitions: list, inferred_name=None):
         name = self.field_name or self.type_name or inferred_name
         arg_doc = self.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
-        return f'{{ {arg_doc}, ... }}'
+        return f'{{ {arg_doc}, … }}'
 
     def contains(self, item: MichelsonType) -> bool:
         self.args[0].assert_type_equal(type(item))

@@ -1,15 +1,16 @@
-from functools import lru_cache
-from datetime import datetime
+from typing import Optional, Union
 from decimal import Decimal
 
+from pytezos.rpc import ShellQuery
+from pytezos.crypto.key import Key
 from pytezos.operation.group import OperationGroup
 from pytezos.operation.content import ContentMixin
 from pytezos.contract.interface import ContractInterface
-from pytezos.context.account import AccountContext
+from pytezos.context.mixin import ContextMixin
 from pytezos.jupyter import get_class_docstring
 
 
-class PyTezosClient(AccountContext, ContentMixin):
+class PyTezosClient(ContextMixin, ContentMixin):
     """ Entry point for a developer, start your script with:
     `from pytezos import pytezos`
     """
@@ -22,12 +23,6 @@ class PyTezosClient(AccountContext, ContentMixin):
         ]
         return '\n'.join(res)
 
-    def _spawn(self, **kwargs):
-        return PyTezosClient(
-            shell=kwargs.get('shell', self.shell),
-            key=kwargs.get('key', self.key)
-        )
-
     def operation_group(self, protocol=None, branch=None, contents=None, signature=None) -> OperationGroup:
         """ Create new operation group (multiple contents).
         You can leave all fields empty in order to create an empty operation group.
@@ -39,12 +34,11 @@ class PyTezosClient(AccountContext, ContentMixin):
         :rtype: OperationGroup
         """
         return OperationGroup(
+            context=self.get_generic_ctx(),
             protocol=protocol,
             branch=branch,
             contents=contents,
-            signature=signature,
-            shell=self.shell,
-            key=self.key
+            signature=signature
         )
 
     def operation(self, content: dict) -> OperationGroup:
@@ -53,11 +47,15 @@ class PyTezosClient(AccountContext, ContentMixin):
         :param content: Operation body (depending on `kind`)
         :rtype: OperationGroup
         """
-        return OperationGroup(
-            contents=[content],
-            shell=self.shell,
-            key=self.key
-        )
+        return OperationGroup( context=self.get_generic_ctx(), contents=[content])
+
+    def bulk(self, *operation_groups: OperationGroup) -> OperationGroup:
+        """
+
+        :param operation_groups:
+        :return:
+        """
+        pass  # TODO
 
     def account(self, account_id=None) -> dict:
         """ Shortcut for RPC contract request.
@@ -68,24 +66,17 @@ class PyTezosClient(AccountContext, ContentMixin):
         return self.shell.contracts[address]()
 
     def balance(self) -> Decimal:
-        return (Decimal(self.account()['balance']) / 10 ** 6).quantize(Decimal('0.000001'))
+        """ Get account balance
+
+        :return: amount in tez
+        """
+        balance_str = self.account()['balance']
+        return (Decimal(balance_str) / 10 ** 6).quantize(Decimal('0.000001'))
 
     def now(self) -> int:
-        """ Timestamp of the current head (UTC).
+        """ Timestamp of the latest block + block time (UTC).
         """
-        constants = self.shell.block.context.constants()  # cached
-        ts = self.shell.head.header()['timestamp']
-        dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
-        first_delay = constants['time_between_blocks'][0]
-        return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
-
-    @lru_cache(maxsize=None)
-    def _get_contract_interface(self, contract_id):
-        return ContractInterface(
-            address=contract_id,
-            shell=self.shell,
-            key=self.key
-        )
+        return self.context.get_now()
 
     def contract(self, contract_id) -> ContractInterface:
         """ Get a high-level interface for a given smart contract id.
@@ -93,4 +84,13 @@ class PyTezosClient(AccountContext, ContentMixin):
         :param contract_id: KT address of a smart contract
         :rtype: ContractInterface
         """
-        return self._get_contract_interface(contract_id)
+        return ContractInterface.from_context(self.create_contract_ctx(address=contract_id))
+
+    def using(self, shell: Optional[Union[ShellQuery, str]] = None, key: Optional[Union[Key, str]] = None):
+        """ Change current rpc endpoint and account (private key).
+
+        :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
+        :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
+        :returns: A copy of current object with changes applied
+        """
+        return PyTezosClient(context=self.create_client_ctx(shell, key))

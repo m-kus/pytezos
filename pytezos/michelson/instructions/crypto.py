@@ -9,7 +9,7 @@ from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BytesType, KeyType, SignatureType, BoolType, KeyHashType, SaplingStateType, \
     ListType, BLS12_381_G1Type, BLS12_381_G2Type, PairType
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.context.execution import ExecutionContext
+from pytezos.context.abstract import AbstractContext
 
 
 def execute_hash(prim: str, stack: MichelsonStack, stdout: List[str], hash_digest: Callable[[bytes], bytes]):
@@ -23,7 +23,7 @@ def execute_hash(prim: str, stack: MichelsonStack, stdout: List[str], hash_diges
 class Blake2bInstruction(MichelsonInstruction, prim='BLAKE2B'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_hash(cls.prim, stack, stdout, lambda x: blake2b_32(bytes(x)).digest())
         return cls()
 
@@ -31,7 +31,7 @@ class Blake2bInstruction(MichelsonInstruction, prim='BLAKE2B'):
 class Sha256Instruction(MichelsonInstruction, prim='SHA256'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_hash(cls.prim, stack, stdout, lambda x: sha256(bytes(x)).digest())
         return cls()
 
@@ -39,7 +39,7 @@ class Sha256Instruction(MichelsonInstruction, prim='SHA256'):
 class Sha512Instruction(MichelsonInstruction, prim='SHA512'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_hash(cls.prim, stack, stdout, lambda x: sha512(bytes(x)).digest())
         return cls()
 
@@ -47,7 +47,7 @@ class Sha512Instruction(MichelsonInstruction, prim='SHA512'):
 class Sha3Instruction(MichelsonInstruction, prim='SHA3'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_hash(cls.prim, stack, stdout, lambda x: sha3.sha3_256(bytes(x)).digest())
         return cls()
 
@@ -55,7 +55,7 @@ class Sha3Instruction(MichelsonInstruction, prim='SHA3'):
 class KeccakInstruction(MichelsonInstruction, prim='KECCAK'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_hash(cls.prim, stack, stdout, lambda x: sha3.keccak_256(bytes(x)).digest())
         return cls()
 
@@ -63,7 +63,7 @@ class KeccakInstruction(MichelsonInstruction, prim='KECCAK'):
 class CheckSignatureInstruction(MichelsonInstruction, prim='CHECK_SIGNATURE'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         pk, sig, msg = cast(Tuple[KeyType, SignatureType, BytesType], stack.pop3())
         pk.assert_type_equal(KeyType)
         sig.assert_type_equal(SignatureType)
@@ -83,7 +83,7 @@ class CheckSignatureInstruction(MichelsonInstruction, prim='CHECK_SIGNATURE'):
 class HashKeyInstruction(MichelsonInstruction, prim='HASH_KEY'):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = cast(KeyType, stack.pop1())
         a.assert_type_equal(KeyType)
         key = Key.from_encoded_key(str(a))
@@ -96,7 +96,7 @@ class HashKeyInstruction(MichelsonInstruction, prim='HASH_KEY'):
 class PairingCheckInstruction(MichelsonInstruction, prim='PAIRING_CHECK'):
 
     @classmethod
-    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         points = cast(ListType, stack.pop1())
         points.assert_type_equal(ListType.create_type(
             args=[PairType.create_type(args=[BLS12_381_G1Type, BLS12_381_G2Type])]))
@@ -113,7 +113,7 @@ class PairingCheckInstruction(MichelsonInstruction, prim='PAIRING_CHECK'):
 class SaplingEmptyStateInstruction(MichelsonInstruction, prim='SAPLING_EMPTY_STATE', args_len=1):
 
     @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         memo_size = cls.args[0].get_int()
         res = SaplingStateType.empty(memo_size)
         res.attach_context(context)

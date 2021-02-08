@@ -1,31 +1,15 @@
-from pytezos.contract.script import ContractScript
 from pytezos.contract.call import ContractCall
-from pytezos.interop import Interop
+from pytezos.context.mixin import ContextMixin, ExecutionContext
+from pytezos.michelson.sections.parameter import ParameterSection
 
 
-class ContractEntrypoint(Interop):
+class ContractEntrypoint(ContextMixin):
     """ Proxy class for spawning ContractCall instances.
     """
 
-    def __init__(self, name, address=None, script: ContractScript = None, shell=None, key=None):
-        super(ContractEntrypoint, self).__init__(shell=shell, key=key)
-        if script is None:
-            assert address is not None
-            code = self.shell.contracts[address].code()
-            script = ContractScript.from_micheline(code)
-
-        self.script = script
-        self.name = name
-        self.address = address
-
-    def _spawn(self, **kwargs):
-        return ContractEntrypoint(
-            name=self.name,
-            script=self.script,
-            address=self.address,
-            shell=kwargs.get('shell', self.shell),
-            key=kwargs.get('key', self.key),
-        )
+    def __init__(self, context: ExecutionContext, entrypoint: str):
+        super(ContractEntrypoint, self).__init__(context=context)
+        self.entrypoint = entrypoint
 
     def __repr__(self):
         res = [
@@ -44,22 +28,14 @@ class ContractEntrypoint(Interop):
         """
         if args:
             if len(args) == 1:
-                (data, is_single) = (args[0], True)
+                py_obj = args[0]
             else:
-                (data, is_single) = (list(args), False)
+                py_obj = args
         elif kwargs:
-            (data, is_single) = (kwargs, False)
+            py_obj = kwargs
         else:
-            (data, is_single) = ([], False)
+            py_obj = None
 
-        if self.name:
-            data = {self.name: data} if data or is_single else self.name
-
-        parameters = self.script.parameter.encode(data)
-        return ContractCall(
-            parameters=parameters,
-            address=self.address,
-            script=self.script,
-            shell=self.shell,
-            key=self.key,
-        )
+        param_ty = ParameterSection.match(self.context.parameter_expr)
+        parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_micheline_value()
+        return ContractCall(context=self.context, parameters=parameters)

@@ -89,7 +89,7 @@ class RpcNode:
         if res.status_code == 404:
             raise RpcError(f'Not found: {path}')
         elif res.status_code != 200:
-            raise RpcError.from_response(res) from None
+            raise RpcError.from_response(res)
 
         return res
 

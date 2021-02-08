@@ -1,53 +1,71 @@
 from typing import Tuple, Optional
+from datetime import datetime
+from pyblake2 import blake2b
 
 from pytezos.rpc.errors import RpcError
-from pytezos.context.execution import ExecutionContext, get_originated_address
-from pytezos.context.account import AccountContext
-from pytezos.crypto.encoding import base58_encode
-from pytezos.michelson.forge import optimize_timestamp
+from pytezos.crypto.key import Key
+from pytezos.rpc.shell import ShellQuery
+from pytezos.context.abstract import AbstractContext
+from pytezos.crypto.encoding import base58_encode, base58_decode
 from pytezos.michelson.micheline import get_script_section
 
 
-class REPLContext(ExecutionContext):
+def get_originated_address(index: int, opg_hash=None):
+    prefix = base58_decode(opg_hash) if opg_hash else b'\x00' * 32
+    nonce = prefix + index.to_bytes(4, 'big')
+    nonce_hash = blake2b(data=nonce, digest_size=20).digest()
+    return base58_encode(nonce_hash, b'KT1').decode()
 
-    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None, **kwargs):
+
+class ExecutionContext(AbstractContext):
+
+    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
+                 block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
+                 key=None, shell=None, address=None, counter=None, script=None):
+        self.key: Optional[Key] = key
+        self.shell: Optional[ShellQuery] = shell
+        self.counter = counter
+        self.block_id = block_id or 'head'
+        self.address = address or get_originated_address(0)
+        self.balance = balance or 0
+        self.amount = amount or 0
+        self.now = now or 0
+        self.level = level or 1
+        self.sender = sender or self.get_dummy_key_hash()
+        self.source = source or self.get_dummy_key_hash()
+        self.chain_id = chain_id or self.get_dummy_chain_id()
+        self.voting_power = voting_power or {}
+        self.total_voting_power = total_voting_power or 0
+        self.parameter_expr = get_script_section(script, 'parameter') if script else None
+        self.storage_expr = get_script_section(script, 'storage') if script else None
+        self.code_expr = get_script_section(script, 'code') if script else None
         self.origination_index = 1
-        self.tmp_big_map_index = 1
-        self.tmp_sapling_index = 1
+        self.tmp_big_map_index = 0
+        self.tmp_sapling_index = 0
         self.alloc_big_map_index = 0
         self.alloc_sapling_index = 0
         self.balance_update = 0
         self.big_maps = {}
-        self.balance = balance or 0
-        self.amount = amount or 0
-        self.voting_power = kwargs.get('voting_power', {})
-        self.total_voting_power = kwargs.get('total_voting_power', 0)
-        self.now = 0
-        self.level = 1
-        self.sender = sender or self.get_dummy_key_hash()
-        self.source = source or self.get_dummy_key_hash()
-        self.chain_id = chain_id or self.get_dummy_chain_id()
-        self.self_address = get_originated_address(0)
-        self.parameter_expr = None
-        self.storage_expr = None
-        self.code_expr = None
-        self.network = None
-        self.block_id = block_id or 'head'
 
     def reset(self):
+        self.counter = None
         self.origination_index = 1
-        self.tmp_big_map_index = 1
-        self.tmp_sapling_index = 1
+        self.tmp_big_map_index = 0
+        self.tmp_sapling_index = 0
         self.alloc_big_map_index = 0
         self.alloc_sapling_index = 0
         self.balance_update = 0
         self.big_maps.clear()
 
-    def set_network(self, network: Optional[str]):
-        self.network = network
+    def set_counter(self, counter: int):
+        self.counter = counter
 
-    def set_block(self, block_id):
-        self.block_id = block_id
+    def get_counter(self) -> int:
+        if self.counter is None:
+            assert self.key, f'key is undefined'
+            self.counter = int(self.shell.contracts[self.key.public_key_hash()]()['counter'])
+        self.counter += 1
+        return self.counter
 
     def register_big_map(self, ptr: int, copy=False) -> int:
         tmp_ptr = self.get_tmp_big_map_id()
@@ -55,9 +73,8 @@ class REPLContext(ExecutionContext):
         return tmp_ptr
 
     def get_tmp_big_map_id(self) -> int:
-        res = -self.tmp_big_map_index
         self.tmp_big_map_index += 1
-        return res
+        return -self.tmp_big_map_index
 
     def get_big_map_diff(self, ptr: int) -> Tuple[Optional[int], int, str]:
         if ptr in self.big_maps:
@@ -84,9 +101,8 @@ class REPLContext(ExecutionContext):
         self.balance_update -= amount
 
     def get_parameter_expr(self, address=None) -> Optional:
-        if self.network and address:
-            ctx = AccountContext(shell=self.network)
-            script = ctx.shell.contracts[address].script()
+        if self.shell and address:
+            script = self.shell.contracts[address].script()
             return get_script_section(script, 'parameter')
         else:
             return None if address else self.parameter_expr
@@ -109,10 +125,9 @@ class REPLContext(ExecutionContext):
     def get_big_map_value(self, ptr: int, key_hash: str):
         if ptr < 0:
             return None
-        assert self.network, f'network is undefined'
+        assert self.shell, f'shell is undefined'
         try:
-            ctx = AccountContext(shell=self.network)
-            return ctx.shell.blocks[self.block_id].context.big_maps[ptr][key_hash]()
+            return self.shell.blocks[self.block_id].context.big_maps[ptr][key_hash]()
         except RpcError:
             return None
 
@@ -120,9 +135,8 @@ class REPLContext(ExecutionContext):
         raise NotImplementedError
 
     def get_tmp_sapling_state_id(self) -> int:
-        res = -self.tmp_sapling_index
         self.tmp_sapling_index += 1
-        return res
+        return -self.tmp_sapling_index
 
     def get_sapling_state_diff(self, offset_commitment=0, offset_nullifier=0) -> Tuple[int, list]:
         ptr = self.alloc_sapling_index
@@ -130,69 +144,71 @@ class REPLContext(ExecutionContext):
         return ptr, []
 
     def get_self_address(self) -> str:
-        return self.self_address
+        return self.address
 
     def get_amount(self) -> int:
         return self.amount
 
     def get_sender(self) -> str:
-        return self.sender
+        return self.key.public_key_hash() if self.key else self.sender
 
     def get_source(self) -> str:
-        return self.source
+        return self.key.public_key_hash() if self.key else self.source
 
     def get_now(self) -> int:
-        if self.network:
-            ctx = AccountContext(shell=self.network)
-            header = ctx.shell.blocks[self.block_id].header()
-            return optimize_timestamp(header['timestamp'])
+        if self.shell:
+            constants = self.shell.block.context.constants()  # cached
+            ts = self.shell.head.header()['timestamp']
+            dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
+            first_delay = constants['time_between_blocks'][0]
+            return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
         else:
             return self.now
 
     def get_level(self) -> int:
-        if self.network:
-            ctx = AccountContext(shell=self.network)
-            header = ctx.shell.blocks[self.block_id].header()
+        if self.shell:
+            header = self.shell.blocks[self.block_id].header()
             return int(header['level'])
         else:
             return self.level
 
     def get_balance(self) -> int:
-        if self.network:
-            ctx = AccountContext(shell=self.network)
-            contract = ctx.shell.contracts[self.get_self_address()]()
+        if self.shell:
+            contract = self.shell.contracts[self.get_self_address()]()
             balance = int(contract['balance'])
         else:
             balance = self.balance
         return balance + self.balance_update
 
     def get_voting_power(self, address: str) -> int:
-        if self.network:
+        if self.shell:
             raise NotImplementedError
         else:
             return self.voting_power.get(address, 0)
 
     def get_total_voting_power(self) -> int:
-        if self.network:
+        if self.shell:
             raise NotImplementedError
         else:
             return self.total_voting_power
 
     def get_chain_id(self) -> str:
-        if self.network:
-            ctx = AccountContext(shell=self.network)
-            return ctx.shell.chains.main.chain_id()
-        else:
-            return self.chain_id
+        return self.shell.chains.main.chain_id() if self.shell else self.chain_id
 
     def get_dummy_address(self) -> str:
         return base58_encode(b'\x00' * 20, b'KT1').decode()
 
     def get_dummy_public_key(self) -> str:
-        return base58_encode(b'\x00' * 32, b'edpk').decode()
+        if self.key:
+            return self.key.public_key()
+        else:
+            return base58_encode(b'\x00' * 32, b'edpk').decode()
 
     def get_dummy_key_hash(self) -> str:
-        return base58_encode(b'\x00' * 20, b'tz1').decode()
+        if self.key:
+            return self.key.public_key_hash()
+        else:
+            return base58_encode(b'\x00' * 20, b'tz1').decode()
 
     def get_dummy_signature(self) -> str:
         return base58_encode(b'\x00' * 64, b'sig').decode()
