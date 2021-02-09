@@ -99,13 +99,13 @@ class PyTezosClient(ContextMixin, ContentMixin):
         """
         return self.context.get_now()
 
-    def contract(self, contract_id) -> ContractInterface:
+    def contract(self, address) -> ContractInterface:
         """ Get a high-level interface for a given smart contract id.
 
-        :param contract_id: KT address of a smart contract
+        :param address: KT address of a smart contract
         :rtype: ContractInterface
         """
-        return ContractInterface.from_context(self._create_contract_ctx(address=contract_id))
+        return ContractInterface.from_context(self._create_contract_ctx(address=address))
 
     def using(self, shell: Optional[Union[ShellQuery, str]] = None, key: Optional[Union[Key, str]] = None):
         """ Change current rpc endpoint and account (private key).

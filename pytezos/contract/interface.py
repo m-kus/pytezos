@@ -1,5 +1,5 @@
 from os.path import exists, expanduser
-from typing import List, Optional, Union, cast
+from typing import List, Optional, Union
 from deprecation import deprecated
 from decimal import Decimal
 
@@ -166,8 +166,16 @@ class ContractInterface(ContextMixin):
 
     @property
     def parameter(self) -> ContractEntrypoint:
-        assert 'default' in self.entrypoints, f'`default` entrypoint is undefined'
-        return getattr(self, 'default')
+        if 'root' in self.entrypoints:
+            return getattr(self, 'root')
+        else:
+            assert 'default' in self.entrypoints, f'`default` entrypoint is undefined'
+            return getattr(self, 'default')
+
+    @property
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    def call(self) -> ContractEntrypoint:
+        return self.parameter
 
     def operation_result(self, operation_group: dict) -> List[ContractCallResult]:
         """ Get operation parameters, and resulting storage as Python objects.

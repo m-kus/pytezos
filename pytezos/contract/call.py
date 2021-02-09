@@ -32,7 +32,6 @@ class ContractCall(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractCall, self).__repr__(),
-            f'.address  # {self.address}',
             f'.amount  # {self.amount}',
             '\nParameters',
             pformat(self.parameters),
@@ -62,6 +61,7 @@ class ContractCall(ContextMixin):
                          parameters=self.parameters)
 
     @property
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def operation_group(self) -> OperationGroup:
         return self.as_transaction().fill()
 
@@ -176,6 +176,7 @@ class ContractCall(ContextMixin):
         else:
             return self.run_operation()
 
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def view(self):
         """ Get return value of a view method.
 

@@ -39,11 +39,11 @@ class TestCrypto(TestCase):
          'p2pk66yEDuRC5RLHpVj8hvAS5fr8HnU2YsLvFNdwQoW3jH8WUynMwGG',
          'tz3Q2KTKWw3xqiowvfX4N7gyyAfCz8hTvcnk')
     ])
-    def test_derive_key_data(self, sk, pk, hash):
+    def test_derive_key_data(self, sk, pk, pkh):
         public_key = Key.from_encoded_key(pk)
         self.assertFalse(public_key.is_secret)
         self.assertEqual(pk, public_key.public_key())
-        self.assertEqual(hash, public_key.public_key_hash())
+        self.assertEqual(pkh, public_key.public_key_hash())
 
         secret_key = Key.from_encoded_key(sk)
         self.assertTrue(secret_key.is_secret)
@@ -107,7 +107,7 @@ class TestCrypto(TestCase):
         key = Key.from_encoded_key(sk, passphrase=passphrase)
         self.assertEqual(pk, key.public_key())
 
-        with patch('pytezos.crypto.pysodium.randombytes', return_value=salt):
+        with patch('pytezos.crypto.key.pysodium.randombytes', return_value=salt):
             self.assertEqual(sk, key.secret_key(passphrase))
 
     @parameterized.expand([

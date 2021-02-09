@@ -158,7 +158,7 @@ class MichelsonType(Micheline):
         return cls.from_micheline_value(expr)
 
     @classmethod
-    def dummy(cls, context: AbstractContext):
+    def dummy(cls, context: AbstractContext) -> 'MichelsonType':
         raise NotImplementedError
 
     @classmethod

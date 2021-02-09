@@ -70,3 +70,10 @@ class ContractData(ContextMixin):
         """
         mode = 'optimized' if optimized else 'readable'
         return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode)
+
+    def dummy(self):
+        """ Try to generate a dummy (empty) value
+
+        :return: Python object
+        """
+        return type(self.data).dummy(self.context).to_python_object(lazy_diff=True)
