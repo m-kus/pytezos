@@ -1,9 +1,22 @@
 from typing import Type
 
-from pytezos.michelson.types.base import MichelsonType, unit
+from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack, Micheline, \
     MichelineLiteral
 from pytezos.context.abstract import AbstractContext
+
+
+class unit(object):
+
+    def __repr__(self):
+        return 'Unit'
+
+    def __eq__(self, other):
+        return isinstance(other, unit)
+
+    def __lt__(self, other):
+        return False
+
 
 Unit = unit()
 
@@ -69,7 +82,7 @@ class StringType(MichelsonType, prim='string'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'string': self.value}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
     def __getitem__(self, item):
@@ -124,7 +137,7 @@ class IntType(MichelsonType, prim='int'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'int': str(self.value)}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -201,7 +214,7 @@ class BytesType(MichelsonType, prim='bytes'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'bytes': self.value.hex()}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         if try_unpack:
             return blind_unpack(self.value)
         return self.value
@@ -260,7 +273,7 @@ class BoolType(MichelsonType, prim='bool'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'prim': 'True' if self.value else 'False'}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -301,7 +314,7 @@ class UnitType(MichelsonType, prim='unit'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return {'prim': 'Unit'}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return unit()
 
 

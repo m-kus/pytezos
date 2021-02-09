@@ -45,6 +45,13 @@ class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
             assert self.ptr is not None, f'Sapling_state id is not defined'
             return {'int': str(self.ptr)}
 
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        if self.ptr is not None:
+            return self.ptr
+        else:
+            return []
+
     def to_literal(self) -> Type[Micheline]:
         if self.ptr is not None:
             return MichelineLiteral.create(self.ptr)

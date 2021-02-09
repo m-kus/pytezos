@@ -53,6 +53,10 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
         else:
             return {'bytes': self.value.to_bytes(32, 'little').hex()}
 
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        return super(BLS12_381_FrType, self).to_python_object()
+
 
 class BLS12_381_G1Type(BytesType, prim='bls12_381_g1'):
 
@@ -76,6 +80,10 @@ class BLS12_381_G1Type(BytesType, prim='bls12_381_g1'):
         y = int.from_bytes(self.value[48:], 'big')
         point = FQ(x), FQ(y), FQ(1)
         return cast(G1Uncompressed, point)
+
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        return super(BLS12_381_G1Type, self).to_python_object()
 
 
 class BLS12_381_G2Type(BytesType, prim='bls12_381_g2'):
@@ -104,3 +112,7 @@ class BLS12_381_G2Type(BytesType, prim='bls12_381_g2'):
         y_re = int.from_bytes(self.value[144:192], 'big')
         point = FQ2([x_re, x_im]), FQ2([y_re, y_im]), FQ2([1, 0])
         return cast(G2Uncompressed, point)
+
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        return super(BLS12_381_G2Type, self).to_python_object()

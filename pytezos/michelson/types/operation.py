@@ -93,5 +93,6 @@ class OperationType(MichelsonType, prim='operation'):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         assert False, 'no micheline representation'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
         return self.content

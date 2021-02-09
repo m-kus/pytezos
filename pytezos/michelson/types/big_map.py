@@ -70,11 +70,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         assert False, 'forbidden'
 
     @classmethod
-    def generate_pydoc(cls, definitions: list, inferred_name=None):
-        name = cls.field_name or cls.type_name or inferred_name
-        arg_names = [f'{name}_key', f'{name}_value'] if name else [None, None]
-        key, val = [arg.generate_pydoc(definitions, inferred_name=arg_names[i]) for i, arg in enumerate(cls.args)]
-        return f'{{ {key}: {val}, ... }} || int /* Big_map ID */'
+    def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
+        doc = super(BigMapType, cls).generate_pydoc(definitions, inferred_name=inferred_name)
+        return f'{doc} || int /* Big_map ID */'
 
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'BigMapType':
@@ -113,10 +111,12 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             assert self.ptr is not None, f'Big_map id is not defined'
             return {'int': str(self.ptr)}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'big_map is not comparable'
         if lazy_diff:
             res = super(BigMapType, self).to_python_object(try_unpack=try_unpack)
-            removals = {key.to_python_object(try_unpack=try_unpack): None for key in self.removed_keys}
+            removals = {key.to_python_object(try_unpack=try_unpack, comparable=True): None
+                        for key in self.removed_keys}
             return {**res, **removals}
         else:
             assert self.ptr is not None, f'Big_map id is not defined'

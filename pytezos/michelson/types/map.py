@@ -48,10 +48,13 @@ class MapType(MichelsonType, prim='map', args_len=2):
         assert keys == list(sorted(keys)), f'keys are unsorted'
 
     @classmethod
-    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
+    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
-        arg_names = [f'{name}_key', f'{name}_value'] if name else [None, None]
-        key, val = [arg.generate_pydoc(definitions, inferred_name=arg_names[i]) for i, arg in enumerate(cls.args)]
+        key = cls.args[0].generate_pydoc(definitions,
+                                         inferred_name=f'{name}_key' if name else None,
+                                         comparable=True)
+        val = cls.args[1].generate_pydoc(definitions,
+                                         inferred_name=f'{name}_value' if name else None)
         return f'{{ {key}: {val}, … }}'
 
     @classmethod
@@ -100,30 +103,31 @@ class MapType(MichelsonType, prim='map', args_len=2):
             for elt in self
         ]
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False) -> dict:
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> dict:
+        assert not comparable, f'{self.prim} is not comparable'
         return {
-            k.to_python_object(try_unpack=try_unpack):
-                v.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff) if v else None
-            for k, v in self
+            k.to_python_object(try_unpack=try_unpack, comparable=True):
+                v.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+            for k, v in self.items
         }
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MapType':
-        items = [(key, val.merge_lazy_diff(lazy_diff)) for key, val in self]
+        items = [(key, val.merge_lazy_diff(lazy_diff)) for key, val in self.items]
         return type(self)(items)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        items = [(key, val.aggregate_lazy_diff(lazy_diff, mode=mode)) for key, val in self]
+        items = [(key, val.aggregate_lazy_diff(lazy_diff, mode=mode)) for key, val in self.items]
         return type(self)(items)
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):
-        for _, val in self:
+        for _, val in self.items:
             val.attach_context(context, big_map_copy=big_map_copy)
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_type_equal(type(key))
         if dup:
             assert self.args[1].is_duplicable(), f'use GET_AND_UPDATE instead'
-        return next((item[1] for item in self if item[0] == key), None)
+        return next((v for k, v in self.items if k == key), None)
 
     def contains(self, key: MichelsonType):
         return self.get(key, dup=False) is not None
@@ -132,9 +136,9 @@ class MapType(MichelsonType, prim='map', args_len=2):
         prev_val = self.get(key, dup=False)
         if prev_val is not None:
             if val is not None:
-                items = [(k, v if k != key else val) for k, v in self]
+                items = [(k, v if k != key else val) for k, v in self.items]
             else:  # remove
-                items = [(k, v) for k, v in self if k != key]
+                items = [(k, v) for k, v in self.items if k != key]
         else:
             if val is not None:
                 items = list(sorted(self.items + [(key, val)], key=lambda x: x[0]))

@@ -5,6 +5,21 @@ from pytezos.michelson.micheline import parse_micheline_value, Micheline
 from pytezos.context.abstract import AbstractContext
 
 
+class null(object):
+
+    def __repr__(self):
+        return 'Null'
+
+    def __eq__(self, other):
+        return isinstance(other, null)
+
+    def __lt__(self, other):
+        return False
+
+
+Null = null()
+
+
 class NoneLiteral(Micheline, prim='None'):
     pass
 
@@ -51,10 +66,10 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         return cls(None)
 
     @classmethod
-    def generate_pydoc(cls, definitions: list, inferred_name=None):
+    def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
         arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=name)
-        return f'{arg_doc} || None'
+        return f'{arg_doc} || None || Null'
 
     @classmethod
     def from_micheline_value(cls, val_expr):
@@ -66,7 +81,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
 
     @classmethod
     def from_python_object(cls, py_obj):
-        if py_obj is None:
+        if py_obj is None or py_obj == Null:
             item = None
         else:
             item = cls.args[0].from_python_object(py_obj)
@@ -92,11 +107,13 @@ class OptionType(MichelsonType, prim='option', args_len=1):
             arg = self.item.to_micheline_value(mode=mode, lazy_diff=lazy_diff)
             return {'prim': 'Some', 'args': [arg]}
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         if self.is_none():
             return None
         else:
-            return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+            return self.item.to_python_object(try_unpack=try_unpack,
+                                              lazy_diff=lazy_diff,
+                                              comparable=comparable)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         item = None if self.is_none() else self.item.merge_lazy_diff(lazy_diff)

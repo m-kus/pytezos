@@ -3,7 +3,7 @@ from typing import Generator, Tuple, List, Union, Type, Optional, cast, Any
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.types.adt import ADT
+from pytezos.michelson.types.adt import ADT, Nested
 
 
 class PairLiteral(Micheline, prim='Pair', args_len=None):
@@ -64,9 +64,9 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return cast(Type['PairType'], type_class)
 
     @classmethod
-    def generate_pydoc(cls, definitions: list, inferred_name=None):
+    def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        flat_args = ADT.get_flat_args(cls)
+        flat_args = ADT.get_flat_args(cls, force_unnamed=comparable)
         if isinstance(flat_args, dict):
             fields = [
                 (name, arg.generate_pydoc(definitions, inferred_name=name))
@@ -112,12 +112,14 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         if isinstance(py_obj, list):
             py_obj = tuple(py_obj)
 
-        if isinstance(py_obj, tuple) and len(py_obj) == 2:
+        if isinstance(py_obj, tuple) or isinstance(py_obj, dict):
+            struct = ADT.from_nested_type(cls)
+            return cls.from_python_object(struct.normalize_python_object(py_obj))
+        elif isinstance(py_obj, Nested):
             value = tuple(cls.args[i].from_python_object(py_obj[i]) for i in [0, 1])
             return cls(value)
         else:
-            struct = ADT.from_nested_type(cls)
-            return cls.from_python_object(struct.normalize_python_object(py_obj))
+            assert False, f'expected list, tuple, or dict, got {type(py_obj).__name__}'
 
     def iter_comb(self, include_nodes=False) -> Generator[MichelsonType, None, None]:
         if include_nodes:
@@ -146,8 +148,12 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return PairLiteral.create_type(args=[item.to_literal() for item in self.items])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in self.iter_comb()]
-        if mode == 'readable':
+        if mode == 'legacy_optimized':
+            items = self.items
+        else:
+            items = list(self.iter_comb())
+        args = [arg.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for arg in items]
+        if mode in ['readable', 'legacy_optimized']:
             return {'prim': 'Pair', 'args': args}
         elif mode == 'optimized':
             if len(args) == 2:
@@ -157,23 +163,22 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             elif len(args) >= 4:
                 return args
             else:
-                assert False, f'unexpected args len {len(args)}'
+                assert False, f'unexpected number of args {len(args)}'
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False) -> Union[dict, tuple]:
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> Union[dict, tuple]:
         struct = ADT.from_nested_type(type(self))
-        flat_values = struct.get_flat_values(self.items)
+        flat_values = struct.get_flat_values(self.items, force_unnamed=comparable)
         if isinstance(flat_values, dict):
             return {
                 name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
                 for name, arg in flat_values.items()
             }
-        else:
-            return tuple(
-                arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
-                for arg in flat_values
-            )
+        return tuple(
+            arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable)
+            for arg in flat_values
+        )
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'PairType':
         items = tuple(item.merge_lazy_diff(lazy_diff) for item in self)

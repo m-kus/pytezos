@@ -30,7 +30,6 @@ class MainnetOperationTestCaseS2TKOG(TestCase):
         py_obj = original_params.to_python_object()
         # pprint(py_obj)
         readable_params = self.program.parameter.from_parameters(original_params.to_parameters(mode='readable'))
-        # optimized_params = self.parameter_type.from_parameters(original_params.to_parameters(mode='optimized'))
         self.assertEqual(py_obj, readable_params.to_python_object())
         self.program.parameter.from_python_object(py_obj)
 

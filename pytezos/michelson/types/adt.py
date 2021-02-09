@@ -40,31 +40,49 @@ def iter_values(prim: str, nested_item: Iterable[MichelsonType], ignore_annots=F
 
 
 def get_type_layout(flat_args: List[Tuple[str, Type[MichelsonType]]], force_named=False) \
-        -> Tuple[Optional[Dict[str, str]], Dict[Union[str, int], str]]:
+        -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
     reserved = set()
-    keys = {}
+    path_to_key = {}
     for i, (bin_path, arg) in enumerate(flat_args):
         key = arg.field_name or arg.type_name
         if key is not None and key not in reserved:
             reserved.add(key)
-            keys[bin_path] = key
+            path_to_key[bin_path] = key
         else:
-            keys[bin_path] = f'{arg.prim}_{i}'
+            path_to_key[bin_path] = f'{arg.prim}_{i}'
 
+    idx_to_path = {i: path for i, path in enumerate(path_to_key)}
     if not reserved and not force_named:
-        paths = {i: path for i, path in enumerate(keys)}
-        keys = None
+        path_to_key = None
+        key_to_path = None
     else:
-        paths = {name: path for path, name in keys.items()}
-    return keys, paths
+        key_to_path = {name: path for path, name in path_to_key.items()}
+    return path_to_key, key_to_path, idx_to_path
+
+
+class Nested:
+
+    def __init__(self, *args):
+        self.args = args
+
+    def __getitem__(self, item: int):
+        return self.args[item]
 
 
 class ADT:
 
-    def __init__(self, prim: str, path_to_key: Optional[Dict[str, str]], key_to_path: Dict[Union[str, int], str]):
+    def __init__(self,
+                 prim: str,
+                 path_to_key: Optional[Dict[str, str]],
+                 key_to_path: Optional[Dict[str, str]],
+                 idx_to_path: Dict[int, str]):
         self.prim = prim
         self.path_to_key = path_to_key
         self.key_to_path = key_to_path
+        self.idx_to_path = idx_to_path
+
+    def __len__(self):
+        return len(self.idx_to_path)
 
     def is_named(self):
         return self.path_to_key is not None
@@ -76,74 +94,85 @@ class ADT:
     def get_path(self, key):
         if isinstance(key, str):
             assert self.is_named(), f'{self.prim} is not named'
+            assert key in self.key_to_path, f'cannot find key `{key}`'
+            return self.key_to_path[key]
+        elif isinstance(key, int):
+            assert key in self.idx_to_path, f'cannot find key `{key}`'
+            return self.idx_to_path[key]
         else:
             assert isinstance(key, int), f'expected int or string, got {type(key).__name__}'
-        assert key in self.key_to_path, f'cannot find key `{key}`'
-        return self.key_to_path[key]
 
     def has_path(self, key) -> bool:
         return self.is_named() and key in self.key_to_path
 
     @classmethod
-    def get_flat_args(cls, nested_type: Type[MichelsonType],
+    def get_flat_args(cls, nested_type: Type[MichelsonType], force_unnamed=False,
                       ignore_annots=False, force_named=False, force_recurse=False, fields_only=False) \
             -> Union[Dict[str, Type[MichelsonType]], List[Type[MichelsonType]]]:
         flat_args = list(iter_type_args(nested_type, ignore_annots=ignore_annots, force_recurse=force_recurse))
-        keys, _ = get_type_layout(flat_args, force_named=force_named)
-        if keys:
-            return {
-                keys[path]: arg
-                for path, arg in flat_args
-                if not fields_only or arg.field_name
-            }
-        else:
-            return [arg for _, arg in flat_args]
+        if not force_unnamed:
+            path_to_key, _, _ = get_type_layout(flat_args, force_named=force_named)
+            if path_to_key:
+                return {
+                    path_to_key[path]: arg
+                    for path, arg in flat_args
+                    if not fields_only or arg.field_name
+                }
+        return [arg for _, arg in flat_args]
 
     @classmethod
     def from_nested_type(cls, nested_type: Type[MichelsonType],
                          ignore_annots=False, force_named=False, force_recurse=False) -> 'ADT':
         flat_args = list(iter_type_args(nested_type, ignore_annots=ignore_annots, force_recurse=force_recurse))
-        keys, paths = get_type_layout(flat_args, force_named=force_named)
-        return cls(prim=nested_type.prim, path_to_key=keys, key_to_path=paths)
+        path_to_key, key_to_path, idx_to_path = get_type_layout(flat_args, force_named=force_named)
+        return cls(prim=nested_type.prim,
+                   path_to_key=path_to_key,
+                   key_to_path=key_to_path,
+                   idx_to_path=idx_to_path)
 
-    def make_nested_pair(self, py_obj) -> tuple:
-        if self.is_named():
-            assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
+    def make_nested_pair(self, py_obj) -> Nested:
+        if isinstance(py_obj, dict):
+            assert self.is_named(), f'cannot parse dict into unnamed pair'
             values = {self.key_to_path[name]: value for name, value in py_obj.items()}
+        elif isinstance(py_obj, tuple):  # can be both named and unnamed
+            values = {self.idx_to_path[i]: value for i, value in enumerate(py_obj)}
         else:
-            assert isinstance(py_obj, tuple), f'expected tuple, got {type(py_obj).__name__})'
-            values = {self.key_to_path[i]: value for i, value in enumerate(py_obj)}
+            assert False, f'expected dict or tuple, got {type(py_obj).__name__}'
 
-        def wrap_tuple(path=''):
-            return tuple(
-                values[subpath] if subpath in values else wrap_tuple(subpath)
-                for subpath in [path + '0', path + '1']
-            )
+        def wrap_pair(path='') -> Nested:
+            items = [values[subpath] if subpath in values else wrap_pair(subpath)
+                     for subpath in [path + '0', path + '1']]
+            return Nested(*items)
 
-        assert len(self.key_to_path) == len(values), f'expected {len(self.key_to_path)} items, got {len(values)}'
-        return wrap_tuple()
+        assert len(self) == len(values), f'expected {len(self)} items, got {len(values)}'
+        return wrap_pair()
 
-    def make_nested_or(self, py_obj) -> tuple:
-        assert self.is_named(), f'sum type has to be named'
-        assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
-        assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
+    def make_nested_or(self, py_obj) -> Nested:
+        assert self.is_named(), f'unnamed sum types are not allowed (in the scope of PyTezos)'
 
-        entrypoint = next(iter(py_obj))
-        assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
-
-        def wrap_tuple(obj, path):
+        def wrap_or(obj, path) -> Nested:
             if len(path) == 0:
                 return obj
             elif path[0] == '0':
-                return wrap_tuple(obj, path[1:]), None
+                return Nested(wrap_or(obj, path[1:]), None)
             elif path[0] == '1':
-                return None, wrap_tuple(obj, path[1:])
+                return Nested(None, wrap_or(obj, path[1:]))
             else:
                 assert False, path
 
-        return wrap_tuple(py_obj[entrypoint], self.key_to_path[entrypoint])
+        if isinstance(py_obj, dict):
+            assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
+            entrypoint = next(iter(py_obj))
+            assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
+            return wrap_or(py_obj[entrypoint], self.key_to_path[entrypoint])
+        elif isinstance(py_obj, tuple):
+            assert len(py_obj) == len(self), f'expected {len(self)} values, got {len(py_obj)}'
+            idx = next(i for i, item in enumerate(py_obj) if item is not None)
+            return wrap_or(py_obj[idx], self.idx_to_path[idx])
+        else:
+            assert False, f'expected dict or tuple, got {type(py_obj).__name__}'
 
-    def normalize_python_object(self, py_obj):
+    def normalize_python_object(self, py_obj) -> Nested:
         if self.prim == 'pair':
             return self.make_nested_pair(py_obj)
         elif self.prim == 'or':
@@ -168,13 +197,13 @@ class ADT:
 
         return wrap_expr(val_expr, self.get_path(entrypoint))
 
-    def get_flat_values(self, nested_item: Iterable[MichelsonType],
+    def get_flat_values(self, nested_item: Iterable[MichelsonType], force_unnamed=False,
                         ignore_annots=False, allow_nones=False, fields_only=False) \
             -> Union[Dict[str, MichelsonType], List[MichelsonType]]:
         flat_values = list(iter_values(self.prim, nested_item,
                                        ignore_annots=ignore_annots,
                                        allow_nones=allow_nones))
-        if self.is_named():
+        if not force_unnamed and self.is_named():
             return {
                 self.get_name(path): arg
                 for path, arg in flat_values

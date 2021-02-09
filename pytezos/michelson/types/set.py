@@ -54,8 +54,13 @@ class SetType(MichelsonType, prim='set', args_len=1):
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'SetType':
-        assert isinstance(py_obj, set), f'expected set, got {type(py_obj).__name__}'
-        items = list(map(cls.args[0].from_python_object, py_obj))
+        if isinstance(py_obj, list):
+            py_set = set(py_obj)
+            assert len(py_set) == len(py_obj), f'found duplicates'
+        else:
+            assert isinstance(py_obj, set), f'expected set or list, got {type(py_obj).__name__}'
+            py_set = py_obj
+        items = list(map(cls.args[0].from_python_object, py_set))
         items = list(sorted(items))
         return cls(items)
 
@@ -65,12 +70,18 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return list(map(lambda x: x.to_micheline_value(mode=mode, lazy_diff=lazy_diff), self))
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
-        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff), self))
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack,
+                                                     lazy_diff=lazy_diff,
+                                                     comparable=True), self))
 
-    def generate_pydoc(self, definitions: list, inferred_name=None):
-        name = self.field_name or self.type_name or inferred_name
-        arg_doc = self.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
+    @classmethod
+    def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
+        name = cls.field_name or cls.type_name or inferred_name
+        arg_doc = cls.args[0].generate_pydoc(definitions,
+                                             inferred_name=f'{name}_item' if name else None,
+                                             comparable=True)
         return f'{{ {arg_doc}, … }}'
 
     def contains(self, item: MichelsonType) -> bool:

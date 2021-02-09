@@ -40,14 +40,14 @@ class TimestampType(IntType, prim='timestamp'):
         return cls.from_value(value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        if mode == 'optimized':
+        if mode in ['optimized', 'legacy_optimized']:
             return {'int': str(self.value)}
         elif mode == 'readable':
             return {'string': format_timestamp(self.value)}
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -106,14 +106,14 @@ class AddressType(StringType, prim='address'):
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        if mode == 'optimized':
+        if mode in ['optimized', 'legacy_optimized']:
             return {'bytes': forge_contract(self.value).hex()}  # because address can also have an entrypoint
         elif mode == 'readable':
             return {'string': self.value}
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -141,14 +141,14 @@ class KeyType(StringType, prim='key'):
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        if mode == 'optimized':
+        if mode in ['optimized', 'legacy_optimized']:
             return {'bytes': forge_public_key(self.value).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -176,14 +176,14 @@ class KeyHashType(StringType, prim='key_hash'):
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        if mode == 'optimized':
+        if mode in ['optimized', 'legacy_optimized']:
             return {'bytes': forge_address(self.value, tz_only=True).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -211,14 +211,14 @@ class SignatureType(StringType, prim='signature'):
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        if mode == 'optimized':
+        if mode in ['optimized', 'legacy_optimized']:
             return {'bytes': forge_base58(self.value).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -246,14 +246,14 @@ class ChainIdType(StringType, prim='chain_id'):
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        if mode == 'optimized':
+        if mode in ['optimized', 'legacy_optimized']:
             return {'bytes': forge_base58(self.value).hex()}
         elif mode == 'readable':
             return {'string': self.value}
         else:
             assert False, f'unsupported mode {mode}'
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
@@ -263,7 +263,7 @@ class ContractType(AddressType, prim='contract', args_len=1):
         return self.value
 
     @classmethod
-    def generate_pydoc(cls, definitions: list, inferred_name=None):
+    def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         param_expr = micheline_to_michelson(cls.args[0].as_micheline_expr())
         if cls.args[0].args:
             name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
@@ -280,6 +280,10 @@ class ContractType(AddressType, prim='contract', args_len=1):
         res = self.value.split('%')
         return res[1] if len(res) == 2 else 'default'
 
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        return super(ContractType, self).to_python_object()
+
 
 class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
@@ -292,7 +296,7 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         return micheline_to_michelson(expr)
 
     @classmethod
-    def generate_pydoc(cls, definitions: list, inferred_name=None):
+    def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
         expr = {}
         for i, suffix in enumerate(['return', 'param']):
@@ -327,5 +331,6 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         # TODO: optimized mode -> harcoded values in the code
         return self.value.as_micheline_expr()
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
         return micheline_to_michelson(self.to_micheline_value())

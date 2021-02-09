@@ -7,7 +7,7 @@ from pytezos.context.abstract import AbstractContext
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
-    'unit': 'Unit || None /* Void */',
+    'unit': 'None || Unit /* `from pytezos import Unit` for resolving None ambiguity */',
     'bytes': 'str  /* Hex string */ ||\n\tbytes  /* Python byte string */',
     'timestamp': 'int  /* Unix time in seconds */ ||\n\tstring  /* Formatted datetime `%Y-%m-%dT%H:%M:%SZ` */',
     'mutez': 'int  /* Amount in `utz` (10^-6) */ ||\n\tDecimal  /* Amount in `tz` */',
@@ -25,13 +25,7 @@ class undefined:
     pass
 
 
-class unit(object):
-
-    def __repr__(self):
-        return 'Unit'
-
-    def __eq__(self, other):
-        return isinstance(other, unit)
+Undefined = undefined()
 
 
 def parse_name(annots: List[str], prefix: str) -> Optional[str]:
@@ -95,7 +89,7 @@ class MichelsonType(Micheline):
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
-    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None) -> str:
+    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False) -> str:
         assert len(cls.args) == 0, f'defined for simple types only'
         if cls.prim in type_mappings:
             if all(x != cls.prim for x, _ in definitions):
@@ -172,7 +166,7 @@ class MichelsonType(Micheline):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         raise NotImplementedError
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         raise NotImplementedError
 
     def to_literal(self) -> Type[Micheline]:

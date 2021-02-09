@@ -35,7 +35,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         return cls(items)
 
     @classmethod
-    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None):
+    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
         arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None)
         return f'[ {arg_doc}, … ]'
@@ -62,7 +62,8 @@ class ListType(MichelsonType, prim='list', args_len=1):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return list(map(lambda x: x.to_micheline_value(mode=mode, lazy_diff=lazy_diff), self))
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'list is not comparable'
         return list(map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff), self))
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':

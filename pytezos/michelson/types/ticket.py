@@ -58,9 +58,9 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         return cast(Type['TicketType'], type_class)
 
     @classmethod
-    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None) -> str:
+    def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False) -> str:
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        item_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_value')
+        item_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_value', comparable=True)
         doc = f'(\n\t  address  /* ticketer */\n\t  {item_doc}\n\t  nat  /* amount */\n\t)'
         definitions.insert(0, (name, doc))
         return f'${name}'
@@ -88,8 +88,9 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return self.to_comb().to_micheline_value(mode=mode)
 
-    def to_python_object(self, try_unpack=False, lazy_diff=False):
-        return self.ticketer, self.item.to_python_object(try_unpack=try_unpack), self.amount
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        assert not comparable, f'{self.prim} is not comparable'
+        return self.ticketer, self.item.to_python_object(try_unpack=try_unpack, comparable=True), self.amount
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         return self
