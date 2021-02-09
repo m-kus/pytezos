@@ -264,32 +264,13 @@ def expand_if_right(prim, annots, args) -> dict:
 @macro(r'^SET_CAR$')
 def expand_set_car(prim, annots, args) -> list:
     assert not args
-    if annots:
-        assert len(annots) == 1
-        access_check = [DUP,
-                        expr(prim='CAR', annots=annots),
-                        DROP]
-    else:
-        access_check, annots = [], ['%']
-    return [*access_check,
-            CDR__,
-            SWAP,
-            expr(prim='PAIR', annots=[annots[0], '%@'])]
+    return [SWAP, expr(prim='UPDATE', args=[{'int': '1'}], annots=annots)]
 
 
 @macro(r'^SET_CDR$')
 def expand_set_cdr(prim, annots, args) -> list:
     assert not args
-    if annots:
-        assert len(annots) == 1
-        access_check = [DUP,
-                        expr(prim='CDR', annots=annots),
-                        DROP]
-    else:
-        access_check, annots = [], ['%']
-    return [*access_check,
-            CAR__,
-            expr(prim='PAIR', annots=['%@', annots[0]])]
+    return [SWAP, expr(prim='UPDATE', args=[{'int': '2'}], annots=annots)]
 
 
 def expand_set_cxr(prim, annots):
