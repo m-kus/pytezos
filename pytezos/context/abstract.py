@@ -1,7 +1,6 @@
-from typing import Tuple, Optional, Union
+from typing import Tuple, Optional
 
 from pytezos.crypto.key import Key
-from pytezos.rpc.shell import ShellQuery
 
 
 class KeyHash(Key):

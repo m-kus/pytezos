@@ -1,13 +1,11 @@
 import re
 import inspect
-import types
 from functools import update_wrapper
 
 
 def is_interactive():
-    return True
-    # import __main__ as main
-    # return not hasattr(main, '__file__')
+    import __main__ as main
+    return not hasattr(main, '__file__')
 
 
 def get_attr_docstring(class_type, attr_name):
@@ -20,13 +18,12 @@ def get_attr_docstring(class_type, attr_name):
 
 
 def default_attr_filter(x):
-    return not x.startswith('_')
+    return True
 
 
 def get_class_docstring(class_type, attr_filter=default_attr_filter, extended=False):
-    def attr_format(x):
+    def format_attribute(x):
         attr = getattr(class_type, x)
-
         if type(attr) == property:
             name = f'.{x}'
         else:
@@ -40,16 +37,15 @@ def get_class_docstring(class_type, attr_filter=default_attr_filter, extended=Fa
             doc = get_attr_docstring(class_type, x)
         else:
             doc = ''
-
         return f'{name}{doc}'
 
-    return '\n'.join(map(attr_format, filter(attr_filter, dir(class_type))))
+    def filter_attribute(x):
+        return not x.startswith('_') and attr_filter(x) and type(getattr(class_type, x)) != property
+
+    return '\n'.join(map(format_attribute, filter(filter_attribute, dir(class_type))))
 
 
 def inline_doc(method):
-    if not is_interactive():
-        return method
-
     doc = [repr(method)]
     if method.__doc__:
         doc.append(re.sub(r' {3,}', '', method.__doc__))
@@ -75,9 +71,12 @@ def inline_doc(method):
 class InlineDocstring(type):
 
     def __new__(mcs, name, bases, attrs, **kwargs):
-        new_attrs = {}
-        for attr_name, attr in attrs.items():
-            if isinstance(attr, types.FunctionType) and attr.__doc__ and not attr_name.startswith('_'):
-                attr = inline_doc(attr)
-            new_attrs[attr_name] = attr
+        if is_interactive():
+            new_attrs = {}
+            for attr_name, attr in attrs.items():
+                if callable(attr) and attr.__doc__ and not attr_name.startswith('_'):
+                    attr = inline_doc(attr)
+                new_attrs[attr_name] = attr
+        else:
+            new_attrs = attrs
         return type.__new__(mcs, name, bases, new_attrs, **kwargs)

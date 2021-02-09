@@ -128,7 +128,7 @@ class ADT:
         assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
         assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
 
-        entrypoint = next(py_obj)
+        entrypoint = next(iter(py_obj))
         assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
 
         def wrap_tuple(obj, path):
@@ -136,12 +136,12 @@ class ADT:
                 return obj
             elif path[0] == '0':
                 return wrap_tuple(obj, path[1:]), None
-            elif path[1] == '1':
+            elif path[0] == '1':
                 return None, wrap_tuple(obj, path[1:])
             else:
                 assert False, path
 
-        return wrap_tuple(py_obj, self.key_to_path[entrypoint])
+        return wrap_tuple(py_obj[entrypoint], self.key_to_path[entrypoint])
 
     def normalize_python_object(self, py_obj):
         if self.prim == 'pair':

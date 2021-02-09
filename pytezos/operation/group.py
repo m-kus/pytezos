@@ -113,7 +113,6 @@ class OperationGroup(ContextMixin, ContentMixin):
             'secret': lambda x: self.key.activation_code,
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
-            'manager_pubkey': source,  # I know, it hurts
             'fee': lambda x: str(default_fee(x)),
             'gas_limit': lambda x: str(default_gas_limit(x)),
             'storage_limit': lambda x: str(default_storage_limit(x)),

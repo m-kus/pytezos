@@ -8,16 +8,16 @@ from pytezos.context.abstract import AbstractContext
 type_mappings = {
     'nat': 'int  /* Natural number */',
     'unit': 'Unit || None /* Void */',
-    'bytes': 'string  /* Hex string */ ||\n\tbytes  /* Python byte string */',
+    'bytes': 'str  /* Hex string */ ||\n\tbytes  /* Python byte string */',
     'timestamp': 'int  /* Unix time in seconds */ ||\n\tstring  /* Formatted datetime `%Y-%m-%dT%H:%M:%SZ` */',
     'mutez': 'int  /* Amount in `utz` (10^-6) */ ||\n\tDecimal  /* Amount in `tz` */',
-    'contract': 'string  /* Base58 encoded `KT` address with optional entrypoint */',
-    'address': 'string  /* Base58 encoded `tz` or `KT` address */',
-    'key': 'string  /* Base58 encoded public key */',
-    'key_hash': 'string  /* Base58 encoded public key hash */',
-    'signature': 'string  /* Base58 encoded signature */',
-    'lambda': 'string  /* Michelson source code */',
-    'chain_id': 'string  /* Base58 encoded chain ID */'
+    'contract': 'str  /* Base58 encoded `KT` address with optional entrypoint */',
+    'address': 'str  /* Base58 encoded `tz` or `KT` address */',
+    'key': 'str  /* Base58 encoded public key */',
+    'key_hash': 'str  /* Base58 encoded public key hash */',
+    'signature': 'str  /* Base58 encoded signature */',
+    'lambda': 'str  /* Michelson source code */',
+    'chain_id': 'str  /* Base58 encoded chain ID */'
 }
 
 
@@ -206,4 +206,4 @@ class MichelsonType(Micheline):
 def generate_pydoc(ty: Type[MichelsonType], title=None):
     definitions = []
     ty.generate_pydoc(definitions, inferred_name=title)
-    return '\n'.join(definitions)
+    return '\n'.join(map(lambda x: f'${x[0]}:\n\t{x[1]}\n', definitions))

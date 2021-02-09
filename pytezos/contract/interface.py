@@ -1,5 +1,5 @@
 from os.path import exists, expanduser
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 from deprecation import deprecated
 from decimal import Decimal
 
@@ -26,32 +26,53 @@ class ContractInterface(ContextMixin):
         self.entrypoints = self.program.parameter.list_entrypoints()
         for entrypoint, ty in self.entrypoints.items():
             attr = ContractEntrypoint(context=context, entrypoint=entrypoint)
-            attr.__doc__ = generate_pydoc(ty)
+            attr.__doc__ = generate_pydoc(ty, entrypoint)
             setattr(self, entrypoint, attr)
 
     def __repr__(self):
         res = [
             super(ContractInterface, self).__repr__(),
-            f'.address  # {self.address}',
+            '.storage',
+            '.parameter',
             '\nEntrypoints',
             *list(map(lambda x: f'.{x}()', self.entrypoints)),
             '\nHelpers',
-            get_class_docstring(self.__class__,
-                                attr_filter=lambda x: not x.startswith('_') and x not in self.entrypoints)
+            get_class_docstring(self.__class__, attr_filter=lambda x: x not in self.entrypoints)
         ]
         return '\n'.join(res)
 
+    def __getattr__(self, item: str) -> ContractEntrypoint:
+        raise AttributeError(f'unexpected entrypoint {item}')
+
     @staticmethod
     def from_file(path: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+        """ Create contract from michelson source code stored in a file.
+
+        :param path: Path to the `.tz` file
+        :param context: optional execution context
+        :rtype: ContractInterface
+        """
         with open(expanduser(path)) as f:
             return ContractInterface.from_michelson(f.read(), context)
 
     @staticmethod
     def from_michelson(source: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+        """ Create contract from michelson source code.
+
+        :param source: Michelson source code
+        :param context: optional execution context
+        :rtype: ContractInterface
+        """
         return ContractInterface.from_micheline(michelson_to_micheline(source), context)
 
     @staticmethod
     def from_micheline(expression, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+        """ Create contract from micheline expression.
+
+        :param expression: [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
+        :param context: optional execution context
+        :rtype: ContractInterface
+        """
         program = MichelsonProgram.match(expression)
         cls = type(ContractInterface.__name__, (ContractInterface,), dict(program=program))
         context = ExecutionContext(
@@ -63,12 +84,17 @@ class ContractInterface(ContextMixin):
 
     @staticmethod
     def from_context(context: ExecutionContext) -> 'ContractInterface':
+        """ Create contract from the previously loaded context data.
+
+        :param context: execution context
+        :return: ContractInterface
+        """
         program = MichelsonProgram.load(context, with_code=True)
         cls = type(ContractInterface.__name__, (ContractInterface,), dict(program=program))
         return cls(context)
 
     @classmethod
-    @deprecated
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def create_from(cls, source):
         """ Initialize from contract code.
 
@@ -83,26 +109,37 @@ class ContractInterface(ContextMixin):
             return ContractInterface.from_michelson(source)
 
     def to_micheline(self):
+        """ Get contract script in Micheline JSON
+
+        :return:  [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
+        """
         return self.program.as_micheline_expr()
 
     def to_michelson(self):
+        """ Get contract listing in formatted Michelson
+
+        :return: string
+        """
         return micheline_to_michelson(self.to_micheline())
 
     def to_file(self, path):
+        """ Write contract source to a .tz file
+
+        :param path: path to the file
+        """
         with open(path, 'w+') as f:
             f.write(self.to_michelson())
 
-    @deprecated
-    def big_map_get(self, path, block_id='head'):
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    def big_map_get(self, path):
         """ Get BigMap entry as Python object by plain key and block height.
 
         :param path: Json path to the key (or just key to access default BigMap location). \
             Use `/` to separate nodes and `::` to separate tuple args. \
             In any other case you'd need to escape those symbols.
-        :param block_id: Block height / hash / offset to use, default is `head`
         :returns: object
         """
-        node = self.storage(block_id)
+        node = self.storage
         for item in path.split('/'):
             if len(item) == 0:
                 continue
@@ -112,15 +149,25 @@ class ContractInterface(ContextMixin):
             node = node[item]
         return node() if node else None
 
-    def storage(self, block_id='head') -> ContractData:
-        """ Get storage as Python object at a specified block height.
+    def at_block(self, block_id: Union[str, int]) -> 'ContractInterface':
+        """ Change the block at which the current contract is inspected
 
-        :param block_id: Block height / hash / offset to use, default is `head`
-        :rtype: ContractData
+        :param block_id: block height / hash / offset to use, default is `head`
+        :rtype: ContractInterface
         """
-        expr = self.shell.blocks[block_id].context.contracts[self.address].storage()
+        return type(self)(self._create_contract_ctx(address=self.address, block_id=block_id))
+
+    @property
+    def storage(self) -> ContractData:
+        expr = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
         storage = self.program.storage.from_micheline_value(expr)
-        return ContractData(self.create_storage_ctx(block_id), storage.item)
+        storage.attach_context(self.context)
+        return ContractData(self.context, storage.item)
+
+    @property
+    def parameter(self) -> ContractEntrypoint:
+        assert 'default' in self.entrypoints, f'`default` entrypoint is undefined'
+        return getattr(self, 'default')
 
     def operation_result(self, operation_group: dict) -> List[ContractCallResult]:
         """ Get operation parameters, and resulting storage as Python objects.
@@ -131,11 +178,11 @@ class ContractInterface(ContextMixin):
         """
         return ContractCallResult.from_run_operation(operation_group, context=self.context)
 
-    def script(self, initial_storage=None, mode='readable') -> dict:
+    def script(self, initial_storage=None, optimized=False) -> dict:
         """ Generate script for contract origination.
 
         :param initial_storage: Python object, leave None to generate default
-        :param mode: either `readable` or `optimized`
+        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
         :return: {"code": $Micheline, "storage": $Micheline}
         """
         if initial_storage:
@@ -144,21 +191,22 @@ class ContractInterface(ContextMixin):
             storage = self.program.storage.dummy(self.context)
         return {
             'code': self.program.as_micheline_expr(),
-            'storage': storage.to_micheline_value(mode=mode)
+            'storage': storage.to_micheline_value(mode='optimized' if optimized else 'readable',
+                                                  lazy_diff=True)
         }
 
-    def originate(self, initial_storage=None, mode='readable',
+    def originate(self, initial_storage=None, optimized=False,
                   balance: Union[int, Decimal] = 0,
                   delegate: Optional[str] = None) -> OperationGroup:
         """ Create an origination operation
 
         :param initial_storage: Python object, leave None to generate default
-        :param mode: either `readable` or `optimized`
-        :param balance:
-        :param delegate:
+        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
+        :param balance: initial balance
+        :param delegate: initial delegator
         :rtype: OperationGroup
         """
-        return OperationGroup(context=self.get_generic_ctx()) \
-            .origination(script=self.script(initial_storage, mode=mode),
+        return OperationGroup(context=self._create_generic_ctx()) \
+            .origination(script=self.script(initial_storage, optimized=optimized),
                          balance=balance,
                          delegate=delegate)

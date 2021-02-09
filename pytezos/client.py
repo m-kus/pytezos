@@ -6,6 +6,7 @@ from pytezos.crypto.key import Key
 from pytezos.operation.group import OperationGroup
 from pytezos.operation.content import ContentMixin
 from pytezos.contract.interface import ContractInterface
+from pytezos.contract.call import ContractCall
 from pytezos.context.mixin import ContextMixin
 from pytezos.jupyter import get_class_docstring
 
@@ -34,7 +35,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :rtype: OperationGroup
         """
         return OperationGroup(
-            context=self.get_generic_ctx(),
+            context=self._create_generic_ctx(),
             protocol=protocol,
             branch=branch,
             contents=contents,
@@ -47,15 +48,35 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param content: Operation body (depending on `kind`)
         :rtype: OperationGroup
         """
-        return OperationGroup( context=self.get_generic_ctx(), contents=[content])
+        return OperationGroup(context=self._create_generic_ctx(), contents=[content])
 
-    def bulk(self, *operation_groups: OperationGroup) -> OperationGroup:
-        """
+    def bulk(self, *operations: Union[OperationGroup, ContractCall]) -> OperationGroup:
+        """ Batch multiple operations and contract calls in a single operation group
 
-        :param operation_groups:
-        :return:
+        :param operations: a tuple of operations or contract calls
+        :rtype: OperationGroup
         """
-        pass  # TODO
+        contents = []
+        reset_fields = {
+            'pkh': '',
+            'source': '',
+            'delegate': '',
+            'counter': '0',
+            'secret': '',
+            'period': '0',
+            'public_key': '',
+            'fee': '0',
+            'gas_limit': '0',
+            'storage_limit': '0'
+        }
+        for opg in operations:
+            if isinstance(opg, ContractCall):
+                opg = opg.as_transaction()
+            else:
+                assert isinstance(opg, OperationGroup), f'expected OperationGroup or ContractCall, got {opg}'
+            for content in opg.contents:
+                contents.append({k: reset_fields.get(k, v) for k, v in content.items()})
+        return OperationGroup(context=self._create_generic_ctx(), contents=contents)
 
     def account(self, account_id=None) -> dict:
         """ Shortcut for RPC contract request.
@@ -84,7 +105,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param contract_id: KT address of a smart contract
         :rtype: ContractInterface
         """
-        return ContractInterface.from_context(self.create_contract_ctx(address=contract_id))
+        return ContractInterface.from_context(self._create_contract_ctx(address=contract_id))
 
     def using(self, shell: Optional[Union[ShellQuery, str]] = None, key: Optional[Union[Key, str]] = None):
         """ Change current rpc endpoint and account (private key).
@@ -93,4 +114,4 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
         :returns: A copy of current object with changes applied
         """
-        return PyTezosClient(context=self.create_client_ctx(shell, key))
+        return PyTezosClient(context=self._create_client_ctx(shell, key))

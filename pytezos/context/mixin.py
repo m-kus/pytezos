@@ -83,19 +83,29 @@ class ContextMixin(metaclass=InlineDocstring):
     def address(self) -> str:
         return self.context.address
 
+    @property
+    def block_id(self) -> Union[str, int]:
+        return self.context.block_id
+
     def __repr__(self):
         res = [
             super(ContextMixin, self).__repr__(),
-            '\nProperties',
-            f'.key  # {self.key}',
-            f'.shell  # {self.shell.node.uri} ({self.shell.node.network})'
+            '\nProperties'
         ]
+        if self.key:
+            res.append(f'.key  # {self.key.public_key_hash()}')
+        if self.shell:
+            res.append(f'.shell  # {self.shell.node.uri} ({self.shell.node.network})')
+        if self.address:
+            res.append(f'.address  # {self.address}')
+        if self.block_id:
+            res.append(f'.block_id  # {self.block_id}')
         return '\n'.join(res)
 
-    def get_generic_ctx(self) -> ExecutionContext:
+    def _create_generic_ctx(self) -> ExecutionContext:
         return ExecutionContext(shell=self.shell, key=self.key)
 
-    def create_contract_ctx(self, address: str) -> ExecutionContext:
+    def _create_contract_ctx(self, address: str, block_id: Optional[Union[str, int]] = None) -> ExecutionContext:
         try:
             script = self.shell.contracts[address].script()
         except RpcError as e:
@@ -103,16 +113,11 @@ class ContextMixin(metaclass=InlineDocstring):
         return ExecutionContext(shell=self.shell,
                                 key=self.key,
                                 address=address,
-                                script=script)
-
-    def create_storage_ctx(self, block_id: Union[str, int]) -> ExecutionContext:
-        return ExecutionContext(shell=self.shell,
-                                key=self.key,
-                                address=self.address,
+                                script=script,
                                 block_id=block_id)
 
-    def create_client_ctx(self, shell: Optional[Union[ShellQuery, str]] = None,
-                          key: Optional[Union[Key, str]] = None) -> ExecutionContext:
+    def _create_client_ctx(self, shell: Optional[Union[ShellQuery, str]] = None,
+                           key: Optional[Union[Key, str]] = None) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
                 shell = shell.split('.')[0]

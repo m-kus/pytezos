@@ -66,7 +66,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
             )
 
         if isinstance(block_id, int) and block_id < 0:
-            return self.blocks[f'head~{block_id}']
+            block_id = f'head{block_id}'
 
         return super(BlocksQuery, self).__getitem__(block_id)
 

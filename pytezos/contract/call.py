@@ -51,26 +51,22 @@ class ContractCall(ContextMixin):
                             parameters=self.parameters,
                             amount=amount)
 
-    @property
-    def operation_group(self) -> OperationGroup:
-        """ Show generated operation group.
+    def as_transaction(self) -> OperationGroup:
+        """ Get operation content
 
         :rtype: OperationGroup
         """
-        return OperationGroup(context=self.get_generic_ctx()) \
+        return OperationGroup(context=self._create_generic_ctx()) \
             .transaction(destination=self.address,
                          amount=self.amount,
-                         parameters=self.parameters) \
-            .fill()
+                         parameters=self.parameters)
 
+    @property
+    def operation_group(self) -> OperationGroup:
+        return self.as_transaction().fill()
+
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
-        """ Autofill, sign and inject resulting operation group.
-
-        :param _async: do not wait for operation inclusion (default is True)
-        :param preapply: do a preapply before injection
-        :param check_result: raise RpcError in case operation is refused
-        :param num_blocks_wait: number of blocks to wait for injection
-        """
         return self.operation_group.autofill().sign().inject(
             _async=_async,
             preapply=preapply,
@@ -84,15 +80,14 @@ class ContractCall(ContextMixin):
         source = self.key.public_key_hash()
         amount = format_tez(self.amount)
         entrypoint = self.parameters['entrypoint']
-        return f'transfer {amount} from {source} to {self.address} ' \
-               f'--entrypoint \'{entrypoint}\' --arg \'{arg}\''
+        return f'transfer {amount} from {source} to {self.address} --entrypoint \'{entrypoint}\' --arg \'{arg}\''
 
     def interpret(self, storage,
                   source=None, sender=None, amount=None, balance=None, chain_id=None, level=None, now=None) \
             -> ContractCallResult:
         """ Run code in the builtin REPL (WARNING! Not recommended for critical tasks).
 
-        :param storage: Python object
+        :param storage: initial storage as Python object
         :param source: patch SOURCE
         :param sender: patch SENDER
         :param amount: patch AMOUNT
@@ -126,16 +121,16 @@ class ContractCall(ContextMixin):
 
     def run_code(self, storage, source=None, sender=None, amount=None, balance=None, chain_id=None, gas_limit=None) \
             -> ContractCallResult:
-        """
+        """ Execute using RPC interpreter
 
-        :param storage:
-        :param source:
-        :param sender:
-        :param amount:
-        :param balance:
-        :param chain_id:
-        :param gas_limit:
-        :return:
+        :param storage: initial storage as Python object
+        :param source: patch SOURCE
+        :param sender: patch SENDER
+        :param amount: patch AMOUNT
+        :param balance: patch BALANCE
+        :param chain_id: patch CHAIN_ID
+        :param gas_limit: restrict max comsumed gas
+        :rtype: ContractCallResult
         """
         storage_ty = StorageSection.match(self.context.storage_expr)
         initial_storage = storage_ty.from_python_object(storage).to_micheline_value()
@@ -156,16 +151,16 @@ class ContractCall(ContextMixin):
         return ContractCallResult.from_run_code(res, parameters=self.parameters, context=self.context)
 
     def run_operation(self) -> ContractCallResult:
-        """
+        """ Simulate operation using real context
 
-        :return:
+        :rtype: ContractCallResult
         """
-        opg_with_metadata = self.operation_group.fill().run()
+        opg_with_metadata = self.as_transaction().fill().run()
         results = ContractCallResult.from_run_operation(opg_with_metadata, context=self.context)
         assert len(results) == 1
         return results[0]
 
-    @deprecated
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def result(self, storage=None, source=None, sender=None, gas_limit=None) -> ContractCallResult:
         """ Simulate operation and parse the result.
 
@@ -186,8 +181,9 @@ class ContractCall(ContextMixin):
 
         :returns: object
         """
-        opg_with_metadata = self.operation_group.fill().run()
-        view_operation = OperationResult.get_contents(opg_with_metadata, source=self.address)[0]
-        view_script = self.shell.contracts[view_operation['destination']].code()
+        opg_with_metadata = self.as_transaction().fill().run()
+        internal_operations = OperationResult.get_contents(opg_with_metadata, source=self.address)
+        assert len(internal_operations) == 1, f'multiple internal operations, not sure which to pick'
+        view_script = self.shell.contracts[internal_operations[0]['destination']].code()
         view = MichelsonProgram.match(view_script)
-        return view.parameter.from_parameters(view_operation['parameters']).to_python_object()
+        return view.parameter.from_parameters(internal_operations[0]['parameters']).to_python_object()

@@ -1,6 +1,10 @@
+from pprint import pformat
 from pytezos.contract.call import ContractCall
 from pytezos.context.mixin import ContextMixin, ExecutionContext
 from pytezos.michelson.sections.parameter import ParameterSection
+from pytezos.michelson.micheline import MichelsonError
+from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.jupyter import get_class_docstring
 
 
 class ContractEntrypoint(ContextMixin):
@@ -14,8 +18,10 @@ class ContractEntrypoint(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractEntrypoint, self).__repr__(),
-            f'.address  # {self.address}',
-            f'\n{self.__doc__}'
+            f'.entrypoint  # {self.entrypoint}',
+            f'\nTypedef\n{self.__doc__}',
+            '\nHelpers',
+            get_class_docstring(self.__class__)
         ]
         return '\n'.join(res)
 
@@ -36,6 +42,35 @@ class ContractEntrypoint(ContextMixin):
         else:
             py_obj = None
 
-        param_ty = ParameterSection.match(self.context.parameter_expr)
-        parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_micheline_value()
+        try:
+            param_ty = ParameterSection.match(self.context.parameter_expr)
+            parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_parameters()
+        except MichelsonError as e:
+            print(self.__doc__)
+            raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args)
         return ContractCall(context=self.context, parameters=parameters)
+
+    def decode(self, value):
+        """ Convert from Michelson to Python type system
+
+        :param value: Micheline JSON expression or Michelson value
+        :return: Python object
+        """
+        if isinstance(value, str):
+            value = michelson_to_micheline(value)
+        param_ty = ParameterSection.match(self.context.parameter_expr)
+        parameters = {'entrypoint': self.entrypoint, 'value': value}
+        py_obj = param_ty.from_parameters(parameters).to_python_object()
+        return py_obj[self.entrypoint]
+
+    def encode(self, py_obj, optimized=False):
+        """ Convert from Python to Michelson type system
+
+        :param py_obj: Python object
+        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
+        :return: Micheline JSON expression
+        """
+        param_ty = ParameterSection.match(self.context.parameter_expr)
+        mode = 'optimized' if optimized else 'readable'
+        parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_parameters(mode=mode)
+        return parameters['value']
