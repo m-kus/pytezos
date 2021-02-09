@@ -23,7 +23,6 @@ jobs:
       run: |
         sudo apt-get update -q
         sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
-        poetry run pip install pysodium==0.7.5
         poetry install -v
     - name: Run tests
       run: poetry run pytest tests/
