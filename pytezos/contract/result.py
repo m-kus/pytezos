@@ -1,10 +1,8 @@
-from typing import List, Dict
+from typing import List
 
 from pytezos.operation.result import OperationResult
 from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types import OperationType
 
 
 class ContractCallResult(OperationResult):

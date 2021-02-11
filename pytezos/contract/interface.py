@@ -12,7 +12,6 @@ from pytezos.michelson.program import MichelsonProgram
 from pytezos.contract.data import ContractData
 from pytezos.context.mixin import ContextMixin, ExecutionContext
 from pytezos.jupyter import get_class_docstring
-from pytezos.michelson.micheline import is_micheline
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.types.base import generate_pydoc
@@ -98,17 +97,18 @@ class ContractInterface(ContextMixin):
     @classmethod
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def create_from(cls, source):
-        """ Initialize from contract code.
+        """ Create contract interface from its code.
 
-        :param source: Michelson code
+        :param source: Michelson code, filename, or Micheline JSON
         :rtype: ContractInterface
         """
-        if isinstance(source, str) and exists(expanduser(source)):
-            return ContractInterface.from_file(source)
-        elif is_micheline(source):
-            return ContractInterface.from_micheline(source)
+        if isinstance(source, str):
+            if exists(expanduser(source)):
+                return ContractInterface.from_file(source)
+            else:
+                return ContractInterface.from_michelson(source)
         else:
-            return ContractInterface.from_michelson(source)
+            return ContractInterface.from_micheline(source)
 
     def to_micheline(self):
         """ Get contract script in Micheline JSON
@@ -154,20 +154,23 @@ class ContractInterface(ContextMixin):
     def using(self,
               shell: Optional[Union[ShellQuery, str]] = None,
               key: Optional[Union[Key, str]] = None,
-              block_id: Optional[Union[str, int]] = None) -> 'ContractInterface':
+              block_id: Optional[Union[str, int]] = None,
+              mode: Optional[str] = None) -> 'ContractInterface':
         """ Change the block at which the current contract is inspected.
         Also, if address is undefined you can specify RPC endpoint, and private key.
 
         :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
         :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
         :param block_id: block height / hash / offset to use, default is `head`
+        :param mode: whether to use `readable` or `optimized` encoding for parameters/storage/other
         :rtype: ContractInterface
         """
         has_address = self.context.address is not None
         return type(self)(self._spawn_context(shell=None if has_address else shell,
                                               key=None if has_address else key,
                                               address=self.context.address,
-                                              block_id=block_id))
+                                              block_id=block_id,
+                                              mode=mode))
 
     @property
     def storage(self) -> ContractData:
@@ -198,11 +201,11 @@ class ContractInterface(ContextMixin):
         """
         return ContractCallResult.from_run_operation(operation_group, context=self.context)
 
-    def script(self, initial_storage=None, optimized=False) -> dict:
+    def script(self, initial_storage=None, mode: Optional[str] = None) -> dict:
         """ Generate script for contract origination.
 
         :param initial_storage: Python object, leave None to generate default
-        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
+        :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
         :return: {"code": $Micheline, "storage": $Micheline}
         """
         if initial_storage:
@@ -211,8 +214,7 @@ class ContractInterface(ContextMixin):
             storage = self.program.storage.dummy(self.context)
         return {
             'code': self.program.as_micheline_expr(),
-            'storage': storage.to_micheline_value(mode='optimized' if optimized else 'readable',
-                                                  lazy_diff=True)
+            'storage': storage.to_micheline_value(mode=mode or self.context.mode, lazy_diff=True)
         }
 
     def originate(self, initial_storage=None, optimized=False,

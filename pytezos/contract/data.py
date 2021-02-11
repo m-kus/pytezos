@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.michelson.types.base import MichelsonType, generate_pydoc
@@ -61,15 +63,15 @@ class ContractData(ContextMixin):
             value = michelson_to_micheline(value)
         return type(self.data).from_micheline_value(value).to_python_object()
 
-    def encode(self, py_obj, optimized=False):
+    def encode(self, py_obj, mode: Optional[str] = None):
         """ Convert from Python to Michelson type system
 
         :param py_obj: Python object
-        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
+        :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
         :return: Micheline JSON expression
         """
-        mode = 'optimized' if optimized else 'readable'
-        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode)
+        return type(self.data).from_python_object(py_obj) \
+            .to_micheline_value(mode=mode or self.context.mode)
 
     def dummy(self):
         """ Try to generate a dummy (empty) value

@@ -108,7 +108,8 @@ class ContextMixin(metaclass=InlineDocstring):
                        shell: Optional[Union[ShellQuery, str]] = None,
                        key: Optional[Union[Key, str]] = None,
                        address: Optional[str] = None,
-                       block_id: Optional[Union[str, int]] = None) -> ExecutionContext:
+                       block_id: Optional[Union[str, int]] = None,
+                       mode: Optional[str] = None) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
                 shell = shell.split('.')[0]
@@ -149,4 +150,5 @@ class ContextMixin(metaclass=InlineDocstring):
             key=key or self.context.key,
             address=address,
             block_id=block_id,
-            script=script)
+            script=script,
+            mode=mode or self.context.mode)

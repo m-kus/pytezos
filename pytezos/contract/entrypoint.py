@@ -1,4 +1,6 @@
 from pprint import pformat
+from typing import Optional
+
 from pytezos.contract.call import ContractCall
 from pytezos.context.mixin import ContextMixin, ExecutionContext
 from pytezos.michelson.sections.parameter import ParameterSection
@@ -44,7 +46,8 @@ class ContractEntrypoint(ContextMixin):
 
         try:
             param_ty = ParameterSection.match(self.context.parameter_expr)
-            parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_parameters()
+            parameters = param_ty.from_python_object({self.entrypoint: py_obj}) \
+                .to_parameters(mode=self.context.mode)
         except MichelsonRuntimeError as e:
             print(self.__doc__)
             raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args)
@@ -63,14 +66,14 @@ class ContractEntrypoint(ContextMixin):
         py_obj = param_ty.from_parameters(parameters).to_python_object()
         return py_obj[self.entrypoint]
 
-    def encode(self, py_obj, optimized=False):
+    def encode(self, py_obj, mode: Optional[str] = None):
         """ Convert from Python to Michelson type system
 
         :param py_obj: Python object
-        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
+        :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
         :return: Micheline JSON expression
         """
         param_ty = ParameterSection.match(self.context.parameter_expr)
-        mode = 'optimized' if optimized else 'readable'
-        parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_parameters(mode=mode)
+        parameters = param_ty.from_python_object({self.entrypoint: py_obj}) \
+            .to_parameters(mode=mode or self.context.mode)
         return parameters['value']

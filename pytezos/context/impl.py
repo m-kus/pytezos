@@ -21,10 +21,11 @@ class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
-                 key=None, shell=None, address=None, counter=None, script=None):
+                 key=None, shell=None, address=None, counter=None, script=None, mode=None):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
+        self.mode = mode or 'readable'
         self.block_id = block_id or 'head'
         self.address = address
         self.balance = balance

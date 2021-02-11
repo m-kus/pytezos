@@ -121,3 +121,9 @@ class TestCrypto(TestCase):
     def test_regression_p256_short_sig(self):
         key = Key.from_encoded_key('p2sk3xPfYsoExTVi7bGSH2KoHgpxFNqewUczHkLtQvr1bwnbhzGM9Y')
         key.sign('try25')
+
+    def test_encrypted_key_str_password(self):
+        key = Key.from_encoded_key(
+            key='edesk1UrFQK6xJM6SYdLxMQbyKaaYQmzYVvQRpJXUmxj3apZ1ufRu4aHSTqWrJiqcHywSbnF146wkNcpUAW7Qy6H',
+            passphrase='12345')
+        self.assertEqual('edsk2juUM8ZMUkaCKHWVnzWhp9DxrK93YK1rQjYk3pTEq2ThXpBxkX', key.secret_key())

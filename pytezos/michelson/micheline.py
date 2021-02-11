@@ -60,22 +60,6 @@ class ErrorTrace(type):
         return type.__new__(mcs, name, bases, wrapped_attrs, **kwargs)
 
 
-def is_micheline(value) -> bool:
-    """ Check if value is a Micheline expression (using heuristics, so not 100% accurate).
-    :param value: Object
-    :rtype: bool
-    """
-    if isinstance(value, list):
-        def get_prim(x):
-            return x.get('prim') if isinstance(x, dict) else None
-        return set(map(get_prim, value)) == {'parameter', 'storage', 'code'}
-    elif isinstance(value, dict):
-        primitives = list(prim_tags.keys())
-        return any(map(lambda x: x in value, ['prim', 'args', 'annots', *primitives]))
-    else:
-        return False
-
-
 def get_script_section(script, section_name):
     assert isinstance(script, dict), f'expected dict, got {script}'
     assert isinstance(script['code'], list), f'expected list, got {script.get("code")}'

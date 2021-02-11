@@ -161,7 +161,7 @@ class ContractCall(ContextMixin):
             balance=str(balance or 0) if is_edo(self.context) else None,
             gas=str(gas_limit) if gas_limit is not None else None
         )
-        res = self.shell.head.helpers.scripts.run_code.post(query)
+        res = self.shell.blocks[self.block_id].helpers.scripts.run_code.post(query)
         return ContractCallResult.from_run_code(res, parameters=self.parameters, context=self.context)
 
     def run_operation(self) -> ContractCallResult:
