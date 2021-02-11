@@ -5,6 +5,7 @@ from pytezos.michelson.types import MichelsonType
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout, Wildcard
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.context.abstract import AbstractContext
+from pytezos.michelson.format import micheline_to_michelson
 
 
 class PushInstruction(MichelsonInstruction, prim='PUSH', args_len=2):

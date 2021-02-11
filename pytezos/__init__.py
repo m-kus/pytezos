@@ -18,6 +18,6 @@ from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.types.core import Unit
-from pytezos.michelson.types.option import Null
+from pytezos.michelson.micheline import MichelsonRuntimeError
 
 pytezos = PyTezosClient()

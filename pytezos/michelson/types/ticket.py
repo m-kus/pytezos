@@ -26,7 +26,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     @staticmethod
     def init(ticketer: str, item: MichelsonType, amount: int) -> 'TicketType':
-        cls = TicketType.create_type(args=[type(item)])
+        cls = TicketType.create_type(args=[item.get_anon_type()])
         return cls(ticketer, item, amount)
 
     @classmethod

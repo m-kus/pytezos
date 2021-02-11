@@ -8,7 +8,7 @@ from pytezos.michelson.forge import unforge_chain_id, unforge_address, unforge_p
 from pytezos.michelson.tags import prim_tags
 
 
-class MichelsonError(Exception):
+class MichelsonRuntimeError(Exception):
 
     def format_stdout(self):
         offset, instruction = next((
@@ -30,7 +30,7 @@ def catch(prim, func):
                 e.args = (type(e).__name__,)
             if prim:
                 e.args = (prim, *e.args)
-            raise MichelsonError(*e.args)
+            raise MichelsonRuntimeError(*e.args)
     return wrapper
 
 
@@ -41,7 +41,7 @@ def try_catch(prim):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                raise MichelsonError(prim, *e.args)
+                raise MichelsonRuntimeError(prim, *e.args)
         return wrapper
     return _catch
 
@@ -199,7 +199,7 @@ class Micheline(metaclass=ErrorTrace):
                 try:
                     return cls.create_type(args=list(map(Micheline.match, args)), annots=annots)
                 except Exception as e:
-                    raise MichelsonError(cls.prim, *e.args)
+                    raise MichelsonRuntimeError(cls.prim, *e.args)
             else:
                 literal = parse_micheline_literal(expr, {
                     'int': int,
@@ -208,11 +208,11 @@ class Micheline(metaclass=ErrorTrace):
                 })
                 return MichelineLiteral.create(literal=literal)
         else:
-            raise MichelsonError(f'malformed expression `{expr}`')
+            raise MichelsonRuntimeError(f'malformed expression `{expr}`')
 
     @classmethod
     def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['Micheline']:
         res = type(cls.__name__, (cls,), dict(args=args, **kwargs))

@@ -1,11 +1,10 @@
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Any
 
-from pytezos.michelson.micheline import MichelsonError, get_script_section
+from pytezos.michelson.micheline import MichelsonRuntimeError, get_script_section
 from pytezos.michelson.parse import MichelsonParser
 from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.types import OperationType, MichelsonType
 
 
 class Interpreter:
@@ -20,9 +19,9 @@ class Interpreter:
         self.debug = debug
 
     @staticmethod
-    def run_code(parameter, storage, script, entrypoint='default',
+    def run_code(parameter, storage, script, entrypoint='default', output_mode='readable',
                  amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None, **kwargs) \
-            -> Tuple[List[OperationType], Optional[MichelsonType], List[dict], List[str], Optional[Exception]]:
+            -> Tuple[List[dict], Any, List[dict], List[str], Optional[Exception]]:
         context = ExecutionContext(
             amount=amount,
             chain_id=chain_id,
@@ -46,8 +45,8 @@ class Interpreter:
             )
             res.begin(stack, stdout, context)
             res.execute(stack, stdout, context)
-            operations, storage, lazy_diff = res.end(stack, stdout)
+            operations, storage, lazy_diff = res.end(stack, stdout, output_mode=output_mode)
             return operations, storage, lazy_diff, stdout, None
-        except MichelsonError as e:
+        except MichelsonRuntimeError as e:
             stdout.append(e.format_stdout())
             return [], None, [], stdout, e

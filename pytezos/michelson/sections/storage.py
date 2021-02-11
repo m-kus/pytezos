@@ -1,7 +1,7 @@
 from typing import Type, List
 
 from pytezos.michelson.types import *
-from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
 from pytezos.context.abstract import AbstractContext
 
 
@@ -17,9 +17,13 @@ class StorageSection(Micheline, prim='storage', args_len=1):
 
     @staticmethod
     def match(type_expr) -> Type['StorageSection']:
-        cls = Micheline.match(type_expr)
-        if not issubclass(cls, StorageSection):
-            cls = StorageSection.create_type(args=[cls])
+        try:
+            cls = Micheline.match(type_expr)
+            if not issubclass(cls, StorageSection):
+                cls = StorageSection.create_type(args=[cls])
+            assert cls.args[0].field_name is None, f'argument type cannot be annotated: %{cls.args[0].field_name}'
+        except Exception as e:
+            raise MichelsonRuntimeError('storage', *e.args)
         return cls
 
     @classmethod

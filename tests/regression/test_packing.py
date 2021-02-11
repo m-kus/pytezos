@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 from pytezos.michelson.micheline import blind_unpack
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.forge import forge_script_expr
+from pytezos.michelson.forge import forge_script_expr, forge_micheline, unforge_micheline
 from pytezos.operation.forge import forge_operation_group
 
 unknown_data = [
@@ -85,11 +85,14 @@ class TestPacking(TestCase):
          "exprtiRSZkLKYRess9GZ3ryb4cVQD36WLo2oysZBFxKTZ2jXqcHWGj"),
         ({"int": "505506"},
          {"prim": "int"},
-         "exprufzwVGdAX7zG91UpiAkR2yVxEDE75tHD5YgSBmYMUx22teZTCM")
+         "exprufzwVGdAX7zG91UpiAkR2yVxEDE75tHD5YgSBmYMUx22teZTCM"),
+        ([{"int": "1"}, {"int": "1"}, {"int": "1"}, {"int": "1"}],
+         {"prim": "pair", "args": [{"prim": "int"}, {"prim": "int"}, {"prim": "int"}, {"prim": "int"}]},
+         "expruN32WETsB2Dx1AynDmMufVr1As9qdnjRxKQ82rk2qZ4uxuKVMK")
     ])
     def test_get_key_hash(self, val_expr, type_expr, expected):
         ty = MichelsonType.match(type_expr)
-        key = ty.from_micheline_value(val_expr).pack()
+        key = ty.from_micheline_value(val_expr).pack(legacy=True)
         self.assertEqual(expected, forge_script_expr(key))
 
     @parameterized.expand([(x,) for x in unknown_data])
@@ -117,3 +120,7 @@ class TestPacking(TestCase):
                  "2426049aa182a3ce38d2ae06a59e1b80bd3fe0d4030001e5ebf2dcc7dcc9d13c2c45cd76823dd604740c7f0000"
 
         self.assertEqual(remote, local)
+
+    def test_forge_combs(self):
+        expr = {'prim': 'Pair', 'args': [{'int': '1'}, {'int': '2'}, {'int': '3'}, {'int': '4'}]}
+        self.assertEqual(expr, unforge_micheline(forge_micheline(expr)))

@@ -2,7 +2,7 @@ from pprint import pformat
 from pytezos.contract.call import ContractCall
 from pytezos.context.mixin import ContextMixin, ExecutionContext
 from pytezos.michelson.sections.parameter import ParameterSection
-from pytezos.michelson.micheline import MichelsonError
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.jupyter import get_class_docstring
 
@@ -45,7 +45,7 @@ class ContractEntrypoint(ContextMixin):
         try:
             param_ty = ParameterSection.match(self.context.parameter_expr)
             parameters = param_ty.from_python_object({self.entrypoint: py_obj}).to_parameters()
-        except MichelsonError as e:
+        except MichelsonRuntimeError as e:
             print(self.__doc__)
             raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args)
         return ContractCall(context=self.context, parameters=parameters)

@@ -97,29 +97,6 @@ you can display documentation for a particular class/method:
 ```python
 >>> from pytezos import pytezos
 >>> pytezos
-<pytezos.client.PyTezosClient object at 0x7f904cf339e8>
-
-Properties
-.key  # tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
-.shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
-
-Helpers
-.account()
-.activate_account()
-.ballot()
-.contract()
-.delegation()
-.double_baking_evidence()
-.double_endorsement_evidence()
-.endorsement()
-.operation()
-.operation_group()
-.origination()
-.proposals()
-.reveal()
-.seed_nonce_revelation()
-.transaction()
-.using()
 ```
 
 ### Publications

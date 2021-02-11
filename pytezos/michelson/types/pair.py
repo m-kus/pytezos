@@ -53,7 +53,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
 
     @classmethod
     def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['PairType']:
         if len(args) > 2:  # comb
@@ -66,7 +66,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        flat_args = ADT.get_flat_args(cls, force_unnamed=comparable)
+        flat_args = ADT.get_flat_args(cls, force_tuple=comparable)
         if isinstance(flat_args, dict):
             fields = [
                 (name, arg.generate_pydoc(definitions, inferred_name=name))

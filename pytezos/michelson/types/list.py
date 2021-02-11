@@ -30,7 +30,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         assert len(items) > 0, 'cannot instantiate from empty list'
         item_type = type(items[0])
         for item in items[1:]:
-            item_type.assert_type_equal(type(item))
+            item_type.assert_type_equal(item.get_anon_type())
         cls = ListType.create_type(args=[item_type])
         return cls(items)
 

@@ -33,7 +33,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
     @staticmethod
     def from_items(items: List[Tuple[MichelsonType, MichelsonType]]) -> 'MapType':
         assert len(items) > 0, 'cannot instantiate from empty list'
-        key_type, val_type = type(items[0][0]), type(items[0][1])
+        key_type, val_type = items[0][0].get_anon_type(), items[0][1].get_anon_type()
         for key, val in items[1:]:
             key_type.assert_type_equal(type(key))
             val_type.assert_type_equal(type(val))

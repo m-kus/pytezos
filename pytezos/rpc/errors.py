@@ -12,7 +12,7 @@ class MichelsonBadReturn(RpcError, error_id='michelson_v1.bad_return'):
     """
 
 
-class MichelsonRuntimeError(RpcError, error_id='michelson_v1'):
+class MichelsonError(RpcError, error_id='michelson_v1'):
     """ Catch all michelson_v1 errors
     """
 

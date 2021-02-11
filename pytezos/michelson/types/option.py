@@ -5,21 +5,6 @@ from pytezos.michelson.micheline import parse_micheline_value, Micheline
 from pytezos.context.abstract import AbstractContext
 
 
-class null(object):
-
-    def __repr__(self):
-        return 'Null'
-
-    def __eq__(self, other):
-        return isinstance(other, null)
-
-    def __lt__(self, other):
-        return False
-
-
-Null = null()
-
-
 class NoneLiteral(Micheline, prim='None'):
     pass
 
@@ -58,7 +43,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
 
     @staticmethod
     def from_some(item: MichelsonType) -> 'OptionType':
-        cls = OptionType.create_type(args=[type(item)])
+        cls = OptionType.create_type(args=[item.get_anon_type()])
         return cls(item)
 
     @classmethod
@@ -69,7 +54,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
         arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=name)
-        return f'{arg_doc} || None || Null'
+        return f'{arg_doc} || None'
 
     @classmethod
     def from_micheline_value(cls, val_expr):
@@ -81,7 +66,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
 
     @classmethod
     def from_python_object(cls, py_obj):
-        if py_obj is None or py_obj == Null:
+        if py_obj is None:
             item = None
         else:
             item = cls.args[0].from_python_object(py_obj)

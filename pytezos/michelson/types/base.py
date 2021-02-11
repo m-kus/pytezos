@@ -1,4 +1,4 @@
-from copy import copy, deepcopy
+from copy import copy
 from typing import Tuple, List, Optional, Type, cast, Union, Any
 
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
@@ -22,7 +22,15 @@ type_mappings = {
 
 
 class undefined:
-    pass
+
+    def __repr__(self):
+        return '_'
+
+    def __eq__(self, other):
+        return isinstance(other, undefined)
+
+    def __lt__(self, other):
+        return False
 
 
 Undefined = undefined()
@@ -56,11 +64,11 @@ class MichelsonType(Micheline):
 
     @classmethod
     def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
+                    args: List[Type['Micheline']],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['MichelsonType']:
         type_args = [arg for arg in args if issubclass(arg, MichelsonType)]
-        if cls.prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda', 'parameter', 'storage']:
+        if cls.prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda']:
             for arg in type_args:
                 assert arg.field_name is None, f'{cls.prim} argument type cannot be annotated: %{arg.field_name}'
         if cls.prim in ['set', 'map', 'big_map', 'ticket']:
@@ -107,36 +115,48 @@ class MichelsonType(Micheline):
     def is_passable(cls):
         if cls.prim in ['operation']:
             return False
+        elif cls.prim == 'lambda':
+            return True
         return all(map(lambda x: x.is_passable(), cls.args))
 
     @classmethod
     def is_storable(cls):
         if cls.prim in ['contract', 'operation']:
             return False
+        elif cls.prim == 'lambda':
+            return True
         return all(map(lambda x: x.is_storable(), cls.args))
 
     @classmethod
     def is_pushable(cls):
         if cls.prim in ['big_map', 'contract', 'operation', 'sapling_state', 'ticket']:
             return False
+        elif cls.prim == 'lambda':
+            return True
         return all(map(lambda x: x.is_pushable(), cls.args))
 
     @classmethod
     def is_packable(cls):
         if cls.prim in ['big_map', 'operation', 'sapling_state', 'ticket']:
             return False
+        elif cls.prim == 'lambda':
+            return True
         return all(map(lambda x: x.is_packable(), cls.args))
 
     @classmethod
     def is_duplicable(cls):
         if cls.prim in ['ticket']:
             return False
+        elif cls.prim == 'lambda':
+            return True
         return all(map(lambda x: x.is_duplicable(), cls.args))
 
     @classmethod
     def is_big_map_friendly(cls):
         if cls.prim in ['big_map', 'operation', 'sapling_state']:
             return False
+        elif cls.prim == 'lambda':
+            return True
         return all(map(lambda x: x.is_big_map_friendly(), cls.args))
 
     @classmethod
@@ -187,14 +207,14 @@ class MichelsonType(Micheline):
         val_expr = self.to_micheline_value(mode=mode)
         return forge_micheline(val_expr)
 
-    def pack(self) -> bytes:
+    def pack(self, legacy=False) -> bytes:
         assert self.is_packable(), f'{self.prim} cannot be packed'
-        data = self.forge(mode='optimized')
+        data = self.forge(mode='legacy_optimized' if legacy else 'optimized')
         return b'\x05' + data
 
     def duplicate(self):
         assert self.is_duplicable(), f'{self.prim} is not duplicable'
-        return deepcopy(self)
+        return copy(self)
 
 
 def generate_pydoc(ty: Type[MichelsonType], title=None):

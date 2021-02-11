@@ -149,12 +149,11 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             src_ptr, dst_ptr, action = self.context.get_big_map_diff(self.ptr)
         else:
             src_ptr, dst_ptr, action = self.ptr, self.ptr, 'update'
-        key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
 
         def make_update(key: MichelsonType, val: Optional[MichelsonType]) -> dict:
             update = {
                 'key': key.to_micheline_value(mode=mode),
-                'key_hash': forge_script_expr(key.pack())
+                'key_hash': forge_script_expr(key.pack(legacy=True))
             }
             if val is not None:
                 update['value'] = val.to_micheline_value(mode=mode)
@@ -165,6 +164,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             'updates': [make_update(key, val) for key, val in self]
         }
         if action == 'alloc':
+            key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
             diff['key_type'] = key_type
             diff['value_type'] = val_type
         elif action == 'copy':
@@ -191,7 +191,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         val = next((v for k, v in self if k == key), undefined())  # search in diff
         if isinstance(val, undefined):
             assert self.context, f'lazy storage is not attached'
-            key_hash = forge_script_expr(key.pack())
+            key_hash = forge_script_expr(key.pack(legacy=True))
             val_expr = self.context.get_big_map_value(self.ptr, key_hash)
             if val_expr is None:
                 return None
@@ -222,7 +222,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     def get_key_hash(self, key_obj):
         key = self.args[0].from_python_object(key_obj)
-        return forge_script_expr(key.pack())
+        return forge_script_expr(key.pack(legacy=True))
 
     def __getitem__(self, key_obj) -> Optional[MichelsonType]:
         key = self.args[0].from_python_object(key_obj)

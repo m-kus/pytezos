@@ -1,0 +1,12 @@
+parameter (or (int %increaseCounterBy) (int %decreaseCounterBy));
+storage int;
+code {
+   UNPAIR;
+   IF_LEFT { ADD }
+           {
+             SWAP;
+             SUB
+           };
+   NIL operation;
+   PAIR;
+ }

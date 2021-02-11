@@ -20,6 +20,10 @@ def skip_nones(**kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if v is not None}
 
 
+def is_edo(context: ExecutionContext) -> bool:
+    return context.shell.head.header()['protocol'].startswith('PtEdo')
+
+
 class ContractCall(ContextMixin):
     """ Proxy class encapsulating a contract call: contract type scheme, contract address, parameters, and amount
     """
@@ -55,7 +59,7 @@ class ContractCall(ContextMixin):
 
         :rtype: OperationGroup
         """
-        return OperationGroup(context=self._create_generic_ctx()) \
+        return OperationGroup(context=self._spawn_context()) \
             .transaction(destination=self.address,
                          amount=self.amount,
                          parameters=self.parameters)
@@ -82,12 +86,12 @@ class ContractCall(ContextMixin):
         entrypoint = self.parameters['entrypoint']
         return f'transfer {amount} from {source} to {self.address} --entrypoint \'{entrypoint}\' --arg \'{arg}\''
 
-    def interpret(self, storage,
+    def interpret(self, storage=None,
                   source=None, sender=None, amount=None, balance=None, chain_id=None, level=None, now=None) \
             -> ContractCallResult:
         """ Run code in the builtin REPL (WARNING! Not recommended for critical tasks).
 
-        :param storage: initial storage as Python object
+        :param storage: initial storage as Python object, leave None if you want to generate a dummy one
         :param source: patch SOURCE
         :param sender: patch SENDER
         :param amount: patch AMOUNT
@@ -98,32 +102,39 @@ class ContractCall(ContextMixin):
         :rtype: pytezos.contract.result.ContractCallResult
         """
         storage_ty = StorageSection.match(self.context.storage_expr)
-        initial_storage = storage_ty.from_python_object(storage).to_micheline_value()
-        script = [self.context.parameter_expr, self.context.storage_expr, self.context.code_expr]
-        operations, res_storage, lazy_diff, stdout, error = Interpreter.run_code(
+        if storage is None:
+            initial_storage = storage_ty.dummy(self.context).to_micheline_value(lazy_diff=True)
+        else:
+            initial_storage = storage_ty.from_python_object(storage).to_micheline_value(lazy_diff=True)
+        operations, storage, lazy_diff, stdout, error = Interpreter.run_code(
             parameter=self.parameters['value'],
             entrypoint=self.parameters['entrypoint'],
             storage=initial_storage,
-            script=script,
-            source=source or self.context.get_source(),
-            sender=sender or self.context.get_sender(),
+            script=self.context.script['code'],
+            source=source,
+            sender=sender or source,
             amount=amount or self.amount,
-            balance=balance or self.context.get_balance(),
-            chain_id=chain_id or self.context.get_chain_id(),
-            level=level or self.context.get_level(),
-            now=now or self.context.get_now()
+            balance=balance,
+            chain_id=chain_id,
+            level=level,
+            now=now
         )
         if error:
             print('\n'.join(stdout))
             raise error
-        return ContractCallResult.from_repl_result(operations, res_storage, lazy_diff,
-                                                   parameters=self.parameters, context=self.context)
+        res = {
+            'operations': operations,
+            'storage': storage,
+            'lazy_diff': lazy_diff
+        }
+        return ContractCallResult.from_run_code(res, parameters=self.parameters, context=self.context)
 
-    def run_code(self, storage, source=None, sender=None, amount=None, balance=None, chain_id=None, gas_limit=None) \
+    def run_code(self, storage=None,
+                 source=None, sender=None, amount=None, balance=None, chain_id=None, gas_limit=None) \
             -> ContractCallResult:
         """ Execute using RPC interpreter
 
-        :param storage: initial storage as Python object
+        :param storage: initial storage as Python object, leave None if you want to generate a dummy one
         :param source: patch SOURCE
         :param sender: patch SENDER
         :param amount: patch AMOUNT
@@ -133,7 +144,10 @@ class ContractCall(ContextMixin):
         :rtype: ContractCallResult
         """
         storage_ty = StorageSection.match(self.context.storage_expr)
-        initial_storage = storage_ty.from_python_object(storage).to_micheline_value()
+        if storage is None:
+            initial_storage = storage_ty.dummy(self.context).to_micheline_value(lazy_diff=True)
+        else:
+            initial_storage = storage_ty.from_python_object(storage).to_micheline_value(lazy_diff=True)
         script = [self.context.parameter_expr, self.context.storage_expr, self.context.code_expr]
         query = skip_nones(
             script=script,
@@ -142,9 +156,9 @@ class ContractCall(ContextMixin):
             input=self.parameters['value'],
             amount=format_mutez(amount or self.amount),
             chain_id=chain_id or self.context.get_chain_id(),
-            source=sender or self.context.get_sender(),
-            payer=source or self.context.get_source(),
-            balance=balance or self.context.get_balance(),
+            source=sender,
+            payer=source,
+            balance=str(balance or 0) if is_edo(self.context) else None,
             gas=str(gas_limit) if gas_limit is not None else None
         )
         res = self.shell.head.helpers.scripts.run_code.post(query)

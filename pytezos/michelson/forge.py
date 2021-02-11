@@ -1,5 +1,6 @@
 import base58
 import strict_rfc3339
+from typing import Tuple
 
 from pytezos.crypto.encoding import base58_encode, base58_decode
 from pytezos.crypto.key import blake2b_32
@@ -11,6 +12,10 @@ prim_int = {v[0]: k for k, v in prim_tags.items()}
 def get_tag(args_len: int, annots_len: int) -> bytes:
     tag = min(args_len * 2 + 3 + (1 if annots_len > 0 else 0), 9)
     return bytes([tag])
+
+
+def read_tag(tag: int) -> Tuple[int, bool]:
+    return (tag - 3) // 2, bool((tag - 3) % 2)
 
 
 def forge_int(value: int) -> bytes:
@@ -301,33 +306,33 @@ def forge_micheline(data) -> bytes:
 
 
 def unforge_micheline(data: bytes):
-    """ Parse Micheline expression from its encoded form (but do not UNPACK).
+    """ Parse Micheline JSON from bytes.
 
-    :param data: Encoded Micheline expression
-    :returns: Object
+    :param data: Forged Micheline expression
+    :returns: Micheline JSON
     """
     ptr = 0
 
-    def parse_list():
+    def unforge_sequence():
         nonlocal ptr
         _, offset = unforge_array(data[ptr:])
         end, res = ptr + offset, []
         ptr += 4
         while ptr < end:
-            res.append(parse())
-        assert ptr == end, f'out of array boundaries'
+            res.append(unforge())
+        assert ptr == end, f'out of sequence boundaries'
         return res
 
-    def parse_prim_expr(args_len=0, annots=False):
+    def unforge_prim_expr(args_len=0, annots=False):
         nonlocal ptr
         prim_tag = data[ptr]
         ptr += 1
         expr = {'prim': prim_int[prim_tag]}
 
         if 0 < args_len < 3:
-            expr['args'] = [parse() for _ in range(args_len)]
+            expr['args'] = [unforge() for _ in range(args_len)]
         elif args_len == 3:
-            expr['args'] = parse_list()
+            expr['args'] = unforge_sequence()
         else:
             assert args_len == 0, f'unexpected args len {args_len}'
 
@@ -337,9 +342,12 @@ def unforge_micheline(data: bytes):
             if len(value) > 0:
                 expr['annots'] = value.decode().split(' ')
 
+        if args_len == 3:
+            ptr += 4
+
         return expr
 
-    def parse():
+    def unforge():
         nonlocal ptr
         tag = data[ptr]
         ptr += 1
@@ -352,21 +360,10 @@ def unforge_micheline(data: bytes):
             ptr += offset
             return {'string': value.decode()}
         elif tag == 2:
-            return parse_list()
-        elif tag == 3:
-            return parse_prim_expr(args_len=0, annots=False)
-        elif tag == 4:
-            return parse_prim_expr(args_len=0, annots=True)
-        elif tag == 5:
-            return parse_prim_expr(args_len=1, annots=False)
-        elif tag == 6:
-            return parse_prim_expr(args_len=1, annots=True)
-        elif tag == 7:
-            return parse_prim_expr(args_len=2, annots=False)
-        elif tag == 8:
-            return parse_prim_expr(args_len=2, annots=True)
-        elif tag == 9:
-            return parse_prim_expr(args_len=3, annots=True)
+            return unforge_sequence()
+        elif 2 < tag < 10:
+            args_len, annots = read_tag(tag)
+            return unforge_prim_expr(args_len, annots)
         elif tag == 10:
             value, offset = unforge_array(data[ptr:])
             ptr += offset
@@ -374,9 +371,9 @@ def unforge_micheline(data: bytes):
         else:
             assert False, f'unkonwn tag {tag} at position {ptr}'
 
-    res = parse()
+    result = unforge()
     assert ptr == len(data), f'have not reach EOS (pos {ptr}/{len(data)})'
-    return res
+    return result
 
 
 def forge_script(script) -> bytes:

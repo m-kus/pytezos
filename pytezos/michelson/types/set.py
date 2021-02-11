@@ -29,7 +29,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
     @staticmethod
     def from_items(items: List[MichelsonType]) -> 'SetType':
         assert len(items) > 0, 'cannot instantiate from empty list'
-        item_type = type(items[0])
+        item_type = items[0].get_anon_type()
         for item in items[1:]:
             item_type.assert_type_equal(type(item))
         cls = SetType.create_type(args=[item_type])

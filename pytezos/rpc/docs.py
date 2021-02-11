@@ -21,29 +21,35 @@ rpc_docs = {
     }
   },
   "/chains/{}": {
+    "PATCH": {
+      "descr": "Forcefully set the bootstrapped flag of the node",
+      "args": [],
+      "ret": "Object"
+    },
     "props": [
       "blocks",
       "chain_id",
       "checkpoint",
       "invalid_blocks",
+      "is_bootstrapped",
       "mempool"
     ]
   },
   "/chains/{}/blocks": {
     "GET": {
-      "descr": "Lists known heads of the blockchain sorted with decreasing fitness. Optional arguments allows to returns the list of predecessors for known heads or the list of predecessors for a given list of blocks.",
+      "descr": "Lists block hashes from '<chain>', up to the last checkpoint, sorted with decreasing fitness. Without arguments it returns the head of the chain. Optional arguments allow to return the list of predecessors of a given block or of a set of blocks.",
       "args": [
         {
           "name": "length",
-          "descr": "The requested number of predecessors to returns (per requested head)."
+          "descr": "The requested number of predecessors to return (per request; see next argument)."
         },
         {
           "name": "head",
-          "descr": "An empty argument requests blocks from the current heads. A non empty list allow to request specific fragment of the chain."
+          "descr": "An empty argument requests blocks starting with the current head. A non empty list allows to request one or more specific fragments of the chain."
         },
         {
           "name": "min_date",
-          "descr": "When `min_date` is provided, heads with a timestamp before `min_date` are filtered out"
+          "descr": "When `min_date` is provided, blocks with a timestamp before `min_date` are filtered out"
         }
       ],
       "ret": "Array"
@@ -90,7 +96,19 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/is_bootstrapped": {
+    "GET": {
+      "descr": "The bootstrap status of a chain",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/config": {
+    "GET": {
+      "descr": "Return the runtime node configuration (this takes into account the command-line arguments and the on-disk configuration file)",
+      "args": [],
+      "ret": "Object"
+    },
     "props": [
       "network"
     ]
@@ -714,7 +732,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}": {
     "GET": {
-      "descr": "All the information about a block.",
+      "descr": "All the information about a block. The associated metadata may not be present depending on the history mode and block's distance from the head.",
       "args": [],
       "ret": "Object"
     },
@@ -726,9 +744,12 @@ rpc_docs = {
       "helpers",
       "live_blocks",
       "metadata",
+      "metadata_hash",
       "minimal_valid_time",
       "operation_hashes",
+      "operation_metadata_hashes",
       "operations",
+      "operations_metadata_hash",
       "protocols",
       "required_endorsements",
       "votes"
@@ -742,6 +763,7 @@ rpc_docs = {
       "delegates",
       "nonces",
       "raw",
+      "sapling",
       "seed"
     ]
   },
@@ -806,6 +828,7 @@ rpc_docs = {
       "entrypoints",
       "manager_key",
       "script",
+      "single_sapling_get_diff",
       "storage"
     ]
   },
@@ -869,6 +892,22 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/contracts/{}/single_sapling_get_diff": {
+    "GET": {
+      "descr": "Returns the root and a diff of a state starting from an optional offset which is zero by default.",
+      "args": [
+        {
+          "name": "offset_commitment",
+          "descr": "Commitments and ciphertexts are returned from the specified offset up to the most recent."
+        },
+        {
+          "name": "offset_nullifier",
+          "descr": "Nullifiers are returned from the specified offset up to the most recent."
+        }
+      ],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/contracts/{}/storage": {
     "GET": {
       "descr": "Access the data of the contract.",
@@ -910,7 +949,8 @@ rpc_docs = {
       "frozen_balance",
       "frozen_balance_by_cycle",
       "grace_period",
-      "staking_balance"
+      "staking_balance",
+      "voting_power"
     ]
   },
   "/chains/{}/blocks/{}/context/delegates/{}/balance": {
@@ -969,6 +1009,13 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/delegates/{}/voting_power": {
+    "GET": {
+      "descr": "The number of rolls in the vote listings for a given delegate",
+      "args": [],
+      "ret": "Integer"
+    }
+  },
   "/chains/{}/blocks/{}/context/nonces": {
     "item": {
       "name": "block_level",
@@ -995,6 +1042,33 @@ rpc_docs = {
         {
           "name": "depth",
           "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/sapling": {
+    "item": {
+      "name": "sapling_state_id",
+      "descr": "A sapling state identifier"
+    }
+  },
+  "/chains/{}/blocks/{}/context/sapling/{}": {
+    "props": [
+      "get_diff"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/sapling/{}/get_diff": {
+    "GET": {
+      "descr": "Returns the root and a diff of a state starting from an optional offset which is zero by default.",
+      "args": [
+        {
+          "name": "offset_commitment",
+          "descr": "Commitments and ciphertexts are returned from the specified offset up to the most recent."
+        },
+        {
+          "name": "offset_nullifier",
+          "descr": "Nullifiers are returned from the specified offset up to the most recent."
         }
       ],
       "ret": "Object"
@@ -1080,7 +1154,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers/baking_rights": {
     "GET": {
-      "descr": "Retrieves the list of delegates allowed to bake a block.\nBy default, it gives the best baking priorities for bakers that have at least one opportunity below the 64th priority for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the baking rights have to be returned. Parameter `delegate` can be used to restrict the results to the given delegates. If parameter `all` is set, all the baking opportunities for each baker at each level are returned, instead of just the first one.\nReturns the list of baking slots. Also returns the minimal timestamps that correspond to these slots. The timestamps are omitted for levels in the past, and are only estimates for levels later that the next block, based on the hypothesis that all predecessor blocks were baked at the first priority.",
+      "descr": "Retrieves the list of delegates allowed to bake a block.\nBy default, it gives the best baking priorities for bakers that have at least one opportunity below the 64th priority for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the baking rights have to be returned. When asked for (a) whole cycle(s), baking opportunities are given by default up to the priority 8.\nParameter `delegate` can be used to restrict the results to the given delegates. If parameter `all` is set, all the baking opportunities for each baker at each level are returned, instead of just the first one.\nReturns the list of baking slots. Also returns the minimal timestamps that correspond to these slots. The timestamps are omitted for levels in the past, and are only estimates for levels later that the next block, based on the hypothesis that all predecessor blocks were baked at the first priority.",
       "args": [
         {
           "name": "level",
@@ -1321,6 +1395,13 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/metadata_hash": {
+    "GET": {
+      "descr": "Hash of the metadata associated to the block. This is only set on blocks starting from environment V1.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/minimal_valid_time": {
     "GET": {
       "descr": "Minimal valid time for a block given a priority and an endorsing power.",
@@ -1366,6 +1447,35 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/operation_metadata_hashes": {
+    "GET": {
+      "descr": "The hashes of all the operation metadata included in the block. This is only set on blocks starting from environment V1.",
+      "args": [],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "list_offset",
+      "descr": "Index `n` of the requested validation pass."
+    }
+  },
+  "/chains/{}/blocks/{}/operation_metadata_hashes/{}": {
+    "GET": {
+      "descr": "All the operation metadata included in `n-th` validation pass of the block. This is only set on blocks starting from environment V1.",
+      "args": [],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "operation_offset",
+      "descr": "Index `m` of the requested operation in its validation pass."
+    }
+  },
+  "/chains/{}/blocks/{}/operation_metadata_hashes/{}/{}": {
+    "GET": {
+      "descr": "The hash of then `m-th` operation metadata in the `n-th` validation pass of the block. This is only set on blocks starting from environment V1.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/operations": {
     "GET": {
       "descr": "All the operations included in the block.",
@@ -1395,6 +1505,13 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/operations_metadata_hash": {
+    "GET": {
+      "descr": "The root hash of the operations metadata from the block. This is only set on blocks starting from environment V1.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/protocols": {
     "GET": {
       "descr": "Current and next protocol.",
@@ -1418,11 +1535,14 @@ rpc_docs = {
     "props": [
       "ballot_list",
       "ballots",
+      "current_period",
       "current_period_kind",
       "current_proposal",
       "current_quorum",
       "listings",
-      "proposals"
+      "proposals",
+      "successor_period",
+      "total_voting_power"
     ]
   },
   "/chains/{}/blocks/{}/votes/ballot_list": {
@@ -1439,9 +1559,16 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/votes/current_period": {
+    "GET": {
+      "descr": "Returns the voting period (index, kind, starting position) and related information (position, remaining) of the interrogated block.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/votes/current_period_kind": {
     "GET": {
-      "descr": "Current period kind.",
+      "descr": "Current period kind. This RPC is DEPRECATED: use `..<block_id>/votes/current_period` RPC instead.",
       "args": [],
       "ret": "Object"
     }
@@ -1474,6 +1601,20 @@ rpc_docs = {
       "ret": "Array"
     }
   },
+  "/chains/{}/blocks/{}/votes/successor_period": {
+    "GET": {
+      "descr": "Returns the voting period (index, kind, starting position) and related information (position, remaining) of the next block.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/votes/total_voting_power": {
+    "GET": {
+      "descr": "Total number of rolls for the delegates in the voting listings.",
+      "args": [],
+      "ret": "Integer"
+    }
+  },
   "/chains/{}/blocks/{}/context/raw/json": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
@@ -1496,6 +1637,7 @@ rpc_docs = {
       "delegates_with_frozen_balance",
       "ramp_up",
       "rolls",
+      "sapling",
       "votes"
     ]
   },
@@ -2453,6 +2595,287 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/raw/json/sapling": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "index",
+      "next"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "sapling_state_id",
+      "descr": "A sapling state identifier"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "ciphertexts",
+      "commitments",
+      "commitments_size",
+      "memo_size",
+      "nullifiers_hashed",
+      "nullifiers_ordered",
+      "nullifiers_size",
+      "roots",
+      "roots_level",
+      "roots_pos",
+      "total_bytes"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/ciphertexts": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "sapling_ciphertext_position",
+      "descr": "The position of a sapling ciphertext"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/ciphertexts/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/commitments": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "sapling_node_position",
+      "descr": "The position of a node in a sapling commitment tree"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/commitments/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/commitments_size": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/memo_size": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/nullifiers_hashed": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "sapling_nullifier",
+      "descr": "A sapling nullifier"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/nullifiers_hashed/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/nullifiers_ordered": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "sapling_nullifier_position",
+      "descr": "A sapling nullifier position"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/nullifiers_ordered/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/nullifiers_size": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/roots": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "sapling_root",
+      "descr": "A sapling root"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/roots/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/roots_level": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/roots_pos": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/total_bytes": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/sapling/next": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/raw/json/votes": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
@@ -2466,11 +2889,13 @@ rpc_docs = {
     },
     "props": [
       "ballots",
+      "current_period",
       "current_period_kind",
       "current_proposal",
       "listings",
       "listings_size",
       "participation_ema",
+      "pred_period_kind",
       "proposals",
       "proposals_count"
     ]
@@ -2501,6 +2926,18 @@ rpc_docs = {
         }
       ],
       "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/current_period": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/votes/current_period_kind": {
@@ -2577,6 +3014,18 @@ rpc_docs = {
         }
       ],
       "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/pred_period_kind": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/votes/proposals": {

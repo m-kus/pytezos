@@ -3,6 +3,8 @@ from typing import List, Optional, Union
 from deprecation import deprecated
 from decimal import Decimal
 
+from pytezos.rpc import ShellQuery
+from pytezos.crypto.key import Key
 from pytezos.operation.group import OperationGroup
 from pytezos.contract.result import ContractCallResult
 from pytezos.contract.entrypoint import ContractEntrypoint
@@ -149,13 +151,23 @@ class ContractInterface(ContextMixin):
             node = node[item]
         return node() if node else None
 
-    def at_block(self, block_id: Union[str, int]) -> 'ContractInterface':
-        """ Change the block at which the current contract is inspected
+    def using(self,
+              shell: Optional[Union[ShellQuery, str]] = None,
+              key: Optional[Union[Key, str]] = None,
+              block_id: Optional[Union[str, int]] = None) -> 'ContractInterface':
+        """ Change the block at which the current contract is inspected.
+        Also, if address is undefined you can specify RPC endpoint, and private key.
 
+        :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
+        :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
         :param block_id: block height / hash / offset to use, default is `head`
         :rtype: ContractInterface
         """
-        return type(self)(self._create_contract_ctx(address=self.address, block_id=block_id))
+        has_address = self.context.address is not None
+        return type(self)(self._spawn_context(shell=None if has_address else shell,
+                                              key=None if has_address else key,
+                                              address=self.context.address,
+                                              block_id=block_id))
 
     @property
     def storage(self) -> ContractData:
@@ -214,7 +226,7 @@ class ContractInterface(ContextMixin):
         :param delegate: initial delegator
         :rtype: OperationGroup
         """
-        return OperationGroup(context=self._create_generic_ctx()) \
+        return OperationGroup(context=self._spawn_context()) \
             .origination(script=self.script(initial_storage, optimized=optimized),
                          balance=balance,
                          delegate=delegate)

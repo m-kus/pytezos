@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from pytezos.operation.result import OperationResult
 from pytezos.context.impl import ExecutionContext
@@ -66,29 +66,4 @@ class ContractCallResult(OperationResult):
             storage=extended_storage.to_python_object(lazy_diff=True),
             lazy_diff=response.get('lazy_diff', []),
             operations=response.get('operations', [])
-        )
-
-    @classmethod
-    def from_repl_result(cls,
-                         operations: List[OperationType],
-                         storage: MichelsonType,
-                         lazy_diff: List[dict],
-                         parameters: dict,
-                         context: ExecutionContext):
-        """ Parse an output of the builtin interpreter.
-
-        :param operations: list of OperationType instances
-        :param storage: MichelsonType instance
-        :param lazy_diff: [{"kind": "big_map", ...}]
-        :param parameters: {"entrypoint": str, "value": $Micheline}
-        :param context: execution context
-        :rtype: ContractCallResult
-        """
-        program = MichelsonProgram.load(context)
-        extended_storage = storage.merge_lazy_diff(lazy_diff)
-        return cls(
-            parameters=program.parameter.from_parameters(parameters),
-            storage=extended_storage.to_python_object(lazy_diff=True),
-            lazy_diff=lazy_diff,
-            operations=[op.to_python_object() for op in operations]
         )

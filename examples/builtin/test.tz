@@ -1,9 +1,0 @@
-parameter (or (option %callAnotherContract (contract unit))
-              (unit %doNothing));
-storage unit;
-code {
-    CAR ; NIL operation ; SWAP ;
-    IF_LEFT { IF_NONE { } { PUSH mutez 0 ; UNIT ; TRANSFER_TOKENS ; CONS } }
-            { } ;
-    UNIT ; SWAP ; PAIR
-}

@@ -74,6 +74,9 @@ class MutezType(NatType, prim='mutez'):
 
 class AddressType(StringType, prim='address'):
 
+    def __repr__(self):
+        return f'{self.value[:6]}⋯{self.value[-3:]}'
+
     def __lt__(self, other: 'AddressType') -> bool:
         if is_pkh(self.value) and is_kt(other.value):
             return True
@@ -292,8 +295,7 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
         self.value = value
 
     def __repr__(self):
-        expr = self.value.as_micheline_expr()
-        return micheline_to_michelson(expr)
+        return 'Lambda'
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):

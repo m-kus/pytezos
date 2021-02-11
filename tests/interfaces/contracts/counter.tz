@@ -1,0 +1,19 @@
+parameter bytes;
+storage (pair :storage (big_map bytes timestamp) nat);
+code { DUP ;
+       DIP { CDR @storage_slash_1 } ;
+       CAR @hash_slash_2 ;
+       PUSH nat 1 ;
+       { DIP { { DIP { DUP @storage } ; SWAP } } ; SWAP } ;
+       CDR %counter ;
+       ADD @counter ;
+       { DIP { { DIP { DUP @storage } ; SWAP } } ; SWAP } ;
+       CAR %records ;
+       NOW ;
+       { DIP { { DIP { { DIP { DUP @hash } ; SWAP } } ; SWAP } } ; SWAP } ;
+       DIP { SOME } ;
+       DIP { DIP { DIP { DIP { DROP ; DROP } } } } ;
+       UPDATE @records ;
+       PAIR %records %counter ;
+       NIL operation ;
+       PAIR }

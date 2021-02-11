@@ -35,7 +35,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :rtype: OperationGroup
         """
         return OperationGroup(
-            context=self._create_generic_ctx(),
+            context=self._spawn_context(),
             protocol=protocol,
             branch=branch,
             contents=contents,
@@ -48,7 +48,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param content: Operation body (depending on `kind`)
         :rtype: OperationGroup
         """
-        return OperationGroup(context=self._create_generic_ctx(), contents=[content])
+        return OperationGroup(context=self._spawn_context(), contents=[content])
 
     def bulk(self, *operations: Union[OperationGroup, ContractCall]) -> OperationGroup:
         """ Batch multiple operations and contract calls in a single operation group
@@ -76,7 +76,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
                 assert isinstance(opg, OperationGroup), f'expected OperationGroup or ContractCall, got {opg}'
             for content in opg.contents:
                 contents.append({k: reset_fields.get(k, v) for k, v in content.items()})
-        return OperationGroup(context=self._create_generic_ctx(), contents=contents)
+        return OperationGroup(context=self._spawn_context(), contents=contents)
 
     def account(self, account_id=None) -> dict:
         """ Shortcut for RPC contract request.
@@ -105,7 +105,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param address: KT address of a smart contract
         :rtype: ContractInterface
         """
-        return ContractInterface.from_context(self._create_contract_ctx(address=address))
+        return ContractInterface.from_context(self._spawn_context(address=address))
 
     def using(self, shell: Optional[Union[ShellQuery, str]] = None, key: Optional[Union[Key, str]] = None):
         """ Change current rpc endpoint and account (private key).
@@ -114,4 +114,4 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
         :returns: A copy of current object with changes applied
         """
-        return PyTezosClient(context=self._create_client_ctx(shell, key))
+        return PyTezosClient(context=self._spawn_context(shell, key))

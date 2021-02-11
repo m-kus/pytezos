@@ -26,16 +26,16 @@ class ExecutionContext(AbstractContext):
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
         self.block_id = block_id or 'head'
-        self.address = address or get_originated_address(0)
-        self.balance = balance or 0
-        self.amount = amount or 0
-        self.now = now or 0
-        self.level = level or 1
-        self.sender = sender or self.get_dummy_key_hash()
-        self.source = source or self.get_dummy_key_hash()
-        self.chain_id = chain_id or self.get_dummy_chain_id()
-        self.voting_power = voting_power or {}
-        self.total_voting_power = total_voting_power or 0
+        self.address = address
+        self.balance = balance
+        self.amount = amount
+        self.now = now
+        self.level = level
+        self.sender = sender
+        self.source = source
+        self.chain_id = chain_id
+        self.voting_power = voting_power
+        self.total_voting_power = total_voting_power
         self.parameter_expr = get_script_section(script, 'parameter') if script else None
         self.storage_expr = get_script_section(script, 'storage') if script else None
         self.code_expr = get_script_section(script, 'code') if script else None
@@ -56,6 +56,13 @@ class ExecutionContext(AbstractContext):
         self.alloc_sapling_index = 0
         self.balance_update = 0
         self.big_maps.clear()
+
+    @property
+    def script(self) -> Optional[dict]:
+        if self.parameter_expr and self.storage_expr and self.code_expr:
+            return dict(code=[self.parameter_expr, self.storage_expr, self.code_expr])
+        else:
+            return None
 
     def set_counter(self, counter: int):
         self.counter = counter
@@ -144,56 +151,71 @@ class ExecutionContext(AbstractContext):
         return ptr, []
 
     def get_self_address(self) -> str:
-        return self.address
+        return self.address or get_originated_address(0)
 
     def get_amount(self) -> int:
-        return self.amount
+        return self.amount or 0
 
     def get_sender(self) -> str:
-        return self.key.public_key_hash() if self.key else self.sender
+        return self.sender or self.get_dummy_key_hash()
 
     def get_source(self) -> str:
-        return self.key.public_key_hash() if self.key else self.source
+        return self.source or self.get_dummy_key_hash()
 
     def get_now(self) -> int:
-        if self.shell:
+        if self.now is not None:
+            return self.now
+        elif self.shell:
             constants = self.shell.block.context.constants()  # cached
             ts = self.shell.head.header()['timestamp']
             dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
             first_delay = constants['time_between_blocks'][0]
             return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
         else:
-            return self.now
+            return 0
 
     def get_level(self) -> int:
-        if self.shell:
+        if self.level is not None:
+            return self.level
+        elif self.shell:
             header = self.shell.blocks[self.block_id].header()
             return int(header['level'])
         else:
-            return self.level
+            return 1
 
     def get_balance(self) -> int:
-        if self.shell:
+        if self.balance is not None:
+            balance = self.balance
+        elif self.shell:
             contract = self.shell.contracts[self.get_self_address()]()
             balance = int(contract['balance'])
         else:
-            balance = self.balance
+            balance = 0
         return balance + self.balance_update
 
     def get_voting_power(self, address: str) -> int:
-        if self.shell:
+        if self.voting_power is not None:
+            return self.voting_power.get(address, 0)
+        elif self.shell:
             raise NotImplementedError
         else:
-            return self.voting_power.get(address, 0)
+            return 0
 
     def get_total_voting_power(self) -> int:
-        if self.shell:
+        if self.total_voting_power is not None:
+            return self.total_voting_power
+        elif self.shell:
             raise NotImplementedError
         else:
-            return self.total_voting_power
+            return 0
 
     def get_chain_id(self) -> str:
-        return self.shell.chains.main.chain_id() if self.shell else self.chain_id
+        if self.chain_id:
+            return self.chain_id
+        elif self.shell:
+            return self.shell.chains.main.chain_id()
+        else:
+            return self.get_dummy_chain_id()
 
     def get_dummy_address(self) -> str:
         return base58_encode(b'\x00' * 20, b'KT1').decode()

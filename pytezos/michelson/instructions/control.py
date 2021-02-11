@@ -2,7 +2,7 @@ from typing import List, cast, Tuple, Union, Type
 
 from pytezos.michelson.instructions.stack import PushInstruction
 from pytezos.michelson.instructions.adt import PairInstruction
-from pytezos.michelson.micheline import MichelineSequence, MichelsonError, Micheline
+from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError, Micheline
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.types import MichelsonType, LambdaType, PairType, BoolType, ListType, OrType, OptionType, \
     MapType, SetType
@@ -105,7 +105,7 @@ class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = stack.pop1()
         assert a.is_packable(), f'expected packable type, got {a.prim}'
-        raise MichelsonError(repr(a))
+        raise MichelsonRuntimeError(repr(a))
 
 
 class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):

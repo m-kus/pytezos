@@ -1,11 +1,11 @@
-from typing import Type, List, Tuple, cast
+from typing import Type, List, Tuple, cast, Any
 
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.micheline import MichelineSequence, try_catch
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.types import PairType, OperationType, ListType, MichelsonType
+from pytezos.michelson.types import PairType, OperationType, ListType
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 
@@ -74,15 +74,15 @@ class MichelsonProgram:
         return self.code.args[0].execute(stack, stdout, context)
 
     @try_catch('END')
-    def end(self, stack: MichelsonStack, stdout: List[str]) -> Tuple[List[OperationType], MichelsonType, List[dict]]:
+    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict]]:
         res = cast(PairType, stack.pop1())
         assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
         res.assert_type_equal(PairType.create_type(args=[
             ListType.create_type([OperationType]),
             self.storage.args[0]
         ]), message='list of operations + resulting storage')
-        operations = list(res.items[0])
+        operations = [op.to_python_object() for op in res.items[0]]
         lazy_diff = []
-        storage = res.items[1].aggregate_lazy_diff(lazy_diff)
+        storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)
         stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
         return operations, storage, lazy_diff

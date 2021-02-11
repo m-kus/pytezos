@@ -1,6 +1,6 @@
-from typing import List, Tuple, Optional, Dict, Union, Type, Iterable, cast, Generator, Any
+from typing import List, Tuple, Optional, Dict, Union, Type, Iterable, cast, Generator
 
-from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import MichelsonType, Undefined
 
 
 def iter_type_args(nested_type: Type[MichelsonType], ignore_annots=False, force_recurse=False, path='') \
@@ -22,7 +22,7 @@ def iter_type_args(nested_type: Type[MichelsonType], ignore_annots=False, force_
 def iter_values(prim: str, nested_item: Iterable[MichelsonType], ignore_annots=False, allow_nones=False, path='') \
         -> Generator[Tuple[str, MichelsonType], None, None]:
     for i, arg in enumerate(nested_item):
-        if arg is None:
+        if arg is Undefined:
             assert allow_nones, f'Nones are not allowed for {prim} args'
         elif arg.prim == prim:
             name = arg.field_name or arg.type_name
@@ -106,11 +106,11 @@ class ADT:
         return self.is_named() and key in self.key_to_path
 
     @classmethod
-    def get_flat_args(cls, nested_type: Type[MichelsonType], force_unnamed=False,
+    def get_flat_args(cls, nested_type: Type[MichelsonType], force_tuple=False,
                       ignore_annots=False, force_named=False, force_recurse=False, fields_only=False) \
             -> Union[Dict[str, Type[MichelsonType]], List[Type[MichelsonType]]]:
         flat_args = list(iter_type_args(nested_type, ignore_annots=ignore_annots, force_recurse=force_recurse))
-        if not force_unnamed:
+        if not force_tuple:
             path_to_key, _, _ = get_type_layout(flat_args, force_named=force_named)
             if path_to_key:
                 return {
@@ -149,28 +149,22 @@ class ADT:
 
     def make_nested_or(self, py_obj) -> Nested:
         assert self.is_named(), f'unnamed sum types are not allowed (in the scope of PyTezos)'
+        assert isinstance(py_obj, dict), f'expected dict, got {py_obj}'
+        assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
+        entrypoint = next(iter(py_obj))
+        assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
 
         def wrap_or(obj, path) -> Nested:
             if len(path) == 0:
                 return obj
             elif path[0] == '0':
-                return Nested(wrap_or(obj, path[1:]), None)
+                return Nested(wrap_or(obj, path[1:]), Undefined)
             elif path[0] == '1':
-                return Nested(None, wrap_or(obj, path[1:]))
+                return Nested(Undefined, wrap_or(obj, path[1:]))
             else:
                 assert False, path
 
-        if isinstance(py_obj, dict):
-            assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
-            entrypoint = next(iter(py_obj))
-            assert entrypoint in self.key_to_path, f'unknown entrypoint {entrypoint}'
-            return wrap_or(py_obj[entrypoint], self.key_to_path[entrypoint])
-        elif isinstance(py_obj, tuple):
-            assert len(py_obj) == len(self), f'expected {len(self)} values, got {len(py_obj)}'
-            idx = next(i for i, item in enumerate(py_obj) if item is not None)
-            return wrap_or(py_obj[idx], self.idx_to_path[idx])
-        else:
-            assert False, f'expected dict or tuple, got {type(py_obj).__name__}'
+        return wrap_or(py_obj[entrypoint], self.key_to_path[entrypoint])
 
     def normalize_python_object(self, py_obj) -> Nested:
         if self.prim == 'pair':
