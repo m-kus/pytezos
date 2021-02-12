@@ -13,7 +13,7 @@ And follow the interactive documentation.
 from pytezos.client import PyTezosClient
 from pytezos.crypto.key import Key
 from pytezos.operation.group import OperationGroup
-from pytezos.contract.interface import ContractInterface, ContractInterface as Contract
+from pytezos.contract.interface import ContractInterface, Contract
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.forge import forge_micheline, unforge_micheline

@@ -1,11 +1,13 @@
 from glob import glob
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, join, exists
 from pprint import pprint
 import fire
 
-from pytezos import pytezos, Contract, RpcError
-from pytezos.michelson.docstring import generate_docstring
+from pytezos import pytezos, ContractInterface
+from pytezos.rpc.errors import RpcError
 from pytezos.operation.result import OperationResult
+from pytezos.context.mixin import default_network
+from pytezos.michelson.types.base import generate_pydoc
 from pytezos.cli.github import create_deployment, create_deployment_status
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
@@ -25,17 +27,12 @@ def get_contract(path):
     if path is None:
         files = glob('*.tz')
         assert len(files) == 1
-        contract = Contract.from_file(abspath(files[0]))
-
-    elif any(map(lambda x: path.startswith(x), ['delphinet', 'dalphanet', 'mainnet', 'carthagenet'])):
-        network, address = path.split(':')
-        ptz = pytezos.using(shell=network)
-        script = ptz.shell.contracts[address].script()
-        contract = Contract.from_micheline(script['code'])
-
+        contract = ContractInterface.from_file(abspath(files[0]))
+    elif exists(path):
+        contract = ContractInterface.from_file(path)
     else:
-        contract = Contract.from_file(path)
-
+        network, address = path.split(':')
+        contract = pytezos.using(shell=network).contract(address)
     return contract
 
 
@@ -49,9 +46,9 @@ class PyTezosCli:
         """
         contract = get_contract(path)
         if action == 'schema':
-            print(generate_docstring(contract.context.schema, title='storage'))
+            print(generate_pydoc(type(contract.storage.data), title='storage'))
         elif action == 'default':
-            pprint(contract.context.default())
+            pprint(contract.storage.dummy())
         else:
             assert False, action
 
@@ -63,11 +60,11 @@ class PyTezosCli:
         """
         contract = get_contract(path)
         if action == 'schema':
-            print(generate_docstring(contract.parameter.schema, title='parameter'))
+            print(contract.parameter.__doc__)
         else:
             assert False, action
 
-    def activate(self, path, network='carthagenet'):
+    def activate(self, path, network=default_network):
         """ Activates and reveals key from the faucet file.
 
         :param path: Path to the .json file downloaded from https://faucet.tzalpha.net/
@@ -101,7 +98,7 @@ class PyTezosCli:
         else:
             print(f'Your key {ptz.key.public_key_hash()} is now active and revealed')
 
-    def deploy(self, path, storage=None, network='carthagenet', key=None,
+    def deploy(self, path, storage=None, network=default_network, key=None,
                github_repo_slug=None, github_oauth_token=None, dry_run=False):
         """ Deploy contract to the specified network.
 
@@ -117,11 +114,8 @@ class PyTezosCli:
         print(f'Deploying contract using {ptz.key.public_key_hash()} in the {network}')
 
         contract = get_contract(path)
-        if storage is not None:
-            storage = contract.context.encode(storage)
-
         try:
-            opg = ptz.origination(script=contract.script(storage=storage)).autofill().sign()
+            opg = ptz.origination(script=contract.script(initial_storage=storage)).autofill().sign()
             print(f'Injecting origination operation:')
             pprint(opg.json_payload())
 

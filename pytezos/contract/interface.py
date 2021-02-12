@@ -232,3 +232,8 @@ class ContractInterface(ContextMixin):
             .origination(script=self.script(initial_storage, optimized=optimized),
                          balance=balance,
                          delegate=delegate)
+
+
+@deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+class Contract(ContractInterface):
+    pass

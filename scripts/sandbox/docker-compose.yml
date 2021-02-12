@@ -1,0 +1,9 @@
+version: "3.6"
+services:
+  node:
+    build: .
+    command: tezos-node run --sandbox=/sandbox/sandbox.json --synchronisation-threshold 0 --data-dir=/sandbox
+    ports:
+      - 127.0.0.1:8732:8732
+# tezos-client import secret key activator unencrypted:edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6
+# tezos-client -block genesis activate protocol PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq with fitness 1 and key activator and parameters /sandbox/parameters.json
