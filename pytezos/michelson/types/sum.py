@@ -3,7 +3,7 @@ from typing import Generator, Tuple, Optional, List, Union, Type, cast
 from pytezos.michelson.types.base import MichelsonType, Undefined, undefined
 from pytezos.michelson.micheline import parse_micheline_value, Micheline
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.types.adt import ADT, Nested
+from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_or
 from pytezos.michelson.types.core import Unit, UnitType
 
 
@@ -15,7 +15,7 @@ class RightLiteral(Micheline, prim='Right', args_len=1):
     pass
 
 
-class OrType(MichelsonType, prim='or', args_len=2):
+class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
     is_enum: bool
 
     def __init__(self, items: Tuple[Union[undefined, MichelsonType], ...]):
@@ -67,6 +67,16 @@ class OrType(MichelsonType, prim='or', args_len=2):
         return cls((Undefined, right))
 
     @classmethod
+    def iter_type_args(cls, entrypoints=False, path='') -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
+        for i, arg in enumerate(cls.args):
+            if issubclass(arg, OrType):
+                if entrypoints and arg.field_name:
+                    yield path + str(i), arg
+                yield from arg.iter_type_args(entrypoints=entrypoints, path=path + str(i))
+            elif entrypoints is False or arg.field_name:
+                yield path + str(i), arg
+
+    @classmethod
     def create_type(cls,
                     args: List[Type['Micheline']],
                     annots: Optional[list] = None,
@@ -87,7 +97,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        flat_args = ADT.get_flat_args(cls, ignore_annots=True, force_named=True)
+        flat_args = cls.get_flat_args(infer_names=True)
         assert isinstance(flat_args, dict), f'sum type has to be named (in the scope of PyTezos)'
         if cls.is_enum:
             doc = ' || '.join(flat_args.keys())
@@ -103,7 +113,7 @@ class OrType(MichelsonType, prim='or', args_len=2):
 
     @classmethod
     def dummy(cls, context: AbstractContext):
-        assert False, 'forbidden'
+        return cls((cls.args[0].dummy(context), Undefined))
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'OrType':
@@ -125,15 +135,28 @@ class OrType(MichelsonType, prim='or', args_len=2):
             py_obj = {py_obj[0]: py_obj[1]}
 
         if isinstance(py_obj, dict):
-            struct = ADT.from_nested_type(cls, ignore_annots=True, force_named=True)
-            return cls.from_python_object(struct.normalize_python_object(py_obj))
+            assert len(py_obj) == 1, f'single key expected, got {len(py_obj)}'
+            entrypoint = next(iter(py_obj))
+            _, key_to_path, _ = cls.get_type_layout(infer_names=True)
+            assert key_to_path, f'sum type has to be named (in the scope of PyTezos)'
+            return cls.from_python_object(wrap_or(py_obj[entrypoint], key_to_path[entrypoint]))
         elif isinstance(py_obj, Nested):
             assert py_obj.args != (Undefined, Undefined), f'both branches are undefined'
-            value = tuple(Undefined if py_obj[i] is Undefined else cls.args[i].from_python_object(py_obj[i])
+            value = tuple(Undefined if py_obj[i] is Undefined
+                          else cls.args[i].from_python_object(py_obj[i])
                           for i in [0, 1])
             return cls(value)
         else:
             assert False, f'expected list, tuple, or dict, got `{py_obj}`'
+
+    def iter_values(self, path='') -> Generator[Tuple[str, MichelsonType], None, None]:
+        for i, arg in enumerate(self.items):
+            if isinstance(arg, OrType):
+                yield from arg.iter_values(path + str(i))
+            elif isinstance(arg, MichelsonType):
+                yield path + str(i), arg
+            else:
+                assert arg == Undefined, f'expected Michelson type or undefined, got {arg}'
 
     def to_literal(self) -> Type[Micheline]:
         if self.is_left():
@@ -148,9 +171,9 @@ class OrType(MichelsonType, prim='or', args_len=2):
         assert False, f'unexpected value {self.items}'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> Union[tuple, dict]:
-        struct = ADT.from_nested_type(type(self), ignore_annots=True, force_named=True)
-        flat_values = struct.get_flat_values(self.items, ignore_annots=True, allow_nones=True)
-        assert isinstance(flat_values, dict) and len(flat_values) == 1
+        flat_values = self.get_flat_values(infer_names=True)
+        assert isinstance(flat_values, dict) and len(flat_values) == 1, \
+            f'sum type has to be named (in the scope of PyTezos)'
         entrypoint = next(iter(flat_values))
         if self.is_enum:
             return entrypoint
@@ -174,5 +197,4 @@ class OrType(MichelsonType, prim='or', args_len=2):
                 item.attach_context(context, big_map_copy=big_map_copy)
 
     def __getitem__(self, key: Union[int, str]) -> MichelsonType:
-        struct = ADT.from_nested_type(type(self), ignore_annots=True, force_named=True)
-        return struct.get_value(self.items, key, ignore_annots=True, allow_nones=True)
+        return self.get_value(key, infer_names=True)

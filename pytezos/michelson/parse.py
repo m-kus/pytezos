@@ -36,7 +36,7 @@ class SimpleMichelsonLexer(Lexer):
     t_RIGHT_PAREN = r'\)'
     t_SEMI = r';'
 
-    t_ignore_MULTI_COMMENT = r'/\*.*?\*/'
+    t_ignore_MULTI_COMMENT = r'/\*[^*]*\*/'
     t_ignore_COMMENT = r'#[^\n]*'
     t_ignore = ' \t\r\n\f'
 

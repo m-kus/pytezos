@@ -5,7 +5,7 @@ from pytezos.michelson.types import OrType
 from pytezos.michelson.types.core import Unit
 from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.types.adt import ADT
+from pytezos.michelson.types.adt import wrap_parameters
 
 
 class ParameterSection(Micheline, prim='parameter', args_len=1):
@@ -34,12 +34,20 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
                     args: List[Union[Type['Micheline'], Any]],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['ParameterSection']:
-        root_name = parse_name(annots, prefix='%') or 'default'
-        if issubclass(args[0], OrType):
-            struct = ADT.from_nested_type(args[0], force_recurse=True)
-            if struct.has_path('default'):
-                root_name = 'root'
-        assert args[0].field_name is None, f'argument type cannot be annotated: %{args[0].field_name}'
+        root_name = parse_name(annots, prefix='%')
+        root_type = args[0]
+        if issubclass(root_type, OrType):
+            if not root_name:
+                root_name = root_type.field_name
+            if not root_name:
+                flat_args = root_type.get_flat_args(entrypoints=True)
+                assert isinstance(flat_args, dict), f'expected a named type, got {flat_args}'
+                root_name = 'root' if 'default' in flat_args else 'default'
+        else:
+            assert args[0].field_name is None, \
+                f'only top-or can be annotated, got ({args[0].prim} %{args[0].field_name})'
+            if not root_name:
+                root_name = 'default'
         res = type(cls.__name__, (cls,), dict(args=args, root_name=root_name, **kwargs))
         return cast(Type['ParameterSection'], res)
 
@@ -51,12 +59,13 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
     @classmethod
     def list_entrypoints(cls) -> Dict[str, Type[MichelsonType]]:
         entrypoints = dict()
-        if issubclass(cls.args[0], OrType):
-            flat_args = ADT.get_flat_args(cls.args[0], force_recurse=True, fields_only=True)
-            if isinstance(flat_args, dict):
-                for name, arg in flat_args.items():
-                    entrypoints[name] = arg.get_anon_type()
-        entrypoints[cls.root_name] = cls.args[0]
+        root_type = cls.args[0]
+        if issubclass(root_type, OrType):
+            flat_args = root_type.get_flat_args(entrypoints=True)
+            assert isinstance(flat_args, dict), f'expected dict of named entrypoints'
+            for name, arg in flat_args.items():
+                entrypoints[name] = arg.get_anon_type()
+        entrypoints[cls.root_name] = root_type
         return entrypoints
 
     @classmethod
@@ -70,24 +79,20 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             res = cls.from_micheline_value(parameters['value'])
             return cast(ParameterSection, res)
         else:
-            assert issubclass(cls.args[0], OrType), f'expected `{cls.root_name}`, got `{entrypoint}`'
-            struct = ADT.from_nested_type(cls.args[0], force_recurse=True)
-            assert struct.has_path(entrypoint), f'unexpected entrypoint `{entrypoint}`'
-            val_expr = struct.normalize_micheline_value(entrypoint, parameters['value'])
-            item = cls.args[0].from_micheline_value(val_expr)
+            root_type = cls.args[0]
+            assert issubclass(root_type, OrType), f'expected `{cls.root_name}`, got `{entrypoint}`'
+            _, key_to_path, _ = root_type.get_type_layout(entrypoints=True)
+            assert entrypoint in key_to_path, f'unexpected entrypoint `{entrypoint}`'
+            val_expr = wrap_parameters(parameters['value'], key_to_path[entrypoint])
+            item = root_type.from_micheline_value(val_expr)
             return cls(item)
 
     def to_parameters(self, mode='readable') -> Dict[str, Any]:
         entrypoint, item = self.root_name, self.item
         if isinstance(self.item, OrType):
-            struct = ADT.from_nested_type(self.args[0], force_recurse=True)
-            if struct.is_named():
-                flat_values = struct.get_flat_values(self.item.items,
-                                                     ignore_annots=True,
-                                                     allow_nones=True,
-                                                     fields_only=True)
-                assert isinstance(flat_values, dict) and len(flat_values) == 1
-                entrypoint, item = next(iter(flat_values.items()))
+            flat_values = self.item.get_flat_values(entrypoints=True)
+            assert isinstance(flat_values, dict) and len(flat_values) == 1, f'expected named type'
+            entrypoint, item = next(iter(flat_values.items()))
         return {'entrypoint': entrypoint,
                 'value': item.to_micheline_value(mode=mode)}
 

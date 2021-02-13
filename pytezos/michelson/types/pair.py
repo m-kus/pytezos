@@ -1,16 +1,16 @@
-from typing import Generator, Tuple, List, Union, Type, Optional, cast, Any
+from typing import Generator, Tuple, List, Union, Type, Optional, cast
 
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.types.adt import ADT, Nested
+from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_pair
 
 
 class PairLiteral(Micheline, prim='Pair', args_len=None):
     pass
 
 
-class PairType(MichelsonType, prim='pair', args_len=None):
+class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
 
     def __init__(self, items: Tuple[MichelsonType, ...]):
         super(PairType, self).__init__()
@@ -64,9 +64,17 @@ class PairType(MichelsonType, prim='pair', args_len=None):
         return cast(Type['PairType'], type_class)
 
     @classmethod
+    def iter_type_args(cls, entrypoints=False, path='') -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
+        for i, arg in enumerate(cls.args):
+            if issubclass(arg, PairType) and not (arg.field_name or arg.type_name):
+                yield from arg.iter_type_args(path=path + str(i))
+            else:
+                yield path + str(i), arg
+
+    @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        flat_args = ADT.get_flat_args(cls, force_tuple=comparable)
+        flat_args = cls.get_flat_args(cls, force_tuple=comparable)
         if isinstance(flat_args, dict):
             fields = [
                 (name, arg.generate_pydoc(definitions, inferred_name=name))
@@ -113,19 +121,31 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             py_obj = tuple(py_obj)
 
         if isinstance(py_obj, tuple) or isinstance(py_obj, dict):
-            struct = ADT.from_nested_type(cls)
-            return cls.from_python_object(struct.normalize_python_object(py_obj))
+            _, key_to_path, idx_to_path = cls.get_type_layout()
+            if isinstance(py_obj, tuple):
+                py_obj = {idx_to_path[i]: value for i, value in enumerate(py_obj)}
+            else:
+                assert key_to_path, f'expected named type'
+                py_obj = {key_to_path[key]: value for key, value in py_obj.items()}
+            return cls.from_python_object(wrap_pair(py_obj))
         elif isinstance(py_obj, Nested):
             value = tuple(cls.args[i].from_python_object(py_obj[i]) for i in [0, 1])
             return cls(value)
         else:
             assert False, f'expected list, tuple, or dict, got {type(py_obj).__name__}'
 
+    def iter_values(self, path='') -> Generator[Tuple[str, MichelsonType], None, None]:
+        for i, item in enumerate(self.items):
+            if isinstance(item, PairType) and not (item.field_name or item.type_name):
+                yield from item.iter_values(path + str(i))
+            else:
+                yield path + str(i), item
+
     def iter_comb(self, include_nodes=False) -> Generator[MichelsonType, None, None]:
         if include_nodes:
             yield self
         for i, item in enumerate(self):
-            if i == 1 and isinstance(item, PairType) and item.field_name is None and item.type_name is None:
+            if i == 1 and isinstance(item, PairType) and not (item.field_name or item.type_name):
                 yield from item.iter_comb(include_nodes=include_nodes)
             else:
                 yield item
@@ -168,8 +188,7 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             assert False, f'unsupported mode {mode}'
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> Union[dict, tuple]:
-        struct = ADT.from_nested_type(type(self))
-        flat_values = struct.get_flat_values(self.items, force_unnamed=comparable)
+        flat_values = self.get_flat_values(force_tuple=comparable)
         if isinstance(flat_values, dict):
             return {
                 name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
@@ -193,5 +212,4 @@ class PairType(MichelsonType, prim='pair', args_len=None):
             item.attach_context(context, big_map_copy=big_map_copy)
 
     def __getitem__(self, key: Union[int, str]) -> MichelsonType:
-        struct = ADT.from_nested_type(type(self))
-        return struct.get_value(self.items, key)
+        return self.get_value(key)

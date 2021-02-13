@@ -67,7 +67,7 @@ code {
              IF_LEFT
                { DIP { UNPAIR ; DROP } }
                { DUG 1; UNPAIR ; DIP { DROP } } ;
-             PAIR ; NIL operation ; PAIR }
+             PAIR ; NIL operation ; PAIR } ;
            # Transform the outputs to the new script types (manager's storage is unchanged)
            SWAP ;
            CAR ;

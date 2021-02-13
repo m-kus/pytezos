@@ -24,4 +24,3 @@ Local forge
 .. automodule:: pytezos.operation.forge
     :members:
     :undoc-members:
-

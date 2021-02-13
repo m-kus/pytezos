@@ -9,24 +9,31 @@ PyTezos client
 
 Contract interface
 ++++++++++++++++++++
-.. autoclass:: pytezos.michelson.interface.ContractInterface
+.. autoclass:: pytezos.contract.interface.ContractInterface
    :members:
    :inherited-members:
 
 Contract entrypoint proxy
 +++++++++++++++++++++++++++
-.. autoclass:: pytezos.michelson.interface.ContractEntrypoint
+.. autoclass:: pytezos.contract.entrypoint.ContractEntrypoint
    :members:
    :special-members: __call__
    :inherited-members:
 
 Contract call proxy
 +++++++++++++++++++++
-.. autoclass:: pytezos.michelson.interface.ContractCall
+.. autoclass:: pytezos.contract.call.ContractCall
    :members:
    :inherited-members:
 
 Contract call result
 ++++++++++++++++++++++
-.. autoclass:: pytezos.michelson.interface.ContractCallResult
+.. autoclass:: pytezos.contract.result.ContractCallResult
    :members:
+
+Contract storage proxy
+++++++++++++++++++++++
+.. autoclass:: pytezos.contract.data.ContractData
+   :members:
+   :special-members: __call__
+   :inherited-members:

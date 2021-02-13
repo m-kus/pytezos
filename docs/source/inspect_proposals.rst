@@ -1,5 +1,5 @@
 Inspecting proposals
 ======================
-.. automodule:: pytezos.proto
+.. automodule:: pytezos.protocol.protocol
     :members:
     :undoc-members:

@@ -13,5 +13,5 @@ See how PyTezos CLI is used in a Travis CI pipeline: https://github.com/atomex-m
 
 Reference
 +++++++++++
-.. autoclass:: pytezos.cli.PyTezosCli
+.. autoclass:: pytezos.cli.cli.PyTezosCli
    :members:

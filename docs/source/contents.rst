@@ -33,8 +33,8 @@ Welcome to PyTezos reference!
    crypto
    operation_groups
    rpc_queries
-   script_wrappers
-   pack
+   types
+   instructions
    code
    repl
    inspect_proposals

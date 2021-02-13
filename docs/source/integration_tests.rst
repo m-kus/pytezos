@@ -7,14 +7,14 @@ Make sure you are familiar with the unittest package, if not - check out the doc
 
 Michelson tests are mostly based on two high-level interfaces:
 
-- :class:`pytezos.michelson.interface.ContractInterface` as a top-level entity
-- :class:`pytezos.michelson.interface.ContractCall` for simulating contract calls
-- :class:`pytezos.michelson.interface.ContractCallResult` for handling call results
+- :class:`pytezos.contract.interface.ContractInterface` as a top-level entity
+- :class:`pytezos.contract.call.ContractCall` for simulating contract calls
+- :class:`pytezos.contract.result.ContractCallResult` for handling call results
 
 There are also two options of executing Michelson scripts:
 
-- :meth:`pytezos.michelson.interface.ContractCall.result` which uses standard RPC endpoint (i.e. remote Michelson interpreter)
-- :meth:`pytezos.michelson.interface.ContractCall.interpret` that uses built-in interpreter which is not guaranteed to behave exactly as the reference one
+- :meth:`pytezos.contract.call.ContractCall.run_code` which uses standard RPC endpoint (i.e. remote Michelson interpreter)
+- :meth:`pytezos.contract.call.ContractCall.interpret` that uses built-in interpreter which is not guaranteed to behave exactly as the reference one
 
 Step by step guide
 --------------------

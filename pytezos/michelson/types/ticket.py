@@ -47,13 +47,11 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
     @classmethod
     def create_type(cls,
                     args: List[Type['MichelsonType']],
-                    field_name: Optional[str] = None,
-                    type_name: Optional[str] = None,
+                    annots: Optional[list] = None,
                     **kwargs) -> Type['TicketType']:
         type_impl = PairType.create_type(args=[AddressType, args[0], NatType])
         type_class = super(TicketType, cls).create_type(args=args,
-                                                        field_name=field_name,
-                                                        type_name=type_name,
+                                                        annots=annots,
                                                         type_impl=type_impl)
         return cast(Type['TicketType'], type_class)
 

@@ -71,29 +71,33 @@ All active interaction with the blockchain starts with the PyTezosClient:
 
    >>> from pytezos import pytezos
    >>> pytezos
-   <pytezos.client.PyTezosClient object at 0x7f904cf339e8>
+   <pytezos.client.PyTezosClient object at 0x7f480c03c190>
 
-   Properties
-   .key  # tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
-   .shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
+    Properties
+    .key  # tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm
+    .shell  # https://rpc.tzkt.io/edonet/ (edonet)
+    .block_id  # head
 
-   Helpers
-   .account()
-   .activate_account()
-   .ballot()
-   .contract()
-   .delegation()
-   .double_baking_evidence()
-   .double_endorsement_evidence()
-   .endorsement()
-   .operation()
-   .operation_group()
-   .origination()
-   .proposals()
-   .reveal()
-   .seed_nonce_revelation()
-   .transaction()
-   .using()
+    Helpers
+    .account()
+    .activate_account()
+    .balance()
+    .ballot()
+    .bulk()
+    .contract()
+    .delegation()
+    .double_baking_evidence()
+    .double_endorsement_evidence()
+    .endorsement()
+    .now()
+    .operation()
+    .operation_group()
+    .origination()
+    .proposals()
+    .reveal()
+    .seed_nonce_revelation()
+    .transaction()
+    .using()
 
 This is one of the cool features in the interactive mode: aside from the autocomplete and call docstrings,
 you can see the list of available methods for class, or list of arguments and return value for a particular methods.
@@ -102,14 +106,14 @@ We are interested in ``using`` method, which is responsible for setting up manag
 .. code-block:: python
 
    >>> pytezos.using
-   <function Interop.using at 0x7fe5d2232840>
+   <function PyTezosClient.using at 0x7f47fc123550>
+    Change current rpc endpoint and account (private key).
 
-   Change current rpc endpoint and account (private key)
-   :param shell: one of 'mainnet', 'carthagenet', 'delphinet', 'dalphanet', RPC node uri, or instance of `ShellQuery`
-   :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
-   :return: A copy of current object with changes applied
+    :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
+    :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
+    :returns: A copy of current object with changes applied
 
-Note, that by default ``pytezos`` is initialized with ``alphanet`` and a predefined private key for demo purpose,
+Note, that by default ``pytezos`` is initialized with the latest testnet and a predefined private key for demo purpose,
 so you can start to interact immediately, but it's highly recommended to use your own key. Let's do that!
 
 Faucet account
@@ -120,23 +124,8 @@ Then configure the client (we can leave ``shell`` parameter empty, but we will s
 
 .. code-block:: python
 
-   >>> pytezos = pytezos.using(
-   ...     key='~/Downloads/tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa.json',
-   ...     shell='alphanet')
+   >>> pytezos = pytezos.using(key='~/Downloads/tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa.json')
 
-Public available RPC providers are available at ``pytezos.rpc``\ :
-
-.. code-block:: python
-
-   >>> from pytezos.rpc import tzkt
-   >>> tzkt
-   <pytezos.rpc.RpcProvider object at 0x7f6f56ad77b8>
-
-   Networks
-   .mainnet  # https://rpc.tzkt.io/mainnet/
-   .carthagenet  # https://rpc.tzkt.io/carthagenet/
-   .delphinet  # https://rpc.tzkt.io/delphinet/
-   .dalphanet  # https://rpc.tzkt.io/dalphanet/
 
 Sandboxed mode
 ^^^^^^^^^^^^^^
@@ -192,14 +181,14 @@ and gas/storage limits.
 
    Properties
    .key  # tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-   .shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
+   .shell  # https://rpc.tzkt.io/edonet/ (edonet)
 
    Payload
-   {'branch': 'BL5UtKR4ysFLwcK2ign1h2KoZLJY88zd1vzWUZPzto9iEJqUj1d',
+   {'branch': 'BMNPpkcU6jzdaZC6AvtyVZzPkWLHFsyadCzDPQNxPDG8YUX8EyR',
     'contents': [{'kind': 'activate_account',
-                  'pkh': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-                  'secret': 'e8d47034af5ea23a9613dba219f8b4a792b22c5f'}],
-    'protocol': 'Pt24m4xiPbLDhVgVfABUjirbmda3yohdN82Sp9FeuAXJ4eV9otd',
+                  'pkh': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+                  'secret': 'ac4aab725c5f5c9323155778e9dec94a14df09eb'}],
+    'protocol': 'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq',
     'signature': None}
 
    Helpers
@@ -235,39 +224,42 @@ Ok, let's sign and preapply operation to see what's going to happen:
 
    >>> pytezos.activate_account().fill().sign().preapply()
    [{'contents': [{'kind': 'activate_account',
-       'pkh': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-       'secret': 'e8d47034af5ea23a9613dba219f8b4a792b22c5f',
+       'pkh': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+       'secret': 'ac4aab725c5f5c9323155778e9dec94a14df09eb',
        'metadata': {'balance_updates': [{'kind': 'contract',
-          'contract': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
+          'contract': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
           'change': '10848740286'}]}}],
-     'signature': 'sigRg96wY6mxLKJ7jaTrVcXzABqhyEa4J1Ji5rGPKPVHv2YugViGfeH1b7qu7eavhhEGoASqffwjnH2fr46oBXVZrMWC6ZFg'}]
+     'signature': 'sigUbev7tsZbMXXJ6QWE12ukaJ9F6fQ9Gzxku2iDTv7j4ipRgxhS4g9P9hV39Fb1xGir1PYXNQt1y6qydGbRUgjAXWmzVjA4'}]
 
 Everything looks good! Ready to inject the operation.
 
 .. code-block:: python
 
    >>> pytezos.activate_account().fill().sign().inject()
-   'oo77zoEsa9RuA7NubhvckM8NBNta8dUbL4e5GuhXmqnZ9XQGK5k'
+   {'chain_id': 'NetXSp4gfdanies',
+    'hash': 'ooTAsux9JZVh1ud2euNrFBFDxUCxWYg3d1tWZSa7WLavVs1wMc9',
+    'protocol': 'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq',
+    'branch': 'BMNPpkcU6jzdaZC6AvtyVZzPkWLHFsyadCzDPQNxPDG8YUX8EyR',
+    'contents': [{'kind': 'activate_account',
+      'pkh': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+      'secret': 'ac4aab725c5f5c9323155778e9dec94a14df09eb'}],
+    'signature': 'sigUbev7tsZbMXXJ6QWE12ukaJ9F6fQ9Gzxku2iDTv7j4ipRgxhS4g9P9hV39Fb1xGir1PYXNQt1y6qydGbRUgjAXWmzVjA4'}
 
 We can search our operation in the node mempool to check what status it has:
 
 .. code-block:: python
 
-   >>> pytezos.shell.mempool.pending_operations['oo77zoEsa9RuA7NubhvckM8NBNta8dUbL4e5GuhXmqnZ9XQGK5k']
+   >>> pytezos.shell.mempool.pending_operations['ooTAsux9JZVh1ud2euNrFBFDxUCxWYg3d1tWZSa7WLavVs1wMc9']
    {'status': 'applied',
-    'hash': 'oo77zoEsa9RuA7NubhvckM8NBNta8dUbL4e5GuhXmqnZ9XQGK5k',
-    'branch': 'BMdgSQxnGGTXuvGp7qrgnM2pMu16dS9Hdjq9UbdHGxzxfKfVR75',
+    'hash': 'ooTAsux9JZVh1ud2euNrFBFDxUCxWYg3d1tWZSa7WLavVs1wMc9',
+    'branch': 'BMNPpkcU6jzdaZC6AvtyVZzPkWLHFsyadCzDPQNxPDG8YUX8EyR',
     'contents': [{'kind': 'activate_account',
-      'pkh': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-      'secret': 'e8d47034af5ea23a9613dba219f8b4a792b22c5f'}],
-    'signature': 'sigbMMUu6h9vAxoM7ZZdwttDk2CcgpwbmCrFjSTQBtTsoLFYNdz85wCKQBMZ2ZMEVrBnt61XGZXyWuuDDbp7WepjHgR6DTrT'}
+      'pkh': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+      'secret': 'ac4aab725c5f5c9323155778e9dec94a14df09eb'}],
+    'signature': 'sigUbev7tsZbMXXJ6QWE12ukaJ9F6fQ9Gzxku2iDTv7j4ipRgxhS4g9P9hV39Fb1xGir1PYXNQt1y6qydGbRUgjAXWmzVjA4'}
 
    >>> pytezos.account()
-   {'manager': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-    'balance': '10848740286',
-    'spendable': True,
-    'delegate': {'setable': False},
-    'counter': '715917'}
+   {'balance': '42119864414', 'counter': '286565'}
 
 Yay! We have claimed our account balance.
 
@@ -277,48 +269,47 @@ Reveal public key
 .. code-block:: python
 
    >>> pytezos.reveal().autofill().sign().inject()
-   'oo3TzPdNhtz5nmE9nL2yGLqwUzSfmb1vjTpu8wFkX5CTKLV67AE'
+   {'chain_id': 'NetXSp4gfdanies',
+    'hash': 'opMnhvsnccU9ZRZc6gaF1WgLNnBkJW7G7j4RX1eKWLkiWSSXf2S',
+    'protocol': 'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq',
+    'branch': 'BMbaFNPvFYAUaY74YXtweKuv6khEiwEyFfggCUDawNLv6yTc8LP',
+    'contents': [{'kind': 'reveal',
+      'source': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+      'fee': '380',
+      'counter': '286566',
+      'gas_limit': '1200',
+      'storage_limit': '0',
+      'public_key': 'edpkvRPjGLLi8fHKuoffMni4Nqrq6YVYd5zGUCvHD4aoKkU2ZtGR6M'}],
+    'signature': 'sigY7LffHKu7pnXsWTkqodYY2weG527zDKZgxnF5E7uhEQRpXyHsfT4T5kH33HRBD2z7tVGVyagP2ahoSvVb8pjnoyAqJUpZ'}
 
 We can also search for operation by hash if we know exact block level or that it was injected recently:
 
 .. code-block:: python
 
-   >>> pytezos.shell.blocks[580244].operations['oo3TzPdNhtz5nmE9nL2yGLqwUzSfmb1vjTpu8wFkX5CTKLV67AE']
-   <pytezos.rpc.protocol.OperationQuery object at 0x7f70650925c0>
-
-   Properties
-   .path  # /chains/main/blocks/580244/operations/3/16 (cached)
-   .node  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
-
-   ()
-   The `m-th` operation in the `n-th` validation pass of the block.
-   :return: Object
-
-   Helpers
-   .unsigned()
-
-   >>> pytezos.shell.blocks[-20:].find_operation('oo3TzPdNhtz5nmE9nL2yGLqwUzSfmb1vjTpu8wFkX5CTKLV67AE')
-   {'protocol': 'Pt24m4xiPbLDhVgVfABUjirbmda3yohdN82Sp9FeuAXJ4eV9otd',
-    'chain_id': 'NetXgtSLGNJvNye',
-    'hash': 'oo3TzPdNhtz5nmE9nL2yGLqwUzSfmb1vjTpu8wFkX5CTKLV67AE',
-    'branch': 'BLdKQLeV5FaPspBLP6J7Tx5xs2XRRH7pJGnXhwEW1uKz9PGBF8H',
+   >>> pytezos.shell.blocks[-20:].find_operation('opMnhvsnccU9ZRZc6gaF1WgLNnBkJW7G7j4RX1eKWLkiWSSXf2S')
+   {'protocol': 'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq',
+    'chain_id': 'NetXSp4gfdanies',
+    'hash': 'opMnhvsnccU9ZRZc6gaF1WgLNnBkJW7G7j4RX1eKWLkiWSSXf2S',
+    'branch': 'BMbaFNPvFYAUaY74YXtweKuv6khEiwEyFfggCUDawNLv6yTc8LP',
     'contents': [{'kind': 'reveal',
-      'source': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-      'fee': '1261',
-      'counter': '715918',
-      'gas_limit': '10000',
+      'source': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+      'fee': '380',
+      'counter': '286566',
+      'gas_limit': '1200',
       'storage_limit': '0',
-      'public_key': 'edpktn9Xg5TaBJ9j6gs1X4AAsQR43zxzmaVNdyerq2PxTy7dUfN3X8',
+      'public_key': 'edpkvRPjGLLi8fHKuoffMni4Nqrq6YVYd5zGUCvHD4aoKkU2ZtGR6M',
       'metadata': {'balance_updates': [{'kind': 'contract',
-         'contract': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-         'change': '-1261'},
+         'contract': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+         'change': '-380'},
         {'kind': 'freezer',
          'category': 'fees',
-         'delegate': 'tz3gN8NTLNLJg5KRsUU47NHNVHbdhcFXjjaB',
-         'cycle': 283,
-         'change': '1261'}],
-       'operation_result': {'status': 'applied', 'consumed_gas': '10000'}}}],
-    'signature': 'sigjzUVPWuFKxmMizHfMUgjqXpo2cqNEHjgRDykqwWiot2129KRWCanZjytUfxFWSDwpNSjkakmWqzhxLwNNcBcQQWJ5mAsW'}
+         'delegate': 'tz1VpvtSaSxKvykrqajFJTZqCXgoVJ5cKaM1',
+         'cycle': 101,
+         'change': '380'}],
+       'operation_result': {'status': 'applied',
+        'consumed_gas': '1000',
+        'consumed_milligas': '1000000'}}}],
+    'signature': 'sigY7LffHKu7pnXsWTkqodYY2weG527zDKZgxnF5E7uhEQRpXyHsfT4T5kH33HRBD2z7tVGVyagP2ahoSvVb8pjnoyAqJUpZ'}
 
 Originate contract
 ------------------
@@ -329,7 +320,7 @@ tutorial we will get it from Michelson source file. There are plenty of availabl
 
 .. code-block:: python
 
-   >>> from pytezos import Contract
+   >>> from pytezos import ContractInterface
    >>> contract = Contract.from_file('~/Documents/demo_contract.tz')
    >>> contract.script
    <function Contract.script at 0x7fe01c0d9c80>
