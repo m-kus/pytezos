@@ -69,7 +69,7 @@ Sapling type
 
 Set type
 ++++++++++++++++++++++++++
-.. automodule:: pytezos.michelson.types.operation
+.. automodule:: pytezos.michelson.types.set
    :members:
    :undoc-members:
 

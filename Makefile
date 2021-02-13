@@ -8,7 +8,7 @@ test:
 	pytest -v .
 
 docs:
-	cd docs && $(MAKE) html
+	cd docs && rm -rf ./build && $(MAKE) html
 
 rpc-docs:
 	python -m scripts.fetch_docs

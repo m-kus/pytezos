@@ -46,6 +46,9 @@ def get_class_docstring(class_type, attr_filter=default_attr_filter, extended=Fa
 
 
 def inline_doc(method):
+    if not is_interactive():
+        return method
+
     doc = [repr(method)]
     if method.__doc__:
         doc.append(re.sub(r' {3,}', '', method.__doc__))
