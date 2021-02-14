@@ -1,7 +1,7 @@
 from copy import copy
 from typing import Generator, Optional, Tuple, List, Union, Type
 
-from pytezos.michelson.types.base import MichelsonType, undefined
+from pytezos.michelson.types.base import MichelsonType, Undefined
 from pytezos.michelson.micheline import parse_micheline_literal, Micheline, MichelineLiteral, MichelineSequence
 from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.types.map import MapType, EltLiteral
@@ -54,7 +54,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             yield key, None
 
     def __repr__(self):
-        if self.ptr >= 0:
+        if isinstance(self.ptr, int):
             return f'<{self.ptr}>'
         else:
             elements = [f'{repr(k)}: {repr(v)}' for k, v in self]
@@ -90,7 +90,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
     @classmethod
     def from_python_object(cls, py_obj: Union[int, dict]) -> 'BigMapType':
         if isinstance(py_obj, int):
-            return cls(ptr=py_obj, items=[])
+            return cls(items=[], ptr=py_obj)
         else:
             items = super(BigMapType, cls).parse_python_object(py_obj)
             return cls(items=items)
@@ -188,9 +188,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_type_equal(type(key))
-        val = next((v for k, v in self if k == key), undefined())  # search in diff
-        if isinstance(val, undefined):
-            assert self.context, f'lazy storage is not attached'
+        val = next((v for k, v in self if k == key), Undefined)  # search in diff
+        if val is Undefined:
+            assert self.context, f'context is not attached'
             key_hash = forge_script_expr(key.pack(legacy=True))
             val_expr = self.context.get_big_map_value(self.ptr, key_hash)
             if val_expr is None:

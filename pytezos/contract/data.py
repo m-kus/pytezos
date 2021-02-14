@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
@@ -10,26 +10,33 @@ from pytezos.jupyter import get_class_docstring
 
 class ContractData(ContextMixin):
 
-    def __init__(self, context: ExecutionContext, data: MichelsonType, path=''):
+    def __init__(self, context: ExecutionContext, data: MichelsonType, path='', title=None):
         super(ContractData, self).__init__(context=context)
         self.data = data
         self.path = path
-        self.__doc__ = generate_pydoc(type(self.data))
+        self.__doc__ = generate_pydoc(type(self.data), title=title)
 
     def __repr__(self):
         res = [
             super(ContractData, self).__repr__(),
-            f'.address  # {self.address}',
-            f'.block_id  # {self.context.block_id}',
             f'.path  # {self.path}',
+            f'\nBuiltin\n()  # get as Python object',
+            f'[key]  # access child elements by name or index',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',
             get_class_docstring(self.__class__)
         ]
         return '\n'.join(res)
 
-    def __getitem__(self, item) -> 'ContractData':
+    def __getitem__(self, item: Union[str, int]) -> 'ContractData':
+        """ Access child elements by name or index (depending on the type)
+
+        :param item: field name (str) or index (int)
+        :rtype: ContractData
+        """
         res = self.data[item]
+        if res is None:
+            raise KeyError(item)
         return ContractData(self.context, res, path=f'{self.path}/{item}')
 
     def __call__(self, try_unpack=False):

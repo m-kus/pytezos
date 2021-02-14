@@ -219,5 +219,7 @@ class MichelsonType(Micheline):
 
 def generate_pydoc(ty: Type[MichelsonType], title=None):
     definitions = []
-    ty.generate_pydoc(definitions, inferred_name=title)
+    top_def = ty.generate_pydoc(definitions, inferred_name=title)
+    if not top_def.startswith('$'):
+        definitions.insert(0, (title or ty.field_name or ty.type_name or 'element', top_def))
     return '\n'.join(map(lambda x: f'${x[0]}:\n\t{x[1]}\n', definitions))

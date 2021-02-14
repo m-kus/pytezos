@@ -33,8 +33,8 @@ class ContractInterface(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractInterface, self).__repr__(),
-            '.storage',
-            '.parameter',
+            '.storage  # access storage data at block `block_id`',
+            '.parameter  # root entrypoint',
             '\nEntrypoints',
             *list(map(lambda x: f'.{x}()', self.entrypoints)),
             '\nHelpers',
@@ -177,15 +177,13 @@ class ContractInterface(ContextMixin):
         expr = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
         storage = self.program.storage.from_micheline_value(expr)
         storage.attach_context(self.context)
-        return ContractData(self.context, storage.item)
+        return ContractData(self.context, storage.item, title='storage')
 
     @property
     def parameter(self) -> ContractEntrypoint:
-        if 'root' in self.entrypoints:
-            return getattr(self, 'root')
-        else:
-            assert 'default' in self.entrypoints, f'`default` entrypoint is undefined'
-            return getattr(self, 'default')
+        root_name = self.program.parameter.root_name
+        assert root_name in self.entrypoints, f'root entrypoint is undefined'
+        return getattr(self, root_name)
 
     @property
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')

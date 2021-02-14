@@ -321,12 +321,13 @@ tutorial we will get it from Michelson source file. There are plenty of availabl
 .. code-block:: python
 
    >>> from pytezos import ContractInterface
-   >>> contract = Contract.from_file('~/Documents/demo_contract.tz')
+   >>> contract = ContractInterface.from_file('~/Documents/demo_contract.tz')
    >>> contract.script
-   <function Contract.script at 0x7fe01c0d9c80>
+   <function ContractInterface.script at 0x7fc1768e2c10>
+   Generate script for contract origination.
 
-   Generate script for contract origination
-   :param storage: Python object, leave None to generate empty
+   :param initial_storage: Python object, leave None to generate default
+   :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
    :return: {"code": $Micheline, "storage": $Micheline}
 
 PyTezos can generate empty storage based on the type description. This is a small part of the high-level interface
@@ -334,139 +335,233 @@ functionality we will further learn.
 
 .. code-block:: python
 
-   >>> pytezos.origination(script=contract.script()).autofill().sign().inject()
-   'op3ZRdR6LjmA8AeNEjKEimr2uQeAWwXSXEftUBiTVx4k86Rw66m'
+   >>> pytezos.origination(script=contract.script()).autofill().sign().inject(_async=False)
+   Wait 42 seconds until block BLu5kNi5aB9gcR6wZzFFPXwabUrumQe7CXy96oHC1RMmWnzGNzm is finalized
+   {'protocol': 'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq',
+     'chain_id': 'NetXSp4gfdanies',
+     'hash': 'oo234sn2hxvWPfpEoLrX4FzY2U5o1wHerkNyom7fPkRvgGfLy9n',
+     'branch': 'BMcta5mYxF4dfsmiPbUDRhFEKWjxz7TSpHjSAKm75VxfBsi9JXH',
+     'contents': [{'kind': 'origination',
+       'source': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+       'fee': '1388',
+       'counter': '286567',
+       'gas_limit': '4377',
+       'storage_limit': '993',
+       'balance': '0',
+       'script': {'code': [...],
+        'storage': {'prim': 'Pair',
+         'args': [{'string': 'KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT'}, []]}},
+       'metadata': {'balance_updates': [{'kind': 'contract',
+          'contract': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+          'change': '-1388'},
+         {'kind': 'freezer',
+          'category': 'fees',
+          'delegate': 'tz1aXQtpS22TKdqxsvFXo9pi5KDbQeyryzLH',
+          'cycle': 101,
+          'change': '1388'}],
+        'operation_result': {'status': 'applied',
+         'big_map_diff': [{'action': 'alloc',
+           'big_map': '8458',
+           'key_type': {'prim': 'address'},
+           'value_type': {'prim': 'ticket', 'args': [{'prim': 'unit'}]}}],
+         'balance_updates': [{'kind': 'contract',
+           'contract': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+           'change': '-184000'},
+          {'kind': 'contract',
+           'contract': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
+           'change': '-64250'}],
+         'originated_contracts': ['KT1CPe5vfXDzozzVXwGUESfisWgjin7MauLz'],
+         'consumed_gas': '4177',
+         'consumed_milligas': '4176862',
+         'storage_size': '736',
+         'paid_storage_size_diff': '736',
+         'lazy_storage_diff': [{'kind': 'big_map',
+           'id': '8458',
+           'diff': {'action': 'alloc',
+            'updates': [],
+            'key_type': {'prim': 'address'},
+            'value_type': {'prim': 'ticket', 'args': [{'prim': 'unit'}]}}}]}}}],
+     'signature': 'sigsd83qtZSzSM94tCTdjNQRRor48KhKqvo6sfvK3WBQDAuiqg1AdtT2aeU316yu8BQLgQaK6YSgWKgLSNuAApHgsVHvin9s'}
 
-   >>> opg = pytezos.shell.blocks[-5:].find_operation('op3ZRdR6LjmA8AeNEjKEimr2uQeAWwXSXEftUBiTVx4k86Rw66m')
-   >>> contract_id = opg['contents'][0]['metadata']['operation_result']['originated_contracts'][0]
-   >>> contract_id
-   'KT1RX74ty3TqBfU6pBs7ce3uV7PLBrUEav6X'
+Note that we used asynchronous injection this time, PyTezos does all the polling job for you and freezes the execution until operations is included into a block.
 
 Access storage
 --------------
 
-Let's play with `KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v <https://better-call.dev/alpha/KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v/operations>`_
-as it has BigMap entries, named entrypoints, and non-trivial data scheme.
+Let's play with `KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf <https://better-call.dev/mainnet/KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf/operations>`_
+as it has BigMap entries, named entrypoints, and a non-trivial data scheme.
 
 .. code-block:: python
 
-   >>> ci = pytezos.contract('KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v')
-   >>> ci
-   <pytezos.michelson.interface.ContractInterface object at 0x7f8bbb11c748>
+   >>> usds = pytezos.using('mainnet').contract('KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf')
+   >>> usds
+    <pytezos.jupyter.ContractInterface object at 0x7fc17689f2b0>
 
-   Properties
-   .key -> tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-   .shell -> https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
-   .address -> KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v
+    Properties
+    .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
+    .shell  # https://mainnet-tezos.giganode.io/ (mainnet)
+    .address  # KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf
+    .block_id  # head
+    .storage  # access storage data at block `block_id`
+    .parameter  # root entrypoint
 
-   Entrypoints
-   .transfer()
-   .approve()
-   .transfer_from()
-   .balance_of()
-   .allowance()
-   .create_account()
-   .create_accounts()
+    Entrypoints
+    .accept_ownership()
+    .burn()
+    .call_FA2()
+    .balance_of()
+    .transfer()
+    .update_operators()
+    .change_master_minter()
+    .change_pauser()
+    .configure_minter()
+    .mint()
+    .pause()
+    .permit()
+    .remove_minter()
+    .set_expiry()
+    .set_transferlist()
+    .transfer_ownership()
+    .unpause()
+    .default()
 
-   Helpers
-   .big_map_get()
-   .storage()
-   .using()
+    Helpers
+    .big_map_get()
+    .create_from()
+    .from_context()
+    .from_file()
+    .from_micheline()
+    .from_michelson()
+    .operation_result()
+    .originate()
+    .program()
+    .script()
+    .to_file()
+    .to_micheline()
+    .to_michelson()
+    .using()
 
-You can access contract storage at any block level, just pass block id into the ``storage`` method:
+You can access contract storage at any block level, just pass block id into the ``using`` method:
 
 .. code-block:: python
 
-   >>> ci.storage(block_id='head~4096')
-   {'accounts': {},
-    'version': 1,
-    'total_supply': 1000,
-    'decimals': 0,
-    'name': 'Calamares',
-    'symbol': 'PLA',
-    'owner': 'tz1WWLRiCFnSzT1uXQYjJYaMVcUefrMxWT25'}
+   >>> usds.using(block_id='head~10').storage()
+    {'default_expiry': 300000,
+     'ledger': -1,
+     'metadata': -2,
+     'minting_allowances': {'tz1PNsHbJRejCnnYzbsQ1CR8wUdEQqVjWen1': 999989000000,
+      'tz1i2tE6hic2ASe9Kvy85ar5hGSSc58bYejT': 999985800000},
+     'operators': -3,
+     'paused': False,
+     'permit_counter': 0,
+     'permits': -4,
+     'roles': {'master_minter': 'tz1i2tE6hic2ASe9Kvy85ar5hGSSc58bYejT',
+      'owner': 'tz1i2tE6hic2ASe9Kvy85ar5hGSSc58bYejT',
+      'pauser': 'tz1i2tE6hic2ASe9Kvy85ar5hGSSc58bYejT',
+      'pending_owner': None},
+     'total_supply': 20200000,
+     'transferlist_contract': None}
 
 Under the hood PyTezos has parsed the storage type, collapsed all nested structures, converted annotations into keys,
-and in the result we get a simple Python object which is much easier to manipulate. Take a look at the storage scheme -
-it looks like Tezos RPC API generated docs.
+and in the result we get a simple Python object which is much easier to manipulate.
+You can also access child elements by name or index (depending on the underlying Michelson type).
+In order to see type definition, just remove the trailing brackets:
 
 .. code-block:: python
 
-   >>> ci.contract.storage
-   <pytezos.michelson.contract.ContractStorage object at 0x7f5d1411f550>
+   >>> usds.storage['ledger']
+    <pytezos.contract.data.ContractData object at 0x7f21aaeaca30>
 
-   $storage:
-       {
-         "accounts": { $address : $account , ... }  /* big_map */,
-         "version": $nat,
-         "total_supply": $nat,
-         "decimals": $nat,
-         "name": string,
-         "symbol": string,
-         "owner": $address
-       }
+    Properties
+    .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
+    .shell  # https://mainnet-tezos.giganode.io/ (mainnet)
+    .address  # KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf
+    .block_id  # head
+    .path  # /ledger
 
-   $account:
-       {
-         "balance": $nat,
-         "allowances": { $address : $nat , ... }
-       }
+    Builtin
+    ()  # get as Python object
+    [key]  # access child elements by name or index
 
-   $nat:
-       int  /* Natural number */
+    Typedef
+    $ledger:
+        { address: nat, … } || int /* Big_map ID */
 
-   $address:
-       string  /* Base58 encoded `tz` or `KT` address */
+    $address:
+        str  /* Base58 encoded `tz` or `KT` address */
+
+    $nat:
+        int  /* Natural number */
 
 
-   Helpers
-   .big_map_decode()
-   .big_map_diff_decode()
-   .big_map_query()
-   .decode()
-   .default()
-   .encode()
+    Helpers
+    .decode()
+    .dummy()
+    .encode()
+    .to_micheline()
+    .to_michelson()
+
+
 
 BigMap lookup
 -------------
 
-It looks like we are talking about some token,
-let's take a peek at the `better-call.dev <https://better-call.dev/alpha/KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v/operations>`_
-and query balance for an account from the big map.
+The approach described in the previous section also works for lazy storage, here's how you can access Big_map values:
 
 .. code-block:: python
 
-   >>> ci.big_map_get('KT1FxfNNcmdEs3n38E1o2GcXhikmpGkyARDq')
-   {'balance': 45, 'allowances': {}}
+   >>> usds.storage['ledger']['tz1PNsHbJRejCnnYzbsQ1CR8wUdEQqVjWen1']()
+   11000000
 
 Pretty cool, hah?
 
 Call entrypoint
 ---------------
 
+In the previous example we queried a token balance for a particular owner.
 We can do the same using special entrypoint ``balance_of``. Let's give a look at the interface:
 
 .. code-block:: python
 
-   >>> ci.balance_of
-   <pytezos.michelson.interface.ContractEntrypoint object at 0x7f4f0cc76e48>
+   >>> usds.balance_of
+    <pytezos.contract.entrypoint.ContractEntrypoint object at 0x7f4789170dc0>
 
-   Properties
-   .key  # tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-   .shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
-   .address  # KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v
+    Properties
+    .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
+    .shell  # https://mainnet-tezos.giganode.io/ (mainnet)
+    .address  # KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf
+    .block_id  # head
+    .entrypoint  # balance_of
 
-   $kwargs:
-       {
-         "address": $address,
-         "nat_contract": $contract (nat)
-       }
+    Builtin
+    (*args, **kwargs)  # build transaction parameters (see typedef)
 
-   $contract:
-       string  /* Base58 encoded `KT` address */
+    Typedef
+    $balance_of:
+        {
+          "requests": [ $requests_item, … ],
+          "callback": contract ($callback_param)
+        }
 
-   $address:
-       string  /* Base58 encoded `tz` or `KT` address */
+    $callback_param:
+        list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))
+
+    $requests_item:
+        {
+          "owner": address,
+          "token_id": nat
+        }
+
+    $address:
+        str  /* Base58 encoded `tz` or `KT` address */
+
+    $nat:
+        int  /* Natural number */
+
+
+    Helpers
+    .decode()
+    .encode()
 
 Apparently, we need to pass an address which balance we want to retrieve and a contract address having a single ``nat``
 parameter which will receive the balance (this is how view methods work in michelson).

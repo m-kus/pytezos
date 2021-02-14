@@ -76,9 +76,13 @@ class ExecutionContext(AbstractContext):
         return self.counter
 
     def register_big_map(self, ptr: int, copy=False) -> int:
-        tmp_ptr = self.get_tmp_big_map_id()
-        self.big_maps[tmp_ptr] = (ptr, copy)
-        return tmp_ptr
+        if copy:
+            tmp_ptr = self.get_tmp_big_map_id()
+            self.big_maps[tmp_ptr] = (ptr, True)
+            return tmp_ptr
+        else:
+            self.big_maps[ptr] = (ptr, False)
+            return ptr
 
     def get_tmp_big_map_id(self) -> int:
         self.tmp_big_map_index += 1

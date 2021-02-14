@@ -141,7 +141,6 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
             assert key_to_path, f'sum type has to be named (in the scope of PyTezos)'
             return cls.from_python_object(wrap_or(py_obj[entrypoint], key_to_path[entrypoint]))
         elif isinstance(py_obj, Nested):
-            assert py_obj.args != (Undefined, Undefined), f'both branches are undefined'
             value = tuple(Undefined if py_obj[i] is Undefined
                           else cls.args[i].from_python_object(py_obj[i])
                           for i in [0, 1])
