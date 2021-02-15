@@ -124,7 +124,6 @@ class OperationResult:
             return all(map(lambda pred: x.get(pred[0]) == pred[1], predicates.items()))
 
         if not predicates:
-            assert len(operation_group['contents']) == 1
             return operation_group['contents']
         else:
             return list(filter(match, OperationResult.iter_contents(operation_group)))

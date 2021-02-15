@@ -321,26 +321,34 @@ tutorial we will get it from Michelson source file. There are plenty of availabl
 .. code-block:: python
 
    >>> from pytezos import ContractInterface
-   >>> contract = ContractInterface.from_file('~/Documents/demo_contract.tz')
+   >>> contract = ContractInterface.from_url('https://gitlab.com/tezos/tezos/-/raw/master/tests_python/contracts_008/mini_scenarios/ticket_wallet_fungible.tz')
    >>> contract.script
    <function ContractInterface.script at 0x7fc1768e2c10>
    Generate script for contract origination.
 
-   :param initial_storage: Python object, leave None to generate default
+   :param initial_storage: Python object, leave None to generate default (attach shell/key for smart fill)
    :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
    :return: {"code": $Micheline, "storage": $Micheline}
 
-PyTezos can generate empty storage based on the type description. This is a small part of the high-level interface
-functionality we will further learn.
+PyTezos can generate empty storage based on the type description, moreover it can do smart filling with the context provided (network, key).
+Let's attach shell and key to the contract interface and see the default storage generated:
 
 .. code-block:: python
 
-   >>> pytezos.origination(script=contract.script()).autofill().sign().inject(_async=False)
-   Wait 42 seconds until block BLu5kNi5aB9gcR6wZzFFPXwabUrumQe7CXy96oHC1RMmWnzGNzm is finalized
-   {'protocol': 'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq',
-     'chain_id': 'NetXSp4gfdanies',
-     'hash': 'oo234sn2hxvWPfpEoLrX4FzY2U5o1wHerkNyom7fPkRvgGfLy9n',
-     'branch': 'BMcta5mYxF4dfsmiPbUDRhFEKWjxz7TSpHjSAKm75VxfBsi9JXH',
+    >>> ci = ci.using(key='edsk4CsgT5yQSxXGvU1uXMNNcoMLXGSQ99GRh72j6sQyNKgSnkmzTT')
+    ... ci.storage.dummy()
+    {'manager': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB', 'tickets': {}}
+
+Perfect! Now we are ready to deploy the contract:
+
+.. code-block:: python
+
+   >>> pytezos.origination(script=ci.script()).autofill().sign().inject(_async=False)
+   Wait 22 seconds until block BLTpvkYfrBkpJYed91XXEQHatQ3RMqSmvRLUEyG5kCQyQNvQiW5 is finalized
+   {'protocol': 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA',
+     'chain_id': 'NetXSgo1ZT2DRUG',
+     'hash': 'ooKx4wBV4DerrXnAEMRfZrwTyBZQQgBMGGD3xbyXeffWn88QC1f',
+     'branch': 'BM8tcfVyd1g8yqqfE8UpasXZWFLS3Xr3cRyYaoKTTfhU9PUr1YR',
      'contents': [{'kind': 'origination',
        'source': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
        'fee': '1388',
@@ -350,7 +358,7 @@ functionality we will further learn.
        'balance': '0',
        'script': {'code': [...],
         'storage': {'prim': 'Pair',
-         'args': [{'string': 'KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT'}, []]}},
+         'args': [{'string': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB'}, []]}},
        'metadata': {'balance_updates': [{'kind': 'contract',
           'contract': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB',
           'change': '-1388'},
@@ -381,14 +389,169 @@ functionality we will further learn.
             'updates': [],
             'key_type': {'prim': 'address'},
             'value_type': {'prim': 'ticket', 'args': [{'prim': 'unit'}]}}}]}}}],
-     'signature': 'sigsd83qtZSzSM94tCTdjNQRRor48KhKqvo6sfvK3WBQDAuiqg1AdtT2aeU316yu8BQLgQaK6YSgWKgLSNuAApHgsVHvin9s'}
+     'signature': 'sigUZzbKEGvHrDLaLV68pRYjbKDUPJXzWLrApDvkSUQw28DTkNMSkAejxJTfcy6DZG7EayHaEzNnihUVYsb57GYggchzbrqe'}
 
 Note that we used asynchronous injection this time, PyTezos does all the polling job for you and freezes the execution until operations is included into a block.
+Previously we were searching operation using an integer ofsset (N levels ago), here's another example how to search an operation using branch:
+
+.. code-block:: python
+
+    >>> from pytezos.operation.result import OperationResult
+    ... opg = pytezos.shell.blocks['BM8tcfVyd1g8yqqfE8UpasXZWFLS3Xr3cRyYaoKTTfhU9PUr1YR':] \
+    ...     .find_operation('ooKx4wBV4DerrXnAEMRfZrwTyBZQQgBMGGD3xbyXeffWn88QC1f')
+    ... res = OperationResult.from_operation_group(opg)
+    ... res[0].originated_contracts[0]
+    'KT1GmhxDtFRdcFdC8G8Wo2B8wXaP76eRYgDc'
+
+
+Bulk injecting
+----------------
+
+The example we chose is actually a ticket wallet that can only send or receive existing tickets, so we need another contract capable of minting new ones.
+Simultaneously, we will explore how to batch several operations in a single group.
+
+.. code-block:: python
+
+    >>> wallet = ContractInterface \
+    ...     .from_url('https://gitlab.com/tezos/tezos/-/raw/master/tests_python/contracts_008/mini_scenarios/ticket_wallet_fungible.tz') \
+    ...     .using(key='edsk4CsgT5yQSxXGvU1uXMNNcoMLXGSQ99GRh72j6sQyNKgSnkmzTT')
+    ...
+    ... builder = ContractInterface \
+    ...     .from_url('https://gitlab.com/tezos/tezos/-/raw/master/tests_python/contracts_008/mini_scenarios/ticket_builder_fungible.tz') \
+    ...     .using(key='edsk4CsgT5yQSxXGvU1uXMNNcoMLXGSQ99GRh72j6sQyNKgSnkmzTT')
+    ...
+    ... opg = pytezos.bulk(
+    ...     wallet.originate(),
+    ...     builder.originate()
+    ... ).autofill().sign().inject(_async=False)
+    ...
+    ... [res.originated_contracts[0] for res in OperationResult.from_operation_group(opg)]
+    ['KT1H4x2tanAMtKW94HrCbpA9nRssfXX7LRj8', 'KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X']
+
+
+
+Call an entrypoint
+-------------------
+
+We have our contracts deployed and ready to be invoked, let's see the list of entrypoints available and their signatures:
+
+.. code-block:: python
+
+   >>> builder = pytezos.contract('KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X')
+   ... builder.parameter
+    <pytezos.contract.entrypoint.ContractEntrypoint object at 0x7f2a900c2b80>
+
+    Properties
+    .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
+    .shell  # https://rpc.tzkt.io/edo2net/ (edo2net)
+    .address  # KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X
+    .block_id  # head
+    .entrypoint  # default
+
+    Builtin
+    (*args, **kwargs)  # build transaction parameters (see typedef)
+
+    Typedef
+    $default:
+        { "burn": ticket (unit) } ||
+        { "mint": $mint }
+
+    $mint:
+        {
+          "destination": contract ($destination_param),
+          "amount": nat
+        }
+
+    $destination_param:
+        ticket unit
+
+    $ticket:
+        /* no literal form, tickets can only be created by another contract */
+
+    $contract:
+        str  /* Base58 encoded `KT` address with optional entrypoint */ ||
+        None  /* when you need to avoid type checking */ ||
+        Undefined  /* `from pytezos import Undefined` for resolving None ambiguity  */
+
+    $nat:
+        int  /* Natural number */
+
+
+    Helpers
+    .decode()
+    .encode()
+
+And for the wallet:
+
+.. code-block:: python
+
+    >>> wallet = pytezos.contract('KT1H4x2tanAMtKW94HrCbpA9nRssfXX7LRj8')
+    >>> wallet.parameter
+    <pytezos.contract.entrypoint.ContractEntrypoint object at 0x7f2a82eaabb0>
+
+    Properties
+    .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
+    .shell  # https://rpc.tzkt.io/edo2net/ (edo2net)
+    .address  # KT1H4x2tanAMtKW94HrCbpA9nRssfXX7LRj8
+    .block_id  # head
+    .entrypoint  # default
+
+    Builtin
+    (*args, **kwargs)  # build transaction parameters (see typedef)
+
+    Typedef
+    $default:
+        { "receive": ticket (unit) } ||
+        { "send": $send }
+
+    $send:
+        {
+          "destination": contract ($destination_param),
+          "amount": nat,
+          "ticketer": address
+        }
+
+    $destination_param:
+        ticket unit
+
+    $ticket:
+        /* no literal form, tickets can only be created by another contract */
+
+    $contract:
+        str  /* Base58 encoded `KT` address with optional entrypoint */ ||
+        None  /* when you need to avoid type checking */ ||
+        Undefined  /* `from pytezos import Undefined` for resolving None ambiguity  */
+
+    $nat:
+        int  /* Natural number */
+
+    $address:
+        str  /* Base58 encoded `tz` or `KT` address */
+
+
+    Helpers
+    .decode()
+    .encode()
+
+Seems that we can mint a ticket using our builder and specify our wallet as a destination.
+Let's also use bulk API again to demonstrate how to batch contract calls:
+
+.. code-block:: python
+
+    >>> opg = pytezos.bulk(
+    ...    builder.mint(destination=f'{wallet.address}%receive', amount=42),
+    ...    builder.mint(destination=f'{wallet.address}%receive', amount=123)
+    ... ).autofill().sign().inject(_async=False)
+    Wait 9 seconds until block BLQGB2tXQkUCZaU4dbG8vJEynkSsidL8YWcKQfnj9WZoJL69fb3 is finalized
+    >>> wallet.storage['tickets']['KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X']()
+    ('KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X', Unit, 165)
+
+Success!
 
 Access storage
 --------------
 
-Let's play with `KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf <https://better-call.dev/mainnet/KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf/operations>`_
+We have slightly touched storage access in the previous section, now let's play with `KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf <https://better-call.dev/mainnet/KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf/operations>`_
 as it has BigMap entries, named entrypoints, and a non-trivial data scheme.
 
 .. code-block:: python
@@ -515,8 +678,8 @@ The approach described in the previous section also works for lazy storage, here
 
 Pretty cool, hah?
 
-Call entrypoint
----------------
+View method
+-------------
 
 In the previous example we queried a token balance for a particular owner.
 We can do the same using special entrypoint ``balance_of``. Let's give a look at the interface:
@@ -563,86 +726,23 @@ We can do the same using special entrypoint ``balance_of``. Let's give a look at
     .decode()
     .encode()
 
-Apparently, we need to pass an address which balance we want to retrieve and a contract address having a single ``nat``
-parameter which will receive the balance (this is how view methods work in michelson).
-Using `conseilpy <https://github.com/baking-bad/conseilpy>`_ we can find such contract
-(for testing purposes, in order not to write our own).
+Apparently, we need to pass a list of requests, where each item contains owner address and token ID.
+In addition to that a callback address is expected which should accept the response (currently there are no on-chain views in Tezos, this async pattern is a workaround for them).
+PyTezos allows you to keep that address empty and get the view result:
 
 .. code-block:: python
 
-   >>> ci.balance_of(
-   ...    address='KT1FxfNNcmdEs3n38E1o2GcXhikmpGkyARDq',
-   ...    nat_contract='KT1JTpEkByTStHYTT3qD8khJomNnvvnrfh4v')
-   <pytezos.michelson.interface.ContractCall object at 0x7f4f0cc980b8>
+   >>> usds.balance_of(requests=[
+   ...   {'owner': 'tz1PNsHbJRejCnnYzbsQ1CR8wUdEQqVjWen1', 'token_id': 0},
+   ...   {'owner': 'tz1i2tE6hic2ASe9Kvy85ar5hGSSc58bYejT', 'token_id': 0},
+   ...   {'owner': 'tz2QegZQXyz8b74iTdaqKsGRF7YQb88Wu9CS', 'token_id': 0}
+   ...], callback=None).view()
+   [{'owner': 'tz1PNsHbJRejCnnYzbsQ1CR8wUdEQqVjWen1',
+     'token_id': 0,
+     'nat_2': 11000000},
+    {'owner': 'tz1i2tE6hic2ASe9Kvy85ar5hGSSc58bYejT',
+     'token_id': 0,
+     'nat_2': 8200000},
+    {'owner': 'tz2QegZQXyz8b74iTdaqKsGRF7YQb88Wu9CS', 'token_id': 0, 'nat_2': 0}]
 
-   Properties
-   .key  # tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa
-   .shell  # https://tezos-dev.cryptonomic-infra.tech/ (alphanet)
 
-   Payload
-   {'branch': 'BMDPbTmdsLnD1JBurPAqiYE45UDunYTBad2UWgCtg5bgyi2UFxu',
-    'contents': [{'amount': '0',
-                  'counter': '715920',
-                  'destination': 'KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v',
-                  'fee': '40364',
-                  'gas_limit': '400000',
-                  'kind': 'transaction',
-                  'parameters': {'args': [{'args': [{'args': [{'args': [{'args': [{'string': 'KT1FxfNNcmdEs3n38E1o2GcXhikmpGkyARDq'},
-                                                                                  {'string': 'KT1JTpEkByTStHYTT3qD8khJomNnvvnrfh4v'}],
-                                                                         'prim': 'Pair'}],
-                                                               'prim': 'Left'}],
-                                                     'prim': 'Right'}],
-                                           'prim': 'Right'}],
-                                 'prim': 'Right'},
-                  'source': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-                  'storage_limit': '60000'}],
-    'protocol': 'Pt24m4xiPbLDhVgVfABUjirbmda3yohdN82Sp9FeuAXJ4eV9otd',
-    'signature': None}
-
-   Helpers
-   .cmdline()
-   .inject()
-   .operation_group
-   .using()
-   .with_amount()
-
-What we got is a ready to inject operation group with encoded parameters.
-In our case we just want to view data, so we can use ``preapply`` to see actual result.
-
-.. code-block:: python
-
-   >>> ci.balance_of(address='KT1FxfNNcmdEs3n38E1o2GcXhikmpGkyARDq',
-   ...               nat_contract='KT1JTpEkByTStHYTT3qD8khJomNnvvnrfh4v') \
-   ...    .operation_group \
-   ...    .sign() \
-   ...    .preapply()
-   [{'contents': [{'kind': 'transaction',
-       'source': 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa',
-       'fee': '40364',
-       'counter': '715920',
-       'gas_limit': '400000',
-       'storage_limit': '60000',
-       'amount': '0',
-       'destination': 'KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v',
-       'parameters': {'prim': 'Right',
-        'args': [{'prim': 'Right',
-          'args': [{'prim': 'Right',
-            'args': [{'prim': 'Left',
-              'args': [{'prim': 'Pair',
-                'args': [{'string': 'KT1FxfNNcmdEs3n38E1o2GcXhikmpGkyARDq'},
-                 {'string': 'KT1JTpEkByTStHYTT3qD8khJomNnvvnrfh4v'}]}]}]}]}]},
-       'metadata': {'balance_updates': [{'kind': 'contract',
-         <...>
-        'internal_operation_results': [{'kind': 'transaction',
-          'source': 'KT1HnvV5Z53naoh51jYvPF7w168nW8nfyx5v',
-          'nonce': 0,
-          'amount': '0',
-          'destination': 'KT1JTpEkByTStHYTT3qD8khJomNnvvnrfh4v',
-          'parameters': {'int': '45'},
-          'result': {'status': 'applied',
-           'storage': {'int': '45'},
-           'consumed_gas': '12290',
-           'storage_size': '86'}}]}}],
-     'signature': 'sigsGCtnZKxWt4UD3HqkxPyemFTgeSVrgBDR4vawFBBFtLKok78JE8Jawn9VCp48ZZ9wYMZN52GhgZYHw8aCfk7fgAG5jMZS'}]
-
-It worked! In the ``internal_operation_results`` we see a spawned transaction with parameters ``{'int': '45'}``

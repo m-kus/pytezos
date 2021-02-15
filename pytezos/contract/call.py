@@ -9,11 +9,9 @@ from pytezos.jupyter import get_class_docstring
 from pytezos.context.mixin import ContextMixin
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.operation.content import format_tez, format_mutez
-from pytezos.operation.result import OperationResult
 from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.program import MichelsonProgram
 
 
 def skip_nones(**kwargs) -> dict:
@@ -70,7 +68,7 @@ class ContractCall(ContextMixin):
         return self.as_transaction().fill()
 
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
-    def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
+    def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5):
         return self.operation_group.autofill().sign().inject(
             _async=_async,
             preapply=preapply,
@@ -86,8 +84,8 @@ class ContractCall(ContextMixin):
         entrypoint = self.parameters['entrypoint']
         return f'transfer {amount} from {source} to {self.address} --entrypoint \'{entrypoint}\' --arg \'{arg}\''
 
-    def interpret(self, storage=None,
-                  source=None, sender=None, amount=None, balance=None, chain_id=None, level=None, now=None) \
+    def interpret(self, storage=None, source=None, sender=None, amount=None, balance=None,
+                  chain_id=None, level=None, now=None, self_address=None) \
             -> ContractCallResult:
         """ Run code in the builtin REPL (WARNING! Not recommended for critical tasks).
 
@@ -99,6 +97,7 @@ class ContractCall(ContextMixin):
         :param chain_id: patch CHAIN_ID
         :param level: patch LEVEL
         :param now: patch NOW
+        :param self_address: patch SELF/SELF_ADDRESS
         :rtype: pytezos.contract.result.ContractCallResult
         """
         storage_ty = StorageSection.match(self.context.storage_expr)
@@ -117,7 +116,8 @@ class ContractCall(ContextMixin):
             balance=balance,
             chain_id=chain_id,
             level=level,
-            now=now
+            now=now,
+            address=self_address
         )
         if error:
             print('\n'.join(stdout))
@@ -190,15 +190,24 @@ class ContractCall(ContextMixin):
         else:
             return self.run_operation()
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def view(self):
         """ Get return value of a view method.
 
-        :returns: object
+        :returns: Decoded parameters of a callback
         """
-        opg_with_metadata = self.as_transaction().fill().run()
-        internal_operations = OperationResult.get_contents(opg_with_metadata, source=self.address)
-        assert len(internal_operations) == 1, f'multiple internal operations, not sure which to pick'
-        view_script = self.shell.contracts[internal_operations[0]['destination']].code()
-        view = MichelsonProgram.match(view_script)
-        return view.parameter.from_parameters(internal_operations[0]['parameters']).to_python_object()
+        if self.address:
+            initial_storage = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
+        else:
+            storage_ty = StorageSection.match(self.context.storage_expr)
+            initial_storage = storage_ty.dummy(self.context).to_micheline_value(lazy_diff=True)
+
+        res, stdout, error = Interpreter.run_view(
+            parameter=self.parameters['value'],
+            entrypoint=self.parameters['entrypoint'],
+            storage=initial_storage,
+            context=self.context
+        )
+        if error:
+            print('\n'.join(stdout))
+            raise error
+        return res

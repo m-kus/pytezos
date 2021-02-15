@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from deprecation import deprecated
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
@@ -86,3 +87,7 @@ class ContractData(ContextMixin):
         :return: Python object
         """
         return type(self.data).dummy(self.context).to_python_object(lazy_diff=True)
+
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    def default(self):
+        return self.dummy()

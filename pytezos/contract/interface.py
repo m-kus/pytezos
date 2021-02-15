@@ -1,3 +1,4 @@
+import requests
 from os.path import exists, expanduser
 from typing import List, Optional, Union
 from deprecation import deprecated
@@ -44,6 +45,19 @@ class ContractInterface(ContextMixin):
 
     def __getattr__(self, item: str) -> ContractEntrypoint:
         raise AttributeError(f'unexpected entrypoint {item}')
+
+    @staticmethod
+    def from_url(url: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+        """ Create contract from michelson source code available via URL
+
+        :param url: link to the Michelson file
+        :param context: optional execution context
+        :rtype: ContractInterface
+        """
+        res = requests.get(url)
+        if res.status_code != 200:
+            raise ValueError(f'cannot fetch `{url} {res.status_code}`', res.text)
+        return ContractInterface.from_michelson(res.text, context)
 
     @staticmethod
     def from_file(path: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
@@ -174,9 +188,12 @@ class ContractInterface(ContextMixin):
 
     @property
     def storage(self) -> ContractData:
-        expr = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
-        storage = self.program.storage.from_micheline_value(expr)
-        storage.attach_context(self.context)
+        if self.address:
+            expr = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
+            storage = self.program.storage.from_micheline_value(expr)
+            storage.attach_context(self.context)
+        else:
+            storage = self.program.storage.dummy(self.context)
         return ContractData(self.context, storage.item, title='storage')
 
     @property
@@ -184,6 +201,21 @@ class ContractInterface(ContextMixin):
         root_name = self.program.parameter.root_name
         assert root_name in self.entrypoints, f'root entrypoint is undefined'
         return getattr(self, root_name)
+
+    @property
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    def contract(self) -> 'ContractInterface':
+        return self
+
+    @property
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    def text(self) -> str:
+        return self.to_michelson()
+
+    @property
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    def code(self):
+        return self.to_micheline()
 
     @property
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
@@ -202,7 +234,7 @@ class ContractInterface(ContextMixin):
     def script(self, initial_storage=None, mode: Optional[str] = None) -> dict:
         """ Generate script for contract origination.
 
-        :param initial_storage: Python object, leave None to generate default
+        :param initial_storage: Python object, leave None to generate default (attach shell/key for smart fill)
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
         :return: {"code": $Micheline, "storage": $Micheline}
         """
@@ -215,19 +247,20 @@ class ContractInterface(ContextMixin):
             'storage': storage.to_micheline_value(mode=mode or self.context.mode, lazy_diff=True)
         }
 
-    def originate(self, initial_storage=None, optimized=False,
+    def originate(self, initial_storage=None,
+                  mode: Optional[str] = None,
                   balance: Union[int, Decimal] = 0,
                   delegate: Optional[str] = None) -> OperationGroup:
         """ Create an origination operation
 
         :param initial_storage: Python object, leave None to generate default
-        :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
+        :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
         :param balance: initial balance
         :param delegate: initial delegator
         :rtype: OperationGroup
         """
         return OperationGroup(context=self._spawn_context()) \
-            .origination(script=self.script(initial_storage, optimized=optimized),
+            .origination(script=self.script(initial_storage, mode=mode),
                          balance=balance,
                          delegate=delegate)
 

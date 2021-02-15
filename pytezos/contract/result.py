@@ -31,7 +31,7 @@ class ContractCallResult(OperationResult):
 
         def decode_result(res: OperationResult) -> 'ContractCallResult':
             kwargs = {}
-            if hasattr(res, 'storage'):
+            if hasattr(res, 'storage') and res.storage is not None:
                 storage = program.storage.from_micheline_value(res.storage)
                 if hasattr(res, 'lazy_diff'):
                     kwargs.update(lazy_diff=res.lazy_diff)

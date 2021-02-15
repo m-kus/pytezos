@@ -2,9 +2,9 @@ from typing import List, cast, Tuple, Optional, Type
 
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
 from pytezos.michelson.sections import ParameterSection
-from pytezos.michelson.types.base import MichelsonType, Micheline
+from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types import NatType, ContractType, AddressType, TimestampType, \
     OptionType, KeyHashType, UnitType, MutezType, OperationType, ChainIdType
 from pytezos.context.abstract import AbstractContext
@@ -211,6 +211,10 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
         amount.assert_type_equal(MutezType)
         assert isinstance(destination, ContractType), f'expected contract, got {destination.prim}'
         parameter.assert_type_equal(destination.args[0])
+
+        ep_type = get_entrypoint_type(context, destination.get_entrypoint(), address=destination.get_address())
+        if ep_type:
+            parameter.assert_type_equal(ep_type, message='destination contract parameter')
 
         transaction = OperationType.transaction(
             source=context.get_self_address(),

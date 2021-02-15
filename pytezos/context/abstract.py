@@ -1,6 +1,16 @@
 from typing import Tuple, Optional
 
+from pyblake2 import blake2b
+
+from pytezos.crypto.encoding import base58_decode, base58_encode
 from pytezos.crypto.key import Key
+
+
+def get_originated_address(index: int, opg_hash=None):
+    prefix = base58_decode(opg_hash) if opg_hash else b'\x00' * 32
+    nonce = prefix + index.to_bytes(4, 'big')
+    nonce_hash = blake2b(data=nonce, digest_size=20).digest()
+    return base58_encode(nonce_hash, b'KT1').decode()
 
 
 class KeyHash(Key):

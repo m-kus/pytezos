@@ -2,6 +2,7 @@ from typing import List, Type, Optional, Tuple, cast
 from copy import copy
 from pprint import pformat
 
+from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types.pair import PairType
@@ -10,7 +11,6 @@ from pytezos.context.abstract import AbstractContext
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):
-    type_impl: Type[PairType] = None
 
     def __init__(self, ticketer: str, item: MichelsonType, amount: int):
         super(TicketType, self).__init__()
@@ -25,7 +25,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         return pformat((self.ticketer, repr(self.item), self.amount))
 
     @staticmethod
-    def init(ticketer: str, item: MichelsonType, amount: int) -> 'TicketType':
+    def create(ticketer: str, item: MichelsonType, amount: int) -> 'TicketType':
         cls = TicketType.create_type(args=[item.get_anon_type()])
         return cls(ticketer, item, amount)
 
@@ -45,23 +45,16 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
             return TicketType(ticketer=left.ticketer, item=left.item, amount=left.amount + right.amount)
 
     @classmethod
-    def create_type(cls,
-                    args: List[Type['MichelsonType']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['TicketType']:
-        type_impl = PairType.create_type(args=[AddressType, args[0], NatType])
-        type_class = super(TicketType, cls).create_type(args=args,
-                                                        annots=annots,
-                                                        type_impl=type_impl)
-        return cast(Type['TicketType'], type_class)
-
-    @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False) -> str:
-        name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
-        item_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_value', comparable=True)
-        doc = f'(\n\t  address  /* ticketer */\n\t  {item_doc}\n\t  nat  /* amount */\n\t)'
-        definitions.insert(0, (name, doc))
-        return f'${name}'
+        super(TicketType, cls).generate_pydoc(definitions)
+        param_expr = micheline_to_michelson(cls.args[0].as_micheline_expr())
+        if cls.args[0].args:
+            name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
+            param_name = f'{name}_param'
+            definitions.insert(0, (param_name, param_expr))
+            return f'ticket (${param_name})'
+        else:
+            return f'ticket ({param_expr})'
 
     @classmethod
     def dummy(cls, context: AbstractContext):
@@ -69,16 +62,18 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'TicketType':
-        comb = cls.type_impl.from_micheline_value(val_expr)
+        type_impl = PairType.create_type(args=[AddressType, cls.args[0], NatType])
+        comb = type_impl.from_micheline_value(val_expr)
         return cls.from_comb(comb)
 
     @classmethod
     def from_python_object(cls, py_obj) -> 'MichelsonType':
-        comb = cls.type_impl.from_python_object(py_obj)
+        type_impl = PairType.create_type(args=[AddressType, cls.args[0], NatType])
+        comb = type_impl.from_python_object(py_obj)
         return cls.from_comb(comb)
 
     def to_comb(self) -> PairType:
-        return self.type_impl.init(items=[AddressType(self.ticketer), self.item, NatType(self.amount)])
+        return PairType.from_comb(items=[AddressType(self.ticketer), self.item, NatType(self.amount)])
 
     def to_literal(self) -> Type[Micheline]:
         return self.to_comb().to_literal()

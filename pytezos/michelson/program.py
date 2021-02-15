@@ -74,15 +74,16 @@ class MichelsonProgram:
         return self.code.args[0].execute(stack, stdout, context)
 
     @try_catch('END')
-    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict]]:
+    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') \
+            -> Tuple[List[dict], Any, List[dict], PairType]:
         res = cast(PairType, stack.pop1())
         assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
         res.assert_type_equal(PairType.create_type(args=[
-            ListType.create_type([OperationType]),
+            ListType.create_type(args=[OperationType]),
             self.storage.args[0]
         ]), message='list of operations + resulting storage')
-        operations = [op.to_python_object() for op in res.items[0]]
+        operations = [op.content for op in res.items[0]]
         lazy_diff = []
         storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)
         stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
-        return operations, storage, lazy_diff
+        return operations, storage, lazy_diff, res

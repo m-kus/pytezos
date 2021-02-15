@@ -64,7 +64,7 @@ class BlockSliceQuery(RpcQuery):
 
     def __init__(self, start: int, stop=None, **kwargs):
         super(BlockSliceQuery, self).__init__(**kwargs)
-        self._start = start
+        self._start: int = start
         self._stop = stop or 'head'
 
     def __repr__(self):
@@ -196,8 +196,14 @@ class BlockSliceQuery(RpcQuery):
         :raises: StopIteration if not found
         """
         last, head = self.get_range()
-        for block_level in range(head, max(1, last - 1), -1):
+        if self._start < 0:
+            levels = range(head, max(1, last - 1), -1)
+        else:
+            levels = range(last, head, 1)
+
+        for block_level in levels:
             try:
+                logger.debug(f'checking level {block_level}...')
                 return self._getitem(block_level).operations[operation_group_hash]()
             except StopIteration:
                 continue

@@ -235,7 +235,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         return self.shell.head.helpers.preapply.operations.post(
             operations=[self.json_payload()])[0]
 
-    def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=2):
+    def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5):
         """ Inject the signed operation group.
 
         :param _async: do not wait for operation inclusion (default is True)

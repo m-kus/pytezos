@@ -8,7 +8,7 @@ from pytezos.crypto.encoding import is_public_key, is_pkh
 from pytezos.jupyter import InlineDocstring
 from pytezos.context.impl import ExecutionContext
 
-default_network = 'edonet'
+default_network = 'edo2net'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
 default_key_hash = 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa'
 alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'  # for flextesa sandbox
@@ -21,7 +21,8 @@ nodes = {
                 'https://tezos-prod.cryptonomic-infra.tech/chains/main/blocks/head'],
     'sandboxnet': ['http://127.0.0.1:8732/'],
     'delphinet': ['https://rpc.tzkt.io/delphinet/'],
-    'edonet': ['https://rpc.tzkt.io/edonet/']
+    'edonet': ['https://rpc.tzkt.io/edonet/'],
+    'edo2net': ['https://rpc.tzkt.io/edo2net/']
 }
 keys = {
     'alice': alice_key
@@ -81,8 +82,7 @@ class ContextMixin(metaclass=InlineDocstring):
         return self.context.key
 
     @property
-    def address(self) -> str:
-        assert self.context.address, f'address is undefined'
+    def address(self) -> Optional[str]:
         return self.context.address
 
     @property

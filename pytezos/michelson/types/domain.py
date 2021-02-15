@@ -1,18 +1,16 @@
 from decimal import Decimal
-from typing import Type
+from typing import Type, cast
 
-from pytezos.crypto.encoding import is_address, is_public_key, is_pkh, \
-    is_sig, \
-    is_kt, is_chain_id
+from pytezos.crypto.encoding import is_address, is_public_key, is_pkh, is_sig, is_kt, is_chain_id
 from pytezos.michelson.forge import forge_public_key, unforge_public_key, unforge_chain_id, unforge_signature, \
     forge_address, unforge_address, unforge_contract, forge_base58, optimize_timestamp, forge_contract
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
 from pytezos.michelson.types.core import NatType, IntType, StringType
-from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import MichelsonType, Undefined
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext, get_originated_address
 
 
 class TimestampType(IntType, prim='timestamp'):
@@ -52,6 +50,9 @@ class TimestampType(IntType, prim='timestamp'):
 
 
 class MutezType(NatType, prim='mutez'):
+
+    def __repr__(self):
+        return str(Decimal(self.value) / 10 ** 6)
 
     @classmethod
     def from_value(cls, value: int) -> 'MutezType':
@@ -263,10 +264,12 @@ class ChainIdType(StringType, prim='chain_id'):
 class ContractType(AddressType, prim='contract', args_len=1):
 
     def __repr__(self):
-        return self.value
+        address, entrypoint = self.get_address(), self.get_entrypoint()
+        return f'{address[:6]}⋯{address[-3:]}%{entrypoint}'
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
+        super(ContractType, cls).generate_pydoc(definitions)
         param_expr = micheline_to_michelson(cls.args[0].as_micheline_expr())
         if cls.args[0].args:
             name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
@@ -275,6 +278,13 @@ class ContractType(AddressType, prim='contract', args_len=1):
             return f'contract (${param_name})'
         else:
             return f'contract ({param_expr})'
+
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'ContractType':
+        if py_obj is None or py_obj is Undefined:
+            py_obj = get_originated_address(0)
+        res = super(ContractType, cls).from_python_object(py_obj)
+        return cast(ContractType, res)
 
     def get_address(self) -> str:
         return self.value.split('%')[0]
@@ -299,6 +309,7 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
+        super(LambdaType, cls).generate_pydoc(definitions)
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
         expr = {}
         for i, suffix in enumerate(['return', 'param']):

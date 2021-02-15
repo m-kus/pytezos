@@ -43,6 +43,9 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         return super(BlocksQuery, self).__call__(
             length=length, head=head, min_date=min_date)
 
+    def _get_block(self, block_id) -> 'BlockQuery':
+        return super(BlocksQuery, self).__getitem__(block_id)
+
     def __getitem__(self, block_id):
         """ Construct block query or get a block range.
 
@@ -54,7 +57,9 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         :rtype: BlockQuery or BlockSliceQuery
         """
         if isinstance(block_id, slice):
-            if not isinstance(block_id.start, int):
+            if isinstance(block_id.start, str):
+                block_id = slice(self._get_block(block_id.start).level(), block_id.stop, None)
+            elif not isinstance(block_id.start, int):
                 raise NotImplementedError('Slice start should be an integer.')
 
             return BlockSliceQuery(
@@ -68,7 +73,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         if isinstance(block_id, int) and block_id < 0:
             block_id = f'head{block_id}'
 
-        return super(BlocksQuery, self).__getitem__(block_id)
+        return self._get_block(block_id)
 
     @property
     def current_voting_period(self):

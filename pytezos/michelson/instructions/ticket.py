@@ -65,7 +65,7 @@ class TicketInstruction(MichelsonInstruction, prim='TICKET'):
         item, amount = cast(Tuple[MichelsonType, NatType], stack.pop2())
         amount.assert_type_equal(NatType)
         address = context.get_self_address()
-        res = TicketType.init(address, item, int(amount))
+        res = TicketType.create(address, item, int(amount))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [item, amount], [res]))
         return cls()

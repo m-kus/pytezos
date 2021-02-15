@@ -1,20 +1,12 @@
 from typing import Tuple, Optional
 from datetime import datetime
-from pyblake2 import blake2b
 
 from pytezos.rpc.errors import RpcError
 from pytezos.crypto.key import Key
 from pytezos.rpc.shell import ShellQuery
-from pytezos.context.abstract import AbstractContext
-from pytezos.crypto.encoding import base58_encode, base58_decode
+from pytezos.context.abstract import AbstractContext, get_originated_address
+from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.micheline import get_script_section
-
-
-def get_originated_address(index: int, opg_hash=None):
-    prefix = base58_decode(opg_hash) if opg_hash else b'\x00' * 32
-    nonce = prefix + index.to_bytes(4, 'big')
-    nonce_hash = blake2b(data=nonce, digest_size=20).digest()
-    return base58_encode(nonce_hash, b'KT1').decode()
 
 
 class ExecutionContext(AbstractContext):
@@ -114,8 +106,11 @@ class ExecutionContext(AbstractContext):
 
     def get_parameter_expr(self, address=None) -> Optional:
         if self.shell and address:
-            script = self.shell.contracts[address].script()
-            return get_script_section(script, 'parameter')
+            if address == get_originated_address(0):
+                return None  # dummy callback
+            else:
+                script = self.shell.contracts[address].script()
+                return get_script_section(script, 'parameter')
         else:
             return None if address else self.parameter_expr
 
@@ -223,7 +218,10 @@ class ExecutionContext(AbstractContext):
             return self.get_dummy_chain_id()
 
     def get_dummy_address(self) -> str:
-        return base58_encode(b'\x00' * 20, b'KT1').decode()
+        if self.key:
+            return self.key.public_key_hash()
+        else:
+            return base58_encode(b'\x00' * 20, b'KT1').decode()
 
     def get_dummy_public_key(self) -> str:
         if self.key:

@@ -45,36 +45,36 @@ class ContractEntrypoint(ContextMixin):
         else:
             py_obj = None
 
-        try:
-            param_ty = ParameterSection.match(self.context.parameter_expr)
-            parameters = param_ty.from_python_object({self.entrypoint: py_obj}) \
-                .to_parameters(mode=self.context.mode)
-        except MichelsonRuntimeError as e:
-            print(self.__doc__)
-            raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args)
-        return ContractCall(context=self.context, parameters=parameters)
+        return ContractCall(context=self.context,
+                            parameters=self.encode(py_obj, self.context.mode))
 
-    def decode(self, value):
+    def decode(self, value, entrypoint: Optional[str] = None) -> dict:
         """ Convert from Michelson to Python type system
 
         :param value: Micheline JSON expression or Michelson value
-        :return: Python object
+        :param entrypoint: overwrite current entrypoint (in case you want to parse tx parameters)
+        :return: Python object {entrypoint: value}
         """
         if isinstance(value, str):
             value = michelson_to_micheline(value)
+        if entrypoint is None:
+            entrypoint = self.entrypoint
         param_ty = ParameterSection.match(self.context.parameter_expr)
-        parameters = {'entrypoint': self.entrypoint, 'value': value}
+        parameters = {'entrypoint': entrypoint, 'value': value}
         py_obj = param_ty.from_parameters(parameters).to_python_object()
-        return py_obj[self.entrypoint]
+        return py_obj
 
-    def encode(self, py_obj, mode: Optional[str] = None):
-        """ Convert from Python to Michelson type system
+    def encode(self, py_obj, mode: Optional[str] = None) -> dict:
+        """ Encode transaction parameters from the given Python object
 
         :param py_obj: Python object
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
-        :return: Micheline JSON expression
+        :return: {entrypoint, value}
         """
-        param_ty = ParameterSection.match(self.context.parameter_expr)
-        parameters = param_ty.from_python_object({self.entrypoint: py_obj}) \
-            .to_parameters(mode=mode or self.context.mode)
-        return parameters['value']
+        try:
+            param_ty = ParameterSection.match(self.context.parameter_expr)
+            return param_ty.from_python_object({self.entrypoint: py_obj}) \
+                .to_parameters(mode=mode or self.context.mode)
+        except MichelsonRuntimeError as e:
+            print(self.__doc__)
+            raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args)

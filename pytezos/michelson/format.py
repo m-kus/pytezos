@@ -19,11 +19,12 @@ class MichelsonFormatterError(ValueError):
 
 
 def is_framed(node):
-    if node['prim'] in {'Pair', 'Left', 'Right', 'Some',
-                        'pair', 'or', 'option', 'map', 'big_map', 'list', 'set', 'contract', 'lambda'}:
+    if node['prim'] in {'Pair', 'Left', 'Right', 'Some', 'pair', 'or', 'option', 'map', 'big_map', 'list', 'set',
+                        'contract', 'lambda', 'ticket', 'sapling_state', 'sapling_transaction'}:
         return True
-    elif node['prim'] in {'key', 'unit', 'signature', 'operation',
-                          'int', 'nat', 'string', 'bytes', 'mutez', 'bool', 'key_hash', 'timestamp', 'address'}:
+    elif node['prim'] in {'key', 'unit', 'signature', 'operation', 'int', 'nat', 'string', 'bytes', 'mutez', 'bool',
+                          'key_hash', 'timestamp', 'address', 'bls12_381_g1', 'bls12_381_g2', 'bls12_381_fr',
+                          'chain_id', 'never'}:
         return 'annots' in node
     return False
 

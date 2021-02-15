@@ -1,43 +1,24 @@
 from typing import Type, Optional
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import MichelineSequence, Micheline
+from pytezos.michelson.micheline import MichelineSequence
 
 
 class OperationType(MichelsonType, prim='operation'):
 
-    def __init__(self, content: dict):
+    def __init__(self, content: dict, ty: Optional[Type[MichelsonType]] = None):
         super(OperationType, self).__init__()
         self.content = content
+        self.ty = ty
 
     def __repr__(self):
-        return ''
-        # if content['kind'] == 'transaction':
-        #     return {'kind': content['kind'],
-        #             'target': content['destination'],
-        #             'amount': content['amount'],
-        #             'entrypoint': content['parameters']['entrypoint'],
-        #             'parameters': micheline_to_michelson(content['parameters']['value'])}
-        # elif content['kind'] == 'origination':
-        #     res = {'kind': content['kind'],
-        #            'target': content['originated_contract'],
-        #            'amount': content['balance'],
-        #            'storage': micheline_to_michelson(content['script']['storage']),
-        #            'code': micheline_to_michelson(content['script']['code'])}
-        #     if content.get('delegate'):
-        #         res['delegate'] = content['delegate']
-        #     return res
-        # elif content['kind'] == 'delegation':
-        #     return {'kind': content['kind'],
-        #             'target': content['delegate']}
-        # else:
-        #     assert False, content['kind']
+        return self.content['kind']
 
     @classmethod
     def origination(cls,
                     source: str,
                     script: Type[MichelineSequence],
-                    storage: Optional[MichelsonType] = None,
+                    storage: MichelsonType,
                     balance: int = 0,
                     delegate: Optional[str] = None) -> 'OperationType':
         content = {
@@ -51,7 +32,7 @@ class OperationType(MichelsonType, prim='operation'):
         }
         if delegate is not None:
             content['delegate'] = delegate
-        return cls(content)
+        return cls(content, ty=type(storage))
 
     @classmethod
     def delegation(cls, source: str, delegate: Optional[str] = None) -> 'OperationType':
@@ -75,24 +56,15 @@ class OperationType(MichelsonType, prim='operation'):
                 'value': parameter.to_micheline_value()
             }
         }
-        return cls(content)
-
-    @classmethod
-    def from_micheline_value(cls, val_expr):
-        assert False, 'forbidden'
-
-    @classmethod
-    def from_python_object(cls, py_obj) -> 'OperationType':
-        assert isinstance(py_obj, dict)
-        assert 'kind' in py_obj
-        return cls(content=py_obj)
-
-    def to_literal(self):
-        assert False, 'no literal representation'
-
-    def to_micheline_value(self, mode='readable', lazy_diff=False):
-        assert False, 'no micheline representation'
+        return cls(content, ty=type(parameter))
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
-        assert not comparable, f'{self.prim} is not comparable'
-        return self.content
+        kind = self.content['kind']
+        assert self.ty, f'data type is not defined for {kind}'
+        if kind == 'transaction':
+            data = self.ty.from_micheline_value(self.content['parameters']['value'])
+        elif kind == 'origination':
+            data = self.ty.from_micheline_value(self.content['script']['storage'])
+        else:
+            assert False, f'not applicable for {kind}'
+        return data.to_python_object(try_unpack=try_unpack)

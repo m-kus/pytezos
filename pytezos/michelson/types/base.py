@@ -11,13 +11,17 @@ type_mappings = {
     'bytes': 'str  /* Hex string */ ||\n\tbytes  /* Python byte string */',
     'timestamp': 'int  /* Unix time in seconds */ ||\n\tstring  /* Formatted datetime `%Y-%m-%dT%H:%M:%SZ` */',
     'mutez': 'int  /* Amount in `utz` (10^-6) */ ||\n\tDecimal  /* Amount in `tz` */',
-    'contract': 'str  /* Base58 encoded `KT` address with optional entrypoint */',
+    'contract': 'str  /* Base58 encoded `KT` address with optional entrypoint */'
+                ' ||\n\tNone  /* when you need to avoid type checking */'
+                ' ||\n\tUndefined  /* `from pytezos import Undefined` for resolving None ambiguity  */',
     'address': 'str  /* Base58 encoded `tz` or `KT` address */',
     'key': 'str  /* Base58 encoded public key */',
     'key_hash': 'str  /* Base58 encoded public key hash */',
     'signature': 'str  /* Base58 encoded signature */',
     'lambda': 'str  /* Michelson source code */',
-    'chain_id': 'str  /* Base58 encoded chain ID */'
+    'chain_id': 'str  /* Base58 encoded chain ID */',
+    'ticket': '/* no literal form, tickets can only be created by another contract */',
+    'operation': '/* no literal form, operations can only be spawned by another contract or lambda */'
 }
 
 
@@ -98,7 +102,9 @@ class MichelsonType(Micheline):
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False) -> str:
-        assert len(cls.args) == 0, f'defined for simple types only'
+        assert len(cls.args) == 0 \
+            or cls.prim in ['contract', 'lambda', 'ticket', 'sapling_state', 'sapling_transaction'], \
+            'defined for simple types only'
         if cls.prim in type_mappings:
             if all(x != cls.prim for x, _ in definitions):
                 definitions.append((cls.prim, type_mappings[cls.prim]))
