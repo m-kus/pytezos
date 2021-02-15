@@ -63,13 +63,12 @@ class ContractCall(ContextMixin):
                          parameters=self.parameters)
 
     @property
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `as_transaction()` instead')
     def operation_group(self) -> OperationGroup:
         return self.as_transaction().fill()
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5):
-        return self.operation_group.autofill().sign().inject(
+        return self.as_transaction().autofill().sign().inject(
             _async=_async,
             preapply=preapply,
             check_result=check_result,
@@ -174,7 +173,7 @@ class ContractCall(ContextMixin):
         assert len(results) == 1
         return results[0]
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use either `run_code` or `run_operation`')
     def result(self, storage=None, source=None, sender=None, gas_limit=None) -> ContractCallResult:
         """ Simulate operation and parse the result.
 

@@ -109,7 +109,9 @@ class ContractInterface(ContextMixin):
         return cls(context)
 
     @classmethod
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0',
+                removed_in='3.1.0',
+                details='use one of `from_file`, `from_michelson`, `from_micheline`, `from_url`')
     def create_from(cls, source):
         """ Create contract interface from its code.
 
@@ -146,7 +148,9 @@ class ContractInterface(ContextMixin):
         with open(path, 'w+') as f:
             f.write(self.to_michelson())
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0',
+                removed_in='3.1.0',
+                details='use `.storage[path][to][big_map][key]()` instead')
     def big_map_get(self, path):
         """ Get BigMap entry as Python object by plain key and block height.
 
@@ -203,22 +207,22 @@ class ContractInterface(ContextMixin):
         return getattr(self, root_name)
 
     @property
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='access `ContractInterface` directly')
     def contract(self) -> 'ContractInterface':
         return self
 
     @property
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `to_michelson()` instead')
     def text(self) -> str:
         return self.to_michelson()
 
     @property
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `to_micheline()` instead')
     def code(self):
         return self.to_micheline()
 
     @property
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `default()` instead')
     def call(self) -> ContractEntrypoint:
         return self.parameter
 
@@ -265,6 +269,6 @@ class ContractInterface(ContextMixin):
                          delegate=delegate)
 
 
-@deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+@deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `ContractInterface` instead')
 class Contract(ContractInterface):
     pass
