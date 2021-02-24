@@ -50,6 +50,12 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps.clear()
 
+    def __copy__(self):
+        raise ValueError("It's not allowed to copy context")
+
+    def __deepcopy__(self, memodict={}):
+        raise ValueError("It's not allowed to copy context")
+
     @property
     def script(self) -> Optional[dict]:
         if self.parameter_expr and self.storage_expr and self.code_expr:

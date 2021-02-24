@@ -180,6 +180,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         return res
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):
+        assert self.context is None, f'context already attached'
         self.context = context
         if self.ptr is None:
             self.ptr = context.get_tmp_big_map_id()
@@ -225,9 +226,14 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         return forge_script_expr(key.pack(legacy=True))
 
     def duplicate(self):
-        res = deepcopy(self)
+        res = type(self)(items=deepcopy(self.items),
+                         ptr=self.ptr,
+                         removed_keys=deepcopy(self.removed_keys))
         res.context = self.context
         return res
+
+    def __deepcopy__(self, memodict={}):
+        return self.duplicate()
 
     def __getitem__(self, key_obj) -> Optional[MichelsonType]:
         key = self.args[0].from_python_object(key_obj)
