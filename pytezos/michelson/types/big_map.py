@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy, copy
 from typing import Generator, Optional, Tuple, List, Union, Type
 
 from pytezos.michelson.types.base import MichelsonType, Undefined
@@ -54,7 +54,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             yield key, None
 
     def __repr__(self):
-        if isinstance(self.ptr, int):
+        if self.context:
             return f'<{self.ptr}>'
         else:
             elements = [f'{repr(k)}: {repr(v)}' for k, v in self]
@@ -223,6 +223,11 @@ class BigMapType(MapType, prim='big_map', args_len=2):
     def get_key_hash(self, key_obj):
         key = self.args[0].from_python_object(key_obj)
         return forge_script_expr(key.pack(legacy=True))
+
+    def duplicate(self):
+        res = deepcopy(self)
+        res.context = self.context
+        return res
 
     def __getitem__(self, key_obj) -> Optional[MichelsonType]:
         key = self.args[0].from_python_object(key_obj)

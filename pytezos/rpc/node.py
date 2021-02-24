@@ -1,7 +1,5 @@
 import requests
 from simplejson import JSONDecodeError
-from hashlib import sha1
-from urllib.parse import urlencode
 from pprint import pformat
 
 
@@ -59,20 +57,15 @@ class RpcError(Exception):
 
 class RpcNode:
 
-    def __init__(self, uri, network='', caching=False):
+    def __init__(self, uri):
         self.uri = uri
-        self.network = network
-        self.caching = caching
-        self._cache = dict()
         self._session = requests.Session()
 
     def __repr__(self):
         res = [
             super(RpcNode, self).__repr__(),
             '\nNode address',
-            f'{self.uri} ({self.network})',
-            '\nCached urls',
-            *list(self._cache.keys())
+            self.uri
         ]
         return '\n'.join(res)
 
@@ -93,38 +86,15 @@ class RpcNode:
 
         return res
 
-    def get(self, path, params=None, caching=False, cache_key=None, timeout=None):
-        if caching and self.caching:
-            if not cache_key:
-                cache_key = path
-                if params:
-                    cache_key += f'?{urlencode(params)}'
-            if cache_key in self._cache:
-                return self._cache[cache_key]
+    def get(self, path, params=None, timeout=None):
+        return self.request('GET', path, params=params, timeout=timeout).json()
 
-        res = self.request('GET', path, params=params, timeout=timeout).json()
-        if caching and self.caching:
-            self._cache[cache_key] = res
-
-        return res
-
-    def post(self, path, params=None, json=None, caching=False):
-        cache_key = None
-        if caching and self.caching:
-            cache_key = sha1((path + str(json)).encode()).hexdigest()
-            if cache_key in self._cache:
-                return self._cache[cache_key]
-
+    def post(self, path, params=None, json=None):
         response = self.request('POST', path, params=params, json=json)
         try:
-            res = response.json()
+            return response.json()
         except JSONDecodeError:
-            res = response.text
-
-        if caching and self.caching:
-            self._cache[cache_key] = res
-
-        return res
+            return response.text
 
     def delete(self, path, params=None):
         return self.request('DELETE', path, params=params).json()
@@ -135,17 +105,17 @@ class RpcNode:
 
 class RpcMultiNode(RpcNode):
 
-    def __init__(self, uri, network, caching=False):
-        super(RpcMultiNode, self).__init__(uri=uri, network=network, caching=caching)
+    def __init__(self, uri):
+        super(RpcMultiNode, self).__init__(uri=uri)
         if not isinstance(uri, list):
             self.uri = [uri]
-        self.nodes = list(map(lambda x: RpcNode(x, network), self.uri))
+        self.nodes = list(map(lambda x: RpcNode(x), self.uri))
         self._next_i = 0
 
     def __repr__(self):
         res = [
             super(RpcNode, self).__repr__(),
-            f'\nNode addresses ({self.network})',
+            f'\nNode addresses',
             *self.uri
         ]
         return '\n'.join(res)

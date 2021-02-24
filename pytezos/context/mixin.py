@@ -47,16 +47,16 @@ class KeyHash(Key):
         return self._pkh
 
     def public_key(self):
-        raise NotImplementedError
+        raise NotImplementedError("Use private key instead of a public key hash")
 
     def secret_key(self, passphrase=None, ed25519_seed=True):
-        raise NotImplementedError
+        raise NotImplementedError("Use private key instead of a public key hash")
 
     def sign(self, message, generic=False):
-        raise NotImplementedError
+        raise NotImplementedError("Use private key instead of a public key hash")
 
     def verify(self, signature, message):
-        raise NotImplementedError
+        raise NotImplementedError("Use private key instead of a public key hash")
 
 
 class ContextMixin(metaclass=InlineDocstring):
@@ -67,7 +67,7 @@ class ContextMixin(metaclass=InlineDocstring):
         super(ContextMixin, self).__init__()
         if context is None:
             context = ExecutionContext(
-                shell=ShellQuery(node=RpcNode(uri=nodes[default_network][0], network=default_network)),
+                shell=ShellQuery(RpcNode(nodes[default_network][0])),
                 key=Key.from_encoded_key(default_key) if is_installed() else KeyHash(default_key_hash))
         self.context = context
 
@@ -97,7 +97,7 @@ class ContextMixin(metaclass=InlineDocstring):
         if self.context.key is not None:
             res.append(f'.key  # {self.key.public_key_hash()}')
         if self.context.shell is not None:
-            res.append(f'.shell  # {self.shell.node.uri} ({self.shell.node.network})')
+            res.append(f'.shell  # {self.shell.node.uri}')
         if self.context.address is not None:
             res.append(f'.address  # {self.address}')
         if self.context.block_id is not None:
@@ -114,12 +114,11 @@ class ContextMixin(metaclass=InlineDocstring):
             if shell.endswith('.pool'):
                 shell = shell.split('.')[0]
                 assert shell in nodes, f'unknown network {shell}'
-                shell = ShellQuery(node=RpcMultiNode(uri=nodes[shell], network=shell))
+                shell = ShellQuery(RpcMultiNode(nodes[shell]))
             elif shell in nodes:
-                caching = 'sandbox' not in shell
-                shell = ShellQuery(node=RpcNode(uri=nodes[shell][0], network=shell, caching=caching))
+                shell = ShellQuery(RpcNode(nodes[shell][0]))
             else:
-                shell = ShellQuery(node=RpcNode(uri=shell))
+                shell = ShellQuery(RpcNode(shell))
         else:
             assert shell is None or isinstance(shell, ShellQuery), f'unexpected shell {shell}'
 

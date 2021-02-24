@@ -71,7 +71,8 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
             )
 
         if isinstance(block_id, int) and block_id < 0:
-            block_id = f'head{block_id}'
+            head_level = self._get_block('head').level()
+            block_id = max(0, head_level + block_id)
 
         return self._get_block(block_id)
 
@@ -107,10 +108,6 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
 
 
 class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
-
-    def __init__(self, *args, **kwargs):
-        super(BlockQuery, self).__init__(*args, **kwargs)
-        self._caching = self._caching or 'head' not in self._params
 
     @property
     def predecessor(self):

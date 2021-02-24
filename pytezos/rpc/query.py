@@ -58,7 +58,7 @@ class RpcQuery(metaclass=InlineDocstring):
     __extensions__ = dict()
 
     @classmethod
-    def __init_subclass__(cls, path='', **kwargs):
+    def __init_subclass__(cls, path: str = '', **kwargs):
         super().__init_subclass__(**kwargs)
         if isinstance(path, list):
             for sub_path in path:
@@ -66,10 +66,9 @@ class RpcQuery(metaclass=InlineDocstring):
         else:
             cls.__extensions__[path] = cls
 
-    def __init__(self, node: RpcNode, path='', caching=False, params=None, timeout=None):
+    def __init__(self, node: RpcNode, path: str = '', params=None, timeout=None):
         self.node = node
         self._wild_path = path
-        self._caching = caching
         self._timeout = timeout
         self._params = params or list()
         self.__doc__ = format_docstring(self.__class__, self._wild_path or '/')
@@ -78,8 +77,8 @@ class RpcQuery(metaclass=InlineDocstring):
         res = [
             super(RpcQuery, self).__repr__(),
             '\nProperties',
-            f'.path  # {self.path or "/"}{" (cached)" if self._caching else ""}',
-            f'.node  # {self.node.uri} ({self.node.network})',
+            f'.path  # {self.path or "/"}',
+            f'.node  # {self.node.uri}',
             self.__doc__
         ]
         return '\n'.join(res)
@@ -89,7 +88,6 @@ class RpcQuery(metaclass=InlineDocstring):
         return child_class(
             path=wild_path,
             node=self.node,
-            caching=self._caching,
             params=params
         )
 
@@ -100,8 +98,7 @@ class RpcQuery(metaclass=InlineDocstring):
     def __call__(self, **params):
         return self.node.get(
             path=self.path,
-            params=params,
-            caching=self._caching
+            params=params
         )
 
     def _getitem(self, item):
@@ -128,7 +125,6 @@ class RpcQuery(metaclass=InlineDocstring):
         return self.node.get(
             path=self.path,
             params=params,
-            caching=self._caching,
             timeout=self._timeout
         )
 
@@ -136,8 +132,7 @@ class RpcQuery(metaclass=InlineDocstring):
         return self.node.post(
             path=self.path,
             params=params,
-            json=json,
-            caching=self._caching
+            json=json
         )
 
     def _put(self, params=None):

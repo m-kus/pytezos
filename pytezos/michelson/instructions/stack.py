@@ -103,11 +103,12 @@ class CastIntruction(MichelsonInstruction, prim='CAST', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        top = stack.pop1()
-        cast_type = cast(Type[MichelsonType], cls.args[0])
-        res = cast_type.from_micheline_value(top.to_micheline_value())
+        res = stack.pop1()
+        # TODO: will become obsolete in the next protocol? (because annots are no longer part of the type)
+        # cast_type = cast(Type[MichelsonType], cls.args[0])
+        # res = cast_type.from_micheline_value(top.to_micheline_value())
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [top], [res]))
+        stdout.append(format_stdout(cls.prim, [res], [res]))
         return cls()
 
 

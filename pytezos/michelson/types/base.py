@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 from typing import Tuple, List, Optional, Type, cast, Union, Any
 
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
@@ -220,7 +220,7 @@ class MichelsonType(Micheline):
 
     def duplicate(self):
         assert self.is_duplicable(), f'{self.prim} is not duplicable'
-        return copy(self)
+        return deepcopy(self)
 
 
 def generate_pydoc(ty: Type[MichelsonType], title=None):

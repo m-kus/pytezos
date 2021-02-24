@@ -1,4 +1,0 @@
-{ "p2p": { "bootstrap-peers": [], "listen-addr": "[::]:9732" },
-  "rpc": { "listen-addrs": ["[::]:8732"] },
-  "shell": { "history_mode": "archive" },
-  "network": "sandbox" }

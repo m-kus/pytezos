@@ -1,5 +1,11 @@
 {
-  "bootstrap_accounts": [],
+  "bootstrap_accounts": [
+    ["edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav", 4000000000000],
+    ["edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9", 4000000000000],
+    ["edpkuTXkJDGcFd5nh6VvMz8phXxU3Bi7h6hqgywNFi1vZTfQNnS1RV", 4000000000000],
+    ["edpkuFrRoDSEbJYgxRtLx2ps82UdaYc1WwfS9sE11yhauZt5DgCHbU", 4000000000000],
+    ["edpkv8EUUH68jmo3f7Um5PezmfGrRF24gnfLpH3sVNwJnV5bVCxL2n", 4000000000000]
+  ],
   "bootstrap_contracts": [],
   "commitments": [],
   "preserved_cycles": 2,
@@ -31,7 +37,6 @@
   ],
   "cost_per_byte": "250",
   "hard_storage_limit_per_operation": "60000",
-  "test_chain_duration": "61440",
   "quorum_min": 2000,
   "quorum_max": 7000,
   "min_proposal_quorum": 500,

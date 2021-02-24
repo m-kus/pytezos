@@ -28,7 +28,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         """ Create new operation group (multiple contents).
         You can leave all fields empty in order to create an empty operation group.
 
-        :param protocol: Leave None for autocomplete, otherwise you know what to do
+        :param protocol: Leave None for autocomplete, unless you know what you are doing
         :param branch: Leave None for autocomplete
         :param contents: List of operation contents (optional)
         :param signature: Can be set later

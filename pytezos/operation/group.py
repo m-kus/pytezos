@@ -1,5 +1,5 @@
 from pprint import pformat
-from typing import List
+from typing import List, Optional
 
 from pytezos.crypto.key import blake2b_32
 from pytezos.operation.content import ContentMixin
@@ -166,14 +166,15 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return local_data
 
-    def autofill(self, gas_reserve=100, counter=None):
+    def autofill(self, gas_reserve=100, counter: Optional[int] = None, branch_offset=50):
         """ Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
         :param gas_reserve: Add a safe reserve for gas limit (default is 100)
         :param counter: Override counter value (for manual handling)
+        :param branch_offset: select head~offset block as branch, where offset is in range (0, 60)
         :rtype: OperationGroup
         """
-        opg = self.fill(counter=counter)
+        opg = self.fill(counter=counter, branch_offset=branch_offset)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
@@ -235,13 +236,15 @@ class OperationGroup(ContextMixin, ContentMixin):
         return self.shell.head.helpers.preapply.operations.post(
             operations=[self.json_payload()])[0]
 
-    def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5):
+    def inject(self, _async=True, preapply=True, check_result=True,
+               num_blocks_wait=5, time_between_blocks: Optional[int] = None):
         """ Inject the signed operation group.
 
         :param _async: do not wait for operation inclusion (default is True)
         :param preapply: do a preapply before injection
-        :param check_result: raise RpcError in case operation is refused
+        :param check_result: raise RpcError in case operation is applied but has runtime errors
         :param num_blocks_wait: number of blocks to wait for injection
+        :param time_between_blocks: override the corresponding parameter from constants
         :returns: operation group with metadata (raw RPC response)
         """
         self.context.reset()
@@ -260,7 +263,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             }
         else:
             for i in range(num_blocks_wait):
-                self.shell.wait_next_block()
+                self.shell.wait_next_block(time_between_blocks=time_between_blocks)
                 try:
                     pending_opg = self.shell.mempool.pending_operations[opg_hash]
                     if not OperationResult.is_applied(pending_opg):

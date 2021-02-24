@@ -1,5 +1,6 @@
 import requests
 import simplejson as json
+from typing import Optional
 from functools import lru_cache
 from binascii import hexlify
 from datetime import datetime
@@ -69,23 +70,25 @@ class ShellQuery(RpcQuery, path=''):
         """
         return self.chains.main.mempool
 
-    def wait_next_block(self, block_hash=None):
+    def wait_next_block(self, block_hash=None, time_between_blocks: Optional[int] = None):
         """ Wait until next block is finalized.
 
         :param block_hash: Current block hash (optional). If not set, current head is used.
+        :param time_between_blocks: override the corresponding parameter from constants
         """
-        block_time = int(self.block.context.constants()["time_between_blocks"][0])
+        if time_between_blocks is None:
+            time_between_blocks = int(self.block.context.constants()["time_between_blocks"][0])
         header = self.head.header()
         if block_hash is None:
             block_hash = header['hash']
 
         prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
         elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
-        delay_sec = 0 if elapsed_sec > block_time else block_time - elapsed_sec
+        delay_sec = 0 if elapsed_sec > time_between_blocks else time_between_blocks - elapsed_sec
         print(f'Wait {delay_sec} seconds until block {block_hash} is finalized')
         sleep(delay_sec)
 
-        for i in range(block_time):
+        for i in range(time_between_blocks):
             current_block_hash = self.head.hash()
             if current_block_hash == block_hash:
                 sleep(1)

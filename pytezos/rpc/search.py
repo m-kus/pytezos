@@ -90,18 +90,18 @@ class BlockSliceQuery(RpcQuery):
     def __call__(self) -> list:
         """ Get block hashes (base58) for this interval.
         """
+        header = self._getitem(self._stop).header()
         if is_bh(self._stop):
             head = self._stop
         else:
-            head = self._getitem(self._stop).hash()
+            head = header['hash']
 
         if self._start < 0:
             length = abs(self._start)
         else:
-            header = self._getitem(self._stop).header()
             length = header['level'] - self._start + 1
 
-        return super(BlockSliceQuery, self).__call__(length=length, head=head)
+        return super(BlockSliceQuery, self).__call__(length=min(header['level'], length), head=head)
 
     def get_range(self):
         """ Get block level range.
@@ -109,7 +109,7 @@ class BlockSliceQuery(RpcQuery):
         def get_level(x):
             if isinstance(x, int):
                 if x < 0:
-                    return self.head.level() + x
+                    return max(0, self.head.level() + x)
                 elif x > 0:
                     return x
                 else:

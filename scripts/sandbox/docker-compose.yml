@@ -6,4 +6,4 @@ services:
     ports:
       - 127.0.0.1:8732:8732
 # tezos-client import secret key activator unencrypted:edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6
-# tezos-client -block genesis activate protocol PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq with fitness 1 and key activator and parameters /sandbox/parameters.json
+# tezos-client -block genesis activate protocol PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq with fitness 1 and key activator and parameters /home/tezos/sandbox/parameters.json

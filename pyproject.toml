@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "pytezos"
-version = "3.0.1"
+version = "3.0.2"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]
 readme = "README.md"
 repository = "https://github.com/baking-bad/pytezos"
 homepage = "https://pytezos.org"
-keywords = ['tezos', 'crypto', 'blockchain', 'xtz']
+keywords = ['tezos', 'blockchain', 'sdk', 'michelson', 'repl', 'cryptocurrencies', 'smart-contracts']
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -16,7 +16,6 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-wheel = "*"
 pyblake2 = "^1.1.2"
 base58 = "^1.0.3"
 requests = "^2.21.0"
@@ -48,8 +47,8 @@ sphinx-sitemap = "*"
 sphinxcontrib-googleanalytics = "^0.1"
 
 [tool.poetry.scripts]
-pytezos = 'pytezos:cli.main'
+pytezos = 'pytezos:cli.cli.main'
 
 [build-system]
-requires = ["poetry_core>=1.0.0", "cryptography==3.3.2"]
+requires = ["poetry_core>=1.0.0", "cryptography==3.3.2", "wheel"]
 build-backend = "poetry.core.masonry.api"
