@@ -3,8 +3,8 @@ from pytezos.operation.forge import forge_operation
 hard_gas_limit_per_operation = 1040000
 hard_storage_limit_per_operation = 60000
 minimal_fees = 100
-minimal_nanotez_per_byte = 1
-minimal_nanotez_per_gas_unit = .1
+minimal_mutez_per_byte = 1
+minimal_mutez_per_gas_unit = .1
 
 
 def calculate_fee(content: dict, consumed_gas: int, extra_size: int, reserve=10) -> int:
@@ -17,8 +17,8 @@ def calculate_fee(content: dict, consumed_gas: int, extra_size: int, reserve=10)
     """
     size = len(forge_operation(content)) + extra_size
     fee = minimal_fees \
-        + minimal_nanotez_per_byte * size \
-        + int(minimal_nanotez_per_gas_unit * consumed_gas)
+        + minimal_mutez_per_byte * size \
+        + int(minimal_mutez_per_gas_unit * consumed_gas)
     return fee + reserve
 
 
