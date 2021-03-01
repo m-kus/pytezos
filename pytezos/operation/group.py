@@ -188,18 +188,14 @@ class OperationGroup(ContextMixin, ContentMixin):
     ) -> 'OperationGroup':
         """Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
-        :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100). Conflicts with `gas_limit` argument.
+        :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
         :param counter: Override counter value (for manual handling)
         :param branch_offset: Select head~offset block as branch, where offset is in range (0, 60)
         :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
-        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of operation dry-run. Conflicts with `gas_reserve` argument.
+        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of operation dry-run.
         :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depeding on results of operation dry-run.
         :rtype: OperationGroup
         """
-        if gas_reserve is not None and gas_limit is not None:
-            # FIXME: Which exception class?
-            raise Exception("Either `gas_reserve` or `gas_limit` could be specified")
-
         opg = self.fill(counter=counter, branch_offset=branch_offset)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
