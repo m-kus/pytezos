@@ -1,5 +1,5 @@
 from pprint import pformat
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 
 from pytezos.crypto.key import blake2b_32
 from pytezos.operation.content import ContentMixin
@@ -9,10 +9,14 @@ from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.forge import forge_base58
-from pytezos.context.mixin import ContextMixin
-from pytezos.context.impl import ExecutionContext
+from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.jupyter import get_class_docstring
 
+DEFAULT_GAS_RESERVE = 100
+DEFAULT_BRANCH_OFFSET = 50
+
+# FIXME: Add explaination of these values
 validation_passes = {
     'endorsement': 0,
     'proposal': 1,
@@ -33,8 +37,15 @@ class OperationGroup(ContextMixin, ContentMixin):
     and also useful helpers for filling with precise fees, signing, forging, and injecting.
     """
 
-    def __init__(self, context: ExecutionContext,
-                 contents=None, protocol=None, chain_id=None, branch=None, signature=None):
+    def __init__(
+        self,
+        context: ExecutionContext,
+        contents: Optional[List[Dict[str, Any]]] = None,
+        protocol: Optional[str] = None,
+        chain_id: Optional[int] = None,
+        branch: Optional[str] = None,
+        signature: Optional[str] = None,
+    ):
         super(OperationGroup, self).__init__(context=context)
         self.contents = contents or []
         self.protocol = protocol
@@ -166,32 +177,59 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return local_data
 
-    def autofill(self, gas_reserve=100, counter: Optional[int] = None, branch_offset=50):
-        """ Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
+    def autofill(
+        self,
+        gas_reserve: int = DEFAULT_GAS_RESERVE,
+        counter: Optional[int] = None,
+        branch_offset: int = DEFAULT_BRANCH_OFFSET,
+        fee: Optional[int] = None,
+        gas_limit: Optional[int] = None,
+        storage_limit: Optional[int] = None,
+    ) -> 'OperationGroup':
+        """Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
-        :param gas_reserve: Add a safe reserve for gas limit (default is 100)
+        :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100). Conflicts with `gas_limit` argument.
         :param counter: Override counter value (for manual handling)
-        :param branch_offset: select head~offset block as branch, where offset is in range (0, 60)
+        :param branch_offset: Select head~offset block as branch, where offset is in range (0, 60)
+        :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
+        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of operation dry-run. Conflicts with `gas_reserve` argument.
+        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depeding on results of operation dry-run.
         :rtype: OperationGroup
         """
+        if gas_reserve is not None and gas_limit is not None:
+            # FIXME: Which exception class?
+            raise Exception("Either `gas_reserve` or `gas_limit` could be specified")
+
         opg = self.fill(counter=counter, branch_offset=branch_offset)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
-        extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature)
+        extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
 
-        def fill_content(content):
-            if validation_passes[content['kind']] == 3:
-                consumed_gas = OperationResult.consumed_gas(content) + gas_reserve
-                paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
-                burned = OperationResult.burned(content)
-                fee = calculate_fee(content, consumed_gas, extra_size)
-                content.update(
-                    gas_limit=str(consumed_gas + gas_reserve),
-                    storage_limit=str(paid_storage_size_diff + burned),
-                    fee=str(fee)
-                )
+        def fill_content(content: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            if validation_passes[content['kind']] != 3:
+                return None
+
+            if fee is None or gas_limit is None:
+                _consumed_gas = OperationResult.consumed_gas(content) + gas_reserve
+
+                if fee is None:
+                    fee = calculate_fee(content, _consumed_gas, extra_size)
+
+                if gas_limit is None:
+                    gas_limit = _consumed_gas + gas_reserve
+
+            if storage_limit is None:
+                _paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
+                _burned = OperationResult.burned(content)
+                storage_limit = _paid_storage_size_diff + _burned
+
+            content.update(
+                gas_limit=str(gas_limit),
+                storage_limit=str(storage_limit),
+                fee=str(fee),
+            )
 
             content.pop('metadata')
             return content
