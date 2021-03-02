@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Optional, Tuple
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.context.abstract import get_originated_address
+from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.michelson.micheline import get_script_section
@@ -98,8 +97,22 @@ class ExecutionContext(AbstractContext):
 
     def get_counter(self) -> int:
         if self.counter is None:
-            assert self.key, f'key is undefined'
-            self.counter = int(self.shell.contracts[self.key.public_key_hash()]()['counter'])  # type: ignore
+            if not self.key:
+                raise Exception('key is undefined')
+            if not self.shell:
+                raise Exception('shell is undefined')
+
+            key_hash = self.key.public_key_hash()
+            self.counter = int(self.shell.contracts[key_hash]()['counter'])
+
+            # NOTE: Ensure counter won't be duplicated
+            mempool_counters = []
+            for opg in self.shell.mempool.pending_operations:
+                if opg.content['source'] == key_hash:
+                    mempool_counters.append(opg.content['counter'])
+            if self.counter + 1 in mempool_counters:
+                self.counter = max(mempool_counters)
+
         self.counter += 1
         return self.counter
 
@@ -140,7 +153,7 @@ class ExecutionContext(AbstractContext):
         assert amount <= balance, f'cannot spend {amount} tez, {balance} tez left'
         self.balance_update -= amount
 
-    def get_parameter_expr(self, address=None):
+    def get_parameter_expr(self, address=None) -> Optional[str]:
         if self.shell and address:
             if address == get_originated_address(0):
                 return None  # dummy callback
