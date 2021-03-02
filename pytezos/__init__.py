@@ -21,5 +21,6 @@ from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.types.core import Unit
 from pytezos.michelson.types.base import Undefined, MichelsonType
 from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.logging import logger
 
 pytezos = PyTezosClient()

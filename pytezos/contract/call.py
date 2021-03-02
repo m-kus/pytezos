@@ -4,6 +4,7 @@ from typing import Union
 from deprecation import deprecated
 
 from pytezos.contract.result import ContractCallResult
+from pytezos.logging import logger
 from pytezos.operation.group import OperationGroup
 from pytezos.jupyter import get_class_docstring
 from pytezos.context.mixin import ContextMixin
@@ -119,7 +120,7 @@ class ContractCall(ContextMixin):
             address=self_address
         )
         if error:
-            print('\n'.join(stdout))
+            logger.debug('\n'.join(stdout))
             raise error
         res = {
             'operations': operations,
@@ -207,6 +208,6 @@ class ContractCall(ContextMixin):
             context=self.context
         )
         if error:
-            print('\n'.join(stdout))
+            logger.debug('\n'.join(stdout))
             raise error
         return res

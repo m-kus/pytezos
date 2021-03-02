@@ -1,9 +1,10 @@
 from glob import glob
 from os.path import abspath, dirname, join, exists
-from pprint import pprint
+from pprint import pformat
 import fire
 
 from pytezos import pytezos, ContractInterface
+from pytezos.logging import logger
 from pytezos.rpc.errors import RpcError
 from pytezos.operation.result import OperationResult
 from pytezos.context.mixin import default_network
@@ -46,9 +47,9 @@ class PyTezosCli:
         """
         contract = get_contract(path)
         if action == 'schema':
-            print(generate_pydoc(type(contract.storage.data), title='storage'))
+            logger.info(generate_pydoc(type(contract.storage.data), title='storage'))
         elif action == 'default':
-            pprint(contract.storage.dummy())
+            logger.info(pformat(contract.storage.dummy()))
         else:
             assert False, action
 
@@ -60,7 +61,7 @@ class PyTezosCli:
         """
         contract = get_contract(path)
         if action == 'schema':
-            print(contract.parameter.__doc__)
+            logger.info(contract.parameter.__doc__)
         else:
             assert False, action
 
@@ -71,32 +72,32 @@ class PyTezosCli:
         :param network: Default is Babylonnet
         """
         ptz = pytezos.using(key=path, shell=network)
-        print(f'Activating {ptz.key.public_key_hash()} in the {network}')
+        logger.info('Activating %s in the %s' % ptz.key.public_key_hash(), network)
 
         if ptz.balance() == 0:
             try:
                 opg = ptz.activate_account().autofill().sign()
-                print(f'Injecting activation operation:')
-                pprint(opg.json_payload())
+                logger.info('Injecting activation operation:')
+                logger.info(pformat(opg.json_payload()))
                 opg.inject(_async=False)
             except RpcError as e:
-                pprint(e)
+                logger.critical(pformat(e))
                 exit(-1)
             else:
-                print(f'Activation succeeded! Claimed balance: {ptz.balance()} ꜩ')
+                logger.info('Activation succeeded! Claimed balance: %s ꜩ' % ptz.balance())
         else:
-            print('Already activated')
+            logger.info('Already activated')
 
         try:
             opg = ptz.reveal().autofill().sign()
-            print(f'Injecting reveal operation:')
-            pprint(opg.json_payload())
+            logger.info('Injecting reveal operation:')
+            logger.info(pformat(opg.json_payload()))
             opg.inject(_async=False)
         except RpcError as e:
-            pprint(e)
+            logger.critical(pformat(e))
             exit(-1)
         else:
-            print(f'Your key {ptz.key.public_key_hash()} is now active and revealed')
+            logger.info('Your key %s is now active and revealed' % ptz.key.public_key_hash())
 
     def deploy(self, path, storage=None, network=default_network, key=None,
                github_repo_slug=None, github_oauth_token=None, dry_run=False):
@@ -111,38 +112,38 @@ class PyTezosCli:
         :param dry_run: Set this flag if you just want to see what would happen
         """
         ptz = pytezos.using(shell=network, key=key)
-        print(f'Deploying contract using {ptz.key.public_key_hash()} in the {network}')
+        logger.info('Deploying contract using %s in the %s' % ptz.key.public_key_hash(), network)
 
         contract = get_contract(path)
         try:
             opg = ptz.origination(script=contract.script(initial_storage=storage)).autofill().sign()
-            print(f'Injecting origination operation:')
-            pprint(opg.json_payload())
+            logger.info('Injecting origination operation:')
+            logger.info(pformat(opg.json_payload()))
 
             if dry_run:
-                pprint(opg.preapply())
+                logger.info(pformat(opg.preapply()))
                 exit(0)
             else:
                 opg = opg.inject(_async=False)
         except RpcError as e:
-            pprint(e)
+            logger.critical(pformat(e))
             exit(-1)
         else:
             originated_contracts = OperationResult.originated_contracts(opg)
             assert len(originated_contracts) == 1
             bcd_link = make_bcd_link(network, originated_contracts[0])
-            print(f'Contract was successfully deployed: {bcd_link}')
+            logger.info('Contract was successfully deployed: %s' % bcd_link)
 
             if github_repo_slug:
                 deployment = create_deployment(github_repo_slug, github_oauth_token,
                                                environment=network)
-                pprint(deployment)
+                logger.info(pformat(deployment))
                 status = create_deployment_status(github_repo_slug, github_oauth_token,
                                                   deployment_id=deployment['id'],
                                                   state='success',
                                                   environment=network,
                                                   environment_url=bcd_link)
-                pprint(status)
+                logger.info(status)
 
 
 def main():
