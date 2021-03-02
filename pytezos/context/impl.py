@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from pprint import pprint
+from typing import Any, Dict, Optional, Tuple
 
 from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 from pytezos.crypto.encoding import base58_encode
@@ -103,15 +104,28 @@ class ExecutionContext(AbstractContext):
                 raise Exception('shell is undefined')
 
             key_hash = self.key.public_key_hash()
-            self.counter = int(self.shell.contracts[key_hash]()['counter'])
 
+            def get_last_operation_counter(mempool: Dict[str, Any]) -> Optional[int]:
+                counter = 0
+                for status, operations in mempool.items():
+                    for operation in operations:
+                        if isinstance(operation, list):
+                            operation = operation[1]
+                        for content in operation.get('contents', []):
+                            if content.get('source') == key_hash:
+                                print(f"counter {counter} => ")
+                                counter = max(counter, int(content.get('counter')))
+                                print(counter)
+                return counter
+
+            self.counter = int(self.shell.contracts[key_hash]()['counter'])
+            print(f"{self.counter=}")
             # NOTE: Ensure counter won't be duplicated
-            mempool_counters = []
-            for opg in self.shell.mempool.pending_operations:
-                if opg.content['source'] == key_hash:
-                    mempool_counters.append(opg.content['counter'])
-            if self.counter + 1 in mempool_counters:
-                self.counter = max(mempool_counters)
+            mempool = self.shell.mempool.pending_operations()
+            pprint(mempool)
+            self.counter = max(self.counter, get_last_operation_counter(mempool))
+            print(f"{self.counter=}")
+
 
         self.counter += 1
         return self.counter
