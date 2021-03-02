@@ -133,7 +133,10 @@ class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
     def level(self) -> int:
         """ Get level for this block from metadata.
         """
-        return self.metadata()['level']['level']
+        try:
+            return self.metadata()['level']['level']
+        except KeyError as exc:
+            raise Exception('Can\'t get block level from metadata. It seems like node is not fully initialized yet.') from exc
 
     def cycle(self) -> int:
         """ Get cycle for this block from metadata.
