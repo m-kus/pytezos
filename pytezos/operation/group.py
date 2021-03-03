@@ -1,5 +1,6 @@
-from pprint import pformat
-from typing import Any, Dict, List, Optional
+from deprecation import deprecated
+from pprint import pformat, pprint
+from typing import List, Optional, Any, Dict
 
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
@@ -306,6 +307,11 @@ class OperationGroup(ContextMixin, ContentMixin):
         hash_digest = blake2b_32(self.binary_payload()).digest()
         return base58_encode(hash_digest, b'o').decode()
 
+    def run_operation(self):
+        # TODO: Docstring
+        return self.shell.blocks['head'].helpers.scripts.run_operation.post(self.json_payload())
+
+    @deprecated(deprecated_in='3.1.0', removed_in='4.0.0', details='use `run_operation()` instead')
     def preapply(self):
         """Preapply signed operation group.
 
@@ -314,7 +320,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         if not self.signature:
             raise ValueError('Not signed')
 
-        return self.shell.head.helpers.preapply.operations.post(operations=[self.json_payload()])[0]
+        return self.run_operation()
 
     def inject(
         self,
@@ -386,6 +392,7 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         raise TimeoutError(f'Operation {opg_hash} got {confirmations} confirmations in {num_blocks_wait} blocks')
 
+    @deprecated(deprecated_in='3.1.0', removed_in='4.0.0', details='use `run_operation()` instead')
     def result(self) -> List[OperationResult]:
         """Parse the preapply result.
 
