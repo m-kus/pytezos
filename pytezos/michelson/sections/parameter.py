@@ -4,12 +4,12 @@ from pytezos.michelson.types.base import MichelsonType, parse_name
 from pytezos.michelson.types import OrType
 from pytezos.michelson.types.core import Unit
 from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.types.adt import wrap_parameters
 
 
 class ParameterSection(Micheline, prim='parameter', args_len=1):
-    args: List[Type[MichelsonType]]
+    args: List[Type[MichelsonType]]  # type: ignore
     root_name: str
 
     def __init__(self, item: MichelsonType):
@@ -34,18 +34,17 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
                     args: List[Union[Type['Micheline'], Any]],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['ParameterSection']:
-        root_name = parse_name(annots, prefix='%')
+        root_name = parse_name(annots, prefix='%')  # type: ignore
         root_type = args[0]
         if issubclass(root_type, OrType):
             if not root_name:
-                root_name = root_type.field_name
+                root_name = root_type.field_name  # type: ignore
             if not root_name:
-                flat_args = root_type.get_flat_args(entrypoints=True)
+                flat_args = root_type.get_flat_args(entrypoints=True)  # type: ignore
                 assert isinstance(flat_args, dict), f'expected a named type, got {flat_args}'
                 root_name = 'root' if 'default' in flat_args else 'default'
         else:
-            assert args[0].field_name is None, \
-                f'only top-or can be annotated, got ({args[0].prim} %{args[0].field_name})'
+            assert args[0].field_name is None, f'only top-or can be annotated, got ({args[0].prim} %{args[0].field_name})'  # type: ignore
             if not root_name:
                 root_name = 'default'
         res = type(cls.__name__, (cls,), dict(args=args, root_name=root_name, **kwargs))
@@ -82,8 +81,8 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             root_type = cls.args[0]
             assert issubclass(root_type, OrType), f'expected `{cls.root_name}`, got `{entrypoint}`'
             _, key_to_path, _ = root_type.get_type_layout(entrypoints=True)
-            assert entrypoint in key_to_path, f'unexpected entrypoint `{entrypoint}`'
-            val_expr = wrap_parameters(parameters['value'], key_to_path[entrypoint])
+            assert entrypoint in key_to_path, f'unexpected entrypoint `{entrypoint}`'  # type: ignore
+            val_expr = wrap_parameters(parameters['value'], key_to_path[entrypoint])  # type: ignore
             item = root_type.from_micheline_value(val_expr)
             return cls(item)
 
@@ -98,7 +97,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
 
     @classmethod
     def generate_pydoc(cls) -> str:
-        definitions = []
+        definitions = []  # type: ignore
         res = cls.args[0].generate_pydoc(definitions, cls.prim)
         if res != f'${cls.prim}':
             definitions.insert(0, (cls.prim, res))
@@ -143,7 +142,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         self.item.attach_context(context, big_map_copy=True)
 
     def aggregate_lazy_diff(self, mode='readable') -> List[dict]:
-        lazy_diff = []
+        lazy_diff = []  # type: ignore
         self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
         return lazy_diff
 

@@ -2,7 +2,7 @@ from typing import Optional, Tuple, Generator, List, Type
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, Micheline, MichelineSequence
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class EltLiteral(Micheline, prim='Elt', args_len=2):
@@ -28,7 +28,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
     @staticmethod
     def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'MapType':
         cls = MapType.create_type(args=[key_type, val_type])
-        return cls(items=[])
+        return cls(items=[])  # type: ignore
 
     @staticmethod
     def from_items(items: List[Tuple[MichelsonType, MichelsonType]]) -> 'MapType':
@@ -38,8 +38,8 @@ class MapType(MichelsonType, prim='map', args_len=2):
             key_type.assert_type_equal(type(key))
             val_type.assert_type_equal(type(val))
         cls = MapType.create_type(args=[key_type, val_type])
-        cls.check_constraints(items)
-        return cls(items=items)
+        cls.check_constraints(items)  # type: ignore
+        return cls(items=items)  # type: ignore
 
     @classmethod
     def check_constraints(cls, items: List[Tuple[MichelsonType, MichelsonType]]):

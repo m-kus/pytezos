@@ -7,7 +7,7 @@ from pytezos.operation.group import OperationGroup
 from pytezos.operation.content import ContentMixin
 from pytezos.contract.interface import ContractInterface
 from pytezos.contract.call import ContractCall
-from pytezos.context.mixin import ContextMixin
+from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.jupyter import get_class_docstring
 
 

@@ -2,7 +2,7 @@ from pprint import pformat
 from typing import Optional
 
 from pytezos.contract.call import ContractCall
-from pytezos.context.mixin import ContextMixin, ExecutionContext
+from pytezos.context.mixin import ContextMixin, ExecutionContext  # type: ignore
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import michelson_to_micheline

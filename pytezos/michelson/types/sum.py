@@ -2,7 +2,7 @@ from typing import Generator, Tuple, Optional, List, Union, Type, cast
 
 from pytezos.michelson.types.base import MichelsonType, Undefined, undefined
 from pytezos.michelson.micheline import parse_micheline_value, Micheline
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_or
 from pytezos.michelson.types.core import Unit, UnitType
 
@@ -26,21 +26,21 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
         return f'({" + ".join(map(repr, self.items))})'
 
     def __iter__(self) -> Generator[Optional[MichelsonType], None, None]:
-        yield from self.items
+        yield from self.items  # type: ignore
 
-    def __eq__(self, other: 'OrType'):
+    def __eq__(self, other: 'OrType'):  # type: ignore
         return all(
             item == other.items[i]
             for i, item in enumerate(self.items)
         )
 
-    def __lt__(self, other: 'OrType'):
+    def __lt__(self, other: 'OrType'):  # type: ignore
         if self.is_left() and other.is_right():
             return True
         elif self.is_left() and other.is_left():
-            return self.items[0] < other.items[0]
+            return self.items[0] < other.items[0]  # type: ignore
         elif self.is_right() and other.is_right():
-            return self.items[1] < other.items[1]
+            return self.items[1] < other.items[1]  # type: ignore
         else:
             return False
 
@@ -72,7 +72,7 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
             if issubclass(arg, OrType):
                 if entrypoints and arg.field_name:
                     yield path + str(i), arg
-                yield from arg.iter_type_args(entrypoints=entrypoints, path=path + str(i))
+                yield from arg.iter_type_args(entrypoints=entrypoints, path=path + str(i))  # type: ignore
             elif entrypoints is False or arg.field_name:
                 yield path + str(i), arg
 
@@ -159,9 +159,9 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
 
     def to_literal(self) -> Type[Micheline]:
         if self.is_left():
-            return LeftLiteral.create_type(args=[self.items[0].to_literal()])
+            return LeftLiteral.create_type(args=[self.items[0].to_literal()])  # type: ignore
         else:
-            return RightLiteral.create_type(args=[self.items[1].to_literal()])
+            return RightLiteral.create_type(args=[self.items[1].to_literal()])  # type: ignore
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         for i, prim in enumerate(['Left', 'Right']):
@@ -175,7 +175,7 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
             f'sum type has to be named (in the scope of PyTezos)'
         entrypoint = next(iter(flat_values))
         if self.is_enum:
-            return entrypoint
+            return entrypoint  # type: ignore
         else:
             py_obj = flat_values[entrypoint].to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
             return (entrypoint, py_obj) if comparable else {entrypoint: py_obj}
@@ -183,12 +183,12 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'OrType':
         items = tuple(item.merge_lazy_diff(lazy_diff) if isinstance(item, MichelsonType) else item
                       for item in self.items)
-        return type(self)(items)
+        return type(self)(items)  # type: ignore
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         items = tuple(item.aggregate_lazy_diff(lazy_diff, mode=mode) if isinstance(item, MichelsonType) else item
                       for item in self.items)
-        return type(self)(items)
+        return type(self)(items)  # type: ignore
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):
         for item in self:

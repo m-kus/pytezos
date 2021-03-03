@@ -7,7 +7,7 @@ from pytezos.michelson.instructions.base import MichelsonInstruction, format_std
 from pytezos.michelson.types import MichelsonType, LambdaType, PairType, BoolType, ListType, OrType, OptionType, \
     MapType, SetType
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.instructions.base import Wildcard
 
 
@@ -29,8 +29,8 @@ class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        depth = cls.args[0].get_int()
-        item = execute_dip(cls.prim, stack, stdout, count=depth, body=cls.args[1], context=context)
+        depth = cls.args[0].get_int()  # type: ignore
+        item = execute_dip(cls.prim, stack, stdout, count=depth, body=cls.args[1], context=context)  # type: ignore
         return cls(item)
 
 
@@ -42,7 +42,7 @@ class DipInstruction(MichelsonInstruction, prim='DIP', args_len=1):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        item = execute_dip(cls.prim, stack, stdout, count=1, body=cls.args[0], context=context)
+        item = execute_dip(cls.prim, stack, stdout, count=1, body=cls.args[0], context=context)  # type: ignore
         return cls(item)
 
 
@@ -51,9 +51,9 @@ class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         lambda_type = LambdaType.create_type(args=cls.args[:2])
-        res = lambda_type(cls.args[2])
+        res = lambda_type(cls.args[2])  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
 
 
 class ExecInstruction(MichelsonInstruction, prim='EXEC'):
@@ -67,7 +67,7 @@ class ExecInstruction(MichelsonInstruction, prim='EXEC'):
         param, lambda_ = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
         assert isinstance(lambda_, LambdaType), f'expected lambda, got {lambda_.prim}'
         param.assert_type_equal(lambda_.args[0])
-        stdout.append(format_stdout(cls.prim, [param, lambda_], []))
+        stdout.append(format_stdout(cls.prim, [param, lambda_], []))  # type: ignore
         lambda_stack = MichelsonStack.from_items([param])
         lambda_body = cast(MichelsonInstruction, lambda_.value)
         item = lambda_body.execute(lambda_stack, stdout, context=context)
@@ -93,9 +93,9 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
             PairInstruction,
             lambda_.value
         ])
-        res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)
+        res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [left, lambda_], [res]))
+        stdout.append(format_stdout(cls.prim, [left, lambda_], [res]))  # type: ignore
         return cls()
 
 
@@ -118,7 +118,7 @@ class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         cond = cast(BoolType, stack.pop1())
         cond.assert_type_equal(BoolType)
-        stdout.append(format_stdout(cls.prim, [cond], []))
+        stdout.append(format_stdout(cls.prim, [cond], []))  # type: ignore
         branch = cls.args[0] if bool(cond) else cls.args[1]
         item = branch.execute(stack, stdout, context=context)
         return cls(item)
@@ -138,10 +138,10 @@ class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
             head, tail = lst.split_head()
             stack.push(tail)
             stack.push(head)
-            stdout.append(format_stdout(cls.prim, [lst], [head, tail]))
+            stdout.append(format_stdout(cls.prim, [lst], [head, tail]))  # type: ignore
             branch = cls.args[0]
         else:
-            stdout.append(format_stdout(cls.prim, [lst], []))
+            stdout.append(format_stdout(cls.prim, [lst], []))  # type: ignore
             branch = cls.args[1]
         item = branch.execute(stack, stdout, context=context)
         return cls(item)
@@ -160,7 +160,7 @@ class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
         branch = cls.args[0] if or_.is_left() else cls.args[1]
         res = or_.resolve()
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [or_], [res]))
+        stdout.append(format_stdout(cls.prim, [or_], [res]))  # type: ignore
         item = branch.execute(stack, stdout, context=context)
         return cls(item)
 
@@ -177,11 +177,11 @@ class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
         opt.assert_type_in(OptionType)
         if opt.is_none():
             branch = cls.args[0]
-            stdout.append(format_stdout(cls.prim, [opt], []))
+            stdout.append(format_stdout(cls.prim, [opt], []))  # type: ignore
         else:
             some = opt.get_some()
             stack.push(some)
-            stdout.append(format_stdout(cls.prim, [opt], [some]))
+            stdout.append(format_stdout(cls.prim, [opt], [some]))  # type: ignore
             branch = cls.args[1]
         item = branch.execute(stack, stdout, context=context)
         return cls(item)
@@ -199,7 +199,7 @@ class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
         while True:
             cond = cast(BoolType, stack.pop1())
             cond.assert_type_equal(BoolType)
-            stdout.append(format_stdout(cls.prim, [cond], []))
+            stdout.append(format_stdout(cls.prim, [cond], []))  # type: ignore
             if bool(cond):
                 item = cls.args[0].execute(stack, stdout, context=context)
                 items.append(item)
@@ -222,7 +222,7 @@ class LoopLeftInstruction(MichelsonInstruction, prim='LOOP_LEFT', args_len=1):
             or_.assert_type_in(OrType)
             var = or_.resolve()
             stack.push(var)
-            stdout.append(format_stdout(cls.prim, [or_], [var]))
+            stdout.append(format_stdout(cls.prim, [or_], [var]))  # type: ignore
             if or_.is_left():
                 item = cls.args[0].execute(stack, stdout, context=context)
                 items.append(item)
@@ -245,24 +245,24 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
-                elt = PairType.from_comb(list(elt))
-            stack.push(elt)
-            stdout.append(format_stdout(cls.prim, popped, [elt]))
+                elt = PairType.from_comb(list(elt))  # type: ignore
+            stack.push(elt)  # type: ignore
+            stdout.append(format_stdout(cls.prim, popped, [elt]))  # type: ignore
             execution = cls.args[0].execute(stack, stdout, context=context)
             executions.append(execution)
             new_elt = stack.pop1()
             if isinstance(src, MapType):
                 items.append((elt[0], new_elt))
             else:
-                items.append(new_elt)
-            popped = [new_elt]
+                items.append(new_elt)  # type: ignore
+            popped = [new_elt]  # type: ignore
 
         if items:
-            res = type(src).from_items(items)
+            res = type(src).from_items(items)  # type: ignore
         else:
             res = src  # TODO: need to deduce argument types
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, popped, [res]))
+        stdout.append(format_stdout(cls.prim, popped, [res]))  # type: ignore
         return cls(executions)
 
 
@@ -279,9 +279,9 @@ class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
-                elt = PairType.from_comb(list(elt))
-            stack.push(elt)
-            stdout.append(format_stdout(cls.prim, popped, [elt]))
+                elt = PairType.from_comb(list(elt))  # type: ignore
+            stack.push(elt)  # type: ignore
+            stdout.append(format_stdout(cls.prim, popped, [elt]))  # type: ignore
             execution = cls.args[0].execute(stack, stdout, context=context)
             executions.append(execution)
             popped = []

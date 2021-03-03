@@ -10,7 +10,7 @@ from pytezos.michelson.types.base import MichelsonType, Undefined
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.context.abstract import AbstractContext, get_originated_address
+from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 
 
 class TimestampType(IntType, prim='timestamp'):
@@ -78,7 +78,7 @@ class AddressType(StringType, prim='address'):
     def __repr__(self):
         return f'{self.value[:6]}⋯{self.value[-3:]}'
 
-    def __lt__(self, other: 'AddressType') -> bool:
+    def __lt__(self, other: 'AddressType') -> bool:  # type: ignore
         if is_pkh(self.value) and is_kt(other.value):
             return True
         elif is_kt(self.value) and is_pkh(other.value):

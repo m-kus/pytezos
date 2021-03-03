@@ -7,7 +7,7 @@ from pytezos.michelson.sections import ParameterSection
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types import NatType, ContractType, AddressType, TimestampType, \
     OptionType, KeyHashType, UnitType, MutezType, OperationType, ChainIdType
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
@@ -17,7 +17,7 @@ class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
         amount = context.get_amount()
         res = MutezType.from_value(amount)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -28,7 +28,7 @@ class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
         balance = context.get_balance()
         res = MutezType.from_value(balance)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -39,7 +39,7 @@ class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
         chain_id = context.get_chain_id()
         res = ChainIdType.from_value(chain_id)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -62,9 +62,9 @@ class SelfInstruction(MichelsonInstruction, prim='SELF'):
         assert self_type, f'parameter type is not defined'
         self_address = context.get_self_address()
         res_type = ContractType.create_type(args=[self_type])
-        res = res_type.from_value(f'{self_address}%{entrypoint}')
+        res = res_type.from_value(f'{self_address}%{entrypoint}')  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -74,7 +74,7 @@ class SelfAddressInstruction(MichelsonInstruction, prim='SELF_ADDRESS'):
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         res = AddressType.from_value(context.get_self_address())
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -85,7 +85,7 @@ class SenderInstruction(MichelsonInstruction, prim='SENDER'):
         sender = context.get_sender()
         res = AddressType.from_value(sender)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -96,7 +96,7 @@ class SourceInstruction(MichelsonInstruction, prim='SOURCE'):
         source = context.get_source()
         res = AddressType.from_value(source)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -107,7 +107,7 @@ class NowInstruction(MichelsonInstruction, prim='NOW'):
         now = context.get_now()
         res = TimestampType.from_value(now)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -119,7 +119,7 @@ class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
         contract.assert_type_in(ContractType)
         res = AddressType.from_value(contract.get_address())
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [contract], [res]))
+        stdout.append(format_stdout(cls.prim, [contract], [res]))  # type: ignore
         return cls()
 
 
@@ -137,11 +137,11 @@ class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
                 stdout.append(f'{cls.prim}: skip type checking for {str(address)}')
             else:
                 entrypoint_type.assert_type_equal(cls.args[0])
-            res = OptionType.from_some(contract_type.from_value(f'{str(address)}%{entrypoint}'))
+            res = OptionType.from_some(contract_type.from_value(f'{str(address)}%{entrypoint}'))  # type: ignore
         except AssertionError:
             res = OptionType.none(contract_type)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [address], [res]))
+        stdout.append(format_stdout(cls.prim, [address], [res]))  # type: ignore
         return cls()
 
 
@@ -151,9 +151,9 @@ class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         key_hash = cast(KeyHashType, stack.pop1())
         key_hash.assert_type_equal(KeyHashType)
-        res = ContractType.create_type(args=[UnitType]).from_value(str(key_hash))
+        res = ContractType.create_type(args=[UnitType]).from_value(str(key_hash))  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [key_hash], [res]))
+        stdout.append(format_stdout(cls.prim, [key_hash], [res]))  # type: ignore
         return cls()
 
 
@@ -175,7 +175,7 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
         context.spend_balance(int(amount))
         origination = OperationType.origination(
             source=context.get_self_address(),
-            script=cls.args[0],
+            script=cls.args[0],  # type: ignore
             storage=initial_storage,
             balance=int(amount),
             delegate=None if delegate.is_none() else str(delegate.get_some())
@@ -183,7 +183,7 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
 
         stack.push(originated_address)
         stack.push(origination)
-        stdout.append(format_stdout(cls.prim, [delegate, amount, initial_storage], [origination, originated_address]))
+        stdout.append(format_stdout(cls.prim, [delegate, amount, initial_storage], [origination, originated_address]))  # type: ignore
         return cls()
 
 
@@ -199,7 +199,7 @@ class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
             delegate=None if delegate.is_none() else str(delegate.get_some())
         )
         stack.push(delegation)
-        stdout.append(format_stdout(cls.prim, [delegate], [delegation]))
+        stdout.append(format_stdout(cls.prim, [delegate], [delegation]))  # type: ignore
         return cls()
 
 
@@ -224,7 +224,7 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
             parameter=parameter
         )
         stack.push(transaction)
-        stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))
+        stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))  # type: ignore
         return cls()
 
 
@@ -236,7 +236,7 @@ class VotingPowerInstruction(MichelsonInstruction, prim='VOTING_POWER'):
         address.assert_type_equal(KeyHashType)
         res = NatType.from_value(context.get_voting_power(str(address)))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [address], [res]))
+        stdout.append(format_stdout(cls.prim, [address], [res]))  # type: ignore
         return cls()
 
 
@@ -246,7 +246,7 @@ class TotalVotingPowerInstruction(MichelsonInstruction, prim='TOTAL_VOTING_POWER
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         res = NatType.from_value(context.get_total_voting_power())
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()
 
 
@@ -256,5 +256,5 @@ class LevelInstruction(MichelsonInstruction, prim='LEVEL'):
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         res = NatType.from_value(context.get_level())
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls()

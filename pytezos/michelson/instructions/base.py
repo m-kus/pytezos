@@ -1,6 +1,6 @@
 from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
 
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.stack import MichelsonStack
 
@@ -25,9 +25,9 @@ def format_stdout(prim: str, inputs: list, outputs: list, arg=None):
 def dispatch_types(*args: Type[Micheline],
                    mapping: Dict[Tuple[Type[Micheline], ...], Tuple[Any, ...]]):
     key = tuple(arg.prim for arg in args)
-    mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}
-    assert key in mapping, f'unexpected types `{" * ".join(key)}`'
-    return mapping[key]
+    mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}  # type: ignore
+    assert key in mapping, f'unexpected types `{" * ".join(key)}`'  # type: ignore
+    return mapping[key]  # type: ignore
 
 
 class MichelsonInstruction(Micheline):

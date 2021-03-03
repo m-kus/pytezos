@@ -1,5 +1,5 @@
-import base58
-import strict_rfc3339
+import base58  # type: ignore
+import strict_rfc3339  # type: ignore
 from typing import Tuple
 
 from pytezos.crypto.encoding import base58_encode, base58_decode
@@ -38,7 +38,7 @@ def forge_int(value: int) -> bytes:
     return bytes(res)
 
 
-def unforge_int(data: bytes) -> (int, int):
+def unforge_int(data: bytes) -> (int, int):  # type: ignore
     """ Decode signed unbounded integer from bytes.
 
     :param data: Encoded integer

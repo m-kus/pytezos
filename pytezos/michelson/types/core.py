@@ -3,7 +3,7 @@ from typing import Type
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, parse_micheline_literal, blind_unpack, Micheline, \
     MichelineLiteral
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class unit(object):
@@ -39,10 +39,10 @@ class StringType(MichelsonType, prim='string'):
         super(StringType, self).__init__()
         self.value = value
 
-    def __lt__(self, other: 'StringType'):
+    def __lt__(self, other: 'StringType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'StringType'):
+    def __eq__(self, other: 'StringType'):  # type: ignore
         return self.value == other.value
 
     def __hash__(self):
@@ -98,10 +98,10 @@ class IntType(MichelsonType, prim='int'):
         super(IntType, self).__init__()
         self.value = value
 
-    def __lt__(self, other: 'IntType'):
+    def __lt__(self, other: 'IntType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'IntType'):
+    def __eq__(self, other: 'IntType'):  # type: ignore
         return self.value == other.value
 
     def __hash__(self):
@@ -165,10 +165,10 @@ class BytesType(MichelsonType, prim='bytes'):
         super(BytesType, self).__init__()
         self.value = value
 
-    def __lt__(self, other: 'BytesType'):
+    def __lt__(self, other: 'BytesType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'BytesType'):
+    def __eq__(self, other: 'BytesType'):  # type: ignore
         return self.value == other.value
 
     def __hash__(self):
@@ -231,10 +231,10 @@ class BoolType(MichelsonType, prim='bool'):
         super(BoolType, self).__init__()
         self.value = value
 
-    def __lt__(self, other: 'BoolType'):
+    def __lt__(self, other: 'BoolType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'BoolType'):
+    def __eq__(self, other: 'BoolType'):  # type: ignore
         return self.value == other.value
 
     def __hash__(self):
@@ -282,10 +282,10 @@ class UnitType(MichelsonType, prim='unit'):
     def __init__(self):
         super(UnitType, self).__init__()
 
-    def __lt__(self, other: 'UnitType'):
+    def __lt__(self, other: 'UnitType'):  # type: ignore
         return False
 
-    def __eq__(self, other: 'UnitType'):
+    def __eq__(self, other: 'UnitType'):  # type: ignore
         return True
 
     def __hash__(self):
@@ -320,8 +320,8 @@ class UnitType(MichelsonType, prim='unit'):
 
 class NeverType(MichelsonType, prim='never'):
 
-    def __lt__(self, other: 'NeverType'):
+    def __lt__(self, other: 'NeverType'):  # type: ignore
         return False
 
-    def __eq__(self, other: 'NeverType'):
+    def __eq__(self, other: 'NeverType'):  # type: ignore
         return True

@@ -4,7 +4,7 @@ from functools import update_wrapper
 
 
 def is_interactive():
-    import __main__ as main
+    import __main__ as main  # type: ignore
     return not hasattr(main, '__file__')
 
 

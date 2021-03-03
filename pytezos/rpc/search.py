@@ -23,7 +23,7 @@ def find_state_change_intervals(head: int, last: int, get: Callable, equals: Cal
 
 
 def find_state_change(head: int, last: int, get: Callable, equals: Callable,
-                      pred_value: Any) -> (int, Any):
+                      pred_value: Any) -> (int, Any):  # type: ignore
     def bisect(start: int, end: int):
         if end == start + 1:
             return end, get(end)
@@ -87,7 +87,7 @@ class BlockSliceQuery(RpcQuery):
         else:
             return self._getitem(stop + item + 1)
 
-    def __call__(self) -> list:
+    def __call__(self) -> list:  # type: ignore
         """ Get block hashes (base58) for this interval.
         """
         header = self._getitem(self._stop).header()

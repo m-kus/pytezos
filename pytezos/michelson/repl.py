@@ -2,7 +2,7 @@ from typing import Tuple, List, Optional, Any, cast
 
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParser
-from pytezos.context.impl import ExecutionContext
+from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types import OperationType
@@ -34,7 +34,7 @@ class Interpreter:
             **kwargs
         )
         stack = MichelsonStack()
-        stdout = []
+        stdout = []  # type: ignore
         try:
             program = MichelsonProgram.load(context, with_code=True)
             res = program.instantiate(
@@ -61,7 +61,7 @@ class Interpreter:
             address=context.address
         )
         stack = MichelsonStack()
-        stdout = []
+        stdout = []  # type: ignore
         try:
             program = MichelsonProgram.load(ctx, with_code=True)
             res = program.instantiate(

@@ -18,7 +18,7 @@ def gen_error_variants(error_id) -> list:
 
 
 class RpcError(Exception):
-    __handlers__ = {}
+    __handlers__ = {}  # type: ignore
 
     @classmethod
     def __init_subclass__(cls, error_id=None, **kwargs):

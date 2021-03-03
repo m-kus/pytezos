@@ -17,6 +17,8 @@ jobs:
         sudo apt-get update -q
         sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
         poetry install -v
+    - name: Run lint
+      run: poetry run mypy pytezos
     - name: Run tests
       run: poetry run pytest tests/
     - name: Make docs

@@ -2,7 +2,7 @@ from typing import Generator, Tuple, List, Union, Type, Optional, cast
 
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_pair
 
 
@@ -16,13 +16,13 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         super(PairType, self).__init__()
         self.items = items
 
-    def __eq__(self, other: 'PairType'):
+    def __eq__(self, other: 'PairType'):  # type: ignore
         return all(
             item == other.items[i]
             for i, item in enumerate(self.items)
         )
 
-    def __lt__(self, other: 'PairType'):
+    def __lt__(self, other: 'PairType'):  # type: ignore
         for i, item in enumerate(self.items):
             if item < other.items[i]:
                 return True
@@ -41,10 +41,10 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
     def init(cls, items: List[MichelsonType]) -> 'PairType':
         if len(items) > 2:
             right_cls = cast(Type['PairType'], cls.args[1])
-            items = items[0], right_cls.init(items[1:])
+            items = items[0], right_cls.init(items[1:])  # type: ignore
         else:
-            items = tuple(items)
-        return cls(items)
+            items = tuple(items)  # type: ignore
+        return cls(items)  # type: ignore
 
     @staticmethod
     def from_comb(items: List[MichelsonType]) -> 'PairType':
@@ -67,7 +67,7 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
     def iter_type_args(cls, entrypoints=False, path='') -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
         for i, arg in enumerate(cls.args):
             if issubclass(arg, PairType) and not (arg.field_name or arg.type_name):
-                yield from arg.iter_type_args(path=path + str(i))
+                yield from arg.iter_type_args(path=path + str(i))  # type: ignore
             else:
                 yield path + str(i), arg
 

@@ -1,6 +1,6 @@
 from typing import List, Callable, cast, Tuple, Union
 
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.instructions.base import dispatch_types, format_stdout, MichelsonInstruction
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BoolType, NatType, IntType
@@ -22,7 +22,7 @@ class OrInstruction(MichelsonInstruction, prim='OR'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])
+        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])  # type: ignore
         return cls()
 
 
@@ -30,7 +30,7 @@ class XorInstruction(MichelsonInstruction, prim='XOR'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])
+        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])  # type: ignore
         return cls()
 
 
@@ -47,7 +47,7 @@ class AndInstruction(MichelsonInstruction, prim='AND'):
         })
         res = res_type.from_value(convert(a) & convert(b))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls()
 
 
@@ -63,5 +63,5 @@ class NotInstruction(MichelsonInstruction, prim='NOT'):
         })
         res = res_type.from_value(convert(a))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))
+        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
         return cls()

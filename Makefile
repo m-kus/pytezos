@@ -4,6 +4,9 @@
 debug:
 	pip install . --force --no-deps
 
+lint:
+	mypy pytezos
+
 test:
 	pytest -v .
 

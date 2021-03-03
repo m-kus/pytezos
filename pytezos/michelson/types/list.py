@@ -1,7 +1,7 @@
 from typing import Tuple, Generator, List, Type
 
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, MichelineSequence
 
 
@@ -23,7 +23,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
     @staticmethod
     def empty(item_type: Type[MichelsonType]):
         cls = ListType.create_type(args=[item_type])
-        return cls(items=[])
+        return cls(items=[])  # type: ignore
 
     @staticmethod
     def from_items(items: List[MichelsonType]):
@@ -32,7 +32,7 @@ class ListType(MichelsonType, prim='list', args_len=1):
         for item in items[1:]:
             item_type.assert_type_equal(item.get_anon_type())
         cls = ListType.create_type(args=[item_type])
-        return cls(items)
+        return cls(items)  # type: ignore
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False):

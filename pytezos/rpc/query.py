@@ -55,11 +55,11 @@ def format_docstring(class_type, query_path):
 
 
 class RpcQuery(metaclass=InlineDocstring):
-    __extensions__ = dict()
+    __extensions__ = dict()  # type: ignore
 
     @classmethod
     def __init_subclass__(cls, path: str = '', **kwargs):
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__(**kwargs)  # type: ignore
         if isinstance(path, list):
             for sub_path in path:
                 cls.__extensions__[sub_path] = cls

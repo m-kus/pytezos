@@ -2,7 +2,7 @@ from typing import List, Optional, Type
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import parse_micheline_value, Micheline
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class NoneLiteral(Micheline, prim='None'):
@@ -19,7 +19,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         super(OptionType, self).__init__()
         self.item = item
 
-    def __lt__(self, other: 'OptionType') -> bool:
+    def __lt__(self, other: 'OptionType') -> bool:  # type: ignore
         if other.item is None:
             return False
         elif self.item is None:
@@ -27,8 +27,8 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         else:
             return self.item < other.item
 
-    def __eq__(self, other: 'OptionType') -> bool:
-        return self.item == other.item
+    def __eq__(self, other: 'OptionType') -> bool:  # type: ignore
+        return self.item == other.item  # type: ignore
 
     def __hash__(self):
         return hash(self.item)
@@ -39,12 +39,12 @@ class OptionType(MichelsonType, prim='option', args_len=1):
     @staticmethod
     def none(some_type: Type[MichelsonType]) -> 'OptionType':
         cls = OptionType.create_type(args=[some_type])
-        return cls(None)
+        return cls(None)  # type: ignore
 
     @staticmethod
     def from_some(item: MichelsonType) -> 'OptionType':
         cls = OptionType.create_type(args=[item.get_anon_type()])
-        return cls(item)
+        return cls(item)  # type: ignore
 
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'OptionType':
@@ -77,13 +77,13 @@ class OptionType(MichelsonType, prim='option', args_len=1):
 
     def get_some(self) -> MichelsonType:
         assert not self.is_none()
-        return self.item
+        return self.item  # type: ignore
 
     def to_literal(self) -> Type[Micheline]:
         if self.is_none():
             return NoneLiteral
         else:
-            return SomeLiteral.create_type(args=[self.item.to_literal()])
+            return SomeLiteral.create_type(args=[self.item.to_literal()])  # type: ignore
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if self.is_none():
@@ -101,13 +101,13 @@ class OptionType(MichelsonType, prim='option', args_len=1):
                                               comparable=comparable)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
-        item = None if self.is_none() else self.item.merge_lazy_diff(lazy_diff)
+        item = None if self.is_none() else self.item.merge_lazy_diff(lazy_diff)  # type: ignore
         return type(self)(item)
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'MichelsonType':
-        item = None if self.is_none() else self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
+        item = None if self.is_none() else self.item.aggregate_lazy_diff(lazy_diff, mode=mode)  # type: ignore
         return type(self)(item)
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):
         if not self.is_none():
-            self.item.attach_context(context, big_map_copy=big_map_copy)
+            self.item.attach_context(context, big_map_copy=big_map_copy)  # type: ignore

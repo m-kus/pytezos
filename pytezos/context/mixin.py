@@ -6,7 +6,7 @@ from pytezos.rpc import ShellQuery, RpcNode, RpcMultiNode
 from pytezos.crypto.key import Key, is_installed
 from pytezos.crypto.encoding import is_public_key, is_pkh
 from pytezos.jupyter import InlineDocstring
-from pytezos.context.impl import ExecutionContext
+from pytezos.context.impl import ExecutionContext  # type: ignore
 
 default_network = 'edo2net'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly

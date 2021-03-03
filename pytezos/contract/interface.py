@@ -1,7 +1,7 @@
 import requests
 from os.path import exists, expanduser
 from typing import List, Optional, Union
-from deprecation import deprecated
+from deprecation import deprecated  # type: ignore
 from decimal import Decimal
 
 from pytezos.rpc import ShellQuery
@@ -11,7 +11,7 @@ from pytezos.contract.result import ContractCallResult
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.contract.data import ContractData
-from pytezos.context.mixin import ContextMixin, ExecutionContext
+from pytezos.context.mixin import ContextMixin, ExecutionContext  # type: ignore
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
@@ -206,22 +206,22 @@ class ContractInterface(ContextMixin):
         assert root_name in self.entrypoints, f'root entrypoint is undefined'
         return getattr(self, root_name)
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='access `ContractInterface` directly')
     def contract(self) -> 'ContractInterface':
         return self
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `to_michelson()` instead')
     def text(self) -> str:
         return self.to_michelson()
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `to_micheline()` instead')
     def code(self):
         return self.to_micheline()
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `default()` instead')
     def call(self) -> ContractEntrypoint:
         return self.parameter

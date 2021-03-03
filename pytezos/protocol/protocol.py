@@ -1,10 +1,10 @@
 import io
 import os
 import tarfile
-import netstruct
+import netstruct  # type: ignore
 import requests
 import simplejson as json
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore
 from binascii import hexlify
 from collections import OrderedDict
 from tempfile import TemporaryDirectory
@@ -60,7 +60,7 @@ def url_to_files(url) -> List[Tuple[str, str]]:
 
 
 def files_to_proto(files: List[Tuple[str, str]]) -> dict:
-    components = OrderedDict()
+    components = OrderedDict()  # type: ignore
 
     for filename, text in files:
         name, ext = filename.split('.')

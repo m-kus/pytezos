@@ -3,7 +3,7 @@ from typing import Tuple, List, Optional, Type, cast, Union, Any
 
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.micheline import Micheline
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 type_mappings = {
     'nat': 'int  /* Natural number */',
@@ -53,10 +53,12 @@ class MichelsonType(Micheline):
     type_name: Optional[str] = None
     args: List[Union[Type['MichelsonType'], Any]] = []
 
-    def __lt__(self, other: 'MichelsonType'):  # for sorting
+    # NOTE: for sorting
+    def __lt__(self, other: 'MichelsonType'):
         assert not self.is_comparable(), f'must be implemented for comparable types'
 
-    def __eq__(self, other: 'MichelsonType'):  # for contains
+    # NOTE: for contains
+    def __eq__(self, other: 'MichelsonType'):  # type: ignore
         assert not self.is_comparable(), f'must be implemented for comparable types'
 
     def __getitem__(self, key):
@@ -79,8 +81,8 @@ class MichelsonType(Micheline):
             assert type_args[0].is_comparable(), f'{cls.prim} key type has to be comparable (not {type_args[0].prim})'
         if cls.prim == 'big_map':
             assert type_args[0].is_big_map_friendly(), f'impossible big_map value type'
-        res = type(cls.__name__, (cls,), dict(field_name=parse_name(annots, '%'),
-                                              type_name=parse_name(annots, ':'),
+        res = type(cls.__name__, (cls,), dict(field_name=parse_name(annots, '%'),  # type: ignore
+                                              type_name=parse_name(annots, ':'),  # type: ignore
                                               args=args,
                                               **kwargs))
         return cast(Type['MichelsonType'], res)
@@ -108,7 +110,7 @@ class MichelsonType(Micheline):
         if cls.prim in type_mappings:
             if all(x != cls.prim for x, _ in definitions):
                 definitions.append((cls.prim, type_mappings[cls.prim]))
-        return cls.prim
+        return cls.prim  # type: ignore
 
     @classmethod
     def is_comparable(cls):
@@ -224,7 +226,7 @@ class MichelsonType(Micheline):
 
 
 def generate_pydoc(ty: Type[MichelsonType], title=None):
-    definitions = []
+    definitions = []  # type: ignore
     top_def = ty.generate_pydoc(definitions, inferred_name=title)
     if not top_def.startswith('$'):
         definitions.insert(0, (title or ty.field_name or ty.type_name or 'element', top_def))

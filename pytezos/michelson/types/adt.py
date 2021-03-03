@@ -21,7 +21,7 @@ def get_type_layout(flat_args: List[Tuple[str, Type[MichelsonType]]],
 
     idx_to_path = {i: path for i, path in enumerate(path_to_key)}
     if len(reserved) == 0 and infer_names is False and entrypoints is False:
-        path_to_key = None
+        path_to_key = None  # type: ignore
         key_to_path = None
     else:
         key_to_path = {name: path for path, name in path_to_key.items()}

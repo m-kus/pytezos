@@ -82,7 +82,7 @@ def parse_micheline_value(val_expr, handlers: Dict[Tuple[str, int], Callable]):
     prim, args = val_expr.get('prim'), val_expr.get('args', [])
     expected = ' or '.join(map(lambda x: f'{x[0]} ({x[1]} args)', handlers))
     assert (prim, len(args)) in handlers, f'expected {expected}, got {prim} ({len(args)} args)'
-    handler = handlers[(prim, len(args))]
+    handler = handlers[(prim, len(args))]  # type: ignore
     return handler(args)
 
 
@@ -155,7 +155,7 @@ class Micheline(metaclass=ErrorTrace):
 
     @classmethod
     def __init_subclass__(cls, prim: Optional[str] = None, args_len: Optional[int] = 0, **kwargs):
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__(**kwargs)  # type: ignore
         if prim is not None:
             assert (prim, args_len) not in cls.classes, f'duplicate key {prim} ({args_len} args)'
             cls.classes[(prim, args_len)] = cls
@@ -177,7 +177,7 @@ class Micheline(metaclass=ErrorTrace):
                 prim, args, annots = parse_micheline_prim(expr)
                 args_len = len(args)
                 if (prim, args_len) not in Micheline.classes:
-                    args_len = None
+                    args_len = None  # type: ignore
                 assert (prim, args_len) in Micheline.classes, f'unregistered primitive {prim} ({args_len} args)'
                 cls = Micheline.classes[prim, args_len]
                 try:
@@ -200,7 +200,7 @@ class Micheline(metaclass=ErrorTrace):
                     annots: Optional[list] = None,
                     **kwargs) -> Type['Micheline']:
         res = type(cls.__name__, (cls,), dict(args=args, **kwargs))
-        return cast(Type['MichelsonPrimitive'], res)
+        return cast(Type['MichelsonPrimitive'], res)  # type: ignore
 
     @classmethod
     def assert_type_equal(cls, other: Type['Micheline'], path='', message=''):
@@ -211,7 +211,7 @@ class Micheline(metaclass=ErrorTrace):
         for i, arg in enumerate(other.args):
             cls.args[i].assert_type_equal(arg, path=f'{path}/{i}', message=message)
         assert cls.literal == other.literal, \
-            f'expected {other.literal}, got {cls.literal} at `{path}`{comment}'
+            f'expected {other.literal}, got {cls.literal} at `{path}`{comment}'  # type: ignore
 
     @classmethod
     def assert_type_in(cls, *others: Type['Micheline'], message=''):
@@ -237,7 +237,7 @@ class MichelineSequence(Micheline):
         self.items = items
 
     @classmethod
-    def as_micheline_expr(cls) -> list:
+    def as_micheline_expr(cls) -> list:  # type: ignore
         return [arg.as_micheline_expr() for arg in cls.args]
 
     @classmethod
@@ -264,12 +264,12 @@ class MichelineLiteral(Micheline):
 
     @classmethod
     def get_int(cls) -> int:
-        assert isinstance(cls.literal, int), f'expected int, got {cls.literal}'
+        assert isinstance(cls.literal, int), f'expected int, got {cls.literal}'  # type: ignore
         return cls.literal
 
     @classmethod
     def get_string(cls) -> str:
-        assert isinstance(cls.literal, str), f'expected string, got {cls.literal}'
+        assert isinstance(cls.literal, str), f'expected string, got {cls.literal}'  # type: ignore
         return cls.literal
 
     @classmethod

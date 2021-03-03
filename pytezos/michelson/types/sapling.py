@@ -3,7 +3,7 @@ from typing import Optional, Type, List
 
 from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import MichelineLiteral, parse_micheline_literal, Micheline, MichelineSequence
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len=1):

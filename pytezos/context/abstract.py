@@ -1,6 +1,6 @@
 from typing import Tuple, Optional
 
-from pyblake2 import blake2b
+from pyblake2 import blake2b  # type: ignore
 
 from pytezos.crypto.encoding import base58_decode, base58_encode
 from pytezos.crypto.key import Key
@@ -63,7 +63,7 @@ class AbstractContext:
     def spend_balance(self, amount: int):
         raise NotImplementedError
 
-    def get_parameter_expr(self, address=None) -> Optional:
+    def get_parameter_expr(self, address=None) -> Optional:  # type: ignore
         raise NotImplementedError
 
     def get_storage_expr(self):

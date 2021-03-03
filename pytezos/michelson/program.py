@@ -4,7 +4,7 @@ from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.micheline import MichelineSequence, try_catch
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.sections.code import CodeSection
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.types import PairType, OperationType, ListType
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
@@ -82,8 +82,8 @@ class MichelsonProgram:
             ListType.create_type(args=[OperationType]),
             self.storage.args[0]
         ]), message='list of operations + resulting storage')
-        operations = [op.content for op in res.items[0]]
-        lazy_diff = []
+        operations = [op.content for op in res.items[0]]  # type: ignore
+        lazy_diff = []  # type: ignore
         storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)
         stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
         return operations, storage, lazy_diff, res

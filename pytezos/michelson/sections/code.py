@@ -1,7 +1,7 @@
 from typing import List, Type
 
 from pytezos.michelson.micheline import Micheline
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class CodeSection(Micheline, prim='code', args_len=1):
@@ -11,7 +11,7 @@ class CodeSection(Micheline, prim='code', args_len=1):
         cls = Micheline.match(code_expr)
         if not issubclass(cls, CodeSection):
             cls = CodeSection.create_type(args=[cls])
-        return cls
+        return cls  # type: ignore
 
     @classmethod
     def execute(cls, stack, stdout: List[str], context: AbstractContext):

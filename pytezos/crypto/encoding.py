@@ -1,4 +1,4 @@
-import base58
+import base58  # type: ignore
 
 
 def tb(l):
