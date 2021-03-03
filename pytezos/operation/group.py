@@ -1,4 +1,4 @@
-from deprecation import deprecated
+from deprecation import deprecated  # type: ignore
 from pprint import pformat, pprint
 from typing import List, Optional, Any, Dict
 

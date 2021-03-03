@@ -112,6 +112,11 @@ class ExecutionContext(AbstractContext):
     def get_counter_offset(self) -> int:
         """Return current count of pending transactions in mempool.
         """
+        if self.key is None:
+            raise Exception('`key` is not set')
+        if self.shell is None:
+            raise Exception('`shell` is not set')
+
         counter_offset = 0
         key_hash = self.key.public_key_hash()
         mempool = self.shell.mempool.pending_operations()
