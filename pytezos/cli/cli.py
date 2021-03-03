@@ -1,8 +1,8 @@
 from glob import glob
 from os.path import abspath, dirname, join, exists
 from pprint import pformat
-import fire  # type: ignore
-
+import click
+from typing import Optional
 from pytezos import __version__
 from pytezos import pytezos, ContractInterface
 from pytezos.logging import logger
@@ -37,121 +37,131 @@ def get_contract(path):
         contract = pytezos.using(shell=network).contract(address)
     return contract
 
+@click.group()
+@click.version_option(__version__)
+@click.pass_context
+def cli(*args, **kwargs):
+    pass
 
-class PyTezosCli:
+@cli.command(help='Manage contract storage')
+@click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
+@click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
+@click.pass_context
+def storage(ctx, action: str, path: Optional[str]) -> None:
+    contract = get_contract(path)
+    if action == 'schema':
+        logger.info(generate_pydoc(type(contract.storage.data), title='storage'))
+    elif action == 'default':
+        logger.info(pformat(contract.storage.dummy()))
+    else:
+        assert False, action
 
-    def version(self) -> None:
-        print(f'pytezos {__version__}')
+@cli.command(help='Manage contract storage')
+@click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
+@click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
+@click.pass_context
+def parameter(ctx, action: str, path: Optional[str]) -> None:
+    contract = get_contract(path)
+    if action == 'schema':
+        logger.info(contract.parameter.__doc__)
+    else:
+        assert False, action
 
-    def storage(self, action, path=None):
-        """ Manage contract storage.
+@cli.command(help='Activate and reveal key from the faucet file')
+@click.option('--path', '-p', type=str, help='Path to the .json file downloaded from https://faucet.tzalpha.net/')
+@click.option('--network', '-n', type=str, default=default_network, help='Default is edo2net')
+@click.pass_context
+def activate(ctx, path: str, network: str) -> None:
+    ptz = pytezos.using(key=path, shell=network)
+    logger.info('Activating %s in the %s' % (ptz.key.public_key_hash(), network,))
 
-        :param action: One of `schema`, `default`
-        :param path: Path to the .tz file, or the following uri: <network>:<KT-address>
-        """
-        contract = get_contract(path)
-        if action == 'schema':
-            logger.info(generate_pydoc(type(contract.storage.data), title='storage'))
-        elif action == 'default':
-            logger.info(pformat(contract.storage.dummy()))
-        else:
-            assert False, action
-
-    def parameter(self, action, path=None):
-        """ Manage contract parameter.
-
-        :param action: One of `schema`
-        :param path: Path to the .tz file, or the following uri: <network>:<KT-address>
-        """
-        contract = get_contract(path)
-        if action == 'schema':
-            logger.info(contract.parameter.__doc__)
-        else:
-            assert False, action
-
-    def activate(self, path, network=default_network):
-        """ Activates and reveals key from the faucet file.
-
-        :param path: Path to the .json file downloaded from https://faucet.tzalpha.net/
-        :param network: Default is Babylonnet
-        """
-        ptz = pytezos.using(key=path, shell=network)
-        logger.info('Activating %s in the %s' % ptz.key.public_key_hash(), network)
-
-        if ptz.balance() == 0:
-            try:
-                opg = ptz.activate_account().autofill().sign()
-                logger.info('Injecting activation operation:')
-                logger.info(pformat(opg.json_payload()))
-                opg.inject(_async=False)
-            except RpcError as e:
-                logger.critical(pformat(e))
-                exit(-1)
-            else:
-                logger.info('Activation succeeded! Claimed balance: %s ꜩ' % ptz.balance())
-        else:
-            logger.info('Already activated')
-
+    if ptz.balance() == 0:
         try:
-            opg = ptz.reveal().autofill().sign()
-            logger.info('Injecting reveal operation:')
+            opg = ptz.activate_account().autofill().sign()
+            logger.info('Injecting activation operation:')
             logger.info(pformat(opg.json_payload()))
             opg.inject(_async=False)
         except RpcError as e:
             logger.critical(pformat(e))
             exit(-1)
         else:
-            logger.info('Your key %s is now active and revealed' % ptz.key.public_key_hash())
+            logger.info('Activation succeeded! Claimed balance: %s ꜩ' % ptz.balance())
+    else:
+        logger.info('Already activated')
 
-    def deploy(self, path, storage=None, network=default_network, key=None,
-               github_repo_slug=None, github_oauth_token=None, dry_run=False):
-        """ Deploy contract to the specified network.
+    try:
+        opg = ptz.reveal().autofill().sign()
+        logger.info('Injecting reveal operation:')
+        logger.info(pformat(opg.json_payload()))
+        opg.inject(_async=False)
+    except RpcError as e:
+        logger.critical(pformat(e))
+        exit(-1)
+    else:
+        logger.info('Your key %s is now active and revealed' % ptz.key.public_key_hash())
 
-        :param path: Path to the .tz file
-        :param storage: Storage in JSON format (not Micheline)
-        :param network:
-        :param key:
-        :param github_repo_slug:
-        :param github_oauth_token:
-        :param dry_run: Set this flag if you just want to see what would happen
-        """
-        ptz = pytezos.using(shell=network, key=key)
-        logger.info('Deploying contract using %s in the %s' % ptz.key.public_key_hash(), network)
+@cli.command(help='Deploy contract to the specified network')
+@click.option('--path', '-p', type=str, help='Path to the .tz file')
+@click.option('--storage', type=str, default=None, help='Storage in JSON format (not Micheline)')
+@click.option('--network', '-n', type=str, default=default_network, help='Default is edo2net')
+@click.option('--key', type=str, default=None)
+@click.option('--github-repo-slug', type=str, default=None)
+@click.option('--github-oauth-token', type=str, default=None)
+@click.option('--dry-run', type=bool, default=False, help='Set this flag if you just want to see what would happen')
+@click.pass_context
+def deploy(
+    cts,
+    path: str,
+    storage: Optional[str],
+    network: str,
+    key: Optional[str],
+    github_repo_slug: Optional[str],
+    github_oauth_token: Optional[str],
+    dry_run: bool,
+):
+    ptz = pytezos.using(shell=network, key=key)
+    logger.info('Deploying contract using %s in the %s' % ptz.key.public_key_hash(), network)
 
-        contract = get_contract(path)
-        try:
-            opg = ptz.origination(script=contract.script(initial_storage=storage)).autofill().sign()
-            logger.info('Injecting origination operation:')
-            logger.info(pformat(opg.json_payload()))
+    contract = get_contract(path)
+    try:
+        opg = ptz.origination(script=contract.script(initial_storage=storage)).autofill().sign()
+        logger.info('Injecting origination operation:')
+        logger.info(pformat(opg.json_payload()))
 
-            if dry_run:
-                logger.info(pformat(opg.preapply()))
-                exit(0)
-            else:
-                opg = opg.inject(_async=False)
-        except RpcError as e:
-            logger.critical(pformat(e))
-            exit(-1)
+        if dry_run:
+            logger.info(pformat(opg.preapply()))
+            exit(0)
         else:
-            originated_contracts = OperationResult.originated_contracts(opg)
-            assert len(originated_contracts) == 1
-            bcd_link = make_bcd_link(network, originated_contracts[0])
-            logger.info('Contract was successfully deployed: %s' % bcd_link)
+            opg = opg.inject(_async=False)
+    except RpcError as e:
+        logger.critical(pformat(e))
+        exit(-1)
+    else:
+        originated_contracts = OperationResult.originated_contracts(opg)
+        assert len(originated_contracts) == 1
+        bcd_link = make_bcd_link(network, originated_contracts[0])
+        logger.info('Contract was successfully deployed: %s' % bcd_link)
 
-            if github_repo_slug:
-                deployment = create_deployment(github_repo_slug, github_oauth_token,
-                                               environment=network)
-                logger.info(pformat(deployment))
-                status = create_deployment_status(github_repo_slug, github_oauth_token,
-                                                  deployment_id=deployment['id'],
-                                                  state='success',
-                                                  environment=network,
-                                                  environment_url=bcd_link)
-                logger.info(status)
+        if github_repo_slug:
+            deployment = create_deployment(
+                github_repo_slug,
+                github_oauth_token,
+                environment=network,
+            )
+            logger.info(pformat(deployment))
+            status = create_deployment_status(
+                github_repo_slug,
+                github_oauth_token,
+                deployment_id=deployment['id'],
+                state='success',
+                environment=network,
+                environment_url=bcd_link,
+            )
+            logger.info(status)
 
 
 def main():
-    return fire.Fire(PyTezosCli)
+    return cli(prog_name='pytezos')
 
 
 if __name__ == '__main__':

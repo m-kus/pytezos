@@ -86,7 +86,7 @@ class ShellQuery(RpcQuery, path=''):
         prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
         elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
         delay_sec = 0 if elapsed_sec > time_between_blocks else time_between_blocks - elapsed_sec
-        logger.info('Wait %s seconds until block %s is finalized' % delay_sec, block_hash)
+        logger.info('Wait %s seconds until block %s is finalized' % (delay_sec, block_hash,))
         sleep(delay_sec)
 
         for i in range(time_between_blocks):
