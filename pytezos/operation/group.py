@@ -204,6 +204,10 @@ class OperationGroup(ContextMixin, ContentMixin):
         extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
 
         def fill_content(content: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            nonlocal fee
+            nonlocal gas_limit
+            nonlocal storage_limit
+
             if validation_passes[content['kind']] != 3:
                 return None
 
