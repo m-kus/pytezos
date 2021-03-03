@@ -2,6 +2,8 @@ from typing import Optional, Union
 from decimal import Decimal
 
 from pytezos.rpc import ShellQuery
+from pytezos.logging import logger
+import logging
 from pytezos.crypto.key import Key
 from pytezos.operation.group import OperationGroup
 from pytezos.operation.content import ContentMixin
@@ -119,3 +121,11 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :returns: A copy of current object with changes applied
         """
         return PyTezosClient(context=self._spawn_context(shell=shell, key=key, mode=mode))
+
+    @property
+    def loglevel(self) -> int:
+        return logger.level
+
+    @loglevel.setter
+    def loglevel(self, value: Union[str, int]) -> None:
+        logger.setLevel(value)

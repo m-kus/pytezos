@@ -4,6 +4,8 @@ import json
 from os import makedirs
 from os.path import dirname, join, exists
 
+from pytezos.logging import logger
+
 network = 'mainnet'
 api_host = 'test.better-call.dev'
 since = 1590969600
@@ -100,9 +102,8 @@ def fetch_contract_samples(max_count=100):
                                                 operation['internal'],
                                                 contract['address'])
                 write_test_data(folder, entrypoint, result)
-        print(name)
+        logger.info(name)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     fetch_contract_samples()

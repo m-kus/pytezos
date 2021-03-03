@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
-from pprint import pprint
+from pprint import pformat
+
+from pytezos.logging import logger
 
 line_size = 100
 
@@ -122,5 +124,5 @@ def micheline_to_michelson(data, inline=False, wrap=False) -> str:
         else:
             return res
     except (KeyError, IndexError, TypeError) as e:
-        pprint(data, compact=True)
+        logger.info(data, compact=True)
         raise MichelsonFormatterError(e.args)

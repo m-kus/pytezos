@@ -2,6 +2,7 @@ from pprint import pformat
 from typing import List, Optional, Any, Dict
 
 from pytezos.crypto.key import blake2b_32
+from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.forge import forge_operation_group
 from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
@@ -204,6 +205,10 @@ class OperationGroup(ContextMixin, ContentMixin):
         extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
 
         def fill_content(content: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            nonlocal fee
+            nonlocal gas_limit
+            nonlocal storage_limit
+
             if validation_passes[content['kind']] != 3:
                 return None
 
@@ -302,7 +307,7 @@ class OperationGroup(ContextMixin, ContentMixin):
                     pending_opg = self.shell.mempool.pending_operations[opg_hash]
                     if not OperationResult.is_applied(pending_opg):
                         raise RpcError.from_errors(OperationResult.errors(pending_opg))
-                    print(f'Still in mempool: {opg_hash}')
+                    logger.info('Still in mempool: %s' % opg_hash)
                 except StopIteration:
                     res = self.shell.blocks[-(i + 1):].find_operation(opg_hash)
                     if check_result:
