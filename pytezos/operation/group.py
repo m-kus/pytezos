@@ -72,8 +72,25 @@ class OperationGroup(ContextMixin, ContentMixin):
             signature=kwargs.get('signature', self.signature),
         )
 
+    def _adjust_counter(self) -> None:
+        key_hash = self.key.public_key_hash()
+        mempool = self.shell.mempool.pending_operations()
+
+        for status, operations in mempool.items():
+            for operation in operations:
+                # FIXME: Replace with pattern matching based on operation kind
+                if isinstance(operation, list):
+                    operation = operation[1]
+                for content in operation.get('contents', []):
+                    if content.get('source') == key_hash:
+                        counter = int(content.get('counter'))
+                        self.counter = max(self.counter, counter)
+
+        self.counter += 1
+
     def json_payload(self) -> dict:
-        """Get json payload used for the preapply."""
+        """ Get JSON payload used for the injection.
+        """
         return {
             'protocol': self.protocol,
             'branch': self.branch,
@@ -311,10 +328,6 @@ class OperationGroup(ContextMixin, ContentMixin):
             min_confirmations = 0 if _async is True else 1
 
         self.context.reset()
-        if preapply:
-            opg_with_metadata = self.preapply()
-            if not OperationResult.is_applied(opg_with_metadata):
-                raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
         opg_hash = self.shell.injection.operation.post(
             operation=self.binary_payload(),

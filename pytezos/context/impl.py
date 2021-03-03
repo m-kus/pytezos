@@ -104,28 +104,28 @@ class ExecutionContext(AbstractContext):
                 raise Exception('shell is undefined')
 
             key_hash = self.key.public_key_hash()
-
-            def get_last_operation_counter(mempool: Dict[str, Any]) -> Optional[int]:
-                counter = 0
-                for status, operations in mempool.items():
-                    for operation in operations:
-                        if isinstance(operation, list):
-                            operation = operation[1]
-                        for content in operation.get('contents', []):
-                            if content.get('source') == key_hash:
-                                print(f"counter {counter} => ")
-                                counter = max(counter, int(content.get('counter')))
-                                print(counter)
-                return counter
-
             self.counter = int(self.shell.contracts[key_hash]()['counter'])
-            print(f"{self.counter=}")
-            # NOTE: Ensure counter won't be duplicated
-            mempool = self.shell.mempool.pending_operations()
-            pprint(mempool)
-            self.counter = max(self.counter, get_last_operation_counter(mempool))
-            print(f"{self.counter=}")
 
+            # def get_last_operation_counter(mempool: Dict[str, Any]) -> Optional[int]:
+            #     counter = 0
+            #     for status, operations in mempool.items():
+            #         for operation in operations:
+            #             if isinstance(operation, list):
+            #                 operation = operation[1]
+            #             for content in operation.get('contents', []):
+            #                 if content.get('source') == key_hash:
+            #                     print(f"counter {counter} => ")
+            #                     counter = max(counter, int(content.get('counter')))
+            #                     print(counter)
+            #     return counter
+
+            # self.counter = int(self.shell.contracts[key_hash]()['counter'])
+            # print(f"{self.counter=}")
+            # # NOTE: Ensure counter won't be duplicated
+            # mempool = self.shell.mempool.pending_operations()
+            # pprint(mempool)
+            # self.counter = max(self.counter, get_last_operation_counter(mempool))
+            # print(f"{self.counter=}")
 
         self.counter += 1
         return self.counter
