@@ -1,7 +1,7 @@
 from datetime import datetime
-from pprint import pprint
-from typing import Any, Dict, Optional, Tuple
+from typing import Optional, Tuple
 
+from pytezos.logging import logger
 from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
@@ -108,6 +108,25 @@ class ExecutionContext(AbstractContext):
 
         self.counter += 1
         return self.counter
+
+    def get_counter_offset(self) -> int:
+        """Return current count of pending transactions in mempool.
+        """
+        counter_offset = 0
+        key_hash = self.key.public_key_hash()
+        mempool = self.shell.mempool.pending_operations()
+
+        for operations in mempool.values():
+            for operation in operations:
+                if isinstance(operation, list):
+                    operation = operation[1]
+                for content in operation.get('contents', []):
+                    if content.get('source') == key_hash:
+                        logger.debug("pending transaction in mempool: %s" % content)
+                        counter_offset += 1
+
+        logger.debug("counter offset: %s" % counter_offset)
+        return counter_offset
 
     def register_big_map(self, ptr: int, copy=False) -> int:
         if copy:
