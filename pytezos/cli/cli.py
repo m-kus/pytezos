@@ -36,7 +36,8 @@ def make_bcd_link(network, address):
 def get_contract(path):
     if path is None:
         files = glob('*.tz')
-        assert len(files) == 1
+        if len(files) != 1:
+            raise Exception('No contracts found in working directory, specify --path implicitly')
         contract = ContractInterface.from_file(abspath(files[0]))
     elif exists(path):
         contract = ContractInterface.from_file(path)
@@ -64,11 +65,11 @@ def storage(_ctx, action: str, path: Optional[str]) -> None:
     elif action == 'default':
         logger.info(pformat(contract.storage.dummy()))
     else:
-        assert False, action
+        raise Exception('Action must be either `schema` or `default`')
 
 
 @cli.command(help='Manage contract storage')
-@click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
+@click.option('--action', '-a', type=str, default='schema' help='One of `schema`')
 @click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
 @click.pass_context
 def parameter(_ctx, action: str, path: Optional[str]) -> None:
@@ -76,7 +77,7 @@ def parameter(_ctx, action: str, path: Optional[str]) -> None:
     if action == 'schema':
         logger.info(contract.parameter.__doc__)
     else:
-        assert False, action
+        raise Exception('Action must be `schema`')
 
 
 @cli.command(help='Activate and reveal key from the faucet file')
@@ -155,7 +156,8 @@ def deploy(
         sys.exit(-1)
     else:
         originated_contracts = OperationResult.originated_contracts(opg)
-        assert len(originated_contracts) == 1
+        if len(originated_contracts) != 1:
+            raise Exception('Operation group must has exactly one originated contract')
         bcd_link = make_bcd_link(network, originated_contracts[0])
         logger.info('Contract was successfully deployed: %s', bcd_link)
 
