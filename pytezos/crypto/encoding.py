@@ -1,4 +1,5 @@
 from typing import Union
+
 import base58  # type: ignore
 
 

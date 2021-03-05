@@ -2,11 +2,13 @@ import binascii
 import hashlib
 import json
 from getpass import getpass
+from os import environ as env
 from os.path import abspath
 from os.path import expanduser
 from os.path import join
-from os import environ as env
-from typing import List, Optional, Union
+from typing import List
+from typing import Optional
+from typing import Union
 
 from mnemonic import Mnemonic  # type: ignore
 from pyblake2 import blake2b  # type: ignore
@@ -111,7 +113,13 @@ class Key(metaclass=InlineDocstring):
         self.activation_code = activation_code
 
     def __repr__(self) -> str:
-        res = [super().__repr__(), '\nPublic key hash', self.public_key_hash(), '\nHelpers', get_class_docstring(self.__class__)]
+        res = [
+            super().__repr__(),
+            '\nPublic key hash',
+            self.public_key_hash(),
+            '\nHelpers',
+            get_class_docstring(self.__class__),
+        ]
         return '\n'.join(res)
 
     @property
@@ -231,7 +239,11 @@ class Key(metaclass=InlineDocstring):
 
         if export:
             pkh = key.public_key_hash()
-            data = {'mnemonic': mnemonic.split(), 'pkh': pkh, 'password': passphrase or ''}
+            data = {
+                'mnemonic': mnemonic.split(),
+                'pkh': pkh,
+                'password': passphrase or '',
+            }
             with open(abspath(f'./{pkh}.json'), 'w+') as f:
                 f.write(json.dumps(data))
 
@@ -358,7 +370,13 @@ class Key(metaclass=InlineDocstring):
             assert isinstance(passphrase, bytes), f'expected bytes or str, got {type(passphrase).__name__}'
 
             salt = pysodium.randombytes(8)
-            encryption_key = hashlib.pbkdf2_hmac(hash_name="sha512", password=passphrase, salt=salt, iterations=32768, dklen=32)
+            encryption_key = hashlib.pbkdf2_hmac(
+                hash_name="sha512",
+                password=passphrase,
+                salt=salt,
+                iterations=32768,
+                dklen=32,
+            )
             encrypted_sk = pysodium.crypto_secretbox(msg=key, nonce=b'\000' * 24, k=encryption_key)
             key = salt + encrypted_sk  # we have to combine salt and encrypted key in order to decrypt later
             prefix = self.curve + b'esk'
