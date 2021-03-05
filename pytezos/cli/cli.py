@@ -69,7 +69,7 @@ def storage(_ctx, action: str, path: Optional[str]) -> None:
 
 
 @cli.command(help='Manage contract storage')
-@click.option('--action', '-a', type=str, default='schema' help='One of `schema`')
+@click.option('--action', '-a', type=str, default='schema', help='One of `schema`')
 @click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
 @click.pass_context
 def parameter(_ctx, action: str, path: Optional[str]) -> None:
