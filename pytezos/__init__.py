@@ -11,17 +11,18 @@ And follow the interactive documentation.
 """
 
 from pytezos.client import PyTezosClient
+from pytezos.contract.interface import Contract
+from pytezos.contract.interface import ContractInterface
 from pytezos.crypto.key import Key
-from pytezos.operation.group import OperationGroup
-from pytezos.operation.result import OperationResult
-from pytezos.contract.interface import ContractInterface, Contract
-from pytezos.michelson.format import micheline_to_michelson
-from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
-from pytezos.michelson.types.core import Unit
-from pytezos.michelson.types.base import Undefined, MichelsonType
-from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.logging import logger
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
+from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import Undefined
+from pytezos.michelson.types.core import Unit
 
 __version__ = '3.0.2'
 

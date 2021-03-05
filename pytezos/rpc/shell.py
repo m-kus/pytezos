@@ -1,16 +1,18 @@
-import requests
-import simplejson as json
-from typing import Optional
-from functools import lru_cache
 from binascii import hexlify
 from datetime import datetime
+from functools import lru_cache
 from time import sleep
+from typing import Optional
 
-from pytezos.logging import logger
+import requests
+import simplejson as json
+
 from pytezos.crypto.encoding import base58_decode
-from pytezos.rpc.query import RpcQuery
 from pytezos.jupyter import get_attr_docstring
-from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
+from pytezos.logging import logger
+from pytezos.rpc.query import RpcQuery
+from pytezos.rpc.search import CyclesQuery
+from pytezos.rpc.search import VotingPeriodsQuery
 
 
 def make_operation_result(**kwargs):

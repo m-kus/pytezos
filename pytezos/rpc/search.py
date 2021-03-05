@@ -1,10 +1,12 @@
-from typing import Any, Callable, Generator
-from pytezos.logging import logger
+from typing import Any
+from typing import Callable
+from typing import Generator
 
+from pytezos.crypto.encoding import is_bh
+from pytezos.jupyter import get_attr_docstring
+from pytezos.logging import logger
 from pytezos.rpc.node import RpcError
 from pytezos.rpc.query import RpcQuery
-from pytezos.jupyter import get_attr_docstring
-from pytezos.crypto.encoding import is_bh
 
 
 def find_state_change_intervals(head: int, last: int, get: Callable, equals: Callable,

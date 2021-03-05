@@ -1,18 +1,22 @@
 from pprint import pformat
-from typing import List, Optional, Any, Dict
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
+from pytezos.context.impl import ExecutionContext  # type: ignore
+from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
-from pytezos.logging import logger
+from pytezos.michelson.forge import forge_base58
 from pytezos.operation.content import ContentMixin
+from pytezos.operation.fees import calculate_fee
+from pytezos.operation.fees import default_fee
+from pytezos.operation.fees import default_gas_limit
+from pytezos.operation.fees import default_storage_limit
 from pytezos.operation.forge import forge_operation_group
-from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-from pytezos.crypto.encoding import base58_encode
-from pytezos.michelson.forge import forge_base58
-from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.context.impl import ExecutionContext  # type: ignore
-from pytezos.jupyter import get_class_docstring
 
 DEFAULT_GAS_RESERVE = 100
 DEFAULT_BRANCH_OFFSET = 50
@@ -47,7 +51,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         branch: Optional[str] = None,
         signature: Optional[str] = None,
     ):
-        super(OperationGroup, self).__init__(context=context)
+        super().__init__(context=context)
         self.contents = contents or []
         self.protocol = protocol
         self.chain_id = chain_id
@@ -56,7 +60,7 @@ class OperationGroup(ContextMixin, ContentMixin):
 
     def __repr__(self):
         res = [
-            super(OperationGroup, self).__repr__(),
+            super().__repr__(),
             '\nPayload',
             pformat(self.json_payload()),
             '\nHelpers',
@@ -108,7 +112,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param branch_offset: select head~offset block as branch, where offset is in range (0, 60)
         :rtype: OperationGroup
         """
-        assert 0 < branch_offset < 60, f'branch offset has to be in range (0, 60)'
+        assert 0 < branch_offset < 60, 'branch offset has to be in range (0, 60)'
         chain_id = self.chain_id or self.context.get_chain_id()
         branch = self.branch or self.shell.blocks[-branch_offset].hash()
         protocol = self.protocol or self.shell.head.header()['protocol']
@@ -193,8 +197,10 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param counter: Override counter value (for manual handling)
         :param branch_offset: Select head~offset block as branch, where offset is in range (0, 60)
         :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
-        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of operation dry-run.
-        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depeding on results of operation dry-run.
+        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of
+            operation dry-run.
+        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depeding on
+            results of operation dry-run.
         :rtype: OperationGroup
         """
         opg = self.fill(counter=counter, branch_offset=branch_offset)
@@ -300,20 +306,20 @@ class OperationGroup(ContextMixin, ContentMixin):
                 'hash': opg_hash,
                 **self.json_payload()
             }
-        else:
-            for i in range(num_blocks_wait):
-                self.shell.wait_next_block(time_between_blocks=time_between_blocks)
-                try:
-                    pending_opg = self.shell.mempool.pending_operations[opg_hash]
-                    if not OperationResult.is_applied(pending_opg):
-                        raise RpcError.from_errors(OperationResult.errors(pending_opg))
-                    logger.info('Still in mempool: %s' % opg_hash)
-                except StopIteration:
-                    res = self.shell.blocks[-(i + 1):].find_operation(opg_hash)
-                    if check_result:
-                        if not OperationResult.is_applied(res):
-                            raise RpcError.from_errors(OperationResult.errors(res))
-                    return res
+
+        for i in range(num_blocks_wait):
+            self.shell.wait_next_block(time_between_blocks=time_between_blocks)
+            try:
+                pending_opg = self.shell.mempool.pending_operations[opg_hash]
+                if not OperationResult.is_applied(pending_opg):
+                    raise RpcError.from_errors(OperationResult.errors(pending_opg))
+                print(f'Still in mempool: {opg_hash}')
+            except StopIteration as exc:
+                res = self.shell.blocks[-(i + 1):].find_operation(opg_hash)
+                if check_result:
+                    if not OperationResult.is_applied(res):
+                        raise RpcError.from_errors(OperationResult.errors(res)) from exc
+                return res
 
         raise TimeoutError(opg_hash)
 

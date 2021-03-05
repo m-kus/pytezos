@@ -1,13 +1,17 @@
-from typing import List, Type, Optional, Tuple, cast
 from copy import copy
 from pprint import pformat
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
+from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.domain import AddressType
+from pytezos.michelson.types.domain import NatType
 from pytezos.michelson.types.pair import PairType
-from pytezos.michelson.types.domain import NatType, AddressType
-from pytezos.context.abstract import AbstractContext  # type: ignore
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):

@@ -1,9 +1,14 @@
-from typing import List, cast, Any, Type, Tuple
+from typing import List
+from typing import Tuple
+from typing import cast
 
-from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
-from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import PairType, OrType, MichelsonType
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.types import MichelsonType
+from pytezos.michelson.types import OrType
+from pytezos.michelson.types import PairType
 
 
 def execute_cxr(prim: str, stack: MichelsonStack, stdout: List[str], idx: int):

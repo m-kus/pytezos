@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from pprint import pformat
 
 from pytezos.logging import logger
 

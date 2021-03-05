@@ -1,7 +1,8 @@
-from typing import List, Type
+from typing import List
+from typing import Type
 
-from pytezos.michelson.micheline import Micheline
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.micheline import Micheline
 
 
 class CodeSection(Micheline, prim='code', args_len=1):

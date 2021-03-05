@@ -1,7 +1,9 @@
-import re
 import difflib
+import re
+from os.path import dirname
+from os.path import join
+
 import simplejson as json
-from os.path import dirname, join
 
 # Based on https://gist.github.com/noporpoise/16e731849eb1231e86d78f9dfeca3abc
 _no_eol = r'\ No newline at end of file'

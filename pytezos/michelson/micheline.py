@@ -1,11 +1,20 @@
-from pprint import pformat
 from functools import wraps
-from typing import Tuple, Dict, Callable, List, Optional, Type, cast, Any, Union
+from pprint import pformat
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
+from pytezos.michelson.forge import unforge_address
+from pytezos.michelson.forge import unforge_chain_id
+from pytezos.michelson.forge import unforge_micheline
+from pytezos.michelson.forge import unforge_public_key
+from pytezos.michelson.forge import unforge_signature
 from pytezos.michelson.format import micheline_to_michelson
-from pytezos.michelson.forge import unforge_chain_id, unforge_address, unforge_public_key, unforge_signature, \
-    unforge_micheline
-from pytezos.michelson.tags import prim_tags
 
 
 class MichelsonRuntimeError(Exception):

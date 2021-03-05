@@ -1,21 +1,26 @@
-import requests
-from os.path import exists, expanduser
-from typing import List, Optional, Union
-from deprecation import deprecated  # type: ignore
 from decimal import Decimal
+from os.path import exists
+from os.path import expanduser
+from typing import List
+from typing import Optional
+from typing import Union
 
-from pytezos.rpc import ShellQuery
-from pytezos.crypto.key import Key
-from pytezos.operation.group import OperationGroup
-from pytezos.contract.result import ContractCallResult
-from pytezos.contract.entrypoint import ContractEntrypoint
-from pytezos.michelson.program import MichelsonProgram
+import requests
+from deprecation import deprecated  # type: ignore
+
+from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.context.mixin import ExecutionContext
 from pytezos.contract.data import ContractData
-from pytezos.context.mixin import ContextMixin, ExecutionContext  # type: ignore
+from pytezos.contract.entrypoint import ContractEntrypoint
+from pytezos.contract.result import ContractCallResult
+from pytezos.crypto.key import Key
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types.base import generate_pydoc
+from pytezos.operation.group import OperationGroup
+from pytezos.rpc import ShellQuery
 
 
 class ContractInterface(ContextMixin):

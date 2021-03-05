@@ -1,6 +1,7 @@
 import functools
 import operator
 from typing import List
+
 from pytezos.rpc.errors import RpcError
 
 

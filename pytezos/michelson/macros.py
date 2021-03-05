@@ -1,5 +1,5 @@
-import re
 import functools
+import re
 from collections import namedtuple
 from typing import Tuple
 

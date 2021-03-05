@@ -1,10 +1,22 @@
-from typing import List, cast, Union, Tuple
+from typing import List
+from typing import Tuple
+from typing import Union
+from typing import cast
 
-from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
-from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import StringType, BytesType, ListType, SetType, MapType, NatType, OptionType, UnitType, \
-    NeverType
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import dispatch_types
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.types import BytesType
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import MapType
+from pytezos.michelson.types import NatType
+from pytezos.michelson.types import NeverType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import SetType
+from pytezos.michelson.types import StringType
+from pytezos.michelson.types import UnitType
 
 
 class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):

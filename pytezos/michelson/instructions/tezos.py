@@ -1,13 +1,26 @@
-from typing import List, cast, Tuple, Optional, Type
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import cast
 
-from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
-from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
-from pytezos.michelson.sections import ParameterSection
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types import NatType, ContractType, AddressType, TimestampType, \
-    OptionType, KeyHashType, UnitType, MutezType, OperationType, ChainIdType
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.sections import ParameterSection
+from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.types import AddressType
+from pytezos.michelson.types import ChainIdType
+from pytezos.michelson.types import ContractType
+from pytezos.michelson.types import KeyHashType
+from pytezos.michelson.types import MutezType
+from pytezos.michelson.types import NatType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import TimestampType
+from pytezos.michelson.types import UnitType
+from pytezos.michelson.types.base import MichelsonType
 
 
 class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):

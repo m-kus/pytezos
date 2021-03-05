@@ -1,19 +1,24 @@
 import io
 import os
 import tarfile
+from binascii import hexlify
+from collections import OrderedDict
+from tempfile import TemporaryDirectory
+from typing import List
+from typing import Tuple
+
 import netstruct  # type: ignore
 import requests
 import simplejson as json
 from tqdm import tqdm  # type: ignore
-from binascii import hexlify
-from collections import OrderedDict
-from tempfile import TemporaryDirectory
-from typing import List, Tuple
 
-from pytezos.crypto.key import blake2b_32
 from pytezos.crypto.encoding import base58_encode
-from pytezos.protocol.diff import make_patch, apply_patch, generate_unidiff_html
-from pytezos.jupyter import get_class_docstring, InlineDocstring
+from pytezos.crypto.key import blake2b_32
+from pytezos.jupyter import InlineDocstring
+from pytezos.jupyter import get_class_docstring
+from pytezos.protocol.diff import apply_patch
+from pytezos.protocol.diff import generate_unidiff_html
+from pytezos.protocol.diff import make_patch
 
 
 def dir_to_files(path) -> List[Tuple[str, str]]:

@@ -1,8 +1,11 @@
-from typing import List, Optional, Type
+from typing import List
+from typing import Optional
+from typing import Type
 
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import parse_micheline_value, Micheline
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.types.base import MichelsonType
 
 
 class NoneLiteral(Micheline, prim='None'):

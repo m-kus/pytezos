@@ -16,11 +16,12 @@ jobs:
       run: |
         sudo apt-get update -q
         sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
-        poetry install -v
+    - name: Install project
+      run: poetry install -v
     - name: Run lint
-      run: poetry run mypy pytezos
+      run: make lint
     - name: Run tests
-      run: poetry run pytest tests/
+      run: make test
     - name: Make docs
       if: github.ref == 'refs/heads/master'
       run: poetry run make docs

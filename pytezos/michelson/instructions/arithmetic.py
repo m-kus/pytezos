@@ -1,11 +1,26 @@
-from typing import List, Union, Tuple, Type, Callable, cast
+from typing import Callable
+from typing import List
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
+
 from py_ecc import optimized_bls12_381 as bls12_381
 
-from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import IntType, NatType, TimestampType, MutezType, OptionType, PairType, \
-    BLS12_381_G1Type, BLS12_381_G2Type, BLS12_381_FrType
-from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import dispatch_types
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.types import BLS12_381_FrType
+from pytezos.michelson.types import BLS12_381_G1Type
+from pytezos.michelson.types import BLS12_381_G2Type
+from pytezos.michelson.types import IntType
+from pytezos.michelson.types import MutezType
+from pytezos.michelson.types import NatType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import PairType
+from pytezos.michelson.types import TimestampType
 
 
 class AbsInstruction(MichelsonInstruction, prim='ABS'):

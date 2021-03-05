@@ -1,13 +1,21 @@
-from typing import Type, List, Tuple, cast, Any
+from typing import Any
+from typing import List
+from typing import Tuple
+from typing import Type
+from typing import cast
 
-from pytezos.michelson.sections.parameter import ParameterSection
-from pytezos.michelson.micheline import MichelineSequence, try_catch
-from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.sections.code import CodeSection
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.types import PairType, OperationType, ListType
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import try_catch
+from pytezos.michelson.sections.code import CodeSection
+from pytezos.michelson.sections.parameter import ParameterSection
+from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.instructions.base import format_stdout, MichelsonInstruction
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import PairType
 
 
 class MichelsonProgram:

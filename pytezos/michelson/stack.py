@@ -1,5 +1,7 @@
-from typing import List, Tuple, Optional
 from pprint import pformat
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 from pytezos.michelson.types.base import MichelsonType
 

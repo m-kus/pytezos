@@ -1,8 +1,10 @@
-from typing import Type, List
+from typing import List
+from typing import Type
 
-from pytezos.michelson.types import *
-from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.types import *
 
 
 class StorageSection(Micheline, prim='storage', args_len=1):

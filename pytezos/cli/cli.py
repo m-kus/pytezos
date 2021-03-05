@@ -1,23 +1,29 @@
 from glob import glob
-from os.path import abspath, dirname, join, exists
+from os.path import abspath
+from os.path import dirname
+from os.path import exists
+from os.path import join
 from pprint import pformat
-import click
-from typing import Optional
-from pytezos import __version__
-from pytezos import pytezos, ContractInterface
-from pytezos.logging import logger
-from pytezos.rpc.errors import RpcError
-from pytezos.operation.result import OperationResult
-from pytezos.context.mixin import default_network  # type: ignore
-from pytezos.michelson.types.base import generate_pydoc
 from pytezos.cli.github import create_deployment, create_deployment_status
+from typing import Optional
+
+import click
+
+from pytezos import ContractInterface
+from pytezos import __version__
+from pytezos import pytezos
+from pytezos.context.mixin import default_network  # type: ignore
+from pytezos.logging import logger
+from pytezos.michelson.types.base import generate_pydoc
+from pytezos.operation.result import OperationResult
+from pytezos.rpc.errors import RpcError
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {
     "argv": ['pytezos', 'kernel', 'run', "-file", "{connection_file}"],
     "display_name": "Michelson",
     "language": "michelson",
-    "codemirror_mode": "michelson"
+    "codemirror_mode": "michelson",
 }
 
 
@@ -37,11 +43,13 @@ def get_contract(path):
         contract = pytezos.using(shell=network).contract(address)
     return contract
 
+
 @click.group()
 @click.version_option(__version__)
 @click.pass_context
 def cli(*args, **kwargs):
     pass
+
 
 @cli.command(help='Manage contract storage')
 @click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
@@ -56,6 +64,7 @@ def storage(ctx, action: str, path: Optional[str]) -> None:
     else:
         assert False, action
 
+
 @cli.command(help='Manage contract storage')
 @click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
 @click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
@@ -67,13 +76,20 @@ def parameter(ctx, action: str, path: Optional[str]) -> None:
     else:
         assert False, action
 
+
 @cli.command(help='Activate and reveal key from the faucet file')
 @click.option('--path', '-p', type=str, help='Path to the .json file downloaded from https://faucet.tzalpha.net/')
 @click.option('--network', '-n', type=str, default=default_network, help='Default is edo2net')
 @click.pass_context
 def activate(ctx, path: str, network: str) -> None:
     ptz = pytezos.using(key=path, shell=network)
-    logger.info('Activating %s in the %s' % (ptz.key.public_key_hash(), network,))
+    logger.info(
+        'Activating %s in the %s'
+        % (
+            ptz.key.public_key_hash(),
+            network,
+        )
+    )
 
     if ptz.balance() == 0:
         try:
@@ -99,6 +115,7 @@ def activate(ctx, path: str, network: str) -> None:
         exit(-1)
     else:
         logger.info('Your key %s is now active and revealed' % ptz.key.public_key_hash())
+
 
 @cli.command(help='Deploy contract to the specified network')
 @click.option('--path', '-p', type=str, help='Path to the .tz file')
@@ -158,6 +175,7 @@ def deploy(
                 environment_url=bcd_link,
             )
             logger.info(status)
+
 
 if __name__ == '__main__':
     cli(prog_name='pytezos')

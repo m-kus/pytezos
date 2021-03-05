@@ -1,13 +1,13 @@
 from pprint import pformat
 from typing import Optional
 
-from pytezos.logging import logger
+from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.context.mixin import ExecutionContext
 from pytezos.contract.call import ContractCall
-from pytezos.context.mixin import ContextMixin, ExecutionContext  # type: ignore
-from pytezos.michelson.sections.parameter import ParameterSection
+from pytezos.logging import logger
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.jupyter import get_class_docstring
+from pytezos.michelson.sections.parameter import ParameterSection
 
 
 class ContractEntrypoint(ContextMixin):

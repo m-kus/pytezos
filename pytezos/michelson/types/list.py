@@ -1,8 +1,12 @@
-from typing import Tuple, Generator, List, Type
+from typing import Generator
+from typing import List
+from typing import Tuple
+from typing import Type
 
-from pytezos.michelson.types.base import MichelsonType
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline, MichelineSequence
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.types.base import MichelsonType
 
 
 class ListType(MichelsonType, prim='list', args_len=1):

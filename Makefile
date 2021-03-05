@@ -5,15 +5,21 @@ debug:
 	pip install . --force --no-deps
 
 install:
-	poetry install
+	poetry install -v
+
+isort:
+	poetry run isort pytezos
+
+pylint:
+	poetry run pylint pytezos || poetry run pylint-exit $$?
 
 mypy:
-	mypy pytezos
+	poetry run mypy pytezos
 
-lint: mypy
+lint: isort pylint mypy
 
 test:
-	pytest -v .
+	poetry run pytest -v .
 
 docs:
 	cd docs && rm -rf ./build && $(MAKE) html

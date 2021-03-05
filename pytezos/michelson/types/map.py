@@ -1,8 +1,14 @@
-from typing import Optional, Tuple, Generator, List, Type
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import parse_micheline_value, Micheline, MichelineSequence
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.types.base import MichelsonType
 
 
 class EltLiteral(Micheline, prim='Elt', args_len=2):

@@ -1,6 +1,7 @@
+from pprint import pformat
+
 import requests
 from simplejson import JSONDecodeError
-from pprint import pformat
 
 
 def urljoin(*args):

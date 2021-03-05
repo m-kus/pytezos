@@ -1,7 +1,8 @@
-from typing import Type, Optional
+from typing import Optional
+from typing import Type
 
-from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.types.base import MichelsonType
 
 
 class OperationType(MichelsonType, prim='operation'):

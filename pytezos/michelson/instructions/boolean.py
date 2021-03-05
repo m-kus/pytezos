@@ -1,9 +1,17 @@
-from typing import List, Callable, cast, Tuple, Union
+from typing import Callable
+from typing import List
+from typing import Tuple
+from typing import Union
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.instructions.base import dispatch_types, format_stdout, MichelsonInstruction
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import dispatch_types
+from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BoolType, NatType, IntType
+from pytezos.michelson.types import BoolType
+from pytezos.michelson.types import IntType
+from pytezos.michelson.types import NatType
 
 
 def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add: Callable):

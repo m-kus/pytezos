@@ -1,8 +1,10 @@
 from os.path import dirname
 
-from pytezos.rpc.node import RpcNode
+from pytezos.jupyter import InlineDocstring
+from pytezos.jupyter import get_attr_docstring
+from pytezos.jupyter import get_class_docstring
 from pytezos.rpc.docs import rpc_docs
-from pytezos.jupyter import get_attr_docstring, get_class_docstring, InlineDocstring
+from pytezos.rpc.node import RpcNode
 
 
 def format_docstring(class_type, query_path):

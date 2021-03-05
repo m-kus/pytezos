@@ -1,4 +1,11 @@
-from typing import List, Type, cast, Dict, Tuple, Any, Union, Optional
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline
@@ -67,5 +74,5 @@ class MichelsonInstruction(Micheline):
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
-    def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         raise NotImplementedError

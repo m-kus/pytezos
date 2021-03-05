@@ -1,8 +1,8 @@
 from typing import List
 
-from pytezos.operation.result import OperationResult
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.michelson.program import MichelsonProgram
+from pytezos.operation.result import OperationResult
 
 
 class ContractCallResult(OperationResult):

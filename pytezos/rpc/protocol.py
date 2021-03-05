@@ -1,14 +1,16 @@
-import pendulum
-import bson  # type: ignore
-from pendulum.parsing.exceptions import ParserError
 from datetime import datetime
 from itertools import count
 from typing import Iterator
 
+import bson  # type: ignore
+import pendulum
+from pendulum.parsing.exceptions import ParserError
+
+from pytezos.crypto.encoding import is_bh
+from pytezos.crypto.encoding import is_ogh
 from pytezos.jupyter import get_attr_docstring
-from pytezos.rpc.search import BlockSliceQuery
 from pytezos.rpc.query import RpcQuery
-from pytezos.crypto.encoding import is_bh, is_ogh
+from pytezos.rpc.search import BlockSliceQuery
 
 
 def to_timestamp(v):

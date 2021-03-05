@@ -1,8 +1,10 @@
-import base58  # type: ignore
-import strict_rfc3339  # type: ignore
 from typing import Tuple
 
-from pytezos.crypto.encoding import base58_encode, base58_decode
+import base58  # type: ignore
+import strict_rfc3339  # type: ignore
+
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.michelson.tags import prim_tags
 

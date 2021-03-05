@@ -46,10 +46,17 @@ sphinx_rtd_theme = { git = "https://github.com/readthedocs/sphinx_rtd_theme.git"
 sphinx-sitemap = "*"
 sphinxcontrib-googleanalytics = "^0.1"
 bump2version = "^1.0.1"
+pylint = "^2.7.2"
+pylint-exit = "^1.2.0"
+isort = "^5.7.0"
 mypy = "^0.812"
 
 [tool.poetry.scripts]
 pytezos = 'pytezos.cli.cli:cli'
+
+[tool.isort]
+force_single_line = true
+line_length = 140
 
 [build-system]
 requires = ["poetry_core>=1.0.0", "cryptography==3.3.2", "wheel"]

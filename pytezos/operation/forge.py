@@ -1,5 +1,11 @@
-from pytezos.michelson.forge import forge_micheline, forge_script, forge_nat, forge_public_key, \
-    forge_address, forge_bool, forge_array, forge_base58
+from pytezos.michelson.forge import forge_address
+from pytezos.michelson.forge import forge_array
+from pytezos.michelson.forge import forge_base58
+from pytezos.michelson.forge import forge_bool
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import forge_nat
+from pytezos.michelson.forge import forge_public_key
+from pytezos.michelson.forge import forge_script
 
 operation_tags = {
     'endorsement': 0,

@@ -1,10 +1,22 @@
-from typing import Generator, Tuple, Optional, List, Union, Type, cast
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
-from pytezos.michelson.types.base import MichelsonType, Undefined, undefined
-from pytezos.michelson.micheline import parse_micheline_value, Micheline
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_or
-from pytezos.michelson.types.core import Unit, UnitType
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.types.adt import ADTMixin
+from pytezos.michelson.types.adt import Nested
+from pytezos.michelson.types.adt import wrap_or
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import Undefined
+from pytezos.michelson.types.base import undefined
+from pytezos.michelson.types.core import Unit
+from pytezos.michelson.types.core import UnitType
 
 
 class LeftLiteral(Micheline, prim='Left', args_len=1):

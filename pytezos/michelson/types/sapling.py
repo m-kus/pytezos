@@ -1,9 +1,14 @@
 from copy import copy
-from typing import Optional, Type, List
+from typing import List
+from typing import Optional
+from typing import Type
 
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.micheline import MichelineLiteral, parse_micheline_literal, Micheline, MichelineSequence
 from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.types.base import MichelsonType
 
 
 class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len=1):

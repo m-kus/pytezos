@@ -1,5 +1,6 @@
-import requests
 from os.path import join
+
+import requests
 
 
 def create_deployment(repo_slug, oauth_token, environment, ref='master'):
