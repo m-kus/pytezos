@@ -1,3 +1,4 @@
+from typing import Union
 import base58  # type: ignore
 
 
@@ -61,8 +62,10 @@ operation_tags = {
 }
 
 
-def scrub_input(v) -> bytes:
-    if isinstance(v, str) and not isinstance(v, bytes):
+def scrub_input(v: Union[str, bytes]) -> bytes:
+    if isinstance(v, bytes):
+        pass
+    elif isinstance(v, str):
         try:
             _ = int(v, 16)
         except ValueError:
@@ -71,12 +74,10 @@ def scrub_input(v) -> bytes:
             if v.startswith('0x'):
                 v = v[2:]
             v = bytes.fromhex(v)
-
-    if not isinstance(v, bytes):
+    else:
         raise TypeError(
             "a bytes-like object is required (also str), not '%s'" %
             type(v).__name__)
-
     return v
 
 
