@@ -93,8 +93,8 @@ def activate(_ctx, path: str, network: str) -> None:
 
     if ptz.balance() == 0:
         try:
-            opg = ptz.activate_account().autofill().sign()
-            logger.info('Injecting activation operation:')
+            opg = ptz.reveal().autofill().sign()
+            logger.info('Injecting reveal operation:')
             logger.info(pformat(opg.json_payload()))
             opg.inject(_async=False)
         except RpcError as e:
