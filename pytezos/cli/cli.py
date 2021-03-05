@@ -159,10 +159,5 @@ def deploy(
             )
             logger.info(status)
 
-
-def main():
-    return cli(prog_name='pytezos')
-
-
 if __name__ == '__main__':
-    main()
+    cli(prog_name='pytezos')
