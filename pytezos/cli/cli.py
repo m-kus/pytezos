@@ -1,10 +1,10 @@
+import sys
 from glob import glob
 from os.path import abspath
 from os.path import dirname
 from os.path import exists
 from os.path import join
 from pprint import pformat
-from pytezos.cli.github import create_deployment, create_deployment_status
 from typing import Optional
 
 import click
@@ -12,6 +12,8 @@ import click
 from pytezos import ContractInterface
 from pytezos import __version__
 from pytezos import pytezos
+from pytezos.cli.github import create_deployment
+from pytezos.cli.github import create_deployment_status
 from pytezos.context.mixin import default_network  # type: ignore
 from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc
@@ -47,7 +49,7 @@ def get_contract(path):
 @click.group()
 @click.version_option(__version__)
 @click.pass_context
-def cli(*args, **kwargs):
+def cli(*_args, **_kwargs):
     pass
 
 
@@ -55,7 +57,7 @@ def cli(*args, **kwargs):
 @click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
 @click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
 @click.pass_context
-def storage(ctx, action: str, path: Optional[str]) -> None:
+def storage(_ctx, action: str, path: Optional[str]) -> None:
     contract = get_contract(path)
     if action == 'schema':
         logger.info(generate_pydoc(type(contract.storage.data), title='storage'))
@@ -69,7 +71,7 @@ def storage(ctx, action: str, path: Optional[str]) -> None:
 @click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
 @click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
 @click.pass_context
-def parameter(ctx, action: str, path: Optional[str]) -> None:
+def parameter(_ctx, action: str, path: Optional[str]) -> None:
     contract = get_contract(path)
     if action == 'schema':
         logger.info(contract.parameter.__doc__)
@@ -81,14 +83,12 @@ def parameter(ctx, action: str, path: Optional[str]) -> None:
 @click.option('--path', '-p', type=str, help='Path to the .json file downloaded from https://faucet.tzalpha.net/')
 @click.option('--network', '-n', type=str, default=default_network, help='Default is edo2net')
 @click.pass_context
-def activate(ctx, path: str, network: str) -> None:
+def activate(_ctx, path: str, network: str) -> None:
     ptz = pytezos.using(key=path, shell=network)
     logger.info(
-        'Activating %s in the %s'
-        % (
-            ptz.key.public_key_hash(),
-            network,
-        )
+        'Activating %s in the %s',
+        ptz.key.public_key_hash(),
+        network,
     )
 
     if ptz.balance() == 0:
@@ -99,9 +99,9 @@ def activate(ctx, path: str, network: str) -> None:
             opg.inject(_async=False)
         except RpcError as e:
             logger.critical(pformat(e))
-            exit(-1)
+            sys.exit(-1)
         else:
-            logger.info('Activation succeeded! Claimed balance: %s ꜩ' % ptz.balance())
+            logger.info('Activation succeeded! Claimed balance: %s ꜩ', ptz.balance())
     else:
         logger.info('Already activated')
 
@@ -112,9 +112,9 @@ def activate(ctx, path: str, network: str) -> None:
         opg.inject(_async=False)
     except RpcError as e:
         logger.critical(pformat(e))
-        exit(-1)
+        sys.exit(-1)
     else:
-        logger.info('Your key %s is now active and revealed' % ptz.key.public_key_hash())
+        logger.info('Your key %s is now active and revealed', ptz.key.public_key_hash())
 
 
 @cli.command(help='Deploy contract to the specified network')
@@ -127,9 +127,9 @@ def activate(ctx, path: str, network: str) -> None:
 @click.option('--dry-run', type=bool, default=False, help='Set this flag if you just want to see what would happen')
 @click.pass_context
 def deploy(
-    cts,
+    _ctx,
     path: str,
-    storage: Optional[str],
+    storage: Optional[str],  # pylint: disable=redefined-outer-name
     network: str,
     key: Optional[str],
     github_repo_slug: Optional[str],
@@ -137,7 +137,7 @@ def deploy(
     dry_run: bool,
 ):
     ptz = pytezos.using(shell=network, key=key)
-    logger.info('Deploying contract using %s in the %s' % ptz.key.public_key_hash(), network)
+    logger.info('Deploying contract using %s in the %s', ptz.key.public_key_hash(), network)
 
     contract = get_contract(path)
     try:
@@ -147,17 +147,17 @@ def deploy(
 
         if dry_run:
             logger.info(pformat(opg.preapply()))
-            exit(0)
+            sys.exit(0)
         else:
             opg = opg.inject(_async=False)
     except RpcError as e:
         logger.critical(pformat(e))
-        exit(-1)
+        sys.exit(-1)
     else:
         originated_contracts = OperationResult.originated_contracts(opg)
         assert len(originated_contracts) == 1
         bcd_link = make_bcd_link(network, originated_contracts[0])
-        logger.info('Contract was successfully deployed: %s' % bcd_link)
+        logger.info('Contract was successfully deployed: %s', bcd_link)
 
         if github_repo_slug:
             deployment = create_deployment(

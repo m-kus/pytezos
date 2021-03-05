@@ -2,4 +2,9 @@
 max-line-length=140
 
 [MESSAGES CONTROL]
-disable=missing-docstring,unsubscriptable-object,invalid-name,too-many-arguments
+disable=
+    missing-docstring,
+    unsubscriptable-object,
+    invalid-name,
+    too-many-arguments,
+    too-many-locals
