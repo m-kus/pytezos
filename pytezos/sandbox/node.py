@@ -20,7 +20,7 @@ node_container: Optional[DockerContainer] = None
 node_container_client: PyTezosClient = PyTezosClient()
 
 
-class _SandboxedNodeTestCase(unittest.TestCase):
+class SandboxedNodeTestCase(unittest.TestCase):
     IMAGE = 'bakingbad/sandboxed-node:v8.2-2'
 
     @classmethod

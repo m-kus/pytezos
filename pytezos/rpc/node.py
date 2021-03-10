@@ -89,7 +89,7 @@ class RpcNode:
             logger.debug('<<<<< %s\n%s', res.status_code, res.text)
             raise RpcError(f'Not found: {path}')
         elif res.status_code != 200:
-            logger.debug('<<<<< %s\n%s', res.status_code, json.dumps(res.json(), indent=4))
+            logger.debug('<<<<< %s\n%s', res.status_code, pformat(res.text, indent=4))
             raise RpcError.from_response(res)
 
         logger.debug('<<<<< %s\n%s', res.status_code, json.dumps(res.json(), indent=4))

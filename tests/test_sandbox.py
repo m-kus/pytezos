@@ -1,16 +1,15 @@
 import logging
 from unittest import skip
+
 from pytezos.logging import logger
-from pprint import pprint
-from time import sleep
-from pytezos.client import PyTezosClient
-from pytezos.sandbox.node import _SandboxedNodeTestCase
-from pytezos.sandbox.parameters import sandbox_params, sandbox_addresses, sandbox_protocols
+from pytezos.sandbox.node import SandboxedNodeTestCase
+from pytezos.sandbox.parameters import sandbox_addresses
 
 logger.setLevel(logging.DEBUG)
 
+
 # NOTE: Node won't be wiped between tests so alphabetical order of method names matters
-class SandboxedNodeTestCase(_SandboxedNodeTestCase):
+class SandboxTestCase(SandboxedNodeTestCase):
     def test_1_activate_protocol(self) -> None:
         # Arrange
         client = self.get_client().using(key='dictator')
@@ -29,7 +28,6 @@ class SandboxedNodeTestCase(_SandboxedNodeTestCase):
 
         # Act
         op = client.bake_block()
-        # FIXME: proto.008-PtEdo2Zk.operation.not_enough_endorsements_for_priority
         op.fill().sign().inject()
 
         # Assert
@@ -38,12 +36,10 @@ class SandboxedNodeTestCase(_SandboxedNodeTestCase):
     @skip('')
     def test_3_create_transaction(self) -> None:
         # Arrange
-        # FIXME: bootstrap1 private key. Move constants from tezos-init-sandboxed-client.sh script to parameters
-        client = self.get_client().using(key='edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh')
+        client = self.get_client().using(key='bootstrap1')
 
         # Act
         op = client.transaction(
-            source=sandbox_addresses['bootstrap1'],
             destination=sandbox_addresses['bootstrap2'],
             amount=42,
         )
@@ -61,7 +57,6 @@ class SandboxedNodeTestCase(_SandboxedNodeTestCase):
 
         # Act
         op = client.bake_block()
-        # FIXME: proto.008-PtEdo2Zk.operation.not_enough_endorsements_for_priority
         op.fill().sign().inject()
 
         # Assert

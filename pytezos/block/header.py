@@ -1,19 +1,14 @@
 from pprint import pformat
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 import bson  # type: ignore
 
-from pytezos.block.forge import forge_protocol_data
+from pytezos.block.forge import forge_protocol_data, forge_block_header, forge_signed_operation
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.crypto.encoding import base58_encode
-from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
-from pytezos.michelson.forge import forge_array
-from pytezos.michelson.forge import forge_base58
+from pytezos.michelson.forge import forge_array, forge_base58
 
 
 class BlockHeader(ContextMixin):
@@ -21,23 +16,29 @@ class BlockHeader(ContextMixin):
         self,
         context: ExecutionContext,
         protocol_data: Optional[Dict[str, Any]] = None,
-        operations: Optional[List[Dict[str, Any]]] = None,
-        protocol: Optional[str] = None,
-        signature: Optional[str] = None,
-        data: Optional[bytes] = None,
+        operations: Optional[List[List[Dict[str, Any]]]] = None,
+        shell_header: Optional[Dict[str, Any]] = None,
+        signature: Optional[str] = None
     ):
         super().__init__(context=context)
         self.protocol_data = protocol_data or {}
         self.operations = operations or []
-        self.protocol = protocol
+        self.shell_header = shell_header or {}
         self.signature = signature
-        self.data = data
 
     def __repr__(self):
         res = [
             super().__repr__(),
-            '\nPayload',
-            pformat(self.json_payload()),
+            '\nHeader',
+            pformat({
+                **self.shell_header,
+                'protocol_data': {
+                    **self.protocol_data,
+                    'signature': self.signature
+                }
+            }),
+            '\nOperations',
+            pformat(self.operations),
             '\nHelpers',
             get_class_docstring(self.__class__),
         ]
@@ -50,7 +51,7 @@ class BlockHeader(ContextMixin):
             "content": {
                 "command": "activate",
                 "hash": protocol_hash,
-                "fitness": ["00", "0000000000000001"],
+                "fitness": ["00", "0000000000000001"],  # TODO: int <-> fitness converter
                 "protocol_parameters": forge_array(bson.dumps(parameters)).hex(),
             }
         }
@@ -61,37 +62,19 @@ class BlockHeader(ContextMixin):
 
     @classmethod
     def bake_block(cls, context: ExecutionContext, min_fee: int = 0) -> 'BlockHeader':
-        # 1. Query pending operations from the mempool (status == applied)
-        # 2. Apply filters (e.g. select only operations with fee > min_fee) <-- optional
-        # 3. Preapply block with selected operations
-        # 4. There are 5 predefined baking accounts (bootstrap) specified in protocol parameters
-        # 5. Check baking rights for the next level http://127.0.0.1:8732/chains/main/blocks/head/helpers/baking_rights to determine priority
-        # 6. Use previous pow stamp (8 bytes) or zero for level 2
-        # 7. Forge block header
-        # 8. Sign block header
-        # 9. Inject header and operations (forged)
-        # See https://gitlab.com/nomadic-labs/tezos/-/blob/francois@test-forging-block/tests_python/tools/forge.py for the reference
-        baker = context.key.public_key_hash()
-        baking_rights = context.shell.blocks.head.helpers.baking_rights()
-        priority = next(item['priority'] for item in baking_rights if item['delegate'] == baker)  # Fail if no rights
-
-        protocol_data = {
-            "priority": priority,
-            "proof_of_work_nonce": (b'\x00' * 8).hex(),
-        }
-
-        # FIXME: this will likely handled by preapply:
-        # max_operations = context.shell.block()['metadata']['max_operation_list_length'][0]['max_op']
         pending_operations = context.shell.mempool.pending_operations()
         operations: List[Dict[str, Any]] = [
             op
             for op in pending_operations['applied']
             if sum(map(lambda x: int(x['fee']), op['contents'])) >= min_fee  # handle batch case
         ]
-
+        protocol_data = {
+            "priority": 0,  # default
+            "proof_of_work_nonce": "0000000000000000"  # dummy nonce
+        }
         return BlockHeader(
             context=context,
-            operations=operations,
+            operations=[[], [], [], operations],  # TODO: group by validation pass
             protocol_data=protocol_data,
         )
 
@@ -100,97 +83,102 @@ class BlockHeader(ContextMixin):
             context=self.context,
             protocol_data=kwargs.get('protocol_data', self.protocol_data.copy()),
             operations=kwargs.get('operations', self.operations.copy()),
-            protocol=kwargs.get('protocol', self.protocol),
+            shell_header=kwargs.get('shell_header', self.shell_header.copy()),
             signature=kwargs.get('signature', self.signature),
-            data=kwargs.get('data', self.data),
         )
 
     def fill(self) -> 'BlockHeader':
-        """Fill the protocol field
+        """Fill missing fields essential for preapply
 
         :rtype: BlockHeader
         """
-        res = self.shell.head.protocols()
-        return self._spawn(protocol=res['next_protocol'])
-
-    def json_payload(self) -> dict:
-        """Get json payload used for the preapply."""
-        signature = self.signature
-        if signature is None:
-            signature = base58_encode(b'\x00' * 64, b'sig').decode()  # null signature, works for preapply
-
-        return {
-            "protocol_data": {
-                "protocol": self.protocol,
-                **self.protocol_data,
-                "signature": signature,
-            },
-            "operations": self.operation_passes(),
+        protocol = self.shell.head.protocols()['next_protocol']
+        protocol_data = {
+            'protocol': protocol,
+            **self.protocol_data
         }
+
+        if 'priority' in protocol_data:
+            baker = self.key.public_key_hash()
+            baking_rights = self.shell.blocks.head.helpers.baking_rights(delegate=baker)
+            protocol_data['priority'] = next(
+                item['priority']
+                for item in baking_rights
+                if item['delegate'] == baker)  # Fail if no rights
+
+        dummy_signature = base58_encode(b'\x00' * 64, b'sig').decode()
+
+        operations = [
+            [
+                {
+                    'protocol': protocol,
+                    'branch': operation['branch'],
+                    'contents': operation['contents'],
+                    'signature': operation['signature']
+                }
+                for operation in operation_list
+            ]
+            for operation_list in self.operations
+        ]
+
+        payload = {
+            'protocol_data': {
+                **protocol_data,
+                'signature': dummy_signature
+            },
+            'operations': operations,
+        }
+        res = self.shell.head.helpers.preapply.block.post(block=payload, sort=True)
+
+        return self._spawn(shell_header=res['shell_header'],
+                           protocol_data=protocol_data,
+                           operations=operations,
+                           signature=dummy_signature)
 
     def binary_payload(self) -> bytes:
         """Get binary payload used for injection/hash calculation."""
         if self.signature is None:
             raise ValueError('Not signed')
-        if self.data is None:
-            raise ValueError('No data')
-        return self.data + forge_base58(self.signature)
+        return self.forge() + forge_base58(self.signature)
 
-    def operation_passes(self) -> List[List[Dict[str, Any]]]:
-        if self.protocol_data.get('content'):
-            return []
-        else:
-            # FIXME: handle all 4 cases
-            return [[], [], [], self.operations]
+    def forge(self) -> bytes:
+        """Convert json representation of the block header into bytes.
 
-    def forge(self) -> 'str':
-        """Convert json representation of the operation group into bytes.
-
-        :returns: Hex string
+        :returns: Binary payload (unsigned)
         """
-        header = self.preapply()
-        header['protocol_data'] = forge_protocol_data(self.protocol_data).hex()
-        res = self.shell.head.helpers.forge_block_header.post(block_header=header)
-        return res['block']
+        return forge_block_header({
+            **self.shell_header,
+            'protocol_data': forge_protocol_data(self.protocol_data).hex()
+        })
 
     def sign(self):
-        """Sign the operation group with the key specified by `using`.
+        """Sign the block header with the key specified by `using`.
 
         :rtype: BlockHeader
         """
         chain_watermark = bytes.fromhex(self.shell.chains.main.watermark())
         watermark = b'\x01' + chain_watermark
-        data = bytes.fromhex(self.forge())
-        signature = self.key.sign(message=watermark + data)
-        return self._spawn(signature=signature, data=data)
+        signature = self.key.sign(message=watermark + self.forge())
+        return self._spawn(signature=signature)
 
-    def hash(self) -> str:
-        """Calculate the Base58 encoded operation group hash."""
-        hash_digest = blake2b_32(self.binary_payload()).digest()
-        return base58_encode(hash_digest, b'B').decode()
-
-    def preapply(self):
-        """Preapply block
-
-        :returns: shell header and operations
-        """
-        if self.protocol is None:
-            raise ValueError('current protocol is not specified')
-
-        res = self.shell.head.helpers.preapply.block.post(block=self.json_payload())
-        # TODO: handle errored operations https://tezos.gitlab.io/alpha/rpc.html#post-block-id-helpers-preapply-block
-        return res['shell_header']
-
-    def inject(self, _async=False, force=False):
+    def inject(self, force=False) -> str:
         """Inject the signed block header.
 
         :returns: block hash
         """
-        block = {
+        operations = [
+            [
+                {
+                    'branch': operation['branch'],
+                    'data': forge_signed_operation(operation).hex()
+                }
+                for operation in operation_list
+            ]
+            for operation_list in self.operations
+        ]
+
+        payload = {
             "data": self.binary_payload().hex(),
-            "operations": self.operation_passes(),
+            "operations": operations
         }
-        block_hash = self.shell.injection.block.post(block=block, _async=False, force=force)
-        if not _async:
-            self.shell.wait_next_block(time_between_blocks=0, delay_sec=.1, max_iterations=100)
-        return block_hash
+        return self.shell.injection.block.post(block=payload, _async=False, force=force)
