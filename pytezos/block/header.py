@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 import bson  # type: ignore
 
+from pytezos.crypto.key import blake2b_32
 from pytezos.block.forge import forge_protocol_data, forge_block_header, forge_signed_operation
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
@@ -135,6 +136,20 @@ class BlockHeader(ContextMixin):
                            operations=operations,
                            signature=dummy_signature)
 
+    def work(self):
+        header = self
+        threshold = (1 << 63) - 1
+        nonce = 1
+
+        while header.pow_stamp() > threshold:
+            header = self._spawn(protocol_data={
+                **self.protocol_data,
+                'proof_of_work_nonce': nonce.to_bytes(8, 'big').hex()
+            })
+            nonce += 1
+
+        return header
+
     def binary_payload(self) -> bytes:
         """Get binary payload used for injection/hash calculation."""
         if self.signature is None:
@@ -151,6 +166,11 @@ class BlockHeader(ContextMixin):
             'protocol_data': forge_protocol_data(self.protocol_data).hex()
         })
 
+    def pow_stamp(self) -> int:
+        data = self.forge() + b'\x00' * 64
+        hash_digest = blake2b_32(data).digest()
+        return int.from_bytes(hash_digest[:8], 'big')
+
     def sign(self):
         """Sign the block header with the key specified by `using`.
 
@@ -166,6 +186,8 @@ class BlockHeader(ContextMixin):
 
         :returns: block hash
         """
+        print(self.pow_stamp())
+
         operations = [
             [
                 {

@@ -45,7 +45,7 @@ sandbox_params = {
     'quorum_min': 2000.0,
     'quorum_max': 7000.0,
     'min_proposal_quorum': 500.0,
-    'initial_endorsers': 1.0,
+    'initial_endorsers': 0.0,
     'delay_per_missing_endorsement': '1'
 }
 

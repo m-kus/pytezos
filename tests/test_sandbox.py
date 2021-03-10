@@ -1,5 +1,5 @@
 import logging
-from unittest import skip
+from time import sleep
 
 from pytezos.logging import logger
 from pytezos.sandbox.node import SandboxedNodeTestCase
@@ -17,6 +17,7 @@ class SandboxTestCase(SandboxedNodeTestCase):
         # Act
         op = client.activate_protocol('PtEdo2Zk')
         op.fill().sign().inject()
+        sleep(1)
 
         # Assert
         block = client.shell.block()
@@ -28,12 +29,12 @@ class SandboxTestCase(SandboxedNodeTestCase):
 
         # Act
         op = client.bake_block()
-        op.fill().sign().inject()
+        op.fill().work().sign().inject()
+        sleep(1)
 
         # Assert
         ...
 
-    @skip('')
     def test_3_create_transaction(self) -> None:
         # Arrange
         client = self.get_client().using(key='bootstrap1')
@@ -44,20 +45,20 @@ class SandboxTestCase(SandboxedNodeTestCase):
             amount=42,
         )
 
-        op.fill().sign().inject()
+        op.fill(branch_offset=1).sign().inject()
+        sleep(1)
 
         # Assert
         ...
 
-    @skip('')
     def test_4_bake_block(self) -> None:
         # Arrange
         client = self.get_client()
         client.loglevel = 'DEBUG'
 
         # Act
-        op = client.bake_block()
-        op.fill().sign().inject()
+        op = client.using(key='bootstrap1').bake_block()
+        op.fill().work().sign().inject()
 
         # Assert
         ...
