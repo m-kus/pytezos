@@ -197,7 +197,7 @@ class Micheline(metaclass=ErrorTrace):
                 literal = parse_micheline_literal(expr, {
                     'int': int,
                     'string': str,
-                    'bytes': lambda x: bytes.fromhex(x)
+                    'bytes': bytes.fromhex,
                 })
                 return MichelineLiteral.create(literal=literal)
         else:

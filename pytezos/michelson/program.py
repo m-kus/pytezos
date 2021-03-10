@@ -1,3 +1,6 @@
+from abc import ABC
+from pytezos.michelson.sections.output import OutputSection
+from pytezos.michelson.sections.input import InputSection
 from typing import Any
 from typing import List
 from typing import Tuple
@@ -18,6 +21,7 @@ from pytezos.michelson.types import OperationType
 from pytezos.michelson.types import PairType
 
 
+# TODO: Abstract class
 class MichelsonProgram:
     parameter: Type[ParameterSection]
     storage: Type[StorageSection]
@@ -33,9 +37,11 @@ class MichelsonProgram:
         parameter = ParameterSection.match(context.get_parameter_expr())
         storage = StorageSection.match(context.get_storage_expr())
         code = CodeSection.match(context.get_code_expr() if with_code else [])
-        cls = type(MichelsonProgram.__name__, (MichelsonProgram,), dict(parameter=parameter,
-                                                                        storage=storage,
-                                                                        code=code))
+        cls = type(
+            MichelsonProgram.__name__,
+            (MichelsonProgram,),
+            dict(parameter=parameter, storage=storage, code=code),
+        )
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
@@ -45,9 +51,11 @@ class MichelsonProgram:
         parameter = next(arg for arg in sequence.args if issubclass(arg, ParameterSection))
         storage = next(arg for arg in sequence.args if issubclass(arg, StorageSection))
         code = next(arg for arg in sequence.args if issubclass(arg, CodeSection))
-        cls = type(MichelsonProgram.__name__, (MichelsonProgram,), dict(parameter=parameter,
-                                                                        storage=storage,
-                                                                        code=code))
+        cls = type(
+            MichelsonProgram.__name__,
+            (MichelsonProgram,),
+            dict(parameter=parameter, storage=storage, code=code),
+        )
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
@@ -61,7 +69,7 @@ class MichelsonProgram:
         return [
             cls.parameter.as_micheline_expr(),
             cls.storage.as_micheline_expr(),
-            cls.code.as_micheline_expr()
+            cls.code.as_micheline_expr(),
         ]
 
     @classmethod
@@ -82,14 +90,96 @@ class MichelsonProgram:
         return self.code.args[0].execute(stack, stdout, context)
 
     @try_catch('END')
-    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') \
-            -> Tuple[List[dict], Any, List[dict], PairType]:
+    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
         res = cast(PairType, stack.pop1())
         assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
-        res.assert_type_equal(PairType.create_type(args=[
-            ListType.create_type(args=[OperationType]),
-            self.storage.args[0]
-        ]), message='list of operations + resulting storage')
+        res.assert_type_equal(
+            PairType.create_type(
+                args=[ListType.create_type(args=[OperationType]), self.storage.args[0]],
+            ),
+            message='list of operations + resulting storage',
+        )
+        operations = [op.content for op in res.items[0]]  # type: ignore
+        lazy_diff = []  # type: ignore
+        storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)
+        stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
+        return operations, storage, lazy_diff, res
+
+
+class TztProgram:
+    code: Type[CodeSection]
+    input: Type[InputSection]
+    output: Type[OutputSection]
+
+    def __init__(self, entrypoint: str, input: InputSection, output: OutputSection):
+        self.entrypoint = entrypoint
+        self.input_value = input
+        self.output_value = output
+
+    @staticmethod
+    def load(context: AbstractContext, with_code=False):
+        input = InputSection.match(context.get_input_expr())
+        output = OutputSection.match(context.get_output_expr())
+        code = CodeSection.match(context.get_code_expr() if with_code else [])
+        cls = type(
+            TztProgram.__name__,
+            (TztProgram,),
+            dict(input=input, output=output, code=code),
+        )
+        return cast(Type['TztProgram'], cls)
+    
+    @staticmethod
+    def create(sequence: Type[MichelineSequence]) -> Type['TztProgram']:
+        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
+        assert {arg.prim for arg in sequence.args} == {'code', 'input', 'output'}, 'unexpected sections'
+        input = next(arg for arg in sequence.args if issubclass(arg, InputSection))
+        output = next(arg for arg in sequence.args if issubclass(arg, OutputSection))
+        code = next(arg for arg in sequence.args if issubclass(arg, CodeSection))
+        cls = type(
+            TztProgram.__name__,
+            (TztProgram,),
+            dict(input=input, output=output, code=code),
+        )
+        return cast(Type['TztProgram'], cls)
+
+    @staticmethod
+    def match(expr) -> Type['TztProgram']:
+        seq = cast(Type[MichelineSequence], MichelineSequence.match(expr))
+        assert issubclass(seq, MichelineSequence), f'expected sequence, got {seq.prim}'
+        return TztProgram.create(seq)
+
+    @classmethod
+    def as_micheline_expr(cls):
+        return [
+            cls.code.as_micheline_expr(),
+            cls.input.as_micheline_expr(),
+            cls.output.as_micheline_expr(),
+        ]
+
+    @classmethod
+    def instantiate(cls, entrypoint: str, input, output) -> 'TztProgram':
+        input_value = cls.input.from_micheline_value(input)
+        output_value = cls.output.from_micheline_value(output)
+        return cls(entrypoint, input_value, output_value)
+
+    @try_catch('BEGIN')
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        for item in self.input_value:
+            stack.push(item)
+
+    def execute(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext) -> MichelsonInstruction:
+        return self.code.args[0].execute(stack, stdout, context)
+
+    @try_catch('END')
+    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
+        res = cast(PairType, stack.pop1())
+        assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
+        res.assert_type_equal(
+            PairType.create_type(
+                args=[ListType.create_type(args=[OperationType]), self.storage.args[0]],
+            ),
+            message='list of operations + resulting storage',
+        )
         operations = [op.content for op in res.items[0]]  # type: ignore
         lazy_diff = []  # type: ignore
         storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)

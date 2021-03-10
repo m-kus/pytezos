@@ -78,6 +78,7 @@ from pytezos.michelson.instructions.struct import MemInstruction
 from pytezos.michelson.instructions.struct import NilInstruction
 from pytezos.michelson.instructions.struct import NoneInstruction
 from pytezos.michelson.instructions.struct import SomeInstruction
+from pytezos.michelson.instructions.tzt import StackEltInstruction
 from pytezos.michelson.instructions.struct import UpdateInstruction
 from pytezos.michelson.instructions.tezos import AddressInstruction
 from pytezos.michelson.instructions.tezos import AmountInstruction

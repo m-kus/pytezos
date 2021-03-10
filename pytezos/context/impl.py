@@ -34,6 +34,8 @@ class ExecutionContext(AbstractContext):
         self.parameter_expr = get_script_section(script, 'parameter') if script else None
         self.storage_expr = get_script_section(script, 'storage') if script else None
         self.code_expr = get_script_section(script, 'code') if script else None
+        self.input_expr = get_script_section(script, 'input') if script else None
+        self.output_expr = get_script_section(script, 'output') if script else None
         self.origination_index = 1
         self.tmp_big_map_index = 0
         self.tmp_sapling_index = 0
@@ -128,6 +130,12 @@ class ExecutionContext(AbstractContext):
     def get_code_expr(self):
         return self.code_expr
 
+    def get_input_expr(self):
+        return self.input_expr
+
+    def get_output_expr(self):
+        return self.output_expr
+
     def set_storage_expr(self, expr):
         self.storage_expr = expr
 
@@ -136,6 +144,12 @@ class ExecutionContext(AbstractContext):
 
     def set_code_expr(self, expr):
         self.code_expr = expr
+
+    def set_input_expr(self, expr):
+        self.input_expr = expr
+
+    def set_output_expr(self, expr):
+        self.output_expr = expr
 
     def get_big_map_value(self, ptr: int, key_hash: str):
         if ptr < 0:

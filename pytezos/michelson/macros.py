@@ -48,7 +48,7 @@ def expand_macro(prim, annots, args, internal=False, extra=None):
     :param prim: macro name
     :param annots: annotations (optional)
     :param args: arguments (optional)
-    :param internal: this function is called during another mocro expansion
+    :param internal: this function is called during another macro expansion
     :param extra: list of ignored primitives
     :returns: Code sequence (Micheline expression)
     """

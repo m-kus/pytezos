@@ -1,0 +1,3 @@
+[submodule "tests/tzt"]
+	path = tests/tzt
+	url = https://gitlab.com/tezos/tzt-reference-test-suite.git
