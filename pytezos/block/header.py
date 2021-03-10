@@ -186,8 +186,6 @@ class BlockHeader(ContextMixin):
 
         :returns: block hash
         """
-        print(self.pow_stamp())
-
         operations = [
             [
                 {
