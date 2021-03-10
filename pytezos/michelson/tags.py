@@ -140,5 +140,10 @@ prim_tags = {
     'READ_TICKET': b'\x89',
     'SPLIT_TICKET': b'\x8A',
     'JOIN_TICKETS': b'\x8B',
-    'GET_AND_UPDATE': b'\x8C'
+    'GET_AND_UPDATE': b'\x8C',
+
+    # FIXME: tzt values
+    'input': b'\xEE',
+    'output': b'\xEE',
+    'Stack_elt': b'\xEE',
 }

@@ -1,3 +1,0 @@
-code { CONS } ;
-input { Stack_elt int 5 ; Stack_elt (list int) { 7 } } ;
-output { Stack_elt (list int) { 5 ; 7 } }

@@ -1,3 +1,0 @@
-code { NIL nat } ;
-input { } ;
-output { Stack_elt (list nat) { } }

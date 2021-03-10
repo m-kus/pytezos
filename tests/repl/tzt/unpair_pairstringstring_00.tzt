@@ -1,3 +1,0 @@
-code { UNPAIR } ;
-input { Stack_elt (pair string string) (Pair "first" "second") } ;
-output { Stack_elt string "first" ; Stack_elt string "second" }

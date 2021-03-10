@@ -1,3 +1,0 @@
-code { COMPARE } ;
-input { Stack_elt bool True ; Stack_elt bool True } ;
-output { Stack_elt int 0 }

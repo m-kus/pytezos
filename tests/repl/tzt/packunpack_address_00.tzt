@@ -1,3 +1,0 @@
-code { PACK ; UNPACK address } ;
-input { Stack_elt address "tz1cxcwwnzENRdhe2Kb8ZdTrdNy4bFNyScx5" } ;
-output { Stack_elt (option address) (Some "tz1cxcwwnzENRdhe2Kb8ZdTrdNy4bFNyScx5") }

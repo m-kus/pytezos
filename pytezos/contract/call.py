@@ -22,7 +22,7 @@ def skip_nones(**kwargs) -> dict:
 
 
 def is_edo(context: ExecutionContext) -> bool:
-    return context.shell.head.header()['protocol'].startswith('PtEdo')
+    return context.shell.head.header()['protocol'].startswith('PtEdo')  # type: ignore
 
 
 class ContractCall(ContextMixin):
@@ -107,6 +107,7 @@ class ContractCall(ContextMixin):
             initial_storage = storage_ty.dummy(self.context).to_micheline_value(lazy_diff=True)
         else:
             initial_storage = storage_ty.from_python_object(storage).to_micheline_value(lazy_diff=True)
+        assert self.context.script
         operations, storage, lazy_diff, stdout, error = Interpreter.run_code(
             parameter=self.parameters['value'],
             entrypoint=self.parameters['entrypoint'],

@@ -1,4 +1,0 @@
-code { ADDRESS } ;
-input { Stack_elt (contract nat) "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi" } ;
-output { Stack_elt address "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi" } ;
-other_contracts { Contract "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi" nat }

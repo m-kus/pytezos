@@ -1,3 +1,0 @@
-code { UNIT } ;
-input { } ;
-output { Stack_elt unit Unit }

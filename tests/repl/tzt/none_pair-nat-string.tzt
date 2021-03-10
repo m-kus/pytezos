@@ -1,3 +1,0 @@
-code { NONE (pair nat string) } ;
-input { } ;
-output { Stack_elt (option (pair nat string)) None }

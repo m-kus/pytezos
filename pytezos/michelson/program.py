@@ -1,6 +1,4 @@
 from abc import ABC
-from pytezos.michelson.sections.output import OutputSection
-from pytezos.michelson.sections.input import InputSection
 from typing import Any
 from typing import List
 from typing import Tuple
@@ -10,9 +8,12 @@ from typing import cast
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.instructions.tzt import StackEltInstruction
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.micheline import try_catch
 from pytezos.michelson.sections.code import CodeSection
+from pytezos.michelson.sections.input import InputSection
+from pytezos.michelson.sections.output import OutputSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.stack import MichelsonStack
@@ -111,11 +112,6 @@ class TztProgram:
     input: Type[InputSection]
     output: Type[OutputSection]
 
-    def __init__(self, entrypoint: str, input: InputSection, output: OutputSection):
-        self.entrypoint = entrypoint
-        self.input_value = input
-        self.output_value = output
-
     @staticmethod
     def load(context: AbstractContext, with_code=False):
         input = InputSection.match(context.get_input_expr())
@@ -157,31 +153,18 @@ class TztProgram:
         ]
 
     @classmethod
-    def instantiate(cls, entrypoint: str, input, output) -> 'TztProgram':
-        input_value = cls.input.from_micheline_value(input)
-        output_value = cls.output.from_micheline_value(output)
-        return cls(entrypoint, input_value, output_value)
+    def instantiate(cls) -> 'TztProgram':
+        return cls()
 
-    @try_catch('BEGIN')
     def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        for item in self.input_value:
-            stack.push(item)
+        for item in self.input.args[0].args[::-1]:
+            cast(StackEltInstruction, item).push(stack, stdout, context)
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext) -> MichelsonInstruction:
         return self.code.args[0].execute(stack, stdout, context)
 
-    @try_catch('END')
-    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
-        res = cast(PairType, stack.pop1())
-        assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
-        res.assert_type_equal(
-            PairType.create_type(
-                args=[ListType.create_type(args=[OperationType]), self.storage.args[0]],
-            ),
-            message='list of operations + resulting storage',
-        )
-        operations = [op.content for op in res.items[0]]  # type: ignore
-        lazy_diff = []  # type: ignore
-        storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)
-        stdout.append(format_stdout(f'END %{self.entrypoint}', [res], []))
-        return operations, storage, lazy_diff, res
+    def end(self, stack: MichelsonStack, stdout: List[str]) -> None:
+        for item in self.output.args[0].args:
+            cast(StackEltInstruction, item).pull(stack, stdout)
+        
+        assert len(stack) == 0

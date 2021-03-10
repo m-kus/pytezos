@@ -1,3 +1,0 @@
-code { PAIR } ;
-input { Stack_elt nat 5 ; Stack_elt string "Hello" } ;
-output { Stack_elt (pair nat string) (Pair 5 "Hello") }

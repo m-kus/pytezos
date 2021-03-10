@@ -1,3 +1,0 @@
-code { CONCAT } ;
-input { Stack_elt string "hello " ; Stack_elt string "world" } ;
-output { Stack_elt string "hello world" }

@@ -1,3 +1,0 @@
-code { XOR } ;
-input { Stack_elt bool False ; Stack_elt bool True } ;
-output { Stack_elt bool True }

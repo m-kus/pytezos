@@ -50,7 +50,7 @@ def try_catch(prim):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                raise MichelsonRuntimeError(prim, *e.args)
+                raise MichelsonRuntimeError(prim, *e.args) from e
         return wrapper
     return _catch
 

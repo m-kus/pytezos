@@ -1,3 +1,0 @@
-code { EDIV } ;
-input { Stack_elt int 5 ; Stack_elt int 0 } ;
-output { Stack_elt (option (pair int nat)) None }

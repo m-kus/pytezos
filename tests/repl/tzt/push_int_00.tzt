@@ -1,3 +1,0 @@
-code { PUSH int 6 } ;
-input { } ;
-output { Stack_elt int 6 }

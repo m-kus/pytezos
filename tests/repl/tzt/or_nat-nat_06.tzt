@@ -1,3 +1,0 @@
-code { OR } ;
-input { Stack_elt nat 7 ; Stack_elt nat 7 } ;
-output { Stack_elt nat 7 }

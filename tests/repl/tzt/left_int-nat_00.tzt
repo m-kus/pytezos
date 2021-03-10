@@ -1,3 +1,0 @@
-code { LEFT nat } ;
-input { Stack_elt int 5 } ;
-output { Stack_elt (or int nat) (Left 5) }

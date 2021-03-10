@@ -1,3 +1,0 @@
-code { MAP { PUSH string "Hello " ; CONCAT } } ;
-input { Stack_elt (list string) { "World!" } } ;
-output { Stack_elt (list string) { "Hello World!" } }

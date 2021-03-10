@@ -1,3 +1,0 @@
-code { ABS } ;
-input { Stack_elt int -5 } ;
-output { Stack_elt nat 5 }

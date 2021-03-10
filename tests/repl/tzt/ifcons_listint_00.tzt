@@ -1,3 +1,0 @@
-code { IF_CONS  { UNIT ; FAILWITH } { PUSH int 1 }} ;
-input { Stack_elt (list int) { } } ;
-output { Stack_elt int 1 }

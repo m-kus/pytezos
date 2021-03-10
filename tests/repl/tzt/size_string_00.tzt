@@ -1,3 +1,0 @@
-code { SIZE } ;
-input { Stack_elt string "hello" } ;
-output { Stack_elt nat 5 }

@@ -8,6 +8,7 @@ debug:
 	pip install . --force --no-deps
 
 install:
+	git submodule update --init
 	poetry install
 
 isort:

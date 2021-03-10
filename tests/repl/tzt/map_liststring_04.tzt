@@ -1,3 +1,0 @@
-code { MAP { } } ;
-input { Stack_elt (list string) { "1" ; "2" ; "3"  } } ;
-output { Stack_elt (list string) { "1" ; "2" ; "3" } }

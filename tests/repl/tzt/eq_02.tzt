@@ -1,3 +1,0 @@
-code { EQ } ;
-input { Stack_elt int 0 } ;
-output { Stack_elt bool True } ;

@@ -1,3 +1,0 @@
-code { IF { UNIT ; FAILWITH } { PUSH int 1 } } ;
-input { Stack_elt bool False } ;
-output { Stack_elt int 1 }

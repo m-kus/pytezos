@@ -1,3 +1,0 @@
-code { OR } ;
-input { Stack_elt bool True ; Stack_elt bool False } ;
-output { Stack_elt bool True }

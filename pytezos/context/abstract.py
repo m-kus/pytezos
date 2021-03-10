@@ -74,6 +74,12 @@ class AbstractContext:
     def get_code_expr(self):
         raise NotImplementedError
 
+    def get_input_expr(self):
+        raise NotImplementedError
+
+    def get_output_expr(self):
+        raise NotImplementedError
+
     def set_storage_expr(self, type_expr):
         raise NotImplementedError
 
@@ -81,6 +87,12 @@ class AbstractContext:
         raise NotImplementedError
 
     def set_code_expr(self, code_expr):
+        raise NotImplementedError
+
+    def set_input_expr(self, code_expr):
+        raise NotImplementedError
+
+    def set_output_expr(self, code_expr):
         raise NotImplementedError
 
     def get_big_map_value(self, ptr: int, key_hash: str):

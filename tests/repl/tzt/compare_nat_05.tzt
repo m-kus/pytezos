@@ -1,3 +1,0 @@
-code { COMPARE } ;
-input { Stack_elt nat 1923 ; Stack_elt nat 4 } ;
-output { Stack_elt int 1 }

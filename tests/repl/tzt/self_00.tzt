@@ -1,5 +1,0 @@
-code { SELF } ;
-input { } ;
-parameter int ;
-self "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi" ;
-output { Stack_elt (contract int) "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi" }

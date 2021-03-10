@@ -1,4 +1,0 @@
-code { AMOUNT } ;
-input { } ;
-output { Stack_elt mutez 10 } ;
-amount 10

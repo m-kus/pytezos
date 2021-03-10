@@ -1,3 +1,0 @@
-code { NONE int } ;
-input { } ;
-output { Stack_elt (option int) None }

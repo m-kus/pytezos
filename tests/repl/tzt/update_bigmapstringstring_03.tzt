@@ -1,4 +1,0 @@
-code { UPDATE } ;
-input { Stack_elt string "2" ; Stack_elt (option string) None ; Stack_elt (big_map string string) 0 } ;
-output { Stack_elt (big_map string string) { Elt "1" "one" } } ;
-big_maps { Big_map 0 string string { Elt "1" "one" ; Elt "2" "two" } }

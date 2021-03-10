@@ -64,7 +64,7 @@ def expand_macro(prim, annots, args, internal=False, extra=None):
             res = handler(groups[0], annots, args)
             return res if internal else seq(res)
 
-    assert False, f'unknown primitive {prim}'
+    assert False, f'unknown primitive `{prim}`'
 
 
 def get_field_annots(annots):

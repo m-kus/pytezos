@@ -31,6 +31,11 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def __iter__(self) -> Generator[Tuple[MichelsonType, MichelsonType], None, None]:
         yield from iter(self.items)
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, MapType):
+            return False
+        return self.items == other.items
+
     @staticmethod
     def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'MapType':
         cls = MapType.create_type(args=[key_type, val_type])

@@ -1,3 +1,0 @@
-code { SIZE } ;
-input { Stack_elt (map string nat) { Elt "a" 1 } } ;
-output { Stack_elt nat 1 }

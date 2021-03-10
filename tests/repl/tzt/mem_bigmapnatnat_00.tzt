@@ -1,4 +1,0 @@
-code { MEM } ;
-input { Stack_elt nat 1 ; Stack_elt (big_map nat nat) 0 } ;
-output { Stack_elt bool False } ;
-big_maps { Big_map 0 nat nat { Elt 0 1 } }

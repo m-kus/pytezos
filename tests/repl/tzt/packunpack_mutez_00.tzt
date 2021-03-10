@@ -1,3 +1,0 @@
-code { PACK ; UNPACK mutez } ;
-input { Stack_elt mutez 1000 } ;
-output { Stack_elt (option mutez) (Some 1000) }

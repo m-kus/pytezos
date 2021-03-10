@@ -1,3 +1,0 @@
-code { MAP { DIP { DUP } ; ADD ; DIP { PUSH int 1 ; ADD } } } ;
-input { Stack_elt (list int) { } ; Stack_elt int 0 } ;
-output { Stack_elt (list int) { } ; Stack_elt int 0 }

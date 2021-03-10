@@ -1,3 +1,0 @@
-code { MAP { DROP ; PUSH string "" } } ;
-input { Stack_elt (list int) { 1 ; 2 ; 3 ; 4 } } ;
-output { Stack_elt (list string) { "" ; "" ; "" ; "" } }

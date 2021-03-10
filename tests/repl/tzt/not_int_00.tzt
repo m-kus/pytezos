@@ -1,3 +1,0 @@
-code { NOT } ;
-input { Stack_elt int 1 } ;
-output { Stack_elt int -2 }

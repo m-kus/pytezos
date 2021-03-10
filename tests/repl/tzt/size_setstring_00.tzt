@@ -1,3 +1,0 @@
-code { SIZE } ;
-input { Stack_elt (set string) { "a" ; "b" ; "c" ; "d" } } ;
-output { Stack_elt nat 4 }

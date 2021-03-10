@@ -1,3 +1,0 @@
-code { CDR } ;
-input { Stack_elt (pair string string) (Pair "first" "second") } ;
-output { Stack_elt string "second" }

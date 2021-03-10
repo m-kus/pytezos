@@ -1,3 +1,0 @@
-code { SUB } ;
-input { Stack_elt timestamp 0 ; Stack_elt timestamp 0 } ;
-output { Stack_elt int 0 }

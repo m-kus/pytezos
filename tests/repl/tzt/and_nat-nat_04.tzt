@@ -1,3 +1,0 @@
-code { AND } ;
-input { Stack_elt int -5 ; Stack_elt nat 12 } ;
-output { Stack_elt nat 8 }

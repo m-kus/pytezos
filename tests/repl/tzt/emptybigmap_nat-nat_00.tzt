@@ -1,3 +1,0 @@
-code { EMPTY_BIG_MAP nat nat } ;
-input { } ;
-output { Stack_elt (big_map nat nat) { } }

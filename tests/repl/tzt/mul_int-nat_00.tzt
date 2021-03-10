@@ -1,3 +1,0 @@
-code { MUL } ;
-input { Stack_elt int 5 ; Stack_elt nat 2 } ;
-output { Stack_elt int 10 }

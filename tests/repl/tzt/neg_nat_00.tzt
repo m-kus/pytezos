@@ -1,3 +1,0 @@
-code { NEG } ;
-input { Stack_elt nat 5 } ;
-output { Stack_elt int -5 }

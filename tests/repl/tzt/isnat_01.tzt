@@ -1,3 +1,0 @@
-code { ISNAT } ;
-input { Stack_elt int 0 } ;
-output { Stack_elt (option nat) (Some 0) }

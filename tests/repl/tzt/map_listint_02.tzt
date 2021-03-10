@@ -1,3 +1,0 @@
-code { MAP { DUP ; MUL } } ;
-input { Stack_elt (list int) { 3 } } ;
-output { Stack_elt (list int) { 9 } }

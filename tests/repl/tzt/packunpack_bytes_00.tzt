@@ -1,3 +1,0 @@
-code { PACK ; UNPACK bytes } ;
-input { Stack_elt bytes 0x00AABBCC } ;
-output { Stack_elt (option bytes) (Some 0x00AABBCC) }

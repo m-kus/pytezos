@@ -1,3 +1,0 @@
-code { NOT } ;
-input { Stack_elt bool False } ;
-output { Stack_elt bool True }

@@ -1,3 +1,0 @@
-code { EMPTY_MAP string string } ;
-input { } ;
-output { Stack_elt (map string string) { } }

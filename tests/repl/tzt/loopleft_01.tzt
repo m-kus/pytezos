@@ -1,3 +1,0 @@
-code { LOOP_LEFT { FAILWITH } } ;
-input { Stack_elt (or int string) (Right "AAAA") } ;
-output { Stack_elt string "AAAA" }

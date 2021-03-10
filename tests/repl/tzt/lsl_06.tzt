@@ -1,3 +1,0 @@
-code { LSL } ;
-input { Stack_elt nat 15 ; Stack_elt nat 2 } ;
-output { Stack_elt nat 60 }

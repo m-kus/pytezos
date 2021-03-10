@@ -1,3 +1,0 @@
-code { COMPARE } ;
-input { Stack_elt timestamp "1" ; Stack_elt timestamp "2" } ;
-output { Stack_elt int -1 }

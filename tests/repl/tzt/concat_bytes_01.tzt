@@ -1,3 +1,0 @@
-code { CONCAT } ;
-input { Stack_elt bytes 0xFF ; Stack_elt bytes 0xaa } ;
-output { Stack_elt bytes 0xffaa }

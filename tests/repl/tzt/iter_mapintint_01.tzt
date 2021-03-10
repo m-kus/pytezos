@@ -1,3 +1,0 @@
-code { ITER { CDR ; CONS } } ;
-input { Stack_elt (map int int) { Elt 5 2 } ; Stack_elt (list int) { } } ;
-output { Stack_elt (list int) { 2 } }

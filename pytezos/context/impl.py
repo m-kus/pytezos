@@ -15,7 +15,7 @@ class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
-                 key=None, shell=None, address=None, counter=None, script=None, mode=None):
+                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
@@ -31,11 +31,11 @@ class ExecutionContext(AbstractContext):
         self.chain_id = chain_id
         self.voting_power = voting_power
         self.total_voting_power = total_voting_power
-        self.parameter_expr = get_script_section(script, 'parameter') if script else None
-        self.storage_expr = get_script_section(script, 'storage') if script else None
+        self.parameter_expr = get_script_section(script, 'parameter') if script and not tzt else None
+        self.storage_expr = get_script_section(script, 'storage') if script and not tzt else None
         self.code_expr = get_script_section(script, 'code') if script else None
-        self.input_expr = get_script_section(script, 'input') if script else None
-        self.output_expr = get_script_section(script, 'output') if script else None
+        self.input_expr = get_script_section(script, 'input') if script and tzt else None
+        self.output_expr = get_script_section(script, 'output') if script and tzt else None
         self.origination_index = 1
         self.tmp_big_map_index = 0
         self.tmp_sapling_index = 0

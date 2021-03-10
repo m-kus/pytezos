@@ -1,3 +1,0 @@
-code { LT } ;
-input { Stack_elt int 1 } ;
-output { Stack_elt bool False } ;
