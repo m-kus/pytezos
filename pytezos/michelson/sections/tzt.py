@@ -129,3 +129,19 @@ class SourceSection(Micheline, prim='source', args_len=1):
     def execute(cls, stack, stdout: List[str], context: AbstractContext):
         context.set_source_expr(cls.as_micheline_expr())
         stdout.append('source: updated')
+
+
+# FIXME: CodeSection copypaste
+class ChainIdSection(Micheline, prim='chain_id', args_len=1):
+
+    @staticmethod
+    def match(output_expr) -> Type['ChainIdSection']:
+        cls = Micheline.match(output_expr)
+        if not issubclass(cls, ChainIdSection):
+            cls = ChainIdSection.create_type(args=[cls])
+        return cls  # type: ignore
+
+    @classmethod
+    def execute(cls, stack, stdout: List[str], context: AbstractContext):
+        context.set_chain_id_expr(cls.as_micheline_expr())
+        stdout.append('chain_id: updated')

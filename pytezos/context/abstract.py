@@ -98,6 +98,9 @@ class AbstractContext:
     def get_source_expr(self):
         raise NotImplementedError
 
+    def get_chain_id_expr(self):
+        raise NotImplementedError
+
     def set_storage_expr(self, type_expr):
         raise NotImplementedError
 
@@ -129,6 +132,9 @@ class AbstractContext:
         raise NotImplementedError
 
     def set_source_expr(self, code_expr):
+        raise NotImplementedError
+
+    def set_chain_id_expr(self, code_expr):
         raise NotImplementedError
 
     def get_big_map_value(self, ptr: int, key_hash: str):

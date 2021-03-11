@@ -5,6 +5,7 @@ from typing import Type
 from typing import cast
 
 from pytezos.context.impl import ExecutionContext
+from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.instructions.tzt import StackEltInstruction
@@ -17,6 +18,7 @@ from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.michelson.sections.tzt import AmountSection
 from pytezos.michelson.sections.tzt import BalanceSection
+from pytezos.michelson.sections.tzt import ChainIdSection
 from pytezos.michelson.sections.tzt import InputSection
 from pytezos.michelson.sections.tzt import NowSection
 from pytezos.michelson.sections.tzt import OutputSection
@@ -187,6 +189,13 @@ class TztMichelsonProgram:
         source = context.get_source_expr()
         if source:
             context.source = SourceSection.match(source).args[0].get_string()  # type: ignore
+        chain_id = context.get_chain_id_expr()
+        if chain_id:
+            # FIXME: Move to some common place
+            context.chain_id = base58_encode(
+                cast(bytes, ChainIdSection.match(chain_id).args[0].literal),
+                prefix=b'Net',
+            ).decode()
 
     def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):  # pylint: disable=no-self-use
         for item in self.input.args[0].args[::-1]:

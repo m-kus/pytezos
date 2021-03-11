@@ -152,4 +152,5 @@ prim_tags = {
     'self': b'\xEE',
     'now': b'\xEE',
     'source': b'\xEE',
+    'chain_id': b'\xEE',
 }
