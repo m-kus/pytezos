@@ -3,7 +3,6 @@ from pprint import pformat
 from typing import Callable
 from typing import Dict
 from typing import List
-from typing import Literal
 from typing import Optional
 from typing import Sequence
 from typing import Tuple
@@ -12,6 +11,8 @@ from typing import TypeVar
 from typing import Union
 from typing import cast
 from typing import overload
+
+from typing_extensions import Literal
 
 from pytezos.michelson.forge import unforge_address
 from pytezos.michelson.forge import unforge_chain_id

@@ -36,6 +36,7 @@ strict_rfc3339 = "0.7"
 py_ecc = "*"
 deprecation = "*"
 click = "^7.1.2"
+typing-extensions = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
 parameterized = "^0.7.0"
