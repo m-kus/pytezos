@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import Tuple
 
 import base58  # type: ignore
@@ -125,13 +126,14 @@ def forge_base58(value: str) -> bytes:
 
 
 def optimize_timestamp(value: str) -> int:
-    """ Encode timestamp into bytes.
+    """ Convert time string to timestamp.
 
-    :param value: RFC3339 time string
+    :param value: RFC3339 time string or timestamp
     """
     assert isinstance(value, str)
-    return int(strict_rfc3339.rfc3339_to_timestamp(value))
-
+    with suppress(strict_rfc3339.InvalidRFC3339Error):
+        return int(strict_rfc3339.rfc3339_to_timestamp(value))
+    return int(value)
 
 def forge_address(value: str, tz_only=False) -> bytes:
     """ Encode address or key hash into bytes.

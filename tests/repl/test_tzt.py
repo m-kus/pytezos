@@ -26,13 +26,6 @@ class TztTest(TestCase):
         # NOTE: expected: ChainIdType({'value': 'NetXH12Aer3be93'})
         # NOTE: actual: ChainIdType({'value': 'NetXdQprcVkpaWU'})
         "chain_id_01.tzt",
-        # NOTE: InvalidRFC3339Error
-        "compare_timestamp_00.tzt",
-        "compare_timestamp_01.tzt",
-        "compare_timestamp_02.tzt",
-        "compare_timestamp_03.tzt",
-        "compare_timestamp_04.tzt",
-        "compare_timestamp_05.tzt",
         # NOTE: unknown primitive Contract
         "contract_00.tzt",
         "contract_01.tzt",
@@ -82,8 +75,6 @@ class TztTest(TestCase):
         "slice_string_05.tzt",
         # NOTE: unknown primitive `MutezUnderflow`
         "sub_mutez-mutez_01.tzt",
-        # NOTE: InvalidRFC3339Error
-        "sub_timestamp-int_04.tzt",
         # NOTE: failed to parse expression LexToken(_,'_',1,238)
         "transfertokens_00.tzt",
         "transfertokens_01.tzt",
