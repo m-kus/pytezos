@@ -1,15 +1,14 @@
 
-from pytezos.michelson.micheline import MichelineLiteral
-from pytezos.michelson.types.base import MichelsonType
-from typing import List, Type
+from typing import List
+from typing import Type
 
 from pytezos.context.abstract import AbstractContext
 from pytezos.logging import logger
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.micheline import MichelineLiteral
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types.core import IntType
-from pytezos.michelson.types.core import NatType
+from pytezos.michelson.types.base import MichelsonType
 
 
 class StackEltInstruction(MichelsonInstruction, prim='Stack_elt', args_len=2):

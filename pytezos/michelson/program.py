@@ -1,28 +1,34 @@
-from abc import ABC
 from typing import Any
 from typing import List
+from typing import Literal
+from typing import Optional
+from typing import Sequence
 from typing import Tuple
 from typing import Type
+from typing import TypeVar
 from typing import cast
+from typing import overload
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.instructions.tzt import StackEltInstruction
+from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.micheline import try_catch
+from pytezos.michelson.micheline import validate_sections
 from pytezos.michelson.sections.code import CodeSection
-from pytezos.michelson.sections.input import InputSection
-from pytezos.michelson.sections.output import OutputSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
+from pytezos.michelson.sections.tzt import InputSection
+from pytezos.michelson.sections.tzt import OutputSection
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType
 from pytezos.michelson.types import OperationType
 from pytezos.michelson.types import PairType
 
 
-# TODO: Abstract class
 class MichelsonProgram:
     parameter: Type[ParameterSection]
     storage: Type[StorageSection]
@@ -35,34 +41,36 @@ class MichelsonProgram:
 
     @staticmethod
     def load(context: AbstractContext, with_code=False):
-        parameter = ParameterSection.match(context.get_parameter_expr())
-        storage = StorageSection.match(context.get_storage_expr())
-        code = CodeSection.match(context.get_code_expr() if with_code else [])
         cls = type(
             MichelsonProgram.__name__,
             (MichelsonProgram,),
-            dict(parameter=parameter, storage=storage, code=code),
+            dict(
+                parameter=ParameterSection.match(context.get_parameter_expr()),
+                storage=StorageSection.match(context.get_storage_expr()),
+                code=CodeSection.match(context.get_code_expr() if with_code else []),
+            ),
         )
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
     def create(sequence: Type[MichelineSequence]) -> Type['MichelsonProgram']:
-        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
-        assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
-        parameter = next(arg for arg in sequence.args if issubclass(arg, ParameterSection))
-        storage = next(arg for arg in sequence.args if issubclass(arg, StorageSection))
-        code = next(arg for arg in sequence.args if issubclass(arg, CodeSection))
+        validate_sections(sequence, ('parameter', 'storage', 'code'))
         cls = type(
             MichelsonProgram.__name__,
             (MichelsonProgram,),
-            dict(parameter=parameter, storage=storage, code=code),
+            dict(
+                parameter=get_script_section(sequence, cls=ParameterSection, required=True),  # type: ignore
+                storage=get_script_section(sequence, cls=StorageSection, required=True),  # type: ignore
+                code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+            ),
         )
         return cast(Type['MichelsonProgram'], cls)
 
     @staticmethod
     def match(expr) -> Type['MichelsonProgram']:
         seq = cast(Type[MichelineSequence], MichelineSequence.match(expr))
-        assert issubclass(seq, MichelineSequence), f'expected sequence, got {seq.prim}'
+        if not issubclass(seq, MichelineSequence):
+            raise Exception(f'Expected sequence, got {seq.prim}')
         return MichelsonProgram.create(seq)
 
     @classmethod
@@ -93,7 +101,8 @@ class MichelsonProgram:
     @try_catch('END')
     def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
         res = cast(PairType, stack.pop1())
-        assert len(stack) == 0, f'stack is not empty: {repr(stack)}'
+        if len(stack):
+            raise Exception(f'Stack is not empty: {repr(stack)}')
         res.assert_type_equal(
             PairType.create_type(
                 args=[ListType.create_type(args=[OperationType]), self.storage.args[0]],
@@ -107,45 +116,48 @@ class MichelsonProgram:
         return operations, storage, lazy_diff, res
 
 
-class TztProgram:
+class TztMichelsonProgram:
     code: Type[CodeSection]
     input: Type[InputSection]
     output: Type[OutputSection]
 
     @staticmethod
     def load(context: AbstractContext, with_code=False):
-        input = InputSection.match(context.get_input_expr())
-        output = OutputSection.match(context.get_output_expr())
-        code = CodeSection.match(context.get_code_expr() if with_code else [])
         cls = type(
-            TztProgram.__name__,
-            (TztProgram,),
-            dict(input=input, output=output, code=code),
+            TztMichelsonProgram.__name__,
+            (TztMichelsonProgram,),
+            dict(
+                input=InputSection.match(context.get_input_expr()),
+                output=OutputSection.match(context.get_output_expr()),
+                code=CodeSection.match(context.get_code_expr() if with_code else []),
+            ),
         )
-        return cast(Type['TztProgram'], cls)
-    
-    @staticmethod
-    def create(sequence: Type[MichelineSequence]) -> Type['TztProgram']:
-        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
-        assert {arg.prim for arg in sequence.args} == {'code', 'input', 'output'}, 'unexpected sections'
-        input = next(arg for arg in sequence.args if issubclass(arg, InputSection))
-        output = next(arg for arg in sequence.args if issubclass(arg, OutputSection))
-        code = next(arg for arg in sequence.args if issubclass(arg, CodeSection))
-        cls = type(
-            TztProgram.__name__,
-            (TztProgram,),
-            dict(input=input, output=output, code=code),
-        )
-        return cast(Type['TztProgram'], cls)
+        return cast(Type['TztMichelsonProgram'], cls)
 
     @staticmethod
-    def match(expr) -> Type['TztProgram']:
+    def create(sequence: Type[MichelineSequence]) -> Type['TztMichelsonProgram']:
+        validate_sections(sequence, ('input', 'output', 'code'))
+        cls = type(
+            TztMichelsonProgram.__name__,
+            (TztMichelsonProgram,),
+            dict(
+                input=get_script_section(sequence, cls=InputSection, required=True),  # type: ignore
+                output=get_script_section(sequence, cls=OutputSection, required=True),  # type: ignore
+                code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+            ),
+        )
+        return cast(Type['TztMichelsonProgram'], cls)
+
+    @staticmethod
+    def match(expr) -> Type['TztMichelsonProgram']:
         seq = cast(Type[MichelineSequence], MichelineSequence.match(expr))
-        assert issubclass(seq, MichelineSequence), f'expected sequence, got {seq.prim}'
-        return TztProgram.create(seq)
+        if not issubclass(seq, MichelineSequence):
+            raise Exception(f'expected sequence, got {seq.prim}')
+        return TztMichelsonProgram.create(seq)
 
     @classmethod
     def as_micheline_expr(cls):
+        # TODO: Serialize all sections
         return [
             cls.code.as_micheline_expr(),
             cls.input.as_micheline_expr(),
@@ -153,10 +165,13 @@ class TztProgram:
         ]
 
     @classmethod
-    def instantiate(cls) -> 'TztProgram':
+    def instantiate(cls) -> 'TztMichelsonProgram':
         return cls()
 
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+    def fill_context(self, context: AbstractContext) -> None:
+        raise NotImplementedError
+
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):  # pylint: disable=no-self-use
         for item in self.input.args[0].args[::-1]:
             cast(StackEltInstruction, item).push(stack, stdout, context)
 
@@ -166,5 +181,6 @@ class TztProgram:
     def end(self, stack: MichelsonStack, stdout: List[str]) -> None:
         for item in self.output.args[0].args:
             cast(StackEltInstruction, item).pull(stack, stdout)
-        
-        assert len(stack) == 0
+
+        if len(stack):
+            raise Exception('Stack is not empty after processing `output` section')

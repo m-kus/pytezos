@@ -8,7 +8,7 @@ from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParser
 from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.program import TztProgram
+from pytezos.michelson.program import TztMichelsonProgram
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import OperationType
 
@@ -89,21 +89,40 @@ class Interpreter:
             res.execute(stack, stdout, context)
             _, _, _, pair = res.end(stack, stdout)
             operations = cast(List[OperationType], list(pair.items[0]))
-            assert len(operations) == 1, f'multiple internal operations, not sure which one to pick'
+            if not len(operations) == 1:
+                raise Exception('Multiple internal operations, not sure which one to pick')
             return operations[0].to_python_object(), stdout, None
         except MichelsonRuntimeError as e:
             stdout.append(e.format_stdout())
             return None, stdout, e
 
     @staticmethod
-    def run_tzt(script, **kwargs) -> None:
-        context = ExecutionContext(script=dict(code=script), tzt=True, **kwargs)
+    def run_tzt(
+        script,
+        amount=None,
+        chain_id=None,
+        source=None,
+        sender=None,
+        balance=None,
+        block_id=None,
+        **kwargs,
+    ) -> None:
+        context = ExecutionContext(
+            amount=amount,
+            chain_id=chain_id,
+            source=source,
+            sender=sender,
+            balance=balance,
+            block_id=block_id,
+            script=dict(code=script),
+            tzt=True,
+            **kwargs,
+        )
         stack = MichelsonStack()
         stdout = []  # type: ignore
 
-        program = TztProgram.load(context, with_code=True)
+        program = TztMichelsonProgram.load(context, with_code=True)
         res = program.instantiate()
         res.begin(stack, stdout, context)
         res.execute(stack, stdout, context)
         res.end(stack, stdout)
-        return None

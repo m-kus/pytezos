@@ -17,7 +17,6 @@ class TztTest(TestCase):
     exclude = [
         ".git",
         "LICENSE",
-
         # NOTE: unknown primitive `MutezOverflow`
         "add_mutez-mutez_01.tzt",
         # NOTE: unknown primitive `Contract`
@@ -62,7 +61,7 @@ class TztTest(TestCase):
         "lsl_01.tzt",
         # NOTE: unknown primitive `GeneralOverflow`
         "lsr_01.tzt",
-        # NOTE: unknown primitive `Big_map
+        # NOTE: unknown primitive `Big_map`
         "mem_bigmapnatnat_00.tzt",
         "mem_bigmapnatnat_01.tzt",
         "mem_bigmapnatnat_02.tzt",

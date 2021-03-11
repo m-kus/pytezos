@@ -1,4 +1,5 @@
 from datetime import datetime
+from inspect import Parameter
 from typing import Optional
 from typing import Tuple
 
@@ -31,11 +32,16 @@ class ExecutionContext(AbstractContext):
         self.chain_id = chain_id
         self.voting_power = voting_power
         self.total_voting_power = total_voting_power
-        self.parameter_expr = get_script_section(script, 'parameter') if script and not tzt else None
-        self.storage_expr = get_script_section(script, 'storage') if script and not tzt else None
-        self.code_expr = get_script_section(script, 'code') if script else None
-        self.input_expr = get_script_section(script, 'input') if script and tzt else None
-        self.output_expr = get_script_section(script, 'output') if script and tzt else None
+        self.parameter_expr = get_script_section(script, name='parameter') if script and not tzt else None
+        self.storage_expr = get_script_section(script,  name='storage') if script and not tzt else None
+        self.code_expr = get_script_section(script, name='code') if script else None
+        self.input_expr = get_script_section(script, name='input') if script and tzt else None
+        self.output_expr = get_script_section(script,  name='output') if script and tzt else None
+        self.sender_expr = get_script_section(script, name='sender') if script and tzt else None
+        self.balance_expr = get_script_section(script, name='balance') if script and tzt else None
+        self.amount_expr = get_script_section(script, name='amount') if script and tzt else None
+        self.self_expr = get_script_section(script,  name='self') if script and tzt else None
+        self.now_expr = get_script_section(script, name= 'now') if script and tzt else None
         self.origination_index = 1
         self.tmp_big_map_index = 0
         self.tmp_sapling_index = 0
@@ -114,15 +120,14 @@ class ExecutionContext(AbstractContext):
         assert amount <= balance, f'cannot spend {amount} tez, {balance} tez left'
         self.balance_update -= amount
 
-    def get_parameter_expr(self, address=None) -> Optional:  # type: ignore
+    def get_parameter_expr(self, address=None):
         if self.shell and address:
             if address == get_originated_address(0):
                 return None  # dummy callback
             else:
                 script = self.shell.contracts[address].script()
                 return get_script_section(script, 'parameter')
-        else:
-            return None if address else self.parameter_expr
+        return None if address else self.parameter_expr
 
     def get_storage_expr(self):
         return self.storage_expr
@@ -135,6 +140,21 @@ class ExecutionContext(AbstractContext):
 
     def get_output_expr(self):
         return self.output_expr
+
+    def get_sender_expr(self):
+        return self.sender_expr
+
+    def get_balance_expr(self):
+        return self.balance_expr
+
+    def get_amount_expr(self):
+        return self.amount_expr
+
+    def get_self_expr(self):
+        return self.self_expr
+
+    def get_now_expr(self):
+        return self.now_expr
 
     def set_storage_expr(self, expr):
         self.storage_expr = expr
