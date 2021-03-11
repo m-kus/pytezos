@@ -23,12 +23,8 @@ class TztTest(TestCase):
         "address_00.tzt",
         "address_01.tzt",
         "address_02.tzt",
-        # NOTE: unknown primitive `amount`
-        "amount_00.tzt",
-        # NOTE: MichelineSequence not equal
-        "apply_00.tzt",
-        # NOTE: unknown primitive `balance`
-        "balance_00.tzt",
+        # NOTE: expected: ChainIdType({'value': 'NetXH12Aer3be93'})
+        # NOTE: actual: ChainIdType({'value': 'NetXdQprcVkpaWU'})
         "chain_id_01.tzt",
         # NOTE: InvalidRFC3339Error
         "compare_timestamp_00.tzt",
@@ -78,18 +74,12 @@ class TztTest(TestCase):
         "mul_mutez-nat_01.tzt",
         # NOTE: unknown primitive `MutezOverflow
         "mul_nat-mutez_01.tzt",
-        # NOTE: unknown primitive `now`
-        "now_00.tzt",
-        # NOTE: unknown primitive `self`
+        # NOTE: parameter type is not defined
         "self_00.tzt",
-        # NOTE: unknown primitive `sender`
-        "sender_00.tzt",
         # NOTE: failed to parse expression LexToken(_,'_',1,199)
         "setdelegate_00.tzt",
         # NOTE: ('SLICE', 'string is empty')
         "slice_string_05.tzt",
-        # NOTE: unknown primitive `source`
-        "source_00.tzt",
         # NOTE: unknown primitive `MutezUnderflow`
         "sub_mutez-mutez_01.tzt",
         # NOTE: InvalidRFC3339Error

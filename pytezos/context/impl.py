@@ -41,7 +41,8 @@ class ExecutionContext(AbstractContext):
         self.balance_expr = get_script_section(script, name='balance') if script and tzt else None
         self.amount_expr = get_script_section(script, name='amount') if script and tzt else None
         self.self_expr = get_script_section(script,  name='self') if script and tzt else None
-        self.now_expr = get_script_section(script, name= 'now') if script and tzt else None
+        self.now_expr = get_script_section(script, name='now') if script and tzt else None
+        self.source_expr = get_script_section(script, name='source') if script and tzt else None
         self.origination_index = 1
         self.tmp_big_map_index = 0
         self.tmp_sapling_index = 0
@@ -156,6 +157,9 @@ class ExecutionContext(AbstractContext):
     def get_now_expr(self):
         return self.now_expr
 
+    def get_source_expr(self):
+        return self.source_expr
+
     def set_storage_expr(self, expr):
         self.storage_expr = expr
 
@@ -170,6 +174,9 @@ class ExecutionContext(AbstractContext):
 
     def set_output_expr(self, expr):
         self.output_expr = expr
+
+    def set_source_expr(self, expr):
+        self.source_expr = expr
 
     def get_big_map_value(self, ptr: int, key_hash: str):
         if ptr < 0:

@@ -119,10 +119,11 @@ class Interpreter:
             **kwargs,
         )
         stack = MichelsonStack()
-        stdout = []  # type: ignore
+        stdout: List[str] = []
 
         program = TztMichelsonProgram.load(context, with_code=True)
         res = program.instantiate()
+        res.fill_context(script, context)
         res.begin(stack, stdout, context)
         res.execute(stack, stdout, context)
         res.end(stack, stdout)

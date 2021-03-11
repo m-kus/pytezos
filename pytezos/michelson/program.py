@@ -1,19 +1,13 @@
 from typing import Any
 from typing import List
-from typing import Literal
-from typing import Optional
-from typing import Sequence
 from typing import Tuple
 from typing import Type
-from typing import TypeVar
 from typing import cast
-from typing import overload
 
-from pytezos.context.abstract import AbstractContext
+from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.instructions.tzt import StackEltInstruction
-from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.micheline import try_catch
@@ -21,8 +15,14 @@ from pytezos.michelson.micheline import validate_sections
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
+from pytezos.michelson.sections.tzt import AmountSection
+from pytezos.michelson.sections.tzt import BalanceSection
 from pytezos.michelson.sections.tzt import InputSection
+from pytezos.michelson.sections.tzt import NowSection
 from pytezos.michelson.sections.tzt import OutputSection
+from pytezos.michelson.sections.tzt import SelfSection
+from pytezos.michelson.sections.tzt import SenderSection
+from pytezos.michelson.sections.tzt import SourceSection
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType
 from pytezos.michelson.types import OperationType
@@ -40,7 +40,7 @@ class MichelsonProgram:
         self.storage_value = storage
 
     @staticmethod
-    def load(context: AbstractContext, with_code=False):
+    def load(context: ExecutionContext, with_code=False):
         cls = type(
             MichelsonProgram.__name__,
             (MichelsonProgram,),
@@ -88,14 +88,14 @@ class MichelsonProgram:
         return cls(entrypoint, parameter_value, storage_value)
 
     @try_catch('BEGIN')
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
         self.parameter_value.attach_context(context)
         self.storage_value.attach_context(context)
         res = PairType.from_comb([self.parameter_value.item, self.storage_value.item])
         stack.push(res)
         stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
-    def execute(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext) -> MichelsonInstruction:
+    def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
         return self.code.args[0].execute(stack, stdout, context)
 
     @try_catch('END')
@@ -122,7 +122,7 @@ class TztMichelsonProgram:
     output: Type[OutputSection]
 
     @staticmethod
-    def load(context: AbstractContext, with_code=False):
+    def load(context: ExecutionContext, with_code=False):
         cls = type(
             TztMichelsonProgram.__name__,
             (TztMichelsonProgram,),
@@ -168,14 +168,31 @@ class TztMichelsonProgram:
     def instantiate(cls) -> 'TztMichelsonProgram':
         return cls()
 
-    def fill_context(self, context: AbstractContext) -> None:
-        raise NotImplementedError
+    def fill_context(self, script, context: ExecutionContext) -> None:
+        sender = context.get_sender_expr()
+        if sender:
+            context.sender = SenderSection.match(sender).args[0].get_string()  # type: ignore
+        amount = context.get_amount_expr()
+        if amount:
+            context.amount = AmountSection.match(amount).args[0].get_int()  # type: ignore
+        balance = context.get_balance_expr()
+        if balance:
+            context.balance = BalanceSection.match(balance).args[0].get_int()  # type: ignore
+        _self = context.get_self_expr()
+        if _self:
+            context.address = SelfSection.match(_self).args[0].get_string()  # type: ignore
+        now = context.get_now_expr()
+        if now:
+            context.now = NowSection.match(now).args[0].get_int()  # type: ignore
+        source = context.get_source_expr()
+        if source:
+            context.source = SourceSection.match(source).args[0].get_string()  # type: ignore
 
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext):  # pylint: disable=no-self-use
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):  # pylint: disable=no-self-use
         for item in self.input.args[0].args[::-1]:
             cast(StackEltInstruction, item).push(stack, stdout, context)
 
-    def execute(self, stack: MichelsonStack, stdout: List[str], context: AbstractContext) -> MichelsonInstruction:
+    def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
         return self.code.args[0].execute(stack, stdout, context)
 
     def end(self, stack: MichelsonStack, stdout: List[str]) -> None:

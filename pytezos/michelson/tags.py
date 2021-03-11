@@ -142,8 +142,14 @@ prim_tags = {
     'JOIN_TICKETS': b'\x8B',
     'GET_AND_UPDATE': b'\x8C',
 
-    # FIXME: tzt values
+    # FIXME: Dummy vaules for TZT, refactor macros
+    'Stack_elt': b'\xEE',
     'input': b'\xEE',
     'output': b'\xEE',
-    'Stack_elt': b'\xEE',
+    'sender': b'\xEE',
+    'amount': b'\xEE',
+    'balance': b'\xEE',
+    'self': b'\xEE',
+    'now': b'\xEE',
+    'source': b'\xEE',
 }

@@ -327,6 +327,12 @@ class LambdaType(MichelsonType, prim='lambda', args_len=2):  # type: ignore
     def __repr__(self):
         return 'Lambda'
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, LambdaType):
+            return False
+        # FIXME: That seems ugly
+        return self.value.as_micheline_expr() == other.value.as_micheline_expr()
+
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         super(LambdaType, cls).generate_pydoc(definitions)
