@@ -44,7 +44,7 @@ def catch(prim, func):
                 e.args = (type(e).__name__,)
             if prim:
                 e.args = (prim, *e.args)
-            raise MichelsonRuntimeError(*e.args)
+            raise MichelsonRuntimeError(*e.args) from e
     return wrapper
 
 

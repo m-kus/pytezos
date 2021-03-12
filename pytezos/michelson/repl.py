@@ -4,7 +4,7 @@ from typing import Optional
 from typing import Tuple
 from typing import cast
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
+from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParser
 from pytezos.michelson.program import MichelsonProgram
@@ -124,6 +124,7 @@ class Interpreter:
         program = TztMichelsonProgram.load(context, with_code=True)
         res = program.instantiate()
         res.fill_context(script, context)
+        res.register_bigmaps(stack, stdout, context)
         res.begin(stack, stdout, context)
         res.execute(stack, stdout, context)
-        res.end(stack, stdout)
+        res.end(stack, stdout, context)

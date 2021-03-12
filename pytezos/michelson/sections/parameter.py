@@ -21,7 +21,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
     root_name: str
 
     def __init__(self, item: MichelsonType):
-        super(Micheline, self).__init__()
+        super().__init__()
         self.item = item
 
     def __repr__(self):
@@ -34,7 +34,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             if not issubclass(cls, ParameterSection):
                 cls = ParameterSection.create_type(args=[cls])
         except Exception as e:
-            raise MichelsonRuntimeError('parameter', *e.args)
+            raise MichelsonRuntimeError('parameter', *e.args) from e
         return cls
 
     @classmethod

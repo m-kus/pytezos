@@ -11,7 +11,7 @@ class StorageSection(Micheline, prim='storage', args_len=1):
     args: List[Type[MichelsonType]]  # type: ignore
 
     def __init__(self, item: MichelsonType):
-        super(Micheline, self).__init__()
+        super().__init__()
         self.item = item
 
     def __repr__(self):
@@ -25,13 +25,13 @@ class StorageSection(Micheline, prim='storage', args_len=1):
                 cls = StorageSection.create_type(args=[cls])
             assert cls.args[0].field_name is None, f'argument type cannot be annotated: %{cls.args[0].field_name}'  # type: ignore
         except Exception as e:
-            raise MichelsonRuntimeError('storage', *e.args)
+            raise MichelsonRuntimeError('storage', *e.args) from e
         return cls  # type: ignore
 
     @classmethod
     def execute(cls, stack, stdout: List[str], context: AbstractContext):
         context.set_storage_expr(cls.as_micheline_expr())
-        stdout.append(f'storage: updated')
+        stdout.append('storage: updated')
 
     @classmethod
     def generate_pydoc(cls) -> str:
