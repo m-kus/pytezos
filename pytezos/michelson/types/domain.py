@@ -25,11 +25,11 @@ from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.types.base import Undefined
 from pytezos.michelson.types.core import IntType
 from pytezos.michelson.types.core import MichelsonType
 from pytezos.michelson.types.core import NatType
 from pytezos.michelson.types.core import StringType
-from pytezos.michelson.types.base import Undefined
 
 
 class TimestampType(IntType, prim='timestamp'):  # type: ignore
