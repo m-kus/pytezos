@@ -17,7 +17,7 @@ jobs:
         sudo apt-get update -q
         sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
     - name: Install project
-      run: poetry install -v
+      run: make install
     - name: Run lint
       run: make lint
     - name: Run tests

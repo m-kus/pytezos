@@ -31,7 +31,7 @@ class MainnetContractTestCaseEXDNHE(TestCase):
     def test_parameter_type_exdnhe(self):
         type_expr = self.program.parameter.as_micheline_expr()
         self.assertEqual(
-            get_script_section(self.script, 'parameter'),
+            get_script_section(self.script, name='parameter', required=True),
             type_expr,
             'micheline -> type -> micheline')
 
@@ -46,7 +46,7 @@ class MainnetContractTestCaseEXDNHE(TestCase):
     def test_storage_type_exdnhe(self):
         type_expr = self.program.storage.as_micheline_expr()
         self.assertEqual(
-            get_script_section(self.script, 'storage'),
+            get_script_section(self.script, name='storage', required=True),
             type_expr,
             'micheline -> type -> micheline')
 

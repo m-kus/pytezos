@@ -48,7 +48,7 @@ def expand_macro(prim, annots, args, internal=False, extra=None):
     :param prim: macro name
     :param annots: annotations (optional)
     :param args: arguments (optional)
-    :param internal: this function is called during another mocro expansion
+    :param internal: this function is called during another macro expansion
     :param extra: list of ignored primitives
     :returns: Code sequence (Micheline expression)
     """
@@ -64,7 +64,7 @@ def expand_macro(prim, annots, args, internal=False, extra=None):
             res = handler(groups[0], annots, args)
             return res if internal else seq(res)
 
-    assert False, f'unknown primitive {prim}'
+    assert False, f'unknown primitive `{prim}`'
 
 
 def get_field_annots(annots):

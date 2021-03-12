@@ -97,3 +97,4 @@ from pytezos.michelson.instructions.ticket import JoinTicketsInstruction
 from pytezos.michelson.instructions.ticket import ReadTicketInstruction
 from pytezos.michelson.instructions.ticket import SplitTicketInstruction
 from pytezos.michelson.instructions.ticket import TicketInstruction
+from pytezos.michelson.instructions.tzt import StackEltInstruction

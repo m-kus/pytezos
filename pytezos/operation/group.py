@@ -20,6 +20,7 @@ from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 
 DEFAULT_GAS_RESERVE = 100
+DEFAULT_BURN_RESERVE = 100
 DEFAULT_BRANCH_OFFSET = 50
 
 # NOTE: Explaination: https://pytezos.baking-bad.org/tutorials/02.html#operation-group
@@ -186,6 +187,7 @@ class OperationGroup(ContextMixin, ContentMixin):
     def autofill(
         self,
         gas_reserve: int = DEFAULT_GAS_RESERVE,
+        burn_reserve: int = DEFAULT_BURN_RESERVE,
         counter: Optional[int] = None,
         branch_offset: int = DEFAULT_BRANCH_OFFSET,
         fee: Optional[int] = None,
@@ -195,6 +197,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         """Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
         :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
+        :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
         :param counter: Override counter value (for manual handling)
         :param branch_offset: Select head~offset block as branch, where offset is in range (0, 60)
         :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
@@ -231,7 +234,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             if storage_limit is None:
                 _paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
                 _burned = OperationResult.burned(content)
-                storage_limit = _paid_storage_size_diff + _burned
+                storage_limit = _paid_storage_size_diff + _burned + burn_reserve
 
             content.update(
                 gas_limit=str(gas_limit),

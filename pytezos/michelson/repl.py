@@ -8,12 +8,13 @@ from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParser
 from pytezos.michelson.program import MichelsonProgram
+from pytezos.michelson.program import TztMichelsonProgram
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import OperationType
 
 
 class Interpreter:
-    """ Michelson interpreter reimplemented in Python.
+    """Michelson interpreter reimplemented in Python.
     Based on the following reference: https://tezos.gitlab.io/michelson-reference/
     """
 
@@ -24,9 +25,20 @@ class Interpreter:
         self.debug = debug
 
     @staticmethod
-    def run_code(parameter, storage, script, entrypoint='default', output_mode='readable',
-                 amount=None, chain_id=None, source=None, sender=None, balance=None, block_id=None, **kwargs) \
-            -> Tuple[List[dict], Any, List[dict], List[str], Optional[Exception]]:
+    def run_code(
+        parameter,
+        storage,
+        script,
+        entrypoint='default',
+        output_mode='readable',
+        amount=None,
+        chain_id=None,
+        source=None,
+        sender=None,
+        balance=None,
+        block_id=None,
+        **kwargs,
+    ) -> Tuple[List[dict], Any, List[dict], List[str], Optional[Exception]]:
         context = ExecutionContext(
             amount=amount,
             chain_id=chain_id,
@@ -35,7 +47,7 @@ class Interpreter:
             balance=balance,
             block_id=block_id,
             script=dict(code=script),
-            **kwargs
+            **kwargs,
         )
         stack = MichelsonStack()
         stdout = []  # type: ignore
@@ -44,7 +56,7 @@ class Interpreter:
             res = program.instantiate(
                 entrypoint=entrypoint,
                 parameter=parameter,
-                storage=storage
+                storage=storage,
             )
             res.begin(stack, stdout, context)
             res.execute(stack, stdout, context)
@@ -55,30 +67,63 @@ class Interpreter:
             return [], None, [], stdout, e
 
     @staticmethod
-    def run_view(entrypoint, parameter, storage, context: ExecutionContext) \
-            -> Tuple[Any, List[str], Optional[Exception]]:
+    def run_view(
+        entrypoint,
+        parameter,
+        storage,
+        context: ExecutionContext,
+    ) -> Tuple[Any, List[str], Optional[Exception]]:
         ctx = ExecutionContext(
             shell=context.shell,
             key=context.key,
             block_id=context.block_id,
             script=context.script,
-            address=context.address
+            address=context.address,
         )
         stack = MichelsonStack()
         stdout = []  # type: ignore
         try:
             program = MichelsonProgram.load(ctx, with_code=True)
-            res = program.instantiate(
-                entrypoint=entrypoint,
-                parameter=parameter,
-                storage=storage
-            )
+            res = program.instantiate(entrypoint=entrypoint, parameter=parameter, storage=storage)
             res.begin(stack, stdout, context)
             res.execute(stack, stdout, context)
             _, _, _, pair = res.end(stack, stdout)
             operations = cast(List[OperationType], list(pair.items[0]))
-            assert len(operations) == 1, f'multiple internal operations, not sure which one to pick'
+            if not len(operations) == 1:
+                raise Exception('Multiple internal operations, not sure which one to pick')
             return operations[0].to_python_object(), stdout, None
         except MichelsonRuntimeError as e:
             stdout.append(e.format_stdout())
             return None, stdout, e
+
+    @staticmethod
+    def run_tzt(
+        script,
+        amount=None,
+        chain_id=None,
+        source=None,
+        sender=None,
+        balance=None,
+        block_id=None,
+        **kwargs,
+    ) -> None:
+        context = ExecutionContext(
+            amount=amount,
+            chain_id=chain_id,
+            source=source,
+            sender=sender,
+            balance=balance,
+            block_id=block_id,
+            script=dict(code=script),
+            tzt=True,
+            **kwargs,
+        )
+        stack = MichelsonStack()
+        stdout: List[str] = []
+
+        program = TztMichelsonProgram.load(context, with_code=True)
+        res = program.instantiate()
+        res.fill_context(script, context)
+        res.begin(stack, stdout, context)
+        res.execute(stack, stdout, context)
+        res.end(stack, stdout)

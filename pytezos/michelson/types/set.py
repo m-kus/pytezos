@@ -24,6 +24,11 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from iter(self.items)
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, SetType):
+            return False
+        return self.items == other.items
+
     @staticmethod
     def empty(item_type: Type[MichelsonType]) -> 'SetType':
         cls = SetType.create_type(args=[item_type])

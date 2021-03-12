@@ -204,7 +204,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         if val is Undefined:
             assert self.context, f'context is not attached'
             key_hash = forge_script_expr(key.pack(legacy=True))
-            val_expr = self.context.get_big_map_value(self.ptr, key_hash)
+            val_expr = self.context.get_big_map_value(self.ptr, key_hash)  # type: ignore
             if val_expr is None:
                 return None
             else:

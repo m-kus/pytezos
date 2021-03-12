@@ -1,11 +1,15 @@
 .ONESHELL:
 .PHONY: docs
+.DEFAULT_GOAL: all
+
+all: install lint test cover
 
 debug:
 	pip install . --force --no-deps
 
 install:
-	poetry install -v
+	git submodule update --init
+	poetry install
 
 isort:
 	poetry run isort pytezos
@@ -19,7 +23,10 @@ mypy:
 lint: isort pylint mypy
 
 test:
-	poetry run pytest -v .
+	poetry run pytest --cov-report=term-missing --cov=pytezos --cov-report=xml -v .
+
+cover:
+	poetry run diff-cover coverage.xml
 
 docs:
 	cd docs && rm -rf ./build && $(MAKE) html

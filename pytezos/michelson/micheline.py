@@ -4,10 +4,15 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Sequence
 from typing import Tuple
 from typing import Type
+from typing import TypeVar
 from typing import Union
 from typing import cast
+from typing import overload
+
+from typing_extensions import Literal
 
 from pytezos.michelson.forge import unforge_address
 from pytezos.michelson.forge import unforge_chain_id
@@ -50,7 +55,7 @@ def try_catch(prim):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                raise MichelsonRuntimeError(prim, *e.args)
+                raise MichelsonRuntimeError(prim, *e.args) from e
         return wrapper
     return _catch
 
@@ -67,12 +72,6 @@ class ErrorTrace(type):
                 attr = catch(prim, attr)
             wrapped_attrs[attr_name] = attr
         return type.__new__(mcs, name, bases, wrapped_attrs, **kwargs)
-
-
-def get_script_section(script, section_name):
-    assert isinstance(script, dict), f'expected dict, got {script}'
-    assert isinstance(script['code'], list), f'expected list, got {script.get("code")}'
-    return next(section for section in script['code'] if section['prim'] == section_name)
 
 
 def parse_micheline_prim(prim_expr) -> Tuple[str, list, list]:
@@ -197,7 +196,7 @@ class Micheline(metaclass=ErrorTrace):
                 literal = parse_micheline_literal(expr, {
                     'int': int,
                     'string': str,
-                    'bytes': lambda x: bytes.fromhex(x)
+                    'bytes': bytes.fromhex,
                 })
                 return MichelineLiteral.create(literal=literal)
         else:
@@ -237,6 +236,9 @@ class Micheline(metaclass=ErrorTrace):
     @classmethod
     def execute(cls, stack, stdout, context):
         assert False, f'`execute` has to be explicitly defined'
+
+
+MichelineT = TypeVar('MichelineT', bound=Micheline)
 
 
 class MichelineSequence(Micheline):
@@ -285,3 +287,35 @@ class MichelineLiteral(Micheline):
     def get_bytes(cls) -> bytes:
         assert isinstance(cls.literal, bytes), f'expected bytes, got {cls.literal}'
         return cls.literal
+
+def validate_sections(sequence: Type[MichelineSequence], sections: Sequence[str]) -> None:
+    if len(sequence.args) != len(sections):
+        raise Exception(f'expected {len(sections)} sections, got {len(sequence.args)}')
+    if {arg.prim for arg in sequence.args} != set(sections):
+        raise Exception(f'Unknown sections, expected: {sections}')
+
+
+@overload
+def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[True]) -> MichelineT:
+    ...
+@overload
+def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[False]) -> Optional[MichelineT]:
+    ...
+@overload
+def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[True]) -> MichelineT:
+    ...
+@overload
+def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[False]) -> Optional[MichelineT]:
+    ...
+def get_script_section(sequence, cls = None, name = None, required = False):
+    try:
+        if cls:
+            return next(arg for arg in sequence.args if issubclass(arg, cls))
+        elif name:
+            return next(arg for arg in sequence['code'] if arg['prim'] == name)
+        else:
+            raise Exception('Either `cls` or `name` must be specified')
+    except StopIteration:
+        if required:
+            raise
+    return None

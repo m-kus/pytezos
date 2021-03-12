@@ -104,7 +104,7 @@ class MichelsonParser(object):
                 extra=self.extra
             )
         except AssertionError as e:
-            raise MichelsonParserError(p.slice[1], str(e))
+            raise MichelsonParserError(p.slice[1], str(e)) from e
         p[0] = Sequence(expr) if isinstance(expr, list) else expr
 
     def p_annots(self, p):

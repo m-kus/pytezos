@@ -24,6 +24,11 @@ class ListType(MichelsonType, prim='list', args_len=1):
     def __iter__(self) -> Generator[MichelsonType, None, None]:
         yield from self.items
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, ListType):
+            return False
+        return self.items == other.items
+
     @staticmethod
     def empty(item_type: Type[MichelsonType]):
         cls = ListType.create_type(args=[item_type])
