@@ -1,27 +1,12 @@
-from typing import List
-from typing import Tuple
-from typing import Type
-from typing import Union
-from typing import cast
+from typing import List, Tuple, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.instructions.adt import PairInstruction
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.base import Wildcard
-from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.instructions.base import MichelsonInstruction, Wildcard, format_stdout
 from pytezos.michelson.instructions.stack import PushInstruction
-from pytezos.michelson.micheline import MichelineSequence
-from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BoolType
-from pytezos.michelson.types import LambdaType
-from pytezos.michelson.types import ListType
-from pytezos.michelson.types import MapType
-from pytezos.michelson.types import MichelsonType
-from pytezos.michelson.types import OptionType
-from pytezos.michelson.types import OrType
-from pytezos.michelson.types import PairType
-from pytezos.michelson.types import SetType
+from pytezos.michelson.types import BoolType, LambdaType, ListType, MapType, MichelsonType, OptionType, OrType, PairType, SetType
 
 
 def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],

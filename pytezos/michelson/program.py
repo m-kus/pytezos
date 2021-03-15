@@ -1,37 +1,17 @@
-from typing import Any
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import cast
+from typing import Any, List, Optional, Tuple, Type, cast
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import base58_encode
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.base import format_stdout
-from pytezos.michelson.instructions.tzt import BigMapInstruction
-from pytezos.michelson.instructions.tzt import StackEltInstruction
-from pytezos.michelson.micheline import MichelineSequence
-from pytezos.michelson.micheline import get_script_section
-from pytezos.michelson.micheline import try_catch
-from pytezos.michelson.micheline import validate_sections
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
+from pytezos.michelson.instructions.tzt import BigMapInstruction, StackEltInstruction
+from pytezos.michelson.micheline import MichelineSequence, get_script_section, try_catch, validate_sections
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.sections.tzt import AmountSection
-from pytezos.michelson.sections.tzt import BalanceSection
-from pytezos.michelson.sections.tzt import BigMapsSection
-from pytezos.michelson.sections.tzt import ChainIdSection
-from pytezos.michelson.sections.tzt import InputSection
-from pytezos.michelson.sections.tzt import NowSection
-from pytezos.michelson.sections.tzt import OutputSection
-from pytezos.michelson.sections.tzt import SelfSection
-from pytezos.michelson.sections.tzt import SenderSection
-from pytezos.michelson.sections.tzt import SourceSection
+from pytezos.michelson.sections.tzt import (AmountSection, BalanceSection, BigMapsSection, ChainIdSection, InputSection, NowSection,
+                                            OutputSection, SelfSection, SenderSection, SourceSection)
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import ListType
-from pytezos.michelson.types import OperationType
-from pytezos.michelson.types import PairType
+from pytezos.michelson.types import ListType, OperationType, PairType
 
 
 class MichelsonProgram:

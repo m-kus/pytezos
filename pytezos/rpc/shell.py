@@ -11,8 +11,7 @@ from pytezos.crypto.encoding import base58_decode
 from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
 from pytezos.rpc.query import RpcQuery
-from pytezos.rpc.search import CyclesQuery
-from pytezos.rpc.search import VotingPeriodsQuery
+from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
 
 
 def make_operation_result(**kwargs):
@@ -73,31 +72,42 @@ class ShellQuery(RpcQuery, path=''):
         """
         return self.chains.main.mempool
 
-    def wait_next_block(self, block_hash=None, time_between_blocks: Optional[int] = None):
+    def wait_next_block(self,
+                        delay_sec=1,
+                        block_hash=None,
+                        time_between_blocks: Optional[int] = None,
+                        max_iterations: Optional[int] = None):
         """ Wait until next block is finalized.
 
         :param block_hash: Current block hash (optional). If not set, current head is used.
         :param time_between_blocks: override the corresponding parameter from constants
+        :param max_iterations: Manually set the number of iterations
+        :param delay_sec: Sleep delay
         """
         if time_between_blocks is None:
             time_between_blocks = int(self.block.context.constants()["time_between_blocks"][0])  # type: ignore
-        header = self.head.header()
-        if block_hash is None:
-            block_hash = header['hash']
 
-        prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
-        elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
-        delay_sec = 0 if elapsed_sec > time_between_blocks else time_between_blocks - elapsed_sec
-        logger.info('Wait %s seconds until block %s is finalized' % (delay_sec, block_hash,))
-        sleep(delay_sec)
+        if time_between_blocks > 0:
+            header = self.head.header()
+            if block_hash is None:
+                block_hash = header['hash']
 
-        for i in range(time_between_blocks):
+            prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+            elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
+            sleep_sec = 0 if elapsed_sec > time_between_blocks else time_between_blocks - elapsed_sec
+            logger.info('Wait %s seconds until block %s is finalized' % (sleep_sec, block_hash,))
+            sleep(sleep_sec)
+
+        if max_iterations is None:
+            max_iterations = max(1, time_between_blocks)
+
+        for i in range(max_iterations):
             current_block_hash = self.head.hash()
             if current_block_hash == block_hash:
-                sleep(1)
+                sleep(delay_sec)
             else:
                 return current_block_hash
-        assert False
+        raise StopIteration("Timeout")
 
 
 class ChainQuery(RpcQuery, path='/chains/{}'):
@@ -192,7 +202,7 @@ class BlockInjectionQuery(RpcQuery, path='/injection/block'):
         :param _async: By default, the RPC will wait for the block to be validated before answering, \
         set True if you don't want to.
         :param force:
-        :param chain: Optionally you can specify the chain
+        :param chain: Optionally you can specify the chain (main/test)
         :returns: ID of the block
         """
         return self._post(

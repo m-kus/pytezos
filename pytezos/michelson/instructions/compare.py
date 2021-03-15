@@ -1,13 +1,9 @@
-from typing import Callable
-from typing import List
-from typing import cast
+from typing import Callable, List, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BoolType
-from pytezos.michelson.types import IntType
+from pytezos.michelson.types import BoolType, IntType
 
 
 def compare(a, b) -> int:

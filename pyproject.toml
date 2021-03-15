@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytezos"
-version = "3.0.3"
+version = "3.0.4"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]
@@ -35,6 +35,7 @@ bson = "^0.5.10"
 strict_rfc3339 = "0.7"
 py_ecc = "*"
 deprecation = "*"
+testcontainers = "^3.2.0"
 click = "^7.1.2"
 typing-extensions = "^3.7.4"
 
@@ -57,7 +58,6 @@ diff-cover = "^4.2.3"
 pytezos = 'pytezos.cli.cli:cli'
 
 [tool.isort]
-force_single_line = true
 line_length = 140
 
 [build-system]

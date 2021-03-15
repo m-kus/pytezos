@@ -1,13 +1,6 @@
-from typing import Dict
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
+from typing import Dict, Generator, List, Optional, Tuple, Type, Union
 
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.base import Undefined
+from pytezos.michelson.types.base import MichelsonType, Undefined
 
 
 def get_type_layout(flat_args: List[Tuple[str, Type[MichelsonType]]],

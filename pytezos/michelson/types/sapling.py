@@ -1,13 +1,8 @@
 from copy import copy
-from typing import List
-from typing import Optional
-from typing import Type
+from typing import List, Optional, Type
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.micheline import MichelineLiteral
-from pytezos.michelson.micheline import MichelineSequence
-from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelineSequence, parse_micheline_literal
 from pytezos.michelson.types.base import MichelsonType
 
 

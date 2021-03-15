@@ -1,16 +1,8 @@
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
-from typing import cast
+from typing import Generator, List, Optional, Tuple, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.types.adt import ADTMixin
-from pytezos.michelson.types.adt import Nested
-from pytezos.michelson.types.adt import wrap_pair
+from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_pair
 from pytezos.michelson.types.base import MichelsonType
 
 

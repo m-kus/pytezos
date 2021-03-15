@@ -1,8 +1,6 @@
 from os.path import dirname
 
-from pytezos.jupyter import InlineDocstring
-from pytezos.jupyter import get_attr_docstring
-from pytezos.jupyter import get_class_docstring
+from pytezos.jupyter import InlineDocstring, get_attr_docstring, get_class_docstring
 from pytezos.rpc.docs import rpc_docs
 from pytezos.rpc.node import RpcNode
 

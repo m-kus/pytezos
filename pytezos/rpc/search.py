@@ -1,6 +1,4 @@
-from typing import Any
-from typing import Callable
-from typing import Generator
+from typing import Any, Callable, Generator
 
 from pytezos.crypto.encoding import is_bh
 from pytezos.jupyter import get_attr_docstring

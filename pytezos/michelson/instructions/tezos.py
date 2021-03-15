@@ -1,25 +1,12 @@
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import cast
+from typing import List, Optional, Tuple, Type, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.sections import ParameterSection
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import AddressType
-from pytezos.michelson.types import ChainIdType
-from pytezos.michelson.types import ContractType
-from pytezos.michelson.types import KeyHashType
-from pytezos.michelson.types import MutezType
-from pytezos.michelson.types import NatType
-from pytezos.michelson.types import OperationType
-from pytezos.michelson.types import OptionType
-from pytezos.michelson.types import TimestampType
-from pytezos.michelson.types import UnitType
+from pytezos.michelson.types import (AddressType, ChainIdType, ContractType, KeyHashType, MutezType, NatType, OperationType, OptionType,
+                                     TimestampType, UnitType)
 from pytezos.michelson.types.base import MichelsonType
 
 

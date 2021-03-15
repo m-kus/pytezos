@@ -199,6 +199,7 @@ def is_public_key(v) -> bool:
     """ Check if value is a public key.
     """
     try:
+        # FIXME: Should this function return True for private keys?
         _validate(v, prefixes=[b"edsk", b"edpk", b"spsk", b"p2sk", b"sppk", b"p2pk"])
     except (ValueError, TypeError):
         return False

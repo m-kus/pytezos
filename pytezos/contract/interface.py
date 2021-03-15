@@ -1,9 +1,6 @@
 from decimal import Decimal
-from os.path import exists
-from os.path import expanduser
-from typing import List
-from typing import Optional
-from typing import Union
+from os.path import exists, expanduser
+from typing import List, Optional, Union
 
 import requests
 from deprecation import deprecated  # type: ignore

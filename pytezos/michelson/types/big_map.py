@@ -1,22 +1,11 @@
-from copy import copy
-from copy import deepcopy
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
+from copy import copy, deepcopy
+from typing import Generator, List, Optional, Tuple, Type, Union
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.forge import forge_script_expr
-from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.micheline import MichelineLiteral
-from pytezos.michelson.micheline import MichelineSequence
-from pytezos.michelson.micheline import parse_micheline_literal
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.base import Undefined
-from pytezos.michelson.types.map import EltLiteral
-from pytezos.michelson.types.map import MapType
+from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelineSequence, parse_micheline_literal
+from pytezos.michelson.types.base import MichelsonType, Undefined
+from pytezos.michelson.types.map import EltLiteral, MapType
 
 
 def big_map_diff_to_lazy_diff(big_map_diff: List[dict]):

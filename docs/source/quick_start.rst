@@ -335,7 +335,7 @@ Let's attach shell and key to the contract interface and see the default storage
 
 .. code-block:: python
 
-    >>> ci = ci.using(key='edsk4CsgT5yQSxXGvU1uXMNNcoMLXGSQ99GRh72j6sQyNKgSnkmzTT')
+    >>> ci = contract.using(key='edsk4CsgT5yQSxXGvU1uXMNNcoMLXGSQ99GRh72j6sQyNKgSnkmzTT')
     ... ci.storage.dummy()
     {'manager': 'tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB', 'tickets': {}}
 

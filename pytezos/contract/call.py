@@ -12,8 +12,7 @@ from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.operation.content import format_mutez
-from pytezos.operation.content import format_tez
+from pytezos.operation.content import format_mutez, format_tez
 from pytezos.operation.group import OperationGroup
 
 

@@ -1,14 +1,9 @@
-from typing import Any
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import cast
+from typing import Any, List, Optional, Tuple, cast
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParser
-from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.program import TztMichelsonProgram
+from pytezos.michelson.program import MichelsonProgram, TztMichelsonProgram
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import OperationType
 

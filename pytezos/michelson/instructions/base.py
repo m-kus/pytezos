@@ -1,11 +1,4 @@
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
-from typing import cast
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline

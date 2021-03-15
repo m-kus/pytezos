@@ -1,24 +1,10 @@
 from functools import wraps
 from pprint import pformat
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
-from typing import Type
-from typing import TypeVar
-from typing import Union
-from typing import cast
-from typing import overload
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, TypeVar, Union, cast, overload
 
 from typing_extensions import Literal
 
-from pytezos.michelson.forge import unforge_address
-from pytezos.michelson.forge import unforge_chain_id
-from pytezos.michelson.forge import unforge_micheline
-from pytezos.michelson.forge import unforge_public_key
-from pytezos.michelson.forge import unforge_signature
+from pytezos.michelson.forge import unforge_address, unforge_chain_id, unforge_micheline, unforge_public_key, unforge_signature
 from pytezos.michelson.format import micheline_to_michelson
 
 

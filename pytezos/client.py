@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import Optional
-from typing import Union
+from typing import Optional, Union
 
+from pytezos.block.header import BlockHeader
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.contract.call import ContractCall
 from pytezos.contract.interface import ContractInterface
@@ -11,6 +11,7 @@ from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup
 from pytezos.rpc import ShellQuery
+from pytezos.sandbox.parameters import get_protocol_hash, get_protocol_parameters
 
 
 class PyTezosClient(ContextMixin, ContentMixin):
@@ -129,3 +130,26 @@ class PyTezosClient(ContextMixin, ContentMixin):
     @loglevel.setter
     def loglevel(self, value: Union[str, int]) -> None:
         logger.setLevel(value)
+
+    def activate_protocol(self, alias: str) -> BlockHeader:
+        """ Initiate user-activated upgrade (sandbox only)
+
+        :param alias: known protocol alias (first 8 symbols)
+        :rtype: BlockHeader
+        """
+        return BlockHeader.activate_protocol(
+            protocol_hash=get_protocol_hash(alias),
+            parameters=get_protocol_parameters(alias),
+            context=self.context,
+        )
+
+    def bake_block(self, min_fee: int = 0) -> BlockHeader:
+        """ Create and inject new block with operations from mempool
+
+        :param min_fee: filter operations by fee (default is 0)
+        :rtype: BlockHeader
+        """
+        return BlockHeader.bake_block(
+            min_fee=min_fee,
+            context=self.context,
+        )

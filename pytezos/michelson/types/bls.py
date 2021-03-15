@@ -2,14 +2,12 @@ from typing import cast
 
 from py_ecc import optimized_bls12_381 as bls12_381
 from py_ecc.bls.constants import POW_2_382
-from py_ecc.bls.typing import G1Uncompressed
-from py_ecc.bls.typing import G2Uncompressed
+from py_ecc.bls.typing import G1Uncompressed, G2Uncompressed
 from py_ecc.fields import optimized_bls12_381_FQ as FQ
 from py_ecc.fields import optimized_bls12_381_FQ2 as FQ2
 
 from pytezos.michelson.micheline import parse_micheline_literal
-from pytezos.michelson.types.core import BytesType
-from pytezos.michelson.types.core import IntType
+from pytezos.michelson.types.core import BytesType, IntType
 
 
 class BLS12_381_FrType(IntType, prim='bls12_381_fr'):

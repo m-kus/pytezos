@@ -8,6 +8,11 @@ DEFAULT_LOGGER_CONFIG = {
             'format': '%(message)s',
         },
     },
+    'loggers': {
+        'urllib3.connectionpool': {
+            'level': 'INFO',
+        },
+    },
     'handlers': {
         'default': {
             'class': 'logging.StreamHandler',

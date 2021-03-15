@@ -4,8 +4,7 @@ from typing import Tuple
 import base58  # type: ignore
 import strict_rfc3339  # type: ignore
 
-from pytezos.crypto.encoding import base58_decode
-from pytezos.crypto.encoding import base58_encode
+from pytezos.crypto.encoding import base58_decode, base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.michelson.tags import prim_tags
 
@@ -153,7 +152,7 @@ def forge_address(value: str, tz_only=False) -> bytes:
     elif prefix == 'KT1':
         res = b'\x01' + address + b'\x00'
     else:
-        raise ValueError(value)
+        raise ValueError(f'Can\'t forge address: unknown prefix `{prefix}`')
 
     return res[1:] if tz_only else res
 

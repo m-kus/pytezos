@@ -4,8 +4,7 @@ import tarfile
 from binascii import hexlify
 from collections import OrderedDict
 from tempfile import TemporaryDirectory
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 
 import netstruct  # type: ignore
 import requests
@@ -14,11 +13,8 @@ from tqdm import tqdm  # type: ignore
 
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
-from pytezos.jupyter import InlineDocstring
-from pytezos.jupyter import get_class_docstring
-from pytezos.protocol.diff import apply_patch
-from pytezos.protocol.diff import generate_unidiff_html
-from pytezos.protocol.diff import make_patch
+from pytezos.jupyter import InlineDocstring, get_class_docstring
+from pytezos.protocol.diff import apply_patch, generate_unidiff_html, make_patch
 
 
 def dir_to_files(path) -> List[Tuple[str, str]]:

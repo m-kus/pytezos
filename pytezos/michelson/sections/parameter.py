@@ -1,18 +1,10 @@
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Type
-from typing import Union
-from typing import cast
+from typing import Any, Dict, List, Optional, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
 from pytezos.michelson.types import OrType
 from pytezos.michelson.types.adt import wrap_parameters
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.base import parse_name
+from pytezos.michelson.types.base import MichelsonType, parse_name
 from pytezos.michelson.types.core import Unit
 
 

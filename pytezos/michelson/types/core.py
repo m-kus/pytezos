@@ -1,11 +1,7 @@
 from typing import Type
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.micheline import MichelineLiteral
-from pytezos.michelson.micheline import blind_unpack
-from pytezos.michelson.micheline import parse_micheline_literal
-from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.micheline import Micheline, MichelineLiteral, blind_unpack, parse_micheline_literal, parse_micheline_value
 from pytezos.michelson.types.base import MichelsonType
 
 

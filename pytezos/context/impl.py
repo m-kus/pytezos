@@ -1,13 +1,13 @@
 from datetime import datetime
 from inspect import Parameter
-from typing import Optional
-from typing import Tuple
+from typing import Optional, Tuple
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.context.abstract import get_originated_address
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.michelson.micheline import get_script_section
+from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
 
@@ -55,6 +55,7 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps = {}
         self.tzt_big_maps = {}
+        self._sandboxed: Optional[bool] = None
 
     def reset(self):
         self.counter = None
@@ -74,11 +75,27 @@ class ExecutionContext(AbstractContext):
         raise ValueError("It's not allowed to copy context")
 
     @property
+    def constants(self):
+        if self.shell is None:
+            raise Exception('`shell` is not set')
+        # NOTE: Cached
+        return self.shell.block.context.constants()
+
+    @property
     def script(self) -> Optional[dict]:
         if self.parameter_expr and self.storage_expr and self.code_expr:
             return dict(code=[self.parameter_expr, self.storage_expr, self.code_expr])
         else:
             return None
+
+    @property
+    def sandboxed(self) -> bool:
+        if self.shell is None:
+            raise Exception('`shell` is not set')
+        if self._sandboxed is None:
+            version = self.shell.version()
+            self._sandboxed = version['network_version']['chain_name'] == 'SANDBOXED_TEZOS'
+        return self._sandboxed
 
     def set_counter(self, counter: int):
         self.counter = counter
@@ -233,11 +250,9 @@ class ExecutionContext(AbstractContext):
         if self.now is not None:
             return self.now
         elif self.shell:
-            # NOTE: cached
-            constants = self.shell.block.context.constants()  # type: ignore
             ts = self.shell.head.header()['timestamp']
             dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
-            first_delay = constants['time_between_blocks'][0]
+            first_delay = self.constants['time_between_blocks'][0]
             return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
         else:
             return 0
@@ -317,3 +332,8 @@ class ExecutionContext(AbstractContext):
 
     def set_voting_power(self, address: str, voting_power: int):
         self.voting_power[address] = voting_power
+
+    def get_operations_ttl(self) -> int:
+        if self.sandboxed:
+            return MAX_OPERATIONS_TTL
+        return DEFAULT_OPERATIONS_TTL

@@ -1,16 +1,12 @@
 from copy import copy
 from pprint import pformat
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
+from typing import List, Optional, Tuple, Type
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.domain import AddressType
-from pytezos.michelson.types.domain import NatType
+from pytezos.michelson.types.domain import AddressType, NatType
 from pytezos.michelson.types.pair import PairType
 
 

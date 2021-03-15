@@ -1,19 +1,9 @@
-from typing import List
-from typing import Tuple
-from typing import Union
-from typing import cast
+from typing import List, Tuple, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BigMapType
-from pytezos.michelson.types import BoolType
-from pytezos.michelson.types import ListType
-from pytezos.michelson.types import MapType
-from pytezos.michelson.types import MichelsonType
-from pytezos.michelson.types import OptionType
-from pytezos.michelson.types import SetType
+from pytezos.michelson.types import BigMapType, BoolType, ListType, MapType, MichelsonType, OptionType, SetType
 
 
 class ConsInstruction(MichelsonInstruction, prim='CONS'):

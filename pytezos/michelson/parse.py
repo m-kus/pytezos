@@ -3,8 +3,7 @@ import json
 import re
 
 from ply.lex import Lexer  # type: ignore
-from ply.lex import LexToken
-from ply.lex import lex
+from ply.lex import LexToken, lex
 from ply.yacc import yacc  # type: ignore
 
 from pytezos.michelson.macros import expand_macro

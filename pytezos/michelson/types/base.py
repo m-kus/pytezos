@@ -1,16 +1,8 @@
-from copy import copy
-from copy import deepcopy
-from typing import Any
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
-from typing import cast
+from copy import copy, deepcopy
+from typing import Any, List, Optional, Tuple, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.forge import forge_micheline
-from pytezos.michelson.forge import unforge_micheline
+from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.micheline import Micheline
 
 type_mappings = {

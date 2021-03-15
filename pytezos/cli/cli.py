@@ -1,19 +1,13 @@
 import sys
 from glob import glob
-from os.path import abspath
-from os.path import dirname
-from os.path import exists
-from os.path import join
+from os.path import abspath, dirname, exists, join
 from pprint import pformat
 from typing import Optional
 
 import click
 
-from pytezos import ContractInterface
-from pytezos import __version__
-from pytezos import pytezos
-from pytezos.cli.github import create_deployment
-from pytezos.cli.github import create_deployment_status
+from pytezos import ContractInterface, __version__, pytezos
+from pytezos.cli.github import create_deployment, create_deployment_status
 from pytezos.context.mixin import default_network  # type: ignore
 from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc

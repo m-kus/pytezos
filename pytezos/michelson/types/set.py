@@ -1,11 +1,8 @@
 from copy import copy
-from typing import Generator
-from typing import List
-from typing import Type
+from typing import Generator, List, Type
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import Micheline, MichelineSequence
 from pytezos.michelson.types.base import MichelsonType
 
 

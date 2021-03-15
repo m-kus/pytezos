@@ -1,7 +1,6 @@
 import difflib
 import re
-from os.path import dirname
-from os.path import join
+from os.path import dirname, join
 
 import simplejson as json
 

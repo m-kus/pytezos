@@ -3,21 +3,14 @@ import hashlib
 import json
 from getpass import getpass
 from os import environ as env
-from os.path import abspath
-from os.path import expanduser
-from os.path import join
-from typing import List
-from typing import Optional
-from typing import Union
+from os.path import abspath, expanduser, join
+from typing import List, Optional, Union
 
 from mnemonic import Mnemonic  # type: ignore
 from pyblake2 import blake2b  # type: ignore
 
-from pytezos.crypto.encoding import base58_decode
-from pytezos.crypto.encoding import base58_encode
-from pytezos.crypto.encoding import scrub_input
-from pytezos.jupyter import InlineDocstring
-from pytezos.jupyter import get_class_docstring
+from pytezos.crypto.encoding import base58_decode, base58_encode, scrub_input
+from pytezos.jupyter import InlineDocstring, get_class_docstring
 
 VALID_MNEMONIC_LENGTHS = [12, 15, 18, 21, 24]
 DEFAULT_LANGUAGE = 'english'
