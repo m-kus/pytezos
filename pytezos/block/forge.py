@@ -11,8 +11,7 @@ def forge_int_fixed(value: int, length: int) -> bytes:
 def forge_command(command):
     if command == 'activate':
         return b'\x00'
-    else:
-        raise NotImplementedError(command)
+    raise NotImplementedError(command)
 
 
 def forge_fitness(fitness: List[str]) -> bytes:

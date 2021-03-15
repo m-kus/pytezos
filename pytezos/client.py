@@ -153,3 +153,25 @@ class PyTezosClient(ContextMixin, ContentMixin):
             min_fee=min_fee,
             context=self.context,
         )
+
+    def sign_message(self, message: Union[str, bytes]) -> str:
+        """Sign arbitrary message with guarantee that resulting operation won't be used onchain.
+
+        :param message: Message to sign
+        :returns: Message signature
+        """
+        op = self.failing_noop(message).fill().sign()
+        return op
+
+    def check_message(self, message: Union[str, bytes], public_key: str, signature: str) -> None:
+        """Check message signature
+
+        :param message: Signed operation
+        :param public_key_hash: Signer's public key
+        :param signature: Message signature
+        """
+        pk = Key.from_encoded_key(public_key)
+        pk.verify(
+            signature=signature,
+            message=message,
+        )

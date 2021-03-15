@@ -17,6 +17,7 @@ from pytezos.rpc.errors import RpcError
 
 # NOTE: Explaination: https://pytezos.baking-bad.org/tutorials/02.html#operation-group
 validation_passes = {
+    'failing_noop': 0,
     'endorsement': 0,
     'proposal': 1,
     'ballot': 1,

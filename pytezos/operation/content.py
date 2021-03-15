@@ -264,3 +264,15 @@ class ContentMixin:
             'storage_limit': str(storage_limit),
             'delegate': delegate
         })
+
+    @inline_doc
+    def failing_noop(self, arbitrary: str):
+        """Operation to sign arbitrary data without the risk it will be used onchain.
+
+        :param arbitrary: Message to sign
+        :returns: dict or OperationGroup
+        """
+        return self.operation({
+            'kind': 'failing_noop',
+            'arbitrary': arbitrary,
+        })
