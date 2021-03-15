@@ -1,24 +1,27 @@
 import atexit
 import unittest
-from datetime import datetime
-from time import sleep, time
-from typing import Any, Dict, Optional
+from time import sleep
+from typing import Optional
 
 import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
-from pytezos import logger
-from pytezos.block.header import BlockHeader
 from pytezos.client import PyTezosClient
 
 # NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase and stopped after
 # NOTE: all tests are completed.
 node_container: Optional[DockerContainer] = None
 node_container_client: PyTezosClient = PyTezosClient()
-
+node_fitness: int = 1
 
 class SandboxedNodeTestCase(unittest.TestCase):
     IMAGE = 'bakingbad/sandboxed-node:v8.2-2'
+    PROTOCOL = 'PtEdo2Zk'
+
+    def run(self, result=None):
+        """ Stop after first error """
+        if not result.errors:
+            super().run(result)
 
     @classmethod
     def get_node_url(cls) -> str:
@@ -64,5 +67,17 @@ class SandboxedNodeTestCase(unittest.TestCase):
             except requests.exceptions.ConnectionError:
                 sleep(0.1)
 
-    def get_current_protocol(self) -> Dict[str, Any]:
-        return self.get_client().shell.block.protocols()
+    def get_next_fitness(self) -> int:
+        global node_fitness
+        # NOTE: Comment out to increment first octet
+        node_fitness += 1
+        # NOTE: Uncomment to increment first octet
+        # node_fitness += int('01' + '0' * 16, 16)
+        return node_fitness
+
+    def initialize(self) -> None:
+        op = self.get_client().using(key='dictator').activate_protocol(
+            self.PROTOCOL,
+            node_fitness=self.get_next_fitness()
+        )
+        op.fill(genesis=True).sign().inject()

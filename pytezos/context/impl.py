@@ -1,5 +1,6 @@
 from datetime import datetime
 from inspect import Parameter
+import time
 from typing import Optional, Tuple
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
@@ -52,16 +53,7 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps = {}
         self._sandboxed: Optional[bool] = None
-
-    def reset(self):
-        self.counter = None
-        self.origination_index = 1
-        self.tmp_big_map_index = 0
-        self.tmp_sapling_index = 0
-        self.alloc_big_map_index = 0
-        self.alloc_sapling_index = 0
-        self.balance_update = 0
-        self.big_maps.clear()
+        self._timestamp: int = 0
 
     def __copy__(self):
         raise ValueError("It's not allowed to copy context")
@@ -91,6 +83,24 @@ class ExecutionContext(AbstractContext):
             version = self.shell.version()
             self._sandboxed = version['network_version']['chain_name'] == 'SANDBOXED_TEZOS'
         return self._sandboxed
+
+    @property
+    def timestamp(self) -> int:
+        if not self.sandboxed:
+            return time.time()
+        self._timestamp += 1
+        return self._timestamp
+
+    def reset(self):
+        self.counter = None
+        self.origination_index = 1
+        self.tmp_big_map_index = 0
+        self.tmp_sapling_index = 0
+        self.alloc_big_map_index = 0
+        self.alloc_sapling_index = 0
+        self.balance_update = 0
+        self.big_maps.clear()
+        self._timestamp = 0
 
     def set_counter(self, counter: int):
         self.counter = counter

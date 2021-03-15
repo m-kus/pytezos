@@ -17,7 +17,7 @@ class SandboxTestCase(SandboxedNodeTestCase):
         # Act
         op = client.activate_protocol('PtEdo2Zk')
         op.fill().sign().inject()
-        sleep(1)
+        # sleep(1)
 
         # Assert
         block = client.shell.block()
@@ -30,7 +30,7 @@ class SandboxTestCase(SandboxedNodeTestCase):
         # Act
         op = client.bake_block()
         op.fill().work().sign().inject()
-        sleep(1)
+        # sleep(1)
 
         # Assert
         ...
@@ -45,8 +45,8 @@ class SandboxTestCase(SandboxedNodeTestCase):
             amount=42,
         )
 
-        op.fill(branch_offset=1).sign().inject(min_confirmations=0)
-        sleep(1)
+        op.fill().sign().inject(min_confirmations=0)
+        # sleep(1)
 
         # Assert
         ...
@@ -62,3 +62,8 @@ class SandboxTestCase(SandboxedNodeTestCase):
 
         # Assert
         ...
+
+    # def test_5_rollback(self) -> None:
+    #     # Arrange
+    #     self.initialize()
+    #     self.initialize()

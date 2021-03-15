@@ -1,5 +1,6 @@
 sandbox_protocols = {
-    'PtEdo2Zk': 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
+    'PtEdo2Zk': 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA',
+    'PsFLoren': 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i',
 }
 
 sandbox_addresses = {

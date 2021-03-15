@@ -97,12 +97,12 @@ class OperationGroup(ContextMixin, ContentMixin):
         return self._spawn(contents=self.contents + [content])
 
     def fill(
-            self,
-            counter: Optional[int] = None,
-            branch_offset: Optional[int] = None,
-            ttl: Optional[int] = None,
-        ):
-        """ Try to fill all fields left unfilled, use approximate fees
+        self,
+        counter: Optional[int] = None,
+        branch_offset: Optional[int] = None,
+        ttl: Optional[int] = None,
+    ):
+        """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :param counter: Override counter value (for manual handling)
@@ -324,7 +324,11 @@ class OperationGroup(ContextMixin, ContentMixin):
             if not OperationResult.is_applied(opg_with_metadata):
                 raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
-        opg_hash = self.shell.injection.operation.post(operation=self.binary_payload(), _async=False)
+        opg_hash = self.shell.injection.operation.post(
+            operation=self.binary_payload(),
+            timestamp=self.context.timestamp,
+            _async=False,
+        )
 
         if min_confirmations == 0:
             return {

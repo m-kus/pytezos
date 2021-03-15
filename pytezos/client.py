@@ -131,7 +131,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
     def loglevel(self, value: Union[str, int]) -> None:
         logger.setLevel(value)
 
-    def activate_protocol(self, alias: str) -> BlockHeader:
+    def activate_protocol(self, alias: str, fitness: int = 0) -> BlockHeader:
         """ Initiate user-activated upgrade (sandbox only)
 
         :param alias: known protocol alias (first 8 symbols)
@@ -141,6 +141,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
             protocol_hash=get_protocol_hash(alias),
             parameters=get_protocol_parameters(alias),
             context=self.context,
+            fitness=fitness,
         )
 
     def bake_block(self, min_fee: int = 0) -> BlockHeader:
