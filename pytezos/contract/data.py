@@ -4,6 +4,7 @@ from deprecation import deprecated  # type: ignore
 
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.types.base import MichelsonType, generate_pydoc
