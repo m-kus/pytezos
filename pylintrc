@@ -7,4 +7,5 @@ disable=
     unsubscriptable-object,
     invalid-name,
     too-many-arguments,
-    too-many-locals
+    too-many-locals,
+    too-many-public-methods

@@ -1,0 +1,1238 @@
+{
+    "description": "This contract has a couple of off-chain-views.",
+    "version": "tzcomet-example v0.0.42",
+    "license": {
+        "name": "MIT",
+        "details": "The MIT License"
+    },
+    "homepage": "https://github.com/tqtezos/TZComet",
+    "source": {
+        "tools": [
+            "TZComet",
+            "deploy-examples/main.exe"
+        ],
+        "location": "https://github.com/tqtezos/TZComet/blob/48fed5db6bd367cae0e7a5ef3ec415e6cf76b30b/src/deploy-examples/main.ml#L147"
+    },
+    "errors": [
+        {
+            "error": {
+                "int": "42"
+            },
+            "expansion": {
+                "string": "Hello I'm error 42"
+            }
+        },
+        {
+            "error": {
+                "int": "42"
+            },
+            "expansion": {
+                "bytes": "7175656c7175652063686f7365206e276120706173206d61726368c3a9"
+            },
+            "languages": [
+                "fr"
+            ]
+        },
+        {
+            "view": "does-not-exist"
+        },
+        {
+            "view": "multiply-the-nat-in-storage",
+            "languages": []
+        }
+    ],
+    "views": [
+        {
+            "name": "an-empty-useless-view",
+            "description": "This view has no implementations\u00a0\u2026\n\nWhich is indeed useless.",
+            "implementations": []
+        },
+        {
+            "name": "multiply-negative-number-or-call-failwith",
+            "implementations": [
+                {
+                    "michelson-storage-view": {
+                        "parameter": {
+                            "prim": "int",
+                            "args": [],
+                            "annots": [
+                                "%the_decisive_argument"
+                            ]
+                        },
+                        "return-type": {
+                            "prim": "int",
+                            "args": [],
+                            "annots": [
+                                "%negative_even_number"
+                            ]
+                        },
+                        "code": [
+                            {
+                                "prim": "CAR",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "PUSH",
+                                "args": [
+                                    {
+                                        "prim": "int",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "int": "0"
+                                    }
+                                ],
+                                "annots": []
+                            },
+                            {
+                                "prim": "COMPARE",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "LT",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "IF",
+                                "args": [
+                                    [
+                                        {
+                                            "prim": "FAILWITH",
+                                            "args": [],
+                                            "annots": []
+                                        }
+                                    ],
+                                    [
+                                        {
+                                            "prim": "PUSH",
+                                            "args": [
+                                                {
+                                                    "prim": "int",
+                                                    "args": [],
+                                                    "annots": []
+                                                },
+                                                {
+                                                    "int": "2"
+                                                }
+                                            ],
+                                            "annots": []
+                                        },
+                                        {
+                                            "prim": "MUL",
+                                            "args": [],
+                                            "annots": []
+                                        }
+                                    ]
+                                ],
+                                "annots": []
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "name": "%the_decisive_argument",
+                                "description": "The integer argument if >0 this will fail."
+                            },
+                            {
+                                "name": "%negative_even_number",
+                                "description": "The result, if any, is twice the argument (%the_decisive_argument)."
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "pure": true,
+            "name": "multiply-the-nat-in-storage",
+            "description": "This one is pure, it multiplies the natural number given as argument with the one in storage.",
+            "implementations": [
+                {
+                    "michelson-storage-view": {
+                        "parameter": {
+                            "prim": "nat",
+                            "args": [],
+                            "annots": []
+                        },
+                        "return-type": {
+                            "prim": "nat",
+                            "args": [],
+                            "annots": []
+                        },
+                        "code": [
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "CDR",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "CAR",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "SWAP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "CAR",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "MUL",
+                                "args": [],
+                                "annots": []
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "just-call-balance",
+            "implementations": [
+                {
+                    "michelson-storage-view": {
+                        "return-type": {
+                            "prim": "mutez",
+                            "args": [],
+                            "annots": []
+                        },
+                        "code": [
+                            {
+                                "prim": "DROP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "BALANCE",
+                                "args": [],
+                                "annots": []
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "the-identity",
+            "implementations": [
+                {
+                    "michelson-storage-view": {
+                        "parameter": {
+                            "prim": "pair",
+                            "args": [
+                                {
+                                    "prim": "nat",
+                                    "args": [],
+                                    "annots": [
+                                        "%arg_zero"
+                                    ]
+                                },
+                                {
+                                    "prim": "pair",
+                                    "args": [
+                                        {
+                                            "prim": "string",
+                                            "args": [],
+                                            "annots": [
+                                                "%arg_one"
+                                            ]
+                                        },
+                                        {
+                                            "prim": "mutez",
+                                            "args": [],
+                                            "annots": [
+                                                "%arg_two"
+                                            ]
+                                        }
+                                    ],
+                                    "annots": []
+                                }
+                            ],
+                            "annots": []
+                        },
+                        "return-type": {
+                            "prim": "pair",
+                            "args": [
+                                {
+                                    "prim": "nat",
+                                    "args": [],
+                                    "annots": [
+                                        "%arg_zero"
+                                    ]
+                                },
+                                {
+                                    "prim": "pair",
+                                    "args": [
+                                        {
+                                            "prim": "string",
+                                            "args": [],
+                                            "annots": [
+                                                "%arg_one_result"
+                                            ]
+                                        },
+                                        {
+                                            "prim": "mutez",
+                                            "args": [],
+                                            "annots": [
+                                                "%arg_two"
+                                            ]
+                                        }
+                                    ],
+                                    "annots": []
+                                }
+                            ],
+                            "annots": []
+                        },
+                        "code": [
+                            {
+                                "prim": "CAR",
+                                "args": [],
+                                "annots": []
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "name": "%arg_zero",
+                                "description": "This is obvioulsy ignored."
+                            },
+                            {
+                                "name": "%arg_one",
+                                "description": "This is also ignored, but different."
+                            },
+                            {
+                                "name": "%arg_one_result",
+                                "description": "This is %arg_one on the resulting side."
+                            },
+                            {
+                                "name": "%arg_two",
+                                "description": "This is also ignored, but with a lot of data\n\nLorem ipsuming and all."
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "an-empty-useless-view",
+            "description": "This view has a bunch of implementations\u00a0\u2026\n\nThey are all meaningless.",
+            "implementations": [
+                {
+                    "michelson-storage-view": {
+                        "return-type": {
+                            "prim": "nat",
+                            "args": [],
+                            "annots": []
+                        },
+                        "code": [
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "PAIR",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DIP",
+                                "args": [
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    }
+                                ],
+                                "annots": []
+                            }
+                        ]
+                    }
+                },
+                {
+                    "michelson-storage-view": {
+                        "return-type": {
+                            "prim": "nat",
+                            "args": [],
+                            "annots": []
+                        },
+                        "code": [
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DUP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "PAIR",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "DIP",
+                                "args": [
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "PAIR",
+                                        "args": [],
+                                        "annots": []
+                                    },
+                                    {
+                                        "prim": "DIP",
+                                        "args": [
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            },
+                                            {
+                                                "prim": "PAIR",
+                                                "args": [],
+                                                "annots": []
+                                            }
+                                        ],
+                                        "annots": []
+                                    }
+                                ],
+                                "annots": []
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "get-contract-address",
+            "implementations": [
+                {
+                    "michelson-storage-view": {
+                        "return-type": {
+                            "prim": "address",
+                            "args": [],
+                            "annots": [
+                                "%ret"
+                            ]
+                        },
+                        "code": [
+                            {
+                                "prim": "DROP",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "SELF",
+                                "args": [],
+                                "annots": []
+                            },
+                            {
+                                "prim": "ADDRESS",
+                                "args": [],
+                                "annots": []
+                            }
+                        ],
+                        "annotations": [
+                            {
+                                "name": "%ret",
+                                "description": "The address of the (any) contract, re-obtained in Michelson."
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

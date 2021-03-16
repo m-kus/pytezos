@@ -142,7 +142,7 @@ class ContractCall(ContextMixin):
         :param amount: patch AMOUNT
         :param balance: patch BALANCE
         :param chain_id: patch CHAIN_ID
-        :param gas_limit: restrict max comsumed gas
+        :param gas_limit: restrict max consumed gas
         :rtype: ContractCallResult
         """
         storage_ty = StorageSection.match(self.context.storage_expr)

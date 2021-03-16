@@ -151,7 +151,7 @@ class ContextMixin(metaclass=InlineDocstring):
             try:
                 script = self.shell.contracts[address].script()
             except RpcError as e:
-                raise RpcError(f'Contract {address} not found', *e.args)
+                raise RpcError(f'Contract {address} not found', *e.args) from e
         else:
             script = self.context.script
 

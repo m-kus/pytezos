@@ -23,7 +23,7 @@ class StorageSection(Micheline, prim='storage', args_len=1):
                 cls = StorageSection.create_type(args=[cls])
             assert cls.args[0].field_name is None, f'argument type cannot be annotated: %{cls.args[0].field_name}'  # type: ignore
         except Exception as e:
-            raise MichelsonRuntimeError('storage', *e.args)
+            raise MichelsonRuntimeError('storage', *e.args) from e
         return cls  # type: ignore
 
     @classmethod

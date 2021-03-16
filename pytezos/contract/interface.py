@@ -1,17 +1,22 @@
+import json
 from decimal import Decimal
 from os.path import exists, expanduser
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
+from urllib.parse import urlparse
 
 import requests
+from cached_property import cached_property  # type: ignore
 from deprecation import deprecated  # type: ignore
 
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.context.mixin import ExecutionContext
 from pytezos.contract.data import ContractData
 from pytezos.contract.entrypoint import ContractEntrypoint
+from pytezos.contract.metadata import ContractMetadata
 from pytezos.contract.result import ContractCallResult
 from pytezos.crypto.key import Key
 from pytezos.jupyter import get_class_docstring
+from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
@@ -21,12 +26,12 @@ from pytezos.rpc import ShellQuery
 
 
 class ContractInterface(ContextMixin):
-    """ Proxy class for interacting with a contract.
-    """
+    """Proxy class for interacting with a contract."""
+
     program: MichelsonProgram
 
     def __init__(self, context: ExecutionContext):
-        super(ContractInterface, self).__init__(context=context)
+        super().__init__(context=context)
         self.entrypoints = self.program.parameter.list_entrypoints()
         for entrypoint, ty in self.entrypoints.items():
             attr = ContractEntrypoint(context=context, entrypoint=entrypoint)
@@ -35,13 +40,13 @@ class ContractInterface(ContextMixin):
 
     def __repr__(self):
         res = [
-            super(ContractInterface, self).__repr__(),
+            super().__repr__(),
             '.storage  # access storage data at block `block_id`',
             '.parameter  # root entrypoint',
             '\nEntrypoints',
             *list(map(lambda x: f'.{x}()', self.entrypoints)),
             '\nHelpers',
-            get_class_docstring(self.__class__, attr_filter=lambda x: x not in self.entrypoints)
+            get_class_docstring(self.__class__, attr_filter=lambda x: x not in self.entrypoints),
         ]
         return '\n'.join(res)
 
@@ -50,7 +55,7 @@ class ContractInterface(ContextMixin):
 
     @staticmethod
     def from_url(url: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
-        """ Create contract from michelson source code available via URL
+        """Create contract from michelson source code available via URL
 
         :param url: link to the Michelson file
         :param context: optional execution context
@@ -63,7 +68,7 @@ class ContractInterface(ContextMixin):
 
     @staticmethod
     def from_file(path: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
-        """ Create contract from michelson source code stored in a file.
+        """Create contract from michelson source code stored in a file.
 
         :param path: Path to the `.tz` file
         :param context: optional execution context
@@ -74,7 +79,7 @@ class ContractInterface(ContextMixin):
 
     @staticmethod
     def from_michelson(source: str, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
-        """ Create contract from michelson source code.
+        """Create contract from michelson source code.
 
         :param source: Michelson source code
         :param context: optional execution context
@@ -84,7 +89,7 @@ class ContractInterface(ContextMixin):
 
     @staticmethod
     def from_micheline(expression, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
-        """ Create contract from micheline expression.
+        """Create contract from micheline expression.
 
         :param expression: [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
         :param context: optional execution context
@@ -95,13 +100,13 @@ class ContractInterface(ContextMixin):
         context = ExecutionContext(
             shell=context.shell if context else None,
             key=context.key if context else None,
-            script=dict(code=expression)
+            script=dict(code=expression),
         )
         return cls(context)
 
     @staticmethod
     def from_context(context: ExecutionContext) -> 'ContractInterface':
-        """ Create contract from the previously loaded context data.
+        """Create contract from the previously loaded context data.
 
         :param context: execution context
         :return: ContractInterface
@@ -111,11 +116,13 @@ class ContractInterface(ContextMixin):
         return cls(context)
 
     @classmethod
-    @deprecated(deprecated_in='3.0.0',
-                removed_in='3.1.0',
-                details='use one of `from_file`, `from_michelson`, `from_micheline`, `from_url`')
+    @deprecated(
+        deprecated_in='3.0.0',
+        removed_in='3.1.0',
+        details='use one of `from_file`, `from_michelson`, `from_micheline`, `from_url`',
+    )
     def create_from(cls, source):
-        """ Create contract interface from its code.
+        """Create contract interface from its code.
 
         :param source: Michelson code, filename, or Micheline JSON
         :rtype: ContractInterface
@@ -123,36 +130,32 @@ class ContractInterface(ContextMixin):
         if isinstance(source, str):
             if exists(expanduser(source)):
                 return ContractInterface.from_file(source)
-            else:
-                return ContractInterface.from_michelson(source)
-        else:
-            return ContractInterface.from_micheline(source)
+            return ContractInterface.from_michelson(source)
+        return ContractInterface.from_micheline(source)
 
     def to_micheline(self):
-        """ Get contract script in Micheline JSON
+        """Get contract script in Micheline JSON
 
         :return:  [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
         """
         return self.program.as_micheline_expr()
 
     def to_michelson(self):
-        """ Get contract listing in formatted Michelson
+        """Get contract listing in formatted Michelson
 
         :return: string
         """
         return micheline_to_michelson(self.to_micheline())
 
     def to_file(self, path):
-        """ Write contract source to a .tz file
+        """Write contract source to a .tz file
 
         :param path: path to the file
         """
         with open(path, 'w+') as f:
             f.write(self.to_michelson())
 
-    @deprecated(deprecated_in='3.0.0',
-                removed_in='3.1.0',
-                details='use `.storage[path][to][big_map][key]()` instead')
+    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `.storage[path][to][big_map][key]()` instead')
     def big_map_get(self, path):
         """ Get BigMap entry as Python object by plain key and block height.
 
@@ -171,12 +174,14 @@ class ContractInterface(ContextMixin):
             node = node[item]
         return node() if node else None
 
-    def using(self,
-              shell: Optional[Union[ShellQuery, str]] = None,
-              key: Optional[Union[Key, str]] = None,
-              block_id: Optional[Union[str, int]] = None,
-              mode: Optional[str] = None) -> 'ContractInterface':
-        """ Change the block at which the current contract is inspected.
+    def using(
+        self,
+        shell: Optional[Union[ShellQuery, str]] = None,
+        key: Optional[Union[Key, str]] = None,
+        block_id: Optional[Union[str, int]] = None,
+        mode: Optional[str] = None,
+    ) -> 'ContractInterface':
+        """Change the block at which the current contract is inspected.
         Also, if address is undefined you can specify RPC endpoint, and private key.
 
         :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
@@ -186,11 +191,15 @@ class ContractInterface(ContextMixin):
         :rtype: ContractInterface
         """
         has_address = self.context.address is not None
-        return type(self)(self._spawn_context(shell=None if has_address else shell,
-                                              key=None if has_address else key,
-                                              address=self.context.address,
-                                              block_id=block_id,
-                                              mode=mode))
+        return type(self)(
+            self._spawn_context(
+                shell=None if has_address else shell,
+                key=None if has_address else key,
+                address=self.context.address,
+                block_id=block_id,
+                mode=mode,
+            )
+        )
 
     @property
     def storage(self) -> ContractData:
@@ -200,12 +209,43 @@ class ContractInterface(ContextMixin):
             storage.attach_context(self.context)
         else:
             storage = self.program.storage.dummy(self.context)
-        return ContractData(self.context, storage.item, title='storage')
+        return ContractData(self.context, storage.item, title="storage")
+
+    @cached_property
+    def metadata(self) -> Optional[ContractMetadata]:
+        metadata_url = self.metadata_url
+        if metadata_url is None:
+            return None
+        logger.info('Trying to fetch contract metadata from `%s`', metadata_url)
+        parsed_url = urlparse(metadata_url)
+
+        if parsed_url.scheme in ('http', 'https'):
+            # NOTE: KT1B34qXVRfQrScEaqjjt6cJ5G8LtVFZ7fSc
+            return ContractMetadata.from_url(metadata_url)
+        elif parsed_url.scheme == 'ipfs':
+            # NOTE: KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW
+            return ContractMetadata.from_ipfs(parsed_url.netloc)
+        elif parsed_url.scheme == 'tezos-storage':
+            # FIXME: Storage argument
+            return ContractMetadata.from_storage(self.storage, parsed_url.path)
+        elif parsed_url.scheme == 'sha256':
+            raise NotImplementedError
+        else:
+            raise NotImplementedError("Unknown metadata URL scheme")
+
+    @cached_property
+    def metadata_url(self) -> Optional[str]:
+        try:
+            metadata_url_storage = self.storage['metadata'][''].data
+            return metadata_url_storage.to_python_object().decode()
+        # FIXME: Dirty
+        except (KeyError, AssertionError):
+            return None
 
     @property
     def parameter(self) -> ContractEntrypoint:
         root_name = self.program.parameter.root_name
-        assert root_name in self.entrypoints, f'root entrypoint is undefined'
+        assert root_name in self.entrypoints, 'root entrypoint is undefined'
         return getattr(self, root_name)
 
     @property  # type: ignore
@@ -229,7 +269,7 @@ class ContractInterface(ContextMixin):
         return self.parameter
 
     def operation_result(self, operation_group: dict) -> List[ContractCallResult]:
-        """ Get operation parameters, and resulting storage as Python objects.
+        """Get operation parameters, and resulting storage as Python objects.
         Can locate operation inside operation groups with multiple contents and/or internal operations.
 
         :param operation_group: {'branch', 'protocol', 'contents', 'signature'}
@@ -238,7 +278,7 @@ class ContractInterface(ContextMixin):
         return ContractCallResult.from_run_operation(operation_group, context=self.context)
 
     def script(self, initial_storage=None, mode: Optional[str] = None) -> dict:
-        """ Generate script for contract origination.
+        """Generate script for contract origination.
 
         :param initial_storage: Python object, leave None to generate default (attach shell/key for smart fill)
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
@@ -250,14 +290,17 @@ class ContractInterface(ContextMixin):
             storage = self.program.storage.dummy(self.context)
         return {
             'code': self.program.as_micheline_expr(),
-            'storage': storage.to_micheline_value(mode=mode or self.context.mode, lazy_diff=True)
+            'storage': storage.to_micheline_value(mode=mode or self.context.mode, lazy_diff=True),
         }
 
-    def originate(self, initial_storage=None,
-                  mode: Optional[str] = None,
-                  balance: Union[int, Decimal] = 0,
-                  delegate: Optional[str] = None) -> OperationGroup:
-        """ Create an origination operation
+    def originate(
+        self,
+        initial_storage=None,
+        mode: Optional[str] = None,
+        balance: Union[int, Decimal] = 0,
+        delegate: Optional[str] = None,
+    ) -> OperationGroup:
+        """Create an origination operation
 
         :param initial_storage: Python object, leave None to generate default
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding for initial storage
@@ -265,10 +308,9 @@ class ContractInterface(ContextMixin):
         :param delegate: initial delegator
         :rtype: OperationGroup
         """
-        return OperationGroup(context=self._spawn_context()) \
-            .origination(script=self.script(initial_storage, mode=mode),
-                         balance=balance,
-                         delegate=delegate)
+        return OperationGroup(context=self._spawn_context()).origination(
+            script=self.script(initial_storage, mode=mode), balance=balance, delegate=delegate
+        )
 
 
 @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `ContractInterface` instead')

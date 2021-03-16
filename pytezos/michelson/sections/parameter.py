@@ -26,7 +26,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             if not issubclass(cls, ParameterSection):
                 cls = ParameterSection.create_type(args=[cls])
         except Exception as e:
-            raise MichelsonRuntimeError('parameter', *e.args)
+            raise MichelsonRuntimeError('parameter', *e.args) from e
         return cls
 
     @classmethod

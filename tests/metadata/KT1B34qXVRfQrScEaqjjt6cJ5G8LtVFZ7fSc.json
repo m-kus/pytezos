@@ -1,0 +1,20 @@
+{
+    "description": "kaladex FA2 NFT contract facilitating decentralised trustless atomic mint,buy/sell,auction of FA2 NFTs.",
+    "version": "1.0",
+    "interfaces": [
+        "TZIP-012",
+        "TZIP-016",
+        "TZIP-020",
+        "TZIP-021"
+    ],
+    "license": {
+        "name": "MIT",
+        "details": "The MIT License"
+    },
+    "tokenCategory": "collectibles",
+    "homepage": "https://kalamint.io/",
+    "source": {
+        "tools": [],
+        "location": "https://gitlab.com/kalamint/kaladex-contracts/-/blob/main/src/contracts/smartpy/FA2-NFTToken.py"
+    }
+}
