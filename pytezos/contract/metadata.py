@@ -58,12 +58,12 @@ class MichelsonStorageView:
     annotations: Optional[List[Dict[str, Any]]] = None
     version: Optional[str] = None
 
-    def as_contract(self, storage: Dict[str, Any]):
+    def as_contract(self, storage_type_expr: Dict[str, Any]):
         from pytezos.contract.interface import ContractInterface
 
         contract = ContractInterface.from_micheline([
-            {'prim': 'parameter', 'args': [self.parameter]},
-            {'prim': 'storage', 'args': [storage]},
+            {'prim': 'parameter', 'args': [{'prim': 'pair', 'args': [self.parameter, storage_type_expr]}]},
+            {'prim': 'storage', 'args': [self.returnValue]},
             {'prim': 'code', 'args': [self.code]},
         ])
         return contract
@@ -127,10 +127,12 @@ class ContractMetadata:
         metadata_json = cls.fix_metadata_json(metadata_json)
         cls.validate_metadata_json(metadata_json)
 
+        # TODO: add dynamic attributes for each off-chain view, like it's done in ContractInterface
+
         return Converter().structure(metadata_json, ContractMetadata)
 
     @classmethod
-    def from_storage(cls, storage, path: str) -> 'ContractMetadata':
+    def from_storage(cls, storage, path: str) -> 'ContractMetadata':  # FIXME: accept tezos-storage URI
         parts = path.split('/')
         if len(parts) == 1:
             # NOTE: KT1JBThDEqyqrEHimhxoUBCSnsKAqFcuHMkP
