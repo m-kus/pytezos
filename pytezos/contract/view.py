@@ -1,4 +1,5 @@
 from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.contract.call import ContractCall
 
 
 class ContractView(ContextMixin):

@@ -47,8 +47,10 @@ class ContractEntrypoint(ContextMixin):
         else:
             py_obj = None
 
-        return ContractCall(context=self.context,
-                            parameters=self.encode(py_obj, self.context.mode))
+        return ContractCall(
+            context=self.context,
+            parameters=self.encode(py_obj, self.context.mode),
+        )
 
     def decode(self, value, entrypoint: Optional[str] = None) -> dict:
         """ Convert from Michelson to Python type system

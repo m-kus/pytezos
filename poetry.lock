@@ -91,6 +91,48 @@ colorama = ["colorama (>=0.4.3)"]
 d = ["aiohttp (>=3.3.2)", "aiohttp-cors"]
 
 [[package]]
+name = "bravado"
+version = "11.0.3"
+description = "Library for accessing Swagger-enabled API's"
+category = "main"
+optional = false
+python-versions = "!=3.0,!=3.1,!=3.2,!=3.3,!=3.4,!=3.5.0"
+
+[package.dependencies]
+bravado-core = ">=5.16.1"
+monotonic = "*"
+msgpack = "*"
+python-dateutil = "*"
+pyyaml = "*"
+requests = ">=2.17"
+simplejson = "*"
+six = "*"
+typing-extensions = "*"
+
+[package.extras]
+fido = ["fido (>=4.2.1)"]
+integration-tests = ["bottle", "ephemeral-port-reserve", "pytest"]
+
+[[package]]
+name = "bravado-core"
+version = "5.17.0"
+description = "Library for adding Swagger support to clients and servers"
+category = "main"
+optional = false
+python-versions = "!=3.0,!=3.1,!=3.2,!=3.3,!=3.4,!=3.5.0"
+
+[package.dependencies]
+jsonref = "*"
+jsonschema = {version = ">=2.5.1", extras = ["format"]}
+msgpack = ">=0.5.2"
+python-dateutil = "*"
+pytz = "*"
+pyyaml = "*"
+simplejson = "*"
+six = "*"
+swagger-spec-validator = ">=2.0.1"
+
+[[package]]
 name = "bson"
 version = "0.5.10"
 description = "BSON codec for Python"
@@ -434,6 +476,22 @@ inflect = ">=0.2.4"
 jinja2 = ">=2.4"
 
 [[package]]
+name = "jsonpointer"
+version = "2.1"
+description = "Identify specific nodes in a JSON document (RFC 6901)"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
+name = "jsonref"
+version = "0.2"
+description = "An implementation of JSON Reference for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "jsonschema"
 version = "3.2.0"
 description = "An implementation of JSON Schema validation for Python"
@@ -443,9 +501,14 @@ python-versions = "*"
 
 [package.dependencies]
 attrs = ">=17.4.0"
+idna = {version = "*", optional = true, markers = "extra == \"format\""}
 importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
+jsonpointer = {version = ">1.13", optional = true, markers = "extra == \"format\""}
 pyrsistent = ">=0.14.0"
+rfc3987 = {version = "*", optional = true, markers = "extra == \"format\""}
 six = ">=1.11.0"
+strict-rfc3339 = {version = "*", optional = true, markers = "extra == \"format\""}
+webcolors = {version = "*", optional = true, markers = "extra == \"format\""}
 
 [package.extras]
 format = ["idna", "jsonpointer (>1.13)", "rfc3987", "strict-rfc3339", "webcolors"]
@@ -499,12 +562,28 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "monotonic"
+version = "1.5"
+description = "An implementation of time.monotonic() for Python 2 & < 3.3"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "more-itertools"
 version = "8.7.0"
 description = "More routines for operating on iterables, beyond itertools"
 category = "dev"
 optional = false
 python-versions = ">=3.5"
+
+[[package]]
+name = "msgpack"
+version = "1.0.2"
+description = "MessagePack (de)serializer."
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "mypy"
@@ -821,6 +900,14 @@ security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 
 [[package]]
+name = "rfc3987"
+version = "1.3.8"
+description = "Parsing and validation of URIs (RFC 3986) and IRIs (RFC 3987)"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "secp256k1"
 version = "0.13.2"
 description = "FFI bindings to libsecp256k1"
@@ -1010,6 +1097,19 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "swagger-spec-validator"
+version = "2.7.3"
+description = "Validation of Swagger specifications"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+jsonschema = "*"
+pyyaml = "*"
+six = "*"
+
+[[package]]
 name = "testcontainers"
 version = "3.3.0"
 description = "Library provides lightweight, throwaway instances of common databases, Selenium web browsers, or anything else that can run in a Docker container"
@@ -1105,6 +1205,14 @@ secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "cer
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
+name = "webcolors"
+version = "1.11.1"
+description = "A library for working with color names and color values formats defined by HTML and CSS."
+category = "main"
+optional = false
+python-versions = ">=3.5,"
+
+[[package]]
 name = "websocket-client"
 version = "0.58.0"
 description = "WebSocket client for Python with low level API options"
@@ -1149,7 +1257,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "7add4140490fc1b350a674620515e631ca20b23043f05cd2633091a2c2f5292b"
+content-hash = "c0861239034e803a01610f60b268bcf6ceffe0fa08194f602564b3d523814bed"
 
 [metadata.files]
 alabaster = [
@@ -1183,6 +1291,14 @@ base58 = [
 ]
 black = [
     {file = "black-20.8b1.tar.gz", hash = "sha256:1c02557aa099101b9d21496f8a914e9ed2222ef70336404eeeac8edba836fbea"},
+]
+bravado = [
+    {file = "bravado-11.0.3-py2.py3-none-any.whl", hash = "sha256:8ac8bbb645e49607917a5c07808116c708521f51e80d9c29bc4a168ff4dd22c6"},
+    {file = "bravado-11.0.3.tar.gz", hash = "sha256:1bb6ef75d84140c851fffe6420baaee5037d840070cfe11d60913be6ab8e0530"},
+]
+bravado-core = [
+    {file = "bravado-core-5.17.0.tar.gz", hash = "sha256:b3b06ae86d3c80de5694340e55df7c9097857ff965b76642979e2a961f332abf"},
+    {file = "bravado_core-5.17.0-py2.py3-none-any.whl", hash = "sha256:fa53e796ea574f905635a43871439a44713c2ef128c62a8fcc1d0ca8765cf855"},
 ]
 bson = [
     {file = "bson-0.5.10.tar.gz", hash = "sha256:d6511b2ab051139a9123c184de1a04227262173ad593429d21e443d6462d6590"},
@@ -1380,6 +1496,14 @@ jinja2-pluralize = [
     {file = "jinja2_pluralize-0.3.0-py2.py3-none-any.whl", hash = "sha256:4fec874a591014774d4c66cb7f65314390731bfc57db4c27119db61aa93b2bc4"},
     {file = "jinja2_pluralize-0.3.0.tar.gz", hash = "sha256:df5c2d5017b9b54c0a66cb790cca9fc08945837c3dbfc323589203f1ffb73c1c"},
 ]
+jsonpointer = [
+    {file = "jsonpointer-2.1-py2.py3-none-any.whl", hash = "sha256:150f80c5badd02c757da6644852f612f88e8b4bc2f9852dcbf557c8738919686"},
+    {file = "jsonpointer-2.1.tar.gz", hash = "sha256:5a34b698db1eb79ceac454159d3f7c12a451a91f6334a4f638454327b7a89962"},
+]
+jsonref = [
+    {file = "jsonref-0.2-py3-none-any.whl", hash = "sha256:b1e82fa0b62e2c2796a13e5401fe51790b248f6d9bf9d7212a3e31a3501b291f"},
+    {file = "jsonref-0.2.tar.gz", hash = "sha256:f3c45b121cf6257eafabdc3a8008763aed1cd7da06dbabc59a9e4d2a5e4e6697"},
+]
 jsonschema = [
     {file = "jsonschema-3.2.0-py2.py3-none-any.whl", hash = "sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163"},
     {file = "jsonschema-3.2.0.tar.gz", hash = "sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"},
@@ -1476,9 +1600,43 @@ mnemonic = [
     {file = "mnemonic-0.19-py2.py3-none-any.whl", hash = "sha256:a8d78c5100acfa7df9bab6b9db7390831b0e54490934b718ff9efd68f0d731a6"},
     {file = "mnemonic-0.19.tar.gz", hash = "sha256:4e37eb02b2cbd56a0079cabe58a6da93e60e3e4d6e757a586d9f23d96abea931"},
 ]
+monotonic = [
+    {file = "monotonic-1.5-py2.py3-none-any.whl", hash = "sha256:552a91f381532e33cbd07c6a2655a21908088962bb8fa7239ecbcc6ad1140cc7"},
+    {file = "monotonic-1.5.tar.gz", hash = "sha256:23953d55076df038541e648a53676fb24980f7a1be290cdda21300b3bc21dfb0"},
+]
 more-itertools = [
     {file = "more-itertools-8.7.0.tar.gz", hash = "sha256:c5d6da9ca3ff65220c3bfd2a8db06d698f05d4d2b9be57e1deb2be5a45019713"},
     {file = "more_itertools-8.7.0-py3-none-any.whl", hash = "sha256:5652a9ac72209ed7df8d9c15daf4e1aa0e3d2ccd3c87f8265a0673cd9cbc9ced"},
+]
+msgpack = [
+    {file = "msgpack-1.0.2-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:b6d9e2dae081aa35c44af9c4298de4ee72991305503442a5c74656d82b581fe9"},
+    {file = "msgpack-1.0.2-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:a99b144475230982aee16b3d249170f1cccebf27fb0a08e9f603b69637a62192"},
+    {file = "msgpack-1.0.2-cp35-cp35m-manylinux2014_aarch64.whl", hash = "sha256:1026dcc10537d27dd2d26c327e552f05ce148977e9d7b9f1718748281b38c841"},
+    {file = "msgpack-1.0.2-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:fe07bc6735d08e492a327f496b7850e98cb4d112c56df69b0c844dbebcbb47f6"},
+    {file = "msgpack-1.0.2-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:9ea52fff0473f9f3000987f313310208c879493491ef3ccf66268eff8d5a0326"},
+    {file = "msgpack-1.0.2-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:26a1759f1a88df5f1d0b393eb582ec022326994e311ba9c5818adc5374736439"},
+    {file = "msgpack-1.0.2-cp36-cp36m-manylinux2014_aarch64.whl", hash = "sha256:497d2c12426adcd27ab83144057a705efb6acc7e85957a51d43cdcf7f258900f"},
+    {file = "msgpack-1.0.2-cp36-cp36m-win32.whl", hash = "sha256:e89ec55871ed5473a041c0495b7b4e6099f6263438e0bd04ccd8418f92d5d7f2"},
+    {file = "msgpack-1.0.2-cp36-cp36m-win_amd64.whl", hash = "sha256:a4355d2193106c7aa77c98fc955252a737d8550320ecdb2e9ac701e15e2943bc"},
+    {file = "msgpack-1.0.2-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:d6c64601af8f3893d17ec233237030e3110f11b8a962cb66720bf70c0141aa54"},
+    {file = "msgpack-1.0.2-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:f484cd2dca68502de3704f056fa9b318c94b1539ed17a4c784266df5d6978c87"},
+    {file = "msgpack-1.0.2-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:f3e6aaf217ac1c7ce1563cf52a2f4f5d5b1f64e8729d794165db71da57257f0c"},
+    {file = "msgpack-1.0.2-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:8521e5be9e3b93d4d5e07cb80b7e32353264d143c1f072309e1863174c6aadb1"},
+    {file = "msgpack-1.0.2-cp37-cp37m-win32.whl", hash = "sha256:31c17bbf2ae5e29e48d794c693b7ca7a0c73bd4280976d408c53df421e838d2a"},
+    {file = "msgpack-1.0.2-cp37-cp37m-win_amd64.whl", hash = "sha256:8ffb24a3b7518e843cd83538cf859e026d24ec41ac5721c18ed0c55101f9775b"},
+    {file = "msgpack-1.0.2-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:b28c0876cce1466d7c2195d7658cf50e4730667196e2f1355c4209444717ee06"},
+    {file = "msgpack-1.0.2-cp38-cp38-manylinux1_i686.whl", hash = "sha256:87869ba567fe371c4555d2e11e4948778ab6b59d6cc9d8460d543e4cfbbddd1c"},
+    {file = "msgpack-1.0.2-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:b55f7db883530b74c857e50e149126b91bb75d35c08b28db12dcb0346f15e46e"},
+    {file = "msgpack-1.0.2-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:ac25f3e0513f6673e8b405c3a80500eb7be1cf8f57584be524c4fa78fe8e0c83"},
+    {file = "msgpack-1.0.2-cp38-cp38-win32.whl", hash = "sha256:0cb94ee48675a45d3b86e61d13c1e6f1696f0183f0715544976356ff86f741d9"},
+    {file = "msgpack-1.0.2-cp38-cp38-win_amd64.whl", hash = "sha256:e36a812ef4705a291cdb4a2fd352f013134f26c6ff63477f20235138d1d21009"},
+    {file = "msgpack-1.0.2-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:2a5866bdc88d77f6e1370f82f2371c9bc6fc92fe898fa2dec0c5d4f5435a2694"},
+    {file = "msgpack-1.0.2-cp39-cp39-manylinux1_i686.whl", hash = "sha256:92be4b12de4806d3c36810b0fe2aeedd8d493db39e2eb90742b9c09299eb5759"},
+    {file = "msgpack-1.0.2-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:de6bd7990a2c2dabe926b7e62a92886ccbf809425c347ae7de277067f97c2887"},
+    {file = "msgpack-1.0.2-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:5a9ee2540c78659a1dd0b110f73773533ee3108d4e1219b5a15a8d635b7aca0e"},
+    {file = "msgpack-1.0.2-cp39-cp39-win32.whl", hash = "sha256:c747c0cc08bd6d72a586310bda6ea72eeb28e7505990f342552315b229a19b33"},
+    {file = "msgpack-1.0.2-cp39-cp39-win_amd64.whl", hash = "sha256:d8167b84af26654c1124857d71650404336f4eb5cc06900667a493fc619ddd9f"},
+    {file = "msgpack-1.0.2.tar.gz", hash = "sha256:fae04496f5bc150eefad4e9571d1a76c55d021325dcd484ce45065ebbdd00984"},
 ]
 mypy = [
     {file = "mypy-0.812-cp35-cp35m-macosx_10_9_x86_64.whl", hash = "sha256:a26f8ec704e5a7423c8824d425086705e381b4f1dfdef6e3a1edab7ba174ec49"},
@@ -1730,6 +1888,10 @@ requests = [
     {file = "requests-2.25.1-py2.py3-none-any.whl", hash = "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e"},
     {file = "requests-2.25.1.tar.gz", hash = "sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804"},
 ]
+rfc3987 = [
+    {file = "rfc3987-1.3.8-py2.py3-none-any.whl", hash = "sha256:10702b1e51e5658843460b189b185c0366d2cf4cff716f13111b0ea9fd2dce53"},
+    {file = "rfc3987-1.3.8.tar.gz", hash = "sha256:d3c4d257a560d544e9826b38bc81db676890c79ab9d7ac92b39c7a253d5ca733"},
+]
 secp256k1 = [
     {file = "secp256k1-0.13.2-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:a755c85947b70c69cf318412bfd12889863e70ddf76b588701835a4da5322d55"},
     {file = "secp256k1-0.13.2-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:a598f2223ed3bf55bb7e317c5ebd1a316b3b4d65db26de32554bb84adf026eae"},
@@ -1834,6 +1996,10 @@ sphinxcontrib-serializinghtml = [
 strict-rfc3339 = [
     {file = "strict-rfc3339-0.7.tar.gz", hash = "sha256:5cad17bedfc3af57b399db0fed32771f18fc54bbd917e85546088607ac5e1277"},
 ]
+swagger-spec-validator = [
+    {file = "swagger-spec-validator-2.7.3.tar.gz", hash = "sha256:f4f23ee4dbd52bfcde90b1144dde22304add6260e9f29252e9fd7814c9b8fd16"},
+    {file = "swagger_spec_validator-2.7.3-py2.py3-none-any.whl", hash = "sha256:d1514ec7e3c058c701f27cc74f85ceb876d6418c9db57786b9c54085ed5e29eb"},
+]
 testcontainers = [
     {file = "testcontainers-3.3.0-py2.py3-none-any.whl", hash = "sha256:aaf1db92e21da51332d4128a17d092fbd868ea749b9e575783015136d6b3fa7d"},
 ]
@@ -1894,6 +2060,10 @@ typing-inspect = [
 urllib3 = [
     {file = "urllib3-1.26.3-py2.py3-none-any.whl", hash = "sha256:1b465e494e3e0d8939b50680403e3aedaa2bc434b7d5af64dfd3c958d7f5ae80"},
     {file = "urllib3-1.26.3.tar.gz", hash = "sha256:de3eedaad74a2683334e282005cd8d7f22f4d55fa690a2a1020a416cb0a47e73"},
+]
+webcolors = [
+    {file = "webcolors-1.11.1-py3-none-any.whl", hash = "sha256:b8cd5d865a25c51ff1218f0c90d0c0781fc64312a49b746b320cf50de1648f6e"},
+    {file = "webcolors-1.11.1.tar.gz", hash = "sha256:76f360636957d1c976db7466bc71dcb713bb95ac8911944dffc55c01cb516de6"},
 ]
 websocket-client = [
     {file = "websocket_client-0.58.0-py2.py3-none-any.whl", hash = "sha256:44b5df8f08c74c3d82d28100fdc81f4536809ce98a17f0757557813275fbb663"},

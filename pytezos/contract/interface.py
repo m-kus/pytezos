@@ -221,17 +221,33 @@ class ContractInterface(ContextMixin):
 
         if parsed_url.scheme in ('http', 'https'):
             # NOTE: KT1B34qXVRfQrScEaqjjt6cJ5G8LtVFZ7fSc
-            return ContractMetadata.from_url(metadata_url)
+            metadata = ContractMetadata.from_url(metadata_url)
+
         elif parsed_url.scheme == 'ipfs':
             # NOTE: KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW
-            return ContractMetadata.from_ipfs(parsed_url.netloc)
+            metadata = ContractMetadata.from_ipfs(parsed_url.netloc)
+
         elif parsed_url.scheme == 'tezos-storage':
-            # FIXME: Storage argument
-            return ContractMetadata.from_storage(self.storage, parsed_url.path)
+            parts = parsed_url.path.split('/')
+            if len(parts) == 1:
+                # NOTE: KT1JBThDEqyqrEHimhxoUBCSnsKAqFcuHMkP
+                storage = self.storage
+            elif len(parts) == 2:
+                # NOTE: KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf
+                context = self._spawn_context(address=parsed_url.netloc)
+                storage = ContractInterface.from_context(context).storage
+            else:
+                raise NotImplementedError('Unknown metadata URL scheme')
+            metadata = ContractMetadata.from_storage(storage, parts[-1])
+
         elif parsed_url.scheme == 'sha256':
             raise NotImplementedError
+
         else:
-            raise NotImplementedError("Unknown metadata URL scheme")
+            raise NotImplementedError('Unknown metadata URL scheme')
+
+        metadata.set_storage_type_expr(self.context.get_storage_expr()['args'][0])
+        return metadata
 
     @cached_property
     def metadata_url(self) -> Optional[str]:

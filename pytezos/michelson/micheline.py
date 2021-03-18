@@ -31,7 +31,8 @@ def catch(prim, func):
             if prim:
                 e.args = (prim, *e.args)
             raise MichelsonRuntimeError(*e.args) from e
-    return wrapper
+    # FIXME:
+    return func
 
 
 def try_catch(prim):
