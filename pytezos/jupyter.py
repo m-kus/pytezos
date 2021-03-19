@@ -3,9 +3,12 @@ import re
 from functools import update_wrapper
 
 
-def is_interactive():
-    import __main__ as main  # type: ignore
-    return not hasattr(main, '__file__')
+def is_interactive() -> bool:
+    try:
+        _ = get_ipython().__class__.__name__  # type: ignore
+        return True
+    except NameError:
+        return False
 
 
 def get_attr_docstring(class_type, attr_name):

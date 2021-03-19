@@ -12,7 +12,6 @@ from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
 
 
-# FIXME: Subclassing ExecutionContext makes Python
 class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
@@ -55,6 +54,7 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps = {}
         self.tzt_big_maps = {}
+        self.debug = False
         self._sandboxed: Optional[bool] = None
 
     def reset(self):

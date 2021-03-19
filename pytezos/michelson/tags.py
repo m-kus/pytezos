@@ -142,7 +142,7 @@ prim_tags = {
     'JOIN_TICKETS': b'\x8B',
     'GET_AND_UPDATE': b'\x8C',
 
-    # FIXME: Dummy vaules for TZT, refactor macros
+    # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',
     'input': b'\xEE',
@@ -153,6 +153,15 @@ prim_tags = {
     'self': b'\xEE',
     'now': b'\xEE',
     'source': b'\xEE',
-    'chain_id': b'\xEE',
-    'big_maps': b'\xEE'
+    'big_maps': b'\xEE',
+
+    # FIXME: Dummy values for Jupyter, refactor macros
+    'DUMP': b'\xEE',
+    'PRINT': b'\xEE',
+    'DEBUG': b'\xEE',
+    'DROP_ALL': b'\xEE',
+    'EXPAND': b'\xEE',
+    'PATCH': b'\xEE',
+    'RESET': b'\xEE',
+    'BIG_MAP_DIFF': b'\xEE',
 }
