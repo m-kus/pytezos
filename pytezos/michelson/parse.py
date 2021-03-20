@@ -1,12 +1,13 @@
 # Inspired by https://github.com/jansorg/tezos-intellij/blob/master/grammar/michelson.bnf
 import json
 import re
-
+from typing import Optional, List
 from ply.lex import Lexer  # type: ignore
 from ply.lex import LexToken, lex
 from ply.yacc import yacc  # type: ignore
 
-from pytezos.michelson.macros import expand_macro
+from pytezos.michelson.tags import prim_tags
+from pytezos.michelson.macros import expand_macro, expr as make_expr
 
 
 class MichelsonParserError(ValueError):
@@ -95,15 +96,22 @@ class MichelsonParser(object):
 
     def p_expr(self, p):
         '''expr : PRIM annots args'''
-        try:
-            expr = expand_macro(
-                prim=p[1],
-                annots=p[2] or [],
-                args=p[3] or [],
-                extra=self.extra
+        prim = p[1]
+        if prim in prim_tags or prim in self.extra_primitives:
+            expr = make_expr(
+                prim=prim, 
+                annots=p[2] or [], 
+                args=p[3] or []
             )
-        except AssertionError as e:
-            raise MichelsonParserError(p.slice[1], str(e)) from e
+        else:
+            try:
+                expr = expand_macro(
+                    prim=prim,
+                    annots=p[2] or [],
+                    args=p[3] or []
+                )
+            except AssertionError as e:
+                raise MichelsonParserError(p.slice[1], str(e)) from e
         p[0] = Sequence(expr) if isinstance(expr, list) else expr
 
     def p_annots(self, p):
@@ -176,7 +184,7 @@ class MichelsonParser(object):
     def p_error(self, p):
         raise MichelsonParserError(p)
 
-    def __init__(self, debug=False, write_tables=False, extra_primitives=None):
+    def __init__(self, debug=False, write_tables=False, extra_primitives: Optional[List[str]] = None):
         """ Initialize Michelson parser
 
         :param debug: Verbose output
@@ -189,7 +197,7 @@ class MichelsonParser(object):
             debug=debug,
             write_tables=write_tables,
         )
-        self.extra = extra_primitives
+        self.extra_primitives = extra_primitives
 
     def parse(self, code):
         """ Parse Michelson source.

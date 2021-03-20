@@ -1,8 +1,8 @@
 from typing import Any, List, Optional, Tuple, cast
 
 from pytezos.context.impl import ExecutionContext
-from pytezos.michelson.micheline import MichelsonRuntimeError
-from pytezos.michelson.parse import MichelsonParser
+from pytezos.michelson.micheline import MichelsonRuntimeError, Micheline
+from pytezos.michelson.parse import MichelsonParser, michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram, TztMichelsonProgram
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import OperationType
@@ -13,11 +13,41 @@ class Interpreter:
     Based on the following reference: https://tezos.gitlab.io/michelson-reference/
     """
 
-    def __init__(self, debug=True):
+    def __init__(self, extra_primitives: Optional[List[str]] = None, debug=False):
         self.stack = MichelsonStack()
         self.context = ExecutionContext()
-        self.parser = MichelsonParser(extra_primitives=[])
+        self.parser = MichelsonParser(extra_primitives=extra_primitives or [])
         self.debug = debug
+
+    def execute(code: str):
+        try:
+            code_expr = michelson_to_micheline(code, parser=self.parser)
+        except MichelsonParserError as e:
+            if self.debug:
+                raise e
+            # TODO: return
+
+        try:
+            code_ast = Micheline.match(code_expr)
+        except MichelsonRuntimeError as e:
+            if self.debug:
+                raise e
+            # TODO: return
+
+        stack_backup = deepcopy(self.stack)
+        context_backup = deepcopy(self.context)
+
+        try:
+            res = code_ast.execute(self.stack, stdout, self.context)
+        except MichelsonRuntimeError as e:
+            if self.debug:
+                raise e
+            self.stack = stack_backup
+            self.context = context_backup
+            # TODO: return
+
+        # TODO: return
+
 
     @staticmethod
     def run_code(

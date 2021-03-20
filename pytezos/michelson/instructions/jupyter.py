@@ -11,19 +11,9 @@ from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types.base import MichelsonType
 
 
-def jupyter_only(fn):
-    @wraps(fn)
-    def wrapper(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        # if not is_interactive():
-        #     raise Exception(f'`{cls.__name__}` instruction could be used only in Jupyter notebooks')
-        return fn(cls, stack, stdout, context)
-    return wrapper
-
-
 class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         print(stack)
         stack.push(stack.items[:])  # type: ignore
@@ -32,23 +22,23 @@ class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
 
 class DumpInstruction(MichelsonInstruction, prim='DUMP', args_len=1):
 
+    def __init__(self, items: List[MichelsonType]):
+        super().__init__()
+        self.items = items
+
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal: Type[MichelineLiteral] = cls.args[0]  # type: ignore
 
         count = cast(int, literal.literal)
-        if len(stack) > 0:
-            count = min(count, len(stack))
-            stack.push(stack.items[:count])  # type: ignore
+        count = min(count, len(stack))
 
-        return cls()
+        return cls(stack.items[:count])
 
 
 class PrintInstruction(MichelsonInstruction, prim='PRINT', args_len=1):
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal: Type[MichelineLiteral] = cls.args[0]  # type: ignore
 
@@ -67,7 +57,6 @@ class PrintInstruction(MichelsonInstruction, prim='PRINT', args_len=1):
 class DebugInstruction(MichelsonInstruction, prim='DEBUG', args_len=1):
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal = cls.args[0]
         debug = bool(literal.get_int())  # type: ignore
@@ -78,7 +67,6 @@ class DebugInstruction(MichelsonInstruction, prim='DEBUG', args_len=1):
 class DropAllInstruction(MichelsonInstruction, prim='DROP_ALL'):
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         stack.items = []
         return cls()
@@ -89,7 +77,6 @@ class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):
     allowed_primitives = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
 
         res_type: MichelsonType
@@ -117,7 +104,6 @@ class PatchValueInstruction(MichelsonInstruction, prim='PATCH', args_len=2):
     allowed_primitives = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res_type: MichelsonType
         literal: Type[MichelineLiteral]
@@ -144,7 +130,6 @@ class PatchValueInstruction(MichelsonInstruction, prim='PATCH', args_len=2):
 class ResetInstruction(MichelsonInstruction, prim='RESET'):
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         context.network = None  # type: ignore
         context.chain_id = None  # type: ignore
@@ -156,7 +141,6 @@ class ResetInstruction(MichelsonInstruction, prim='RESET'):
 class ResetValueInstruction(MichelsonInstruction, prim='RESET', args_len=1):
 
     @classmethod
-    @jupyter_only
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal: Type[MichelineLiteral]
         literal = cls.args[0]  # type: ignore
