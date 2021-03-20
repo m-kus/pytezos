@@ -261,18 +261,22 @@ class MichelineLiteral(Micheline):
 
     @classmethod
     def get_int(cls) -> int:
-        assert isinstance(cls.literal, int), f'expected int, got {cls.literal}'  # type: ignore
+        if not isinstance(cls.literal, int):
+            raise TypeError(f'Expected int, got {cls.literal}')  # type: ignore
         return cls.literal
 
     @classmethod
     def get_string(cls) -> str:
-        assert isinstance(cls.literal, str), f'expected string, got {cls.literal}'  # type: ignore
+        if not isinstance(cls.literal, str):
+            raise TypeError(f'Expected str, got {cls.literal}')  # type: ignore
         return cls.literal
 
     @classmethod
     def get_bytes(cls) -> bytes:
-        assert isinstance(cls.literal, bytes), f'expected bytes, got {cls.literal}'
+        if not isinstance(cls.literal, bytes):
+            raise TypeError(f'Expected bytes, got {cls.literal}')  # type: ignore
         return cls.literal
+
 
 def validate_sections(sequence: Type[MichelineSequence], sections: Sequence[str]) -> None:
     if len(sequence.args) != len(sections):

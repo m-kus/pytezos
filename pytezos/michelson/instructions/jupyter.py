@@ -1,27 +1,26 @@
 import re
-from functools import wraps
 from typing import List, Type, cast
+
+import strict_rfc3339  # type: ignore
 
 from pytezos.context.abstract import AbstractContext
 from pytezos.context.mixin import nodes
-from pytezos.jupyter import is_interactive
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.micheline import MichelineLiteral, MichelsonRuntimeError
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types.base import MichelsonType
 
 
 class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        print(stack)
+        stdout.append(str(stack))
+        # FIXME: Should not modify stack, just return value
         stack.push(stack.items[:])  # type: ignore
         return cls()
 
 
 class DumpInstruction(MichelsonInstruction, prim='DUMP', args_len=1):
-
     def __init__(self, items: List[MichelsonType]):
         super().__init__()
         self.items = items
@@ -37,7 +36,6 @@ class DumpInstruction(MichelsonInstruction, prim='DUMP', args_len=1):
 
 
 class PrintInstruction(MichelsonInstruction, prim='PRINT', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal: Type[MichelineLiteral] = cls.args[0]  # type: ignore
@@ -55,7 +53,6 @@ class PrintInstruction(MichelsonInstruction, prim='PRINT', args_len=1):
 
 
 class DebugInstruction(MichelsonInstruction, prim='DEBUG', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal = cls.args[0]
@@ -65,7 +62,6 @@ class DebugInstruction(MichelsonInstruction, prim='DEBUG', args_len=1):
 
 
 class DropAllInstruction(MichelsonInstruction, prim='DROP_ALL'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         stack.items = []
@@ -95,7 +91,7 @@ class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):
         elif res_type.prim == 'NOW':
             context.now = None  # type: ignore
         else:
-            raise Exception(f'Expected one of {cls.allowed_primitives}, got {res_type.prim}')
+            raise ValueError(f'Expected one of {cls.allowed_primitives}, got {res_type.prim}')
         return cls()
 
 
@@ -120,15 +116,17 @@ class PatchValueInstruction(MichelsonInstruction, prim='PATCH', args_len=2):
         elif res_type.prim == 'SOURCE':
             context.source = literal.get_string()  # type: ignore
         elif res_type.prim == 'NOW':
-            # FIXME: Both formats?
-            context.now = literal.get_int()  # type: ignore
+            try:
+                context.now = literal.get_int()  # type: ignore
+            # FIXME: Why does TypeError appear to be wrapped?
+            except (TypeError, MichelsonRuntimeError):
+                context.now = int(strict_rfc3339.rfc3339_to_timestamp(literal.get_string()))  # type: ignore
         else:
-            raise Exception(f'Expected one of {cls.allowed_primitives}, got {res_type.prim}')
+            raise ValueError(f'Expected one of {cls.allowed_primitives}, got {res_type.prim}')
         return cls()
 
 
 class ResetInstruction(MichelsonInstruction, prim='RESET'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         context.network = None  # type: ignore
@@ -139,7 +137,6 @@ class ResetInstruction(MichelsonInstruction, prim='RESET'):
 
 
 class ResetValueInstruction(MichelsonInstruction, prim='RESET', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal: Type[MichelineLiteral]

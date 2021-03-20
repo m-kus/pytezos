@@ -174,7 +174,7 @@ class JupyterInstructionsTest(TestCase):
                 PATCH CHAIN_ID;
                 PATCH SENDER;
                 PATCH SOURCE;
-                PATCH NOW;
+                PATCH NOW "1970-01-01T00:00:01Z";
             }
         """
         self._execute_code(code)
@@ -184,7 +184,7 @@ class JupyterInstructionsTest(TestCase):
         self.assertEqual(None, self.context.chain_id)
         self.assertEqual(None, self.context.sender)
         self.assertEqual(None, self.context.source)
-        self.assertEqual(None, self.context.now)
+        self.assertEqual(1, self.context.now)
 
     def test_reset(self):
         self.context.network = 'mainnet'

@@ -57,7 +57,8 @@ class Interpreter:
         return result
 
     def reset(self) -> None:
-        self.__init__()
+        self.stack = MichelsonStack()
+        self.context = ExecutionContext()
 
     @staticmethod
     def run_code(

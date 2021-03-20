@@ -1,6 +1,7 @@
 import inspect
 import re
 from functools import update_wrapper
+from typing import Optional
 
 
 def is_interactive() -> bool:
@@ -11,23 +12,24 @@ def is_interactive() -> bool:
         return False
 
 
-def get_attr_docstring(class_type, attr_name):
+def get_attr_docstring(class_type, attr_name) -> Optional[str]:
     if attr_name == 'get':
         attr_name = '__call__'
 
     attr = getattr(class_type, attr_name, None)
     if attr and attr.__doc__:
         return re.sub(r' {3,}', '', attr.__doc__)
+    return None
 
 
-def default_attr_filter(x):
+def default_attr_filter(x) -> bool:  # pylint: disable=unused-argument
     return True
 
 
 def get_class_docstring(class_type, attr_filter=default_attr_filter, extended=False):
     def format_attribute(x):
         attr = getattr(class_type, x)
-        if type(attr) == property:
+        if isinstance(attr, property):
             name = f'.{x}'
         else:
             if extended:
@@ -43,9 +45,23 @@ def get_class_docstring(class_type, attr_filter=default_attr_filter, extended=Fa
         return f'{name}{doc}'
 
     def filter_attribute(x):
-        return not x.startswith('_') and attr_filter(x) and type(getattr(class_type, x)) != property
+        return all(
+            [
+                not x.startswith('_'),
+                attr_filter(x),
+                not isinstance(getattr(class_type, x), property),
+            ]
+        )
 
-    return '\n'.join(map(format_attribute, filter(filter_attribute, dir(class_type))))
+    return '\n'.join(
+        map(
+            format_attribute,
+            filter(
+                filter_attribute,
+                dir(class_type),
+            ),
+        ),
+    )
 
 
 def inline_doc(method):
@@ -75,7 +91,6 @@ def inline_doc(method):
 
 
 class InlineDocstring(type):
-
     def __new__(mcs, name, bases, attrs, **kwargs):
         if is_interactive():
             new_attrs = {}
