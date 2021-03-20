@@ -68,12 +68,6 @@ class ExecutionContext(AbstractContext):
         self.big_maps.clear()
         self.tzt_big_maps.clear()
 
-    def __copy__(self):
-        raise ValueError("It's not allowed to copy context")
-
-    def __deepcopy__(self, memodict={}):
-        raise ValueError("It's not allowed to copy context")
-
     @property
     def constants(self):
         if self.shell is None:
