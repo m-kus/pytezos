@@ -24,9 +24,7 @@ class JupyterInstructionsTest(TestCase):
         sequence = MichelineSequence.match(micheline)
 
         program = MichelsonProgram.create(sequence)(
-            'default',
-            parameter or ParameterSection(UnitType()),
-            storage or StorageSection(UnitType())
+            'default', parameter or ParameterSection(UnitType()), storage or StorageSection(UnitType())
         )
         program.execute(self.stack, self.stdout, self.context)
 
@@ -44,16 +42,16 @@ class JupyterInstructionsTest(TestCase):
 
         self.assertEqual(
             [
-                [IntType(1), IntType(0)],
                 IntType(1),
                 IntType(0),
             ],
-            self.stack.items
+            self.stack.items,
         )
         self.assertEqual(
             [
                 'PUSH / _ => 0',
                 'PUSH / _ => 1',
+                'DUMP => [1, 0]',
             ],
             self.stdout,
         )
@@ -72,16 +70,16 @@ class JupyterInstructionsTest(TestCase):
 
         self.assertEqual(
             [
-                [IntType(1)],
                 IntType(1),
                 IntType(0),
             ],
-            self.stack.items
+            self.stack.items,
         )
         self.assertEqual(
             [
                 'PUSH / _ => 0',
                 'PUSH / _ => 1',
+                'DUMP => [1]',
             ],
             self.stdout,
         )
@@ -99,11 +97,7 @@ class JupyterInstructionsTest(TestCase):
         self._execute_code(code)
 
         self.assertEqual(
-            [
-                'PUSH / _ => 0',
-                'PUSH / _ => 1',
-                'second in stack: 0'
-            ],
+            ['PUSH / _ => 0', 'PUSH / _ => 1', 'second in stack: 0'],
             self.stdout,
         )
 
@@ -131,10 +125,7 @@ class JupyterInstructionsTest(TestCase):
         """
         self._execute_code(code)
 
-        self.assertEqual(
-            [],
-            self.stack.items
-        )
+        self.assertEqual([], self.stack.items)
         self.assertEqual(
             [
                 'PUSH / _ => 0',

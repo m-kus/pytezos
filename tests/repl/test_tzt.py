@@ -9,8 +9,6 @@ from pytezos.michelson.parse import MichelsonParser
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.repl import Interpreter
 
-logger.setLevel(logging.DEBUG)
-
 
 class TztTest(TestCase):
     path = join(dirname(__file__), "tzt")

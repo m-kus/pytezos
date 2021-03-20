@@ -12,12 +12,15 @@ from pytezos.michelson.types.base import MichelsonType
 
 
 class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
+    def __init__(self, items: List[MichelsonType]):
+        super().__init__()
+        self.items = items
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        stdout.append(str(stack))
-        # FIXME: Should not modify stack, just return value
-        stack.push(stack.items[:])  # type: ignore
-        return cls()
+        items = stack.items[:]
+        stdout.append(f'DUMP => {items}')
+        return cls(items)
 
 
 class DumpInstruction(MichelsonInstruction, prim='DUMP', args_len=1):
@@ -28,11 +31,11 @@ class DumpInstruction(MichelsonInstruction, prim='DUMP', args_len=1):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal: Type[MichelineLiteral] = cls.args[0]  # type: ignore
-
         count = cast(int, literal.literal)
         count = min(count, len(stack))
-
-        return cls(stack.items[:count])
+        items = stack.items[:count]
+        stdout.append(f'DUMP => {items}')
+        return cls(items)
 
 
 class PrintInstruction(MichelsonInstruction, prim='PRINT', args_len=1):
