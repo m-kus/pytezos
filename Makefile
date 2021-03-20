@@ -28,6 +28,9 @@ test:
 cover:
 	poetry run diff-cover coverage.xml
 
+build:
+	poetry build
+
 docs:
 	cd docs && rm -rf ./build && $(MAKE) html
 

@@ -1,11 +1,23 @@
 from typing import Any, List, Optional, Tuple, cast
 
+from attr import dataclass
+
 from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.micheline import MichelsonRuntimeError
-from pytezos.michelson.parse import MichelsonParser
+from pytezos.michelson.parse import MichelsonParser, michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram, TztMichelsonProgram
+from pytezos.michelson.sections import CodeSection
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import OperationType
+
+
+@dataclass(kw_only=True)
+class InterpreterResult:
+    operations = None
+    storage = None
+    lazy_diff = None
+    stdout: List[str]
+    error: Optional[Exception] = None
 
 
 class Interpreter:
@@ -18,6 +30,22 @@ class Interpreter:
         self.context = ExecutionContext()
         self.parser = MichelsonParser(extra_primitives=[])
         self.debug = debug
+
+    def run_cell(self, code: str) -> InterpreterResult:
+        """Execute some code preserving current context and stack"""
+        result = InterpreterResult(stdout=[])
+        code_section = CodeSection.match(michelson_to_micheline(code))
+
+        try:
+            code_section.args[0].execute(self.stack, result.stdout, self.context)
+        except MichelsonRuntimeError as e:
+            result.stdout.append(e.format_stdout())
+            result.error = e
+
+        return result
+
+    def reset(self) -> None:
+        self.__init__()
 
     @staticmethod
     def run_code(
