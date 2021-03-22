@@ -13,7 +13,7 @@ from pytezos.michelson.types.base import MichelsonType
 
 class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
     def __init__(self, items: List[MichelsonType]):
-        super().__init__()
+        super().__init__(stack_items_added=len(items))
         self.items = items
 
     @classmethod
@@ -25,7 +25,7 @@ class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
 
 class DumpInstruction(MichelsonInstruction, prim='DUMP', args_len=1):
     def __init__(self, items: List[MichelsonType]):
-        super().__init__()
+        super().__init__(stack_items_added=len(items))
         self.items = items
 
     @classmethod

@@ -52,12 +52,13 @@ class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
         res = lambda_type(cls.args[2])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
+        return cls(stack_items_added=1)
 
 
 class ExecInstruction(MichelsonInstruction, prim='EXEC'):
 
     def __init__(self, item: MichelsonInstruction):
-        super(ExecInstruction, self).__init__()
+        super(ExecInstruction, self).__init__(stack_items_added=1)
         self.item = item
 
     @classmethod
@@ -94,7 +95,7 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
         res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [left, lambda_], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
@@ -124,8 +125,8 @@ class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
 
 class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
 
-    def __init__(self, item: MichelsonInstruction):
-        super(IfConsInstruction, self).__init__()
+    def __init__(self, stack_items_added: int, item: MichelsonInstruction):
+        super(IfConsInstruction, self).__init__(stack_items_added)
         self.item = item
 
     @classmethod
@@ -138,17 +139,19 @@ class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
             stack.push(head)
             stdout.append(format_stdout(cls.prim, [lst], [head, tail]))  # type: ignore
             branch = cls.args[0]
+            stack_items_added = 2
         else:
             stdout.append(format_stdout(cls.prim, [lst], []))  # type: ignore
             branch = cls.args[1]
+            stack_items_added = 0
         item = branch.execute(stack, stdout, context=context)
-        return cls(item)
+        return cls(stack_items_added, item)
 
 
 class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
 
     def __init__(self, item: MichelsonInstruction):
-        super(IfLeftInstruction, self).__init__()
+        super(IfLeftInstruction, self).__init__(stack_items_added=1)
         self.item = item
 
     @classmethod
@@ -165,8 +168,8 @@ class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
 
 class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
 
-    def __init__(self, item: MichelsonInstruction):
-        super(IfNoneInstruction, self).__init__()
+    def __init__(self, stack_items_added: int, item: MichelsonInstruction):
+        super(IfNoneInstruction, self).__init__(stack_items_added)
         self.item = item
 
     @classmethod
@@ -176,13 +179,15 @@ class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
         if opt.is_none():
             branch = cls.args[0]
             stdout.append(format_stdout(cls.prim, [opt], []))  # type: ignore
+            stack_items_added = 0
         else:
             some = opt.get_some()
             stack.push(some)
             stdout.append(format_stdout(cls.prim, [opt], [some]))  # type: ignore
             branch = cls.args[1]
+            stack_items_added = 1
         item = branch.execute(stack, stdout, context=context)
-        return cls(item)
+        return cls(stack_items_added, item)
 
 
 class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
@@ -208,35 +213,38 @@ class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
 
 class LoopLeftInstruction(MichelsonInstruction, prim='LOOP_LEFT', args_len=1):
 
-    def __init__(self, items: List[MichelsonInstruction]):
-        super(LoopLeftInstruction, self).__init__()
+    def __init__(self, stack_items_added: int, items: List[MichelsonInstruction]):
+        super(LoopLeftInstruction, self).__init__(stack_items_added)
         self.items = items
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        stack_items_added = 0
         items = []
         while True:
             or_ = cast(OrType, stack.pop1())
             or_.assert_type_in(OrType)
             var = or_.resolve()
             stack.push(var)
+            stack_items_added += 1
             stdout.append(format_stdout(cls.prim, [or_], [var]))  # type: ignore
             if or_.is_left():
                 item = cls.args[0].execute(stack, stdout, context=context)
                 items.append(item)
             else:
                 break
-        return cls(items)
+        return cls(stack_items_added, items)
 
 
 class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
 
-    def __init__(self, items: List[MichelsonInstruction]):
-        super(MapInstruction, self).__init__()
+    def __init__(self, stack_items_added: int, items: List[MichelsonInstruction]):
+        super(MapInstruction, self).__init__(stack_items_added)
         self.items = items
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        stack_items_added = 0
         src = cast(Union[ListType, MapType], stack.pop1())
         executions = []
         items = []
@@ -245,6 +253,7 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
             if isinstance(src, MapType):
                 elt = PairType.from_comb(list(elt))  # type: ignore
             stack.push(elt)  # type: ignore
+            stack_items_added += 1
             stdout.append(format_stdout(cls.prim, popped, [elt]))  # type: ignore
             execution = cls.args[0].execute(stack, stdout, context=context)
             executions.append(execution)
@@ -260,27 +269,30 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
         else:
             res = src  # TODO: need to deduce argument types
         stack.push(res)
+        stack_items_added += 1
         stdout.append(format_stdout(cls.prim, popped, [res]))  # type: ignore
-        return cls(executions)
+        return cls(stack_items_added, executions)
 
 
 class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
 
-    def __init__(self, items: List[MichelsonInstruction]):
-        super(IterInstruction, self).__init__()
+    def __init__(self, stack_items_added: int, items: List[MichelsonInstruction]):
+        super(IterInstruction, self).__init__(stack_items_added)
         self.items = items
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        stack_items_added = 0
         src = cast(Union[ListType, MapType, SetType], stack.pop1())
         executions = []
         popped = [src]
         for elt in src:
             if isinstance(src, MapType):
                 elt = PairType.from_comb(list(elt))  # type: ignore
+            stack_items_added += 1
             stack.push(elt)  # type: ignore
             stdout.append(format_stdout(cls.prim, popped, [elt]))  # type: ignore
             execution = cls.args[0].execute(stack, stdout, context=context)
             executions.append(execution)
             popped = []
-        return cls(executions)
+        return cls(stack_items_added, executions)

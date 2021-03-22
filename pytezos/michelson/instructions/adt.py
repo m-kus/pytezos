@@ -19,7 +19,7 @@ class CarInstruction(MichelsonInstruction, prim='CAR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_cxr(cls.prim, stack, stdout, 0)  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class CdrInstruction(MichelsonInstruction, prim='CDR'):
@@ -27,7 +27,7 @@ class CdrInstruction(MichelsonInstruction, prim='CDR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_cxr(cls.prim, stack, stdout, 1)  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class GetnInstruction(MichelsonInstruction, prim='GET', args_len=1):
@@ -40,7 +40,7 @@ class GetnInstruction(MichelsonInstruction, prim='GET', args_len=1):
         res = pair.access_comb(index)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [pair], [res], index))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
@@ -53,7 +53,7 @@ class UpdatenInstruction(MichelsonInstruction, prim='UPDATE', args_len=1):
         res = pair.update_comb(index, element)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [element, pair], [res], index))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class LeftInstruction(MichelsonInstruction, prim='LEFT', args_len=1):
@@ -75,7 +75,7 @@ class RightInstruction(MichelsonInstruction, prim='RIGHT', args_len=1):
         res = OrType.from_right(right, cls.args[0])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [right], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class PairInstruction(MichelsonInstruction, prim='PAIR'):
@@ -86,7 +86,7 @@ class PairInstruction(MichelsonInstruction, prim='PAIR'):
         res = PairType.from_comb([left, right])
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [left, right], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class UnpairInstruction(MichelsonInstruction, prim='UNPAIR'):
@@ -99,7 +99,7 @@ class UnpairInstruction(MichelsonInstruction, prim='UNPAIR'):
         stack.push(right)
         stack.push(left)
         stdout.append(format_stdout(cls.prim, [pair], [left, right]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=2)
 
 
 class PairnInstruction(MichelsonInstruction, prim='PAIR', args_len=1):
@@ -112,7 +112,7 @@ class PairnInstruction(MichelsonInstruction, prim='PAIR', args_len=1):
         res = PairType.from_comb(leaves)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, leaves, [res], count))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class UnpairnInstruction(MichelsonInstruction, prim='UNPAIR', args_len=1):
@@ -128,4 +128,4 @@ class UnpairnInstruction(MichelsonInstruction, prim='UNPAIR', args_len=1):
         for leaf in reversed(leaves):
             stack.push(leaf)
         stdout.append(format_stdout(cls.prim, [pair], leaves, count))  # type: ignore
-        return cls()
+        return cls(stack_items_added=len(leaves))

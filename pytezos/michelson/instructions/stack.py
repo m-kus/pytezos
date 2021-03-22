@@ -14,7 +14,7 @@ class PushInstruction(MichelsonInstruction, prim='PUSH', args_len=2):
         res = res_type.from_literal(literal)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class DropnInstruction(MichelsonInstruction, prim='DROP', args_len=1):
@@ -46,7 +46,7 @@ class DupnInstruction(MichelsonInstruction, prim='DUP', args_len=1):
         stack.restore(count=depth)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth), res], depth))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class DupInstruction(MichelsonInstruction, prim='DUP'):
@@ -56,7 +56,7 @@ class DupInstruction(MichelsonInstruction, prim='DUP'):
         res = stack.peek().duplicate()
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [res], [res, res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SwapInstruction(MichelsonInstruction, prim='SWAP'):
@@ -67,7 +67,7 @@ class SwapInstruction(MichelsonInstruction, prim='SWAP'):
         stack.push(a)
         stack.push(b)
         stdout.append(format_stdout(cls.prim, [a, b], [b, a]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=2)
 
 
 class DigInstruction(MichelsonInstruction, prim='DIG', args_len=1):
@@ -80,7 +80,7 @@ class DigInstruction(MichelsonInstruction, prim='DIG', args_len=1):
         stack.restore(count=depth)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [*Wildcard.n(depth), res], [res, *Wildcard.n(depth)], depth))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class DugInstruction(MichelsonInstruction, prim='DUG', args_len=1):
@@ -93,7 +93,7 @@ class DugInstruction(MichelsonInstruction, prim='DUG', args_len=1):
         stack.push(res)
         stack.restore(count=depth)
         stdout.append(format_stdout(cls.prim, [res, *Wildcard.n(depth)], [*Wildcard.n(depth), res], depth))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class CastIntruction(MichelsonInstruction, prim='CAST', args_len=1):
@@ -106,7 +106,7 @@ class CastIntruction(MichelsonInstruction, prim='CAST', args_len=1):
         # res = cast_type.from_micheline_value(top.to_micheline_value())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [res], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class RenameInstruction(MichelsonInstruction, prim='RENAME'):

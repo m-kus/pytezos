@@ -35,6 +35,9 @@ class MichelsonInstruction(Micheline):
     field_names: List[str] = []
     var_names: List[str] = []
 
+    def __init__(self, stack_items_added: int = 0) -> None:
+        self.stack_items_added = stack_items_added
+
     @staticmethod
     def match(expr) -> Type['MichelsonInstruction']:
         return cast(Type['MichelsonInstruction'], Micheline.match(expr))

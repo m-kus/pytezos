@@ -29,7 +29,7 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
             res = res_type.from_value(convert(a) + convert(b))
             stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         stack.push(res)
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class PackInstruction(MichelsonInstruction, prim='PACK'):
@@ -40,7 +40,7 @@ class PackInstruction(MichelsonInstruction, prim='PACK'):
         res = BytesType.from_value(a.pack())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class UnpackInstruction(MichelsonInstruction, prim='UNPACK', args_len=1):
@@ -57,7 +57,7 @@ class UnpackInstruction(MichelsonInstruction, prim='UNPACK', args_len=1):
             res = OptionType.none(cls.args[0])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SizeInstruction(MichelsonInstruction, prim='SIZE'):
@@ -69,7 +69,7 @@ class SizeInstruction(MichelsonInstruction, prim='SIZE'):
         res = NatType.from_value(len(src))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [src], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SliceInstruction(MichelsonInstruction, prim='SLICE'):
@@ -87,7 +87,7 @@ class SliceInstruction(MichelsonInstruction, prim='SLICE'):
             res = OptionType.none(type(s))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [offset, length, s], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class UnitInstruction(MichelsonInstruction, prim='UNIT'):
@@ -97,7 +97,7 @@ class UnitInstruction(MichelsonInstruction, prim='UNIT'):
         res = UnitType()
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class NeverInstruction(MichelsonInstruction, prim='NEVER'):

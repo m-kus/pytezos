@@ -4,7 +4,7 @@ from typing import Any, List, Optional, Tuple, cast
 from attr import dataclass
 
 from pytezos.context.impl import ExecutionContext
-from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParser, MichelsonParserError, michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram, TztMichelsonProgram
 from pytezos.michelson.sections import CodeSection
@@ -19,6 +19,8 @@ class InterpreterResult:
     lazy_diff = None
     stdout: List[str]
     error: Optional[Exception] = None
+    instructions: Optional[MichelineSequence] = None
+    stack: Optional[MichelsonStack] = None
 
 
 class Interpreter:
@@ -44,7 +46,9 @@ class Interpreter:
 
         try:
             code_section = CodeSection.match(michelson_to_micheline(code))
-            code_section.args[0].execute(self.stack, result.stdout, self.context)
+            operations = code_section.args[0].execute(self.stack, result.stdout, self.context)
+            result.operations = operations
+            result.stack = self.stack
         except (MichelsonParserError, MichelsonRuntimeError) as e:
             if self.debug:
                 raise

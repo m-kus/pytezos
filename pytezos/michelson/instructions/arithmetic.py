@@ -18,7 +18,7 @@ class AbsInstruction(MichelsonInstruction, prim='ABS'):
         res = NatType.from_value(abs(int(a)))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class AddInstruction(MichelsonInstruction, prim='ADD'):
@@ -49,7 +49,7 @@ class AddInstruction(MichelsonInstruction, prim='ADD'):
             res = res_type.from_point(bls12_381.add(a.to_point(), b.to_point()))  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class EdivInstruction(MichelsonInstruction, prim='EDIV'):
@@ -76,7 +76,7 @@ class EdivInstruction(MichelsonInstruction, prim='EDIV'):
             res = OptionType.from_some(PairType.from_comb(items))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Callable[[Tuple[int, int]], int]):
@@ -95,7 +95,7 @@ class LslInstruction(MichelsonInstruction, prim='LSL'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_shift(cls.prim, stack, stdout, lambda x: x[0] << x[1])  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class LsrInstruction(MichelsonInstruction, prim='LSR'):
@@ -103,7 +103,7 @@ class LsrInstruction(MichelsonInstruction, prim='LSR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_shift(cls.prim, stack, stdout, lambda x: x[0] >> x[1])  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class MulInstruction(MichelsonInstruction, prim='MUL'):
@@ -136,7 +136,7 @@ class MulInstruction(MichelsonInstruction, prim='MUL'):
             res = res_type.from_point(bls12_381.multiply(a.to_point(), int(b)))  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class NegInstruction(MichelsonInstruction, prim='NEG'):
@@ -157,7 +157,7 @@ class NegInstruction(MichelsonInstruction, prim='NEG'):
             res = res_type.from_point(bls12_381.neg(a.to_point()))  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SubInstruction(MichelsonInstruction, prim='SUB'):
@@ -177,7 +177,7 @@ class SubInstruction(MichelsonInstruction, prim='SUB'):
         res = res_type.from_value(int(a) - int(b))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class IntInstruction(MichelsonInstruction, prim='INT'):
@@ -189,7 +189,7 @@ class IntInstruction(MichelsonInstruction, prim='INT'):
         res = IntType.from_value(int(a))
         stack.push(res)
         stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
@@ -204,4 +204,4 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
             res = OptionType.none(NatType)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)

@@ -22,7 +22,7 @@ class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
             res = OptionType.from_some(res)  # type: ignore
         stack.push(res)  # type: ignore
         stdout.append(format_stdout(cls.prim, [pair], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
@@ -35,7 +35,7 @@ class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
         stack.push(ticket)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [ticket], [res, ticket]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=2)
 
 
 class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
@@ -55,7 +55,7 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
             res = OptionType.from_some(PairType.from_comb(list(res)))  # type: ignore
         stack.push(res)  # type: ignore
         stdout.append(format_stdout(cls.prim, [ticket, amounts], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class TicketInstruction(MichelsonInstruction, prim='TICKET'):
@@ -68,4 +68,4 @@ class TicketInstruction(MichelsonInstruction, prim='TICKET'):
         res = TicketType.create(address, item, int(amount))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [item, amount], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)

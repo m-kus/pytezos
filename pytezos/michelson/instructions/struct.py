@@ -15,7 +15,7 @@ class ConsInstruction(MichelsonInstruction, prim='CONS'):
         res = lst.prepend(elt)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [elt, lst], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class NilInstruction(MichelsonInstruction, prim='NIL', args_len=1):
@@ -25,7 +25,7 @@ class NilInstruction(MichelsonInstruction, prim='NIL', args_len=1):
         res = ListType.empty(cls.args[0])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class EmptyBigMapInstruction(MichelsonInstruction, prim='EMPTY_BIG_MAP', args_len=2):
@@ -36,7 +36,7 @@ class EmptyBigMapInstruction(MichelsonInstruction, prim='EMPTY_BIG_MAP', args_le
         res.attach_context(context)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class EmptyMapInstruction(MichelsonInstruction, prim='EMPTY_MAP', args_len=2):
@@ -46,7 +46,7 @@ class EmptyMapInstruction(MichelsonInstruction, prim='EMPTY_MAP', args_len=2):
         res = MapType.empty(key_type=cls.args[0], val_type=cls.args[1])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class EmptySetInstruction(MichelsonInstruction, prim='EMPTY_SET', args_len=1):
@@ -56,7 +56,7 @@ class EmptySetInstruction(MichelsonInstruction, prim='EMPTY_SET', args_len=1):
         res = SetType.empty(item_type=cls.args[0])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class GetInstruction(MichelsonInstruction, prim='GET'):
@@ -72,7 +72,7 @@ class GetInstruction(MichelsonInstruction, prim='GET'):
             res = OptionType.from_some(val)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [key, src], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class GetAndUpdateInstruction(MichelsonInstruction, prim='GET_AND_UPDATE'):
@@ -86,7 +86,7 @@ class GetAndUpdateInstruction(MichelsonInstruction, prim='GET_AND_UPDATE'):
         stack.push(dst)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [key, val, src], [res, dst]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=2)
 
 
 class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
@@ -104,7 +104,7 @@ class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
             _, dst = src.update(key, None if val.is_none() else val.get_some())  # type: ignore
         stack.push(dst)
         stdout.append(format_stdout(cls.prim, [key, val, src], [dst]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class MemInstruction(MichelsonInstruction, prim='MEM'):
@@ -116,7 +116,7 @@ class MemInstruction(MichelsonInstruction, prim='MEM'):
         res = BoolType.from_value(src.contains(key))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [key, src], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class NoneInstruction(MichelsonInstruction, prim='NONE', args_len=1):
@@ -126,7 +126,7 @@ class NoneInstruction(MichelsonInstruction, prim='NONE', args_len=1):
         res = OptionType.none(cls.args[0])  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SomeInstruction(MichelsonInstruction, prim='SOME'):
@@ -137,4 +137,4 @@ class SomeInstruction(MichelsonInstruction, prim='SOME'):
         res = OptionType.from_some(some)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [some], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)

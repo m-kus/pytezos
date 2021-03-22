@@ -18,7 +18,7 @@ class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
         res = MutezType.from_value(amount)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
@@ -29,7 +29,7 @@ class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
         res = MutezType.from_value(balance)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
@@ -40,7 +40,7 @@ class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
         res = ChainIdType.from_value(chain_id)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 def get_entrypoint_type(context: AbstractContext, name: str, address=None) -> Optional[Type[MichelsonType]]:
@@ -65,7 +65,7 @@ class SelfInstruction(MichelsonInstruction, prim='SELF'):
         res = res_type.from_value(f'{self_address}%{entrypoint}')  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SelfAddressInstruction(MichelsonInstruction, prim='SELF_ADDRESS'):
@@ -75,7 +75,7 @@ class SelfAddressInstruction(MichelsonInstruction, prim='SELF_ADDRESS'):
         res = AddressType.from_value(context.get_self_address())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SenderInstruction(MichelsonInstruction, prim='SENDER'):
@@ -86,7 +86,7 @@ class SenderInstruction(MichelsonInstruction, prim='SENDER'):
         res = AddressType.from_value(sender)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class SourceInstruction(MichelsonInstruction, prim='SOURCE'):
@@ -97,7 +97,7 @@ class SourceInstruction(MichelsonInstruction, prim='SOURCE'):
         res = AddressType.from_value(source)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class NowInstruction(MichelsonInstruction, prim='NOW'):
@@ -108,7 +108,7 @@ class NowInstruction(MichelsonInstruction, prim='NOW'):
         res = TimestampType.from_value(now)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
@@ -120,7 +120,7 @@ class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
         res = AddressType.from_value(contract.get_address())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [contract], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
@@ -142,7 +142,7 @@ class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
             res = OptionType.none(contract_type)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [address], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
@@ -154,7 +154,7 @@ class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
         res = ContractType.create_type(args=[UnitType]).from_value(str(key_hash))  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [key_hash], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', args_len=1):
@@ -184,7 +184,7 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
         stack.push(originated_address)
         stack.push(origination)
         stdout.append(format_stdout(cls.prim, [delegate, amount, initial_storage], [origination, originated_address]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=2)
 
 
 class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
@@ -200,7 +200,7 @@ class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
         )
         stack.push(delegation)
         stdout.append(format_stdout(cls.prim, [delegate], [delegation]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
@@ -225,7 +225,7 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
         )
         stack.push(transaction)
         stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class VotingPowerInstruction(MichelsonInstruction, prim='VOTING_POWER'):
@@ -237,7 +237,7 @@ class VotingPowerInstruction(MichelsonInstruction, prim='VOTING_POWER'):
         res = NatType.from_value(context.get_voting_power(str(address)))
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [address], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class TotalVotingPowerInstruction(MichelsonInstruction, prim='TOTAL_VOTING_POWER'):
@@ -247,7 +247,7 @@ class TotalVotingPowerInstruction(MichelsonInstruction, prim='TOTAL_VOTING_POWER
         res = NatType.from_value(context.get_total_voting_power())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
 
 
 class LevelInstruction(MichelsonInstruction, prim='LEVEL'):
@@ -257,4 +257,4 @@ class LevelInstruction(MichelsonInstruction, prim='LEVEL'):
         res = NatType.from_value(context.get_level())
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
-        return cls()
+        return cls(stack_items_added=1)
