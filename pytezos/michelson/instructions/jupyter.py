@@ -5,9 +5,11 @@ import strict_rfc3339  # type: ignore
 
 from pytezos.context.abstract import AbstractContext
 from pytezos.context.mixin import nodes
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.micheline import MichelineLiteral, MichelsonRuntimeError
+from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
+from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelsonRuntimeError
+from pytezos.michelson.sections import ParameterSection, StorageSection
 from pytezos.michelson.stack import MichelsonStack
+from pytezos.michelson.types import ListType, OperationType, PairType
 from pytezos.michelson.types.base import MichelsonType
 
 
@@ -69,6 +71,64 @@ class DropAllInstruction(MichelsonInstruction, prim='DROP_ALL'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         stack.items = []
         return cls()
+
+
+class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        # FIXME: MichelsonProgram copypaste
+        parameter_literal, storage_literal = cls.args  # type: ignore
+
+        parameter_type_expr = context.get_parameter_expr()
+        storage_type_expr = context.get_storage_expr()
+        if parameter_type_expr is None:
+            raise Exception('parameter type is not initialized')
+        if storage_type_expr is None:
+            raise Exception('storage type is not initialized')
+
+        parameter_type = ParameterSection.match(parameter_type_expr)
+        storage_type = StorageSection.match(storage_type_expr)
+        parameter = parameter_type.from_micheline_value(parameter_literal.as_micheline_expr())
+        storage = storage_type.from_micheline_value(storage_literal.as_micheline_expr())
+
+        parameter.attach_context(context)
+        storage.attach_context(context)
+        res = PairType.from_comb([parameter.item, storage.item])
+        stack.items = []
+        stack.push(res)
+        stdout.append(format_stdout(f'BEGIN %default', [], [res]))
+        return cls(stack_items_added=1)
+
+
+class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        # FIXME: MichelsonProgram copypaste
+        debug, context.debug = context.debug, False  # type: ignore
+
+        res = cast(PairType, stack.pop1())
+        if len(stack):
+            raise Exception(f'Stack is not empty: {stack}')
+        res.assert_type_equal(
+            PairType.create_type(
+                args=[
+                    ListType.create_type(args=[OperationType]),
+                    StorageSection.match(context.get_storage_expr()).args[0]
+                ],
+            ),
+            message='list of operations + resulting storage',
+        )
+        operations = ListType(items=[op for op in res.items[0]])
+        lazy_diff = []  # type: ignore
+        storage = res.items[1].aggregate_lazy_diff(lazy_diff)
+        stdout.append(format_stdout(f'END %default', [res], []))
+
+        res = PairType.from_comb([operations, storage])
+        stack.push(res)
+        context.debug = debug  # type: ignore
+        return cls(stack_items_added=1)
 
 
 class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):

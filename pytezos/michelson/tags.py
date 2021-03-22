@@ -160,6 +160,8 @@ prim_tags = {
     'PRINT': b'\xEE',
     'DEBUG': b'\xEE',
     'DROP_ALL': b'\xEE',
+    'BEGIN': b'\xEE',
+    'COMMIT': b'\xEE',
     'EXPAND': b'\xEE',
     'PATCH': b'\xEE',
     'RESET': b'\xEE',

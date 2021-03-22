@@ -90,7 +90,10 @@ class MichelsonProgram:
             raise Exception(f'Stack is not empty: {repr(stack)}')
         res.assert_type_equal(
             PairType.create_type(
-                args=[ListType.create_type(args=[OperationType]), self.storage.args[0]],
+                args=[
+                    ListType.create_type(args=[OperationType]),
+                    self.storage.args[0]
+                ],
             ),
             message='list of operations + resulting storage',
         )

@@ -35,8 +35,8 @@ class Interpreter:
     ):
         self.stack = MichelsonStack()
         self.context = ExecutionContext()
-        self.parser = MichelsonParser(extra_primitives=extra_primitives or [])
-        self.debug = debug
+        self.context.debug = debug
+        self.parser = MichelsonParser(debug=debug, extra_primitives=extra_primitives)
 
     def execute(self, code: str) -> InterpreterResult:
         """Execute some code preserving current context and stack"""
@@ -50,7 +50,7 @@ class Interpreter:
             result.operations = operations
             result.stack = self.stack
         except (MichelsonParserError, MichelsonRuntimeError) as e:
-            if self.debug:
+            if self.context.debug:
                 raise
 
             self.stack = stack_backup

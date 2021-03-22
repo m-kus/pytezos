@@ -14,6 +14,11 @@ class OperationType(MichelsonType, prim='operation'):
     def __repr__(self):
         return self.content['kind']
 
+    def __eq__(self, other):
+        if not isinstance(other, OperationType):
+            return False
+        return self.content == other.content
+
     @classmethod
     def origination(cls,
                     source: str,
