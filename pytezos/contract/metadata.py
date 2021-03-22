@@ -82,10 +82,17 @@ class MichelsonStorageView:
     def as_contract(self, storage_type_expr: Dict[str, Any]):
         from pytezos.contract.interface import ContractInterface
 
+        view_type = self.parameter or {'prim': 'unit'}
         contract = ContractInterface.from_micheline([
-            {'prim': 'parameter', 'args': [{'prim': 'pair', 'args': [self.parameter or {'prim': 'unit'}, storage_type_expr]}]},
-            {'prim': 'storage', 'args': [self.returnType]},
-            {'prim': 'code', 'args': [self.code]},
+            {'prim': 'parameter', 'args': [{'prim': 'pair', 'args': [view_type, storage_type_expr]}]},
+            {'prim': 'storage', 'args': [{'prim': 'option', 'args': [self.returnType]}]},
+            {'prim': 'code', 'args': [[
+                {'prim': 'CAR'},
+                self.code,
+                {'prim': 'SOME'},
+                {'prim': 'NIL', 'args': [{'prim': 'operation'}]},
+                {'prim': 'PAIR'}
+            ]]},
         ])
         return contract
 

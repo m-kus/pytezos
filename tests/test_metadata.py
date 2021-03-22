@@ -20,7 +20,7 @@ class MetadataTest(TestCase):
     def test_run_storage_view(self):
         contract = PyTezosClient().using('delphinet').contract('KT1RyihALYEsVCcKP7Ya6teCHs9ii5ZHQxvj')
         view_entrypoint = contract.metadata.multiplyTheNatInStorage
-        view_entrypoint(2, contract.storage()).run_code()
+        view_entrypoint(2, *contract.storage.data.to_python_object(comparable=True)).run_code()
     
     def test_run_openapi_view(self):
         metadata = ContractMetadata.from_file(join(dirname(__file__), 'metadata/swagger_view.json'))
