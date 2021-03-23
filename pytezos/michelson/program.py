@@ -81,7 +81,7 @@ class MichelsonProgram:
         stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
-        return self.code.args[0].execute(stack, stdout, context)
+        return cast(MichelsonInstruction, self.code.args[0].execute(stack, stdout, context))
 
     @try_catch('END')
     def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
@@ -185,7 +185,7 @@ class TztMichelsonProgram:
             cast(StackEltInstruction, item).push(stack, stdout, context)
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
-        return self.code.args[0].execute(stack, stdout, context)
+        return cast(MichelsonInstruction, self.code.args[0].execute(stack, stdout, context))
 
     def end(self, stack: MichelsonStack, stdout: List[str]) -> None:
         for item in self.output.args[0].args:

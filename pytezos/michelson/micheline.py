@@ -4,8 +4,7 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, TypeVa
 
 from typing_extensions import Literal
 
-from pytezos.michelson.forge import unforge_address, unforge_chain_id, unforge_micheline, unforge_public_key, \
-    unforge_signature
+from pytezos.michelson.forge import unforge_address, unforge_chain_id, unforge_micheline, unforge_public_key, unforge_signature
 from pytezos.michelson.format import micheline_to_michelson
 
 

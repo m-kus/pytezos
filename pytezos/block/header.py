@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import bson  # type: ignore
 
-from pytezos.block.forge import forge_block_header, forge_protocol_data, forge_signed_operation, bump_fitness
+from pytezos.block.forge import bump_fitness, forge_block_header, forge_protocol_data, forge_signed_operation
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.crypto.encoding import base58_encode
@@ -54,7 +54,7 @@ class BlockHeader(ContextMixin):
         parameters: Dict[str, Any],
         context: ExecutionContext
     ) -> 'BlockHeader':
-        prev_fitness = context.shell.head.header()['fitness']
+        prev_fitness = context.shell.head.header()['fitness']  # type: ignore
         protocol_data = {
             "content": {
                 "command": "activate",
