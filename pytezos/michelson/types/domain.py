@@ -76,7 +76,7 @@ class MutezType(NatType, prim='mutez'):
 class AddressType(StringType, prim='address'):
 
     def __repr__(self):
-        return f'{self.value[:6]}⋯{self.value[-3:]}'
+        return f'{self.value[:6]}…{self.value[-3:]}'
 
     def __lt__(self, other: 'AddressType') -> bool:  # type: ignore
         if is_pkh(self.value) and is_kt(other.value):
@@ -265,7 +265,7 @@ class ContractType(AddressType, prim='contract', args_len=1):
 
     def __repr__(self):
         address, entrypoint = self.get_address(), self.get_entrypoint()
-        return f'{address[:6]}⋯{address[-3:]}%{entrypoint}'
+        return f'{address[:6]}…{address[-3:]}%{entrypoint}'
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):

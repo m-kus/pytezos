@@ -1,5 +1,5 @@
 import re
-from typing import List, Type, cast
+from typing import Dict, List, Type, cast
 
 import strict_rfc3339  # type: ignore
 
@@ -103,6 +103,10 @@ class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
 
 class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
 
+    def __init__(self, lazy_diff: List[Dict[str, str]], stack_items_added: int = 0) -> None:
+        super().__init__(stack_items_added)
+        self.lazy_diff = lazy_diff
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         # FIXME: MichelsonProgram copypaste
@@ -120,7 +124,7 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
             ),
             message='list of operations + resulting storage',
         )
-        operations = ListType(items=[op for op in res.items[0]])
+        operations = ListType(items=[op for op in res.items[0]])  # type: ignore
         lazy_diff = []  # type: ignore
         storage = res.items[1].aggregate_lazy_diff(lazy_diff)
         stdout.append(format_stdout(f'END %default', [res], []))
@@ -128,7 +132,7 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
         res = PairType.from_comb([operations, storage])
         stack.push(res)
         context.debug = debug  # type: ignore
-        return cls(stack_items_added=1)
+        return cls(lazy_diff=lazy_diff, stack_items_added=1)
 
 
 class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):

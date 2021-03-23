@@ -1,6 +1,7 @@
 from unittest.case import TestCase, skip
 
 from pytezos import MichelsonRuntimeError
+from pytezos.michelson.instructions import CommitInstruction
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.types import (
     PairType,
@@ -99,7 +100,6 @@ class InterpreterTest(TestCase):
             interpreter.stack.items,
         )
 
-    @skip("FIXME: Empty big maps")
     def test_execute_contract_big_map(self) -> None:
         # Arrange
         interpreter = Interpreter()
@@ -200,6 +200,39 @@ class InterpreterTest(TestCase):
             interpreter.stack.items,
         )
         self.assertEqual({}, interpreter.context.big_maps)
+        commit_instruction = next(
+            (
+                i
+                for i in result.instructions.items[::-1]
+                if isinstance(i, CommitInstruction)
+            )
+        )
+        self.assertEqual(
+            [
+                {
+                    "diff": {
+                        "action": "alloc",
+                        "key_type": {"prim": "string"},
+                        "updates": [
+                            {
+                                "key": {"string": "banana"},
+                                "key_hash": "expruyWGhjeJ3v2cWgMkRyYuvbdZKjjARtHvhVeJDCyHgLebMmhBEo",
+                                "value": {"int": "22"},
+                            },
+                            {
+                                "key": {"string": "cherry"},
+                                "key_hash": "expruVgSSodFW5ZDLidXaTVVczu6ddLVebXjMZBG33Z2oyQDUugvdE",
+                                "value": {"int": "20"},
+                            },
+                        ],
+                        "value_type": {"prim": "nat"},
+                    },
+                    "id": "0",
+                    "kind": "big_map",
+                }
+            ],
+            commit_instruction.lazy_diff,
+        )
 
     def test_execute_contract_operations(self) -> None:
         # Arrange
@@ -254,13 +287,13 @@ class InterpreterTest(TestCase):
                 "COMPARE / 0.0002 : 0.0001 => 1",
                 "LT / 1 => False",
                 "IF / False => _",
-                "SENDER / _ => tz1VSU⋯cjb",
+                "SENDER / _ => tz1VSU…cjb",
                 "CONTRACT: skip type checking for tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                "CONTRACT / tz1VSU⋯cjb => tz1VSU⋯cjb%default?",
-                "IF_NONE / tz1VSU⋯cjb%default? => tz1VSU⋯cjb%default",
-                "SWAP / tz1VSU⋯cjb%default : 0.0001 => 0.0001 : tz1VSU⋯cjb%default",
+                "CONTRACT / tz1VSU…cjb => tz1VSU…cjb%default?",
+                "IF_NONE / tz1VSU…cjb%default? => tz1VSU…cjb%default",
+                "SWAP / tz1VSU…cjb%default : 0.0001 => 0.0001 : tz1VSU…cjb%default",
                 "UNIT / _ => Unit",
-                "TRANSFER_TOKENS / Unit : 0.0001 : tz1VSU⋯cjb%default => transaction",
+                "TRANSFER_TOKENS / Unit : 0.0001 : tz1VSU…cjb%default => transaction",
                 "NIL / _ => []",
                 "SWAP / [] : transaction => transaction : []",
                 "CONS / transaction : [] => [transaction]",
@@ -297,4 +330,3 @@ class InterpreterTest(TestCase):
             ],
             interpreter.stack.items,
         )
-        self.assertEqual({}, interpreter.context.big_maps)
