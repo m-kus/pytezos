@@ -1,0 +1,10 @@
+parameter unit;
+storage unit;
+code { DROP;
+       PUSH address "KT1Cs32iHq1t6bMmENUaNohW5VRXnBZeUFt9%";
+       CONTRACT %a nat;
+       ASSERT_SOME;
+       DROP;
+       UNIT;
+       NIL operation; PAIR
+     };

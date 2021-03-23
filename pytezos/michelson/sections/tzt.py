@@ -144,3 +144,19 @@ class ChainIdSection(Micheline, prim='chain_id', args_len=1):
     def execute(cls, stack, stdout: List[str], context: AbstractContext):
         context.set_chain_id_expr(cls.as_micheline_expr())
         stdout.append('chain_id: updated')
+
+
+# FIXME: CodeSection copypaste
+class BigMapsSection(Micheline, prim='big_maps', args_len=1):
+
+    @staticmethod
+    def match(output_expr) -> Type['BigMapsSection']:
+        cls = Micheline.match(output_expr)
+        if not issubclass(cls, BigMapsSection):
+            cls = BigMapsSection.create_type(args=[cls])
+        return cls  # type: ignore
+
+    @classmethod
+    def execute(cls, stack, stdout: List[str], context: AbstractContext):
+        context.set_big_maps_expr(cls.as_micheline_expr())
+        stdout.append('big_maps: updated')

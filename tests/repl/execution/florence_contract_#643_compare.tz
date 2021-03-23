@@ -1,0 +1,8 @@
+parameter unit;
+storage int;
+code { DROP;
+       PUSH address "tz1fPTuhC8AP9KuSucubfpGSj8fU88z8bz6c";
+       PUSH address "tz1fPTuhC8AP9KuSucubfpGSj8fU88z8bz6c%";
+       COMPARE;
+       NIL operation; PAIR
+     };

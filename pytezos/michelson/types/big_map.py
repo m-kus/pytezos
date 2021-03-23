@@ -60,6 +60,13 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             elements = [f'{repr(k)}: {repr(v)}' for k, v in self]
             return f'{{{", ".join(elements)}}}'
 
+    def __deepcopy__(self, memodict={}):
+        return self.duplicate()
+
+    def __getitem__(self, key_obj) -> Optional[MichelsonType]:  # type: ignore
+        key = self.args[0].from_python_object(key_obj)
+        return self.get(key, dup=False)
+
     @staticmethod
     def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'BigMapType':
         cls = BigMapType.create_type(args=[key_type, val_type])
@@ -186,6 +193,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             self.ptr = context.get_tmp_big_map_id()
         else:
             self.ptr = context.register_big_map(self.ptr, copy=big_map_copy)
+        if context.tzt:  # type: ignore
+            context.tzt_big_maps[self.ptr] = self  # type: ignore
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_type_equal(type(key))
@@ -232,9 +241,3 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         res.context = self.context
         return res
 
-    def __deepcopy__(self, memodict={}):
-        return self.duplicate()
-
-    def __getitem__(self, key_obj) -> Optional[MichelsonType]:  # type: ignore
-        key = self.args[0].from_python_object(key_obj)
-        return self.get(key, dup=False)
