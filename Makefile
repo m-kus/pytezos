@@ -11,6 +11,9 @@ install:
 	git submodule update --init
 	poetry install
 
+notebook:
+	poetry run jupyter notebook
+
 isort:
 	poetry run isort pytezos
 

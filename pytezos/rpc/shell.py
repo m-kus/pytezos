@@ -186,7 +186,7 @@ class DescribeQuery(RpcQuery, path='/describe'):
 
 class BlockInjectionQuery(RpcQuery, path='/injection/block'):
 
-    def post(self, block, _async=False, force=False, chain=None):
+    def post(self, block, timestamp=None, _async=False, force=False, chain=None):
         """ Inject a block in the node and broadcast it.
         The `operations` embedded in `blockHeader` might be pre-validated using a contextual RPCs from the latest block
         (e.g. '/blocks/head/context/preapply').
@@ -209,7 +209,8 @@ class BlockInjectionQuery(RpcQuery, path='/injection/block'):
             params={
                 'async': _async,
                 'force': force,
-                'chain': chain
+                'chain': chain,
+                'timestamp': timestamp,
             },
             json=block
         )

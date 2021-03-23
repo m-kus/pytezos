@@ -12,12 +12,12 @@ class TestOperationGroup(TestCase):
     def test_fill(self, rpc_mock):
         # Arrange
         testmap = {
-            "branch_offset_sandboxed": [5, None, True, -5],
-            "branch_offset_not_sandboxed": [5, None, False, -5],
-            "ttl_sandboxed": [None, 5, True, -55],
-            "ttl_not_sandboxed": [None, 5, False, -55],
-            "ttl_sandboxed_default": [None, None, True, 0],
-            "ttl_not_sandboxed_default": [None, None, False, -50],
+            "branch_offset_sandboxed": [5, None, True, 'head-5'],
+            "branch_offset_not_sandboxed": [5, None, False, 'head-5'],
+            "ttl_sandboxed": [None, 10, True, 'head-50'],
+            "ttl_not_sandboxed": [None, 10, False, 'head-50'],
+            "ttl_sandboxed_default": [None, None, True, 'head-0'],
+            "ttl_not_sandboxed_default": [None, None, False, 'head-55'],
         }
 
         client = PyTezosClient()

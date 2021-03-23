@@ -1,24 +1,42 @@
 import atexit
 import unittest
-from datetime import datetime
-from time import sleep, time
-from typing import Any, Dict, Optional
+from time import sleep
+from typing import Optional
 
 import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
-from pytezos import logger
-from pytezos.block.header import BlockHeader
 from pytezos.client import PyTezosClient
 
-# NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase and stopped after
-# NOTE: all tests are completed.
+# NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
+# and stopped after all tests are completed.
 node_container: Optional[DockerContainer] = None
 node_container_client: PyTezosClient = PyTezosClient()
+node_fitness: int = 1
 
 
 class SandboxedNodeTestCase(unittest.TestCase):
-    IMAGE = 'bakingbad/sandboxed-node:v8.2-2'
+    IMAGE = 'bakingbad/sandboxed-node:v9.0-rc1-1'
+    PROTOCOL = 'PtEdo2Zk'
+
+    def run(self, result: Optional[unittest.TestResult] = None):
+        """ Stop after first error """
+        # FIXME: not working with pytest, type(result) == _pytest.unittest.TestCaseFunction
+        super().run(result)
+
+    def activate(self, protocol_alias: str, reset: bool = False):
+        return self.get_client().using(key='dictator') \
+            .activate_protocol(protocol_alias) \
+            .fill(block_id='genesis' if reset else 'head').sign().inject()
+
+    def bake_block(self):
+        return self.get_client().using(key='bootstrap1') \
+            .bake_block() \
+            .fill().work().sign().inject()
+
+    @property
+    def client(self) -> PyTezosClient:
+        return self.get_client().using(key='bootstrap2')
 
     @classmethod
     def get_node_url(cls) -> str:
@@ -63,6 +81,3 @@ class SandboxedNodeTestCase(unittest.TestCase):
                 break
             except requests.exceptions.ConnectionError:
                 sleep(0.1)
-
-    def get_current_protocol(self) -> Dict[str, Any]:
-        return self.get_client().shell.block.protocols()

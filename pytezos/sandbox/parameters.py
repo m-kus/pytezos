@@ -1,6 +1,5 @@
-sandbox_protocols = {
-    'PtEdo2Zk': 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
-}
+EDO = 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
+FLORENCE = 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i'
 
 sandbox_addresses = {
     'activator': 'tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV',
@@ -50,11 +49,5 @@ sandbox_params = {
 }
 
 
-def get_protocol_hash(alias):
-    if alias not in sandbox_protocols:
-        raise KeyError(f'Unsupported protocol alias: {alias}')
-    return sandbox_protocols[alias]
-
-
-def get_protocol_parameters(alias):
+def get_protocol_parameters(protocol_hash):
     return sandbox_params

@@ -11,7 +11,7 @@ from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup
 from pytezos.rpc import ShellQuery
-from pytezos.sandbox.parameters import get_protocol_hash, get_protocol_parameters
+from pytezos.sandbox.parameters import get_protocol_parameters
 
 
 class PyTezosClient(ContextMixin, ContentMixin):
@@ -131,16 +131,16 @@ class PyTezosClient(ContextMixin, ContentMixin):
     def loglevel(self, value: Union[str, int]) -> None:
         logger.setLevel(value)
 
-    def activate_protocol(self, alias: str) -> BlockHeader:
+    def activate_protocol(self, protocol_hash: str) -> BlockHeader:
         """ Initiate user-activated upgrade (sandbox only)
 
-        :param alias: known protocol alias (first 8 symbols)
+        :param protocol_hash: Protocol hash
         :rtype: BlockHeader
         """
         return BlockHeader.activate_protocol(
-            protocol_hash=get_protocol_hash(alias),
-            parameters=get_protocol_parameters(alias),
-            context=self.context,
+            protocol_hash=protocol_hash,
+            parameters=get_protocol_parameters(protocol_hash),
+            context=self.context
         )
 
     def bake_block(self, min_fee: int = 0) -> BlockHeader:
