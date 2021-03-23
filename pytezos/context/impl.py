@@ -59,14 +59,11 @@ class ExecutionContext(AbstractContext):
     def __copy__(self):
         raise ValueError("It's not allowed to copy context")
 
-    def __deepcopy__(self, memodict={}):
-        raise ValueError("It's not allowed to copy context")
-
     @property
     def constants(self):
         if self.shell is None:
             raise Exception('`shell` is not set')
-        # NOTE: Cached
+        # FIXME: Cached, can be an issue when switching between protocols
         return self.shell.block.context.constants()
 
     @property
