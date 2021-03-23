@@ -19,6 +19,7 @@ def to_camelcase(string: str) -> str:
         return string
     return ''.join(w.lower() if i == 0 else w.title() for i, w in enumerate(words))
 
+
 metadata_json_replace_table = {
     '"return-type":': '"returnType":',
     '"michelson-storage-view":': '"michelsonStorageView":',
@@ -79,21 +80,43 @@ class MichelsonStorageView:
     annotations: Optional[List[Dict[str, Any]]] = None
     version: Optional[str] = None
 
-    def as_contract(self, storage_type_expr: Dict[str, Any]):
+    def as_contract(self, context):
         from pytezos.contract.interface import ContractInterface
 
         view_type = self.parameter or {'prim': 'unit'}
-        contract = ContractInterface.from_micheline([
-            {'prim': 'parameter', 'args': [{'prim': 'pair', 'args': [view_type, storage_type_expr]}]},
-            {'prim': 'storage', 'args': [{'prim': 'option', 'args': [self.returnType]}]},
-            {'prim': 'code', 'args': [[
-                {'prim': 'CAR'},
-                self.code,
-                {'prim': 'SOME'},
-                {'prim': 'NIL', 'args': [{'prim': 'operation'}]},
-                {'prim': 'PAIR'}
-            ]]},
-        ])
+        contract = ContractInterface.from_micheline(
+            [
+                {
+                    'prim': 'parameter',
+                    'args': [
+                        {
+                            'prim': 'pair',
+                            'args': [
+                                view_type,
+                                context.get_storage_expr()['args'][0],
+                            ],
+                        },
+                    ],
+                },
+                {
+                    'prim': 'storage',
+                    'args': [{'prim': 'option', 'args': [self.returnType]}],
+                },
+                {
+                    'prim': 'code',
+                    'args': [
+                        [
+                            {'prim': 'CAR'},
+                            self.code,
+                            {'prim': 'SOME'},
+                            {'prim': 'NIL', 'args': [{'prim': 'operation'}]},
+                            {'prim': 'PAIR'},
+                        ]
+                    ],
+                },
+            ],
+            context,
+        )
         return contract
 
 
@@ -109,12 +132,12 @@ class View:
     implementations: List[Union[MichelsonStorageViewImplementation, RestApiViewImplementation]]
     pure: bool = False
 
-    def get_entrypoint(self, storage_type_expr) -> Callable:
+    def get_entrypoint(self, context) -> Callable:
         if len(self.implementations) != 1:
             raise Exception
         imp = self.implementations[0]
         if isinstance(imp, MichelsonStorageViewImplementation):
-            return imp.michelsonStorageView.as_contract(storage_type_expr).default
+            return imp.michelsonStorageView.as_contract(context).default
         elif isinstance(imp, RestApiViewImplementation):
             return imp.restApiQuery.as_swagger_entrypoint()
         raise NotImplementedError('Unknown view implementation')
@@ -132,19 +155,19 @@ class ContractMetadata:
     views: Optional[List[View]] = None
 
     def __attrs_post_init__(self):
-        self._storage_type_expr = None
+        self._context = None
 
     def __getattribute__(self, name: str) -> Callable:
         with suppress(AttributeError):
             return super().__getattribute__(name)
         try:
             view = self.views_by_name[name]
-            return view.get_entrypoint(self._storage_type_expr)
+            return view.get_entrypoint(self._context)
         except KeyError as e:
             raise KeyError(f'Unknown view `{name}`, available: {list(self.views_by_name.keys())}') from e
 
-    def set_storage_type_expr(self, val):
-        self._storage_type_expr = val
+    def set_context(self, context):
+        self._context = context
 
     @property
     def views_by_name(self):

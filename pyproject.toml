@@ -68,7 +68,7 @@ line_length = 140
 
 [tool.black]
 line-length = 140
-target-version = ['py37', 'py38', 'py39']
+target-version = ['py37', 'py38']
 skip-string-normalization = true
 
 [build-system]

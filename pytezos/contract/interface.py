@@ -246,7 +246,7 @@ class ContractInterface(ContextMixin):
         else:
             raise NotImplementedError('Unknown metadata URL scheme')
 
-        metadata.set_storage_type_expr(self.context.get_storage_expr()['args'][0])
+        metadata.set_context(self.context)
         return metadata
 
     @cached_property
