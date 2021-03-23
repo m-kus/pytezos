@@ -89,14 +89,7 @@ class InterpreterTest(TestCase):
             result.stdout,
         )
         self.assertEqual(
-            [
-                PairType(
-                    (
-                        ListType([]),
-                        UnitType(),
-                    ),
-                )
-            ],
+            [],
             interpreter.stack.items,
         )
 
@@ -189,14 +182,7 @@ class InterpreterTest(TestCase):
             result.stdout,
         )
         self.assertEqual(
-            [
-                PairType(
-                    (
-                        ListType([]),
-                        BigMapType(items=[], ptr=0),
-                    )
-                )
-            ],
+            [],
             interpreter.stack.items,
         )
         self.assertEqual({}, interpreter.context.big_maps)
@@ -304,29 +290,34 @@ class InterpreterTest(TestCase):
             ],
             result.stdout,
         )
+        commit_instruction = next(
+            (
+                i
+                for i in result.instructions.items[::-1]
+                if isinstance(i, CommitInstruction)
+            )
+        )
         self.assertEqual(
-            [
-                PairType(
-                    (
-                        ListType(
-                            [
-                                OperationType(
-                                    {
-                                        "kind": "transaction",
-                                        "source": "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi",
-                                        "destination": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                                        "amount": "100",
-                                        "parameters": {
-                                            "entrypoint": "default",
-                                            "value": {"prim": "Unit"},
-                                        },
-                                    }
-                                )
-                            ]
-                        ),
-                        UnitType(),
-                    )
+            PairType(
+                (
+                    ListType(
+                        [
+                            OperationType(
+                                {
+                                    "kind": "transaction",
+                                    "source": "KT1BEqzn5Wx8uJrZNvuS9DVHmLvG9td3fDLi",
+                                    "destination": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                                    "amount": "100",
+                                    "parameters": {
+                                        "entrypoint": "default",
+                                        "value": {"prim": "Unit"},
+                                    },
+                                }
+                            )
+                        ]
+                    ),
+                    UnitType(),
                 )
-            ],
-            interpreter.stack.items,
+            ),
+            commit_instruction.result,
         )

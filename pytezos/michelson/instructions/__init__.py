@@ -15,9 +15,9 @@ from pytezos.michelson.instructions.crypto import (Blake2bInstruction, CheckSign
                                                    Sha3Instruction, Sha256Instruction, Sha512Instruction)
 from pytezos.michelson.instructions.generic import (ConcatInstruction, NeverInstruction, PackInstruction, SizeInstruction, SliceInstruction,
                                                     UnitInstruction, UnpackInstruction)
-from pytezos.michelson.instructions.jupyter import (BeginInstruction, CommitInstruction, DebugInstruction, DropAllInstruction,
-                                                    DumpAllInstruction, DumpInstruction, PatchInstruction, PatchValueInstruction,
-                                                    PrintInstruction, ResetInstruction, ResetValueInstruction)
+from pytezos.michelson.instructions.jupyter import (BeginInstruction, BigMapDiffInstruction, CommitInstruction, DebugInstruction,
+                                                    DropAllInstruction, DumpAllInstruction, DumpInstruction, PatchInstruction,
+                                                    PatchValueInstruction, PrintInstruction, ResetInstruction, ResetValueInstruction)
 from pytezos.michelson.instructions.stack import (DigInstruction, DropInstruction, DropnInstruction, DugInstruction, DupInstruction,
                                                   DupnInstruction, PushInstruction, RenameInstruction, SwapInstruction)
 from pytezos.michelson.instructions.struct import (ConsInstruction, EmptyBigMapInstruction, EmptyMapInstruction, EmptySetInstruction,

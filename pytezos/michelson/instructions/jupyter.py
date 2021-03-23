@@ -1,4 +1,5 @@
 import re
+from contextlib import suppress
 from typing import Dict, List, Type, cast
 
 import strict_rfc3339  # type: ignore
@@ -103,9 +104,10 @@ class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
 
 class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
 
-    def __init__(self, lazy_diff: List[Dict[str, str]], stack_items_added: int = 0) -> None:
+    def __init__(self, lazy_diff: List[Dict[str, str]], result, stack_items_added: int = 0) -> None:
         super().__init__(stack_items_added)
         self.lazy_diff = lazy_diff
+        self.result = result
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
@@ -129,10 +131,9 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
         storage = res.items[1].aggregate_lazy_diff(lazy_diff)
         stdout.append(format_stdout(f'END %default', [res], []))
 
-        res = PairType.from_comb([operations, storage])
-        stack.push(res)
+        result = PairType.from_comb([operations, storage])
         context.debug = debug  # type: ignore
-        return cls(lazy_diff=lazy_diff, stack_items_added=1)
+        return cls(lazy_diff=lazy_diff, result=result)
 
 
 class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):
@@ -218,3 +219,18 @@ class ResetValueInstruction(MichelsonInstruction, prim='RESET', args_len=1):
         context.big_maps = {}  # type: ignore
         stack.items = []
         return cls()
+
+
+class BigMapDiffInstruction(MichelsonInstruction, prim='BIG_MAP_DIFF'):
+    def __init__(self, lazy_diff: List[Dict[str, str]], stack_items_added: int = 0) -> None:
+        super().__init__(stack_items_added)
+        self.lazy_diff = lazy_diff
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        lazy_diff = []  # type: ignore
+        # FIXME: AssertionError instead of informational exception
+        with suppress(AssertionError):
+            stack.peek().aggregate_lazy_diff(lazy_diff)
+        stdout.append(f'BIG_MAP_DIFF')
+        return cls(lazy_diff=lazy_diff, stack_items_added=1)
