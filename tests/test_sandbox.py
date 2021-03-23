@@ -1,10 +1,5 @@
-import logging
-
-from pytezos.logging import logger
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses, EDO, FLORENCE
-
-logger.setLevel(logging.DEBUG)
 
 
 # NOTE: Node won't be wiped between tests so alphabetical order of method names matters

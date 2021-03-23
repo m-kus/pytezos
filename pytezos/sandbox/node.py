@@ -19,10 +19,10 @@ class SandboxedNodeTestCase(unittest.TestCase):
     IMAGE = 'bakingbad/sandboxed-node:v9.0-rc1-1'
     PROTOCOL = 'PtEdo2Zk'
 
-    def run(self, result=None):
+    def run(self, result: Optional[unittest.TestResult] = None):
         """ Stop after first error """
-        if not result.errors:
-            super().run(result)
+        # FIXME: not working with pytest, type(result) == _pytest.unittest.TestCaseFunction
+        super().run(result)
 
     def activate(self, protocol_alias: str, reset: bool = False):
         return self.get_client().using(key='dictator') \
