@@ -3,32 +3,13 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import bson  # type: ignore
 
-from pytezos.block.forge import forge_block_header, forge_protocol_data, forge_signed_operation
+from pytezos.block.forge import forge_block_header, forge_protocol_data, forge_signed_operation, bump_fitness
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
-from pytezos.michelson.forge import forge_array, forge_base58
-
-
-# NOTE: Comment out to increment first octet
-def fitness_tuple_to_int(fitness_tuple: Tuple[str, str]) -> int:
-    return int(fitness_tuple[1], 16)
-
-
-def fitness_int_to_tuple(fitness_int: int) -> Tuple[str, str]:
-    fitness_str = "%0.16X" % fitness_int
-    return ("00", fitness_str)
-
-
-# NOTE: Uncomment to increment first octet
-# def fitness_tuple_to_int(fitness_tuple: Tuple[str, str]) -> int:
-#     return int(fitness_tuple[0] + fitness_tuple[1], 16)
-
-# def fitness_int_to_tuple(fitness_int: int) -> Tuple[str, str]:
-#     fitness_str = "%0.18X" % fitness_int
-#     return (fitness_str[:2], fitness_str[2:])
+from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
 
 
 class BlockHeader(ContextMixin):
@@ -71,14 +52,14 @@ class BlockHeader(ContextMixin):
         cls,
         protocol_hash: str,
         parameters: Dict[str, Any],
-        context: ExecutionContext,
-        fitness: int = 1,
+        context: ExecutionContext
     ) -> 'BlockHeader':
+        prev_fitness = context.shell.head.header()['fitness']
         protocol_data = {
             "content": {
                 "command": "activate",
                 "hash": protocol_hash,
-                "fitness": fitness_int_to_tuple(fitness),
+                "fitness": bump_fitness(prev_fitness),
                 "protocol_parameters": forge_array(bson.dumps(parameters)).hex(),
             }
         }
@@ -91,9 +72,10 @@ class BlockHeader(ContextMixin):
     def bake_block(cls, context: ExecutionContext, min_fee: int = 0) -> 'BlockHeader':
         pending_operations = context.shell.mempool.pending_operations()  # type: ignore
         operations: List[Dict[str, Any]] = [
-            op for op in pending_operations['applied'] if sum(map(lambda x: int(x['fee']), op['contents'])) >= min_fee  # handle batch case
+            op for op in pending_operations['applied']
+            if sum(map(lambda x: int(x['fee']), op['contents'])) >= min_fee  # handle batch case
         ]
-        # NOTE: Real values will be set during autofill
+        # NOTE: Real values will be set during fill
         protocol_data = {
             "priority": 0,
             "proof_of_work_nonce": "0000000000000000",
@@ -113,23 +95,24 @@ class BlockHeader(ContextMixin):
             signature=kwargs.get('signature', self.signature),
         )
 
-    def fill(self, genesis=False) -> 'BlockHeader':
+    def fill(self, block_id='head') -> 'BlockHeader':
         """Fill missing fields essential for preapply
 
+        :param block_id: head or genesis
         :rtype: BlockHeader
         """
-        protocol = self.shell.blocks.head.protocols()['next_protocol']
-        genesis_protocol = self.shell.blocks.genesis.protocols()['next_protocol']
-
+        protocol = self.shell.blocks[block_id].protocols()['next_protocol']
         protocol_data = {
-            'protocol': genesis_protocol if genesis else protocol,
+            'protocol': protocol,
             **self.protocol_data,
         }
 
         if 'priority' in protocol_data:
             baker = self.key.public_key_hash()
-            baking_rights = self.shell.blocks.head.helpers.baking_rights(delegate=baker)
-            protocol_data['priority'] = next(item['priority'] for item in baking_rights if item['delegate'] == baker)  # Fail if no rights
+            baking_rights = self.shell.blocks[block_id].helpers.baking_rights(delegate=baker)
+            protocol_data['priority'] = next(item['priority']
+                                             for item in baking_rights
+                                             if item['delegate'] == baker)  # Fail if no rights
 
         dummy_signature = base58_encode(b'\x00' * 64, b'sig').decode()
 
@@ -153,10 +136,14 @@ class BlockHeader(ContextMixin):
             },
             'operations': operations,
         }
-        res = self.shell.head.helpers.preapply.block.post(
+
+        pred_shell_header = self.shell.blocks[block_id].header.shell()
+        timestamp = optimize_timestamp(pred_shell_header['timestamp']) + 1
+
+        res = self.shell.blocks[block_id].helpers.preapply.block.post(
             block=payload,
             sort=True,
-            timestamp=self.context.timestamp,
+            timestamp=timestamp,
         )
 
         return self._spawn(
@@ -168,7 +155,7 @@ class BlockHeader(ContextMixin):
 
     def work(self):
         header = self
-        threshold = self.context.constants['proof_of_work_threshold']
+        threshold = int(self.context.constants['proof_of_work_threshold'])
         nonce = 1
 
         while header.pow_stamp() > threshold:
@@ -237,7 +224,6 @@ class BlockHeader(ContextMixin):
         }
         return self.shell.injection.block.post(
             block=payload,
-            timestamp=self.context.timestamp,
             _async=False,
             force=force,
         )

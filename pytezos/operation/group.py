@@ -106,7 +106,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :param counter: Override counter value (for manual handling)
-        :param branch_offset: select head~offset block as branch, where offset is in range (0, 60)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :rtype: OperationGroup
         """
         if branch_offset is not None:
@@ -118,7 +118,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             raise Exception('`ttl` has to be in range (0, 60]')
 
         chain_id = self.chain_id or self.context.get_chain_id()
-        branch = self.branch or self.shell.blocks[-(MAX_OPERATIONS_TTL - ttl)].hash()
+        branch = self.branch or self.shell.blocks[f'head-{MAX_OPERATIONS_TTL - ttl}'].hash()
         protocol = self.protocol or self.shell.head.header()['protocol']
         source = self.key.public_key_hash()
 
@@ -204,7 +204,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
         :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
         :param counter: Override counter value (for manual handling)
-        :param branch_offset: Select head~offset block as branch, where offset is in range (0, 60)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
         :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of
             operation dry-run.
@@ -212,15 +212,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             results of operation dry-run.
         :rtype: OperationGroup
         """
-        if branch_offset is not None:
-            logger.warning('`branch_offset` argument is deprecated, use `ttl` instead')
-            ttl = MAX_OPERATIONS_TTL - branch_offset
-        if ttl is None:
-            ttl = self.context.get_operations_ttl()
-        if not 0 < ttl <= MAX_OPERATIONS_TTL:
-            raise Exception('`ttl` has to be in range (0, 60]')
-
-        opg = self.fill(counter=counter, ttl=ttl)
+        opg = self.fill(counter=counter, ttl=ttl, branch_offset=branch_offset)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
@@ -326,7 +318,6 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         opg_hash = self.shell.injection.operation.post(
             operation=self.binary_payload(),
-            timestamp=self.context.timestamp,
             _async=False,
         )
 

@@ -4,7 +4,8 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, TypeVa
 
 from typing_extensions import Literal
 
-from pytezos.michelson.forge import unforge_address, unforge_chain_id, unforge_micheline, unforge_public_key, unforge_signature
+from pytezos.michelson.forge import unforge_address, unforge_chain_id, unforge_micheline, unforge_public_key, \
+    unforge_signature
 from pytezos.michelson.format import micheline_to_michelson
 
 
@@ -220,7 +221,7 @@ class Micheline(metaclass=ErrorTrace):
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
-    def execute(cls, stack, stdout, context):
+    def execute(cls, stack, stdout, context) -> 'Micheline':
         assert False, f'`execute` has to be explicitly defined'
 
 
@@ -238,7 +239,7 @@ class MichelineSequence(Micheline):
         return [arg.as_micheline_expr() for arg in cls.args]
 
     @classmethod
-    def execute(cls, stack, stdout, context):
+    def execute(cls, stack, stdout, context) -> Micheline:
         return cls([arg.execute(stack, stdout, context) for arg in cls.args])
 
 
@@ -274,6 +275,7 @@ class MichelineLiteral(Micheline):
         assert isinstance(cls.literal, bytes), f'expected bytes, got {cls.literal}'
         return cls.literal
 
+
 def validate_sections(sequence: Type[MichelineSequence], sections: Sequence[str]) -> None:
     if len(sequence.args) != len(sections):
         raise Exception(f'expected {len(sections)} sections, got {len(sequence.args)}')
@@ -282,18 +284,30 @@ def validate_sections(sequence: Type[MichelineSequence], sections: Sequence[str]
 
 
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[True]) -> MichelineT:
+def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[True])\
+        -> MichelineT:
     ...
+
+
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[False]) -> Optional[MichelineT]:
+def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[False])\
+        -> Optional[MichelineT]:
     ...
+
+
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[True]) -> MichelineT:
+def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[True])\
+        -> MichelineT:
     ...
+
+
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[False]) -> Optional[MichelineT]:
+def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[False])\
+        -> Optional[MichelineT]:
     ...
-def get_script_section(sequence, cls = None, name = None, required = False):
+
+
+def get_script_section(sequence, cls=None, name=None, required=False):
     try:
         if cls:
             return next(arg for arg in sequence.args if issubclass(arg, cls))

@@ -1,7 +1,17 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
 from pytezos.operation.forge import forge_operation
+
+
+def bump_fitness(fitness: Tuple[str, str]) -> Tuple[str, str]:
+    if len(fitness) == 0:
+        major = 0
+        minor = 1
+    else:
+        major = int.from_bytes(bytes.fromhex(fitness[0]), 'big')
+        minor = int.from_bytes(bytes.fromhex(fitness[1]), 'big') + 1
+    return major.to_bytes(1, 'big').hex(), minor.to_bytes(8, 'big').hex()
 
 
 def forge_int_fixed(value: int, length: int) -> bytes:
