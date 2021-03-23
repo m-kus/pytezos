@@ -1,15 +1,15 @@
-from typing import Any, List, Tuple, Type, cast
+from typing import Any, List, Optional, Tuple, Type, cast
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import base58_encode
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.instructions.tzt import StackEltInstruction
+from pytezos.michelson.instructions.tzt import BigMapInstruction, StackEltInstruction
 from pytezos.michelson.micheline import MichelineSequence, get_script_section, try_catch, validate_sections
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.sections.tzt import (AmountSection, BalanceSection, ChainIdSection, InputSection, NowSection, OutputSection,
-                                            SelfSection, SenderSection, SourceSection)
+from pytezos.michelson.sections.tzt import (AmountSection, BalanceSection, BigMapsSection, ChainIdSection, InputSection, NowSection,
+                                            OutputSection, SelfSection, SenderSection, SourceSection)
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType, OperationType, PairType
 
@@ -105,6 +105,7 @@ class TztMichelsonProgram:
     code: Type[CodeSection]
     input: Type[InputSection]
     output: Type[OutputSection]
+    big_maps: Optional[Type[BigMapsSection]]
 
     @staticmethod
     def load(context: ExecutionContext, with_code=False):
@@ -115,6 +116,7 @@ class TztMichelsonProgram:
                 input=InputSection.match(context.get_input_expr()),
                 output=OutputSection.match(context.get_output_expr()),
                 code=CodeSection.match(context.get_code_expr() if with_code else []),
+                big_maps=BigMapsSection.match(context.get_big_maps_expr()) if context.get_big_maps_expr() else None,
             ),
         )
         return cast(Type['TztMichelsonProgram'], cls)
@@ -129,6 +131,7 @@ class TztMichelsonProgram:
                 input=get_script_section(sequence, cls=InputSection, required=True),  # type: ignore
                 output=get_script_section(sequence, cls=OutputSection, required=True),  # type: ignore
                 code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+                big_maps=get_script_section(sequence, cls=BigMapsSection, required=False),  # type: ignore
             ),
         )
         return cast(Type['TztMichelsonProgram'], cls)
@@ -180,16 +183,29 @@ class TztMichelsonProgram:
                 prefix=b'Net',
             ).decode()
 
+    def register_bigmaps(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
+        if self.big_maps:
+            for item in self.big_maps.args[0].args[::-1]:
+                if not issubclass(item, BigMapInstruction):
+                    raise Exception('Only `Big_map` instructions can be used in `big_maps` section')
+                item.add(stack, stdout, context)
+
     def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):  # pylint: disable=no-self-use
+
         for item in self.input.args[0].args[::-1]:
-            cast(StackEltInstruction, item).push(stack, stdout, context)
+            if issubclass(item, StackEltInstruction):
+                item.push(stack, stdout, context)
+            else:
+                raise Exception('Only `Stack_elt` instructions can be used in `input` section', item)
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
         return self.code.args[0].execute(stack, stdout, context)
 
-    def end(self, stack: MichelsonStack, stdout: List[str]) -> None:
+    def end(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
         for item in self.output.args[0].args:
-            cast(StackEltInstruction, item).pull(stack, stdout)
+            if not issubclass(item, StackEltInstruction):
+                raise Exception('Only `Stack_elt` instructions can be used in `output` section')
+            item.pull(stack, stdout, context)
 
         if len(stack):
             raise Exception('Stack is not empty after processing `output` section')

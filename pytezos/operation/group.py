@@ -15,9 +15,13 @@ from pytezos.operation.forge import forge_operation_group
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 
-# NOTE: Explaination: https://pytezos.baking-bad.org/tutorials/02.html#operation-group
+# NOTE: Index of a group of operations:
+# 0 - endorsements
+# 1 - voting operations
+# 2 - anonymous operations
+# 3 - manager operations
 validation_passes = {
-    'failing_noop': 0,
+    'failing_noop': -1,
     'endorsement': 0,
     'proposal': 1,
     'ballot': 1,

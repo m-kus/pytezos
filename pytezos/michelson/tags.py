@@ -144,6 +144,7 @@ prim_tags = {
 
     # FIXME: Dummy vaules for TZT, refactor macros
     'Stack_elt': b'\xEE',
+    'Big_map': b'\xEE',
     'input': b'\xEE',
     'output': b'\xEE',
     'sender': b'\xEE',
@@ -153,4 +154,5 @@ prim_tags = {
     'now': b'\xEE',
     'source': b'\xEE',
     'chain_id': b'\xEE',
+    'big_maps': b'\xEE'
 }

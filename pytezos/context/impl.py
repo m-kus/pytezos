@@ -12,6 +12,7 @@ from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
 
 
+# FIXME: Subclassing ExecutionContext makes Python
 class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
@@ -32,6 +33,7 @@ class ExecutionContext(AbstractContext):
         self.chain_id = chain_id
         self.voting_power = voting_power
         self.total_voting_power = total_voting_power
+        self.tzt = tzt
         self.parameter_expr = get_script_section(script, name='parameter') if script and not tzt else None
         self.storage_expr = get_script_section(script,  name='storage') if script and not tzt else None
         self.code_expr = get_script_section(script, name='code') if script else None
@@ -44,6 +46,7 @@ class ExecutionContext(AbstractContext):
         self.now_expr = get_script_section(script, name='now') if script and tzt else None
         self.source_expr = get_script_section(script, name='source') if script and tzt else None
         self.chain_id_expr = get_script_section(script, name='chain_id') if script and tzt else None
+        self.big_maps_expr = get_script_section(script, name='big_maps') if script and tzt else None
         self.origination_index = 1
         self.tmp_big_map_index = 0
         self.tmp_sapling_index = 0
@@ -51,6 +54,7 @@ class ExecutionContext(AbstractContext):
         self.alloc_sapling_index = 0
         self.balance_update = 0
         self.big_maps = {}
+        self.tzt_big_maps = {}
         self._sandboxed: Optional[bool] = None
 
     def reset(self):
@@ -62,6 +66,7 @@ class ExecutionContext(AbstractContext):
         self.alloc_sapling_index = 0
         self.balance_update = 0
         self.big_maps.clear()
+        self.tzt_big_maps.clear()
 
     def __copy__(self):
         raise ValueError("It's not allowed to copy context")
@@ -181,6 +186,9 @@ class ExecutionContext(AbstractContext):
     def get_chain_id_expr(self):
         return self.chain_id_expr
 
+    def get_big_maps_expr(self):
+        return self.big_maps_expr
+
     def set_storage_expr(self, expr):
         self.storage_expr = expr
 
@@ -202,8 +210,11 @@ class ExecutionContext(AbstractContext):
     def set_chain_id_expr(self, expr):
         self.chain_id_expr = expr
 
+    def set_big_maps_expr(self, expr):
+        self.big_maps_expr = expr
+
     def get_big_map_value(self, ptr: int, key_hash: str):
-        if ptr < 0:
+        if self.tzt or ptr < 0:
             return None
         assert self.shell, f'shell is undefined'
         try:

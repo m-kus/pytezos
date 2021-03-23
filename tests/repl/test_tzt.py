@@ -33,33 +33,12 @@ class TztTest(TestCase):
         # NOTE: failed to parse expression LexToken(_,'_',1,658)
         "createcontract_00.tzt",
         "createcontract_01.tzt",
-        # NOTE: actual: 'context': None
-        "emptybigmap_nat-nat_00.tzt",
-        "emptymap_nat-nat_00.tzt",
-        "emptymap_string-string_00.tzt",
         # NOTE: unknown primitive `Failed`
         "failwith_00.tzt",
-        # NOTE: big_map contains non-pushable arguments
-        "get_bigmapstringstring_00.tzt",
-        "get_bigmapstringstring_01.tzt",
-        "get_bigmapstringstring_02.tzt",
         # NOTE: unknown primitive `GeneralOverflow`
         "lsl_01.tzt",
         # NOTE: unknown primitive `GeneralOverflow`
         "lsr_01.tzt",
-        # NOTE: unknown primitive `Big_map`
-        "mem_bigmapnatnat_00.tzt",
-        "mem_bigmapnatnat_01.tzt",
-        "mem_bigmapnatnat_02.tzt",
-        "mem_bigmapnatnat_03.tzt",
-        "mem_bigmapnatnat_04.tzt",
-        "mem_bigmapnatnat_05.tzt",
-        "mem_bigmapstringnat_00.tzt",
-        "mem_bigmapstringnat_01.tzt",
-        "mem_bigmapstringnat_02.tzt",
-        "mem_bigmapstringnat_03.tzt",
-        "mem_bigmapstringnat_04.tzt",
-        "mem_bigmapstringnat_05.tzt",
         # NOTE: unknown primitive `MutezOverflow`
         "mul_mutez-nat_01.tzt",
         # NOTE: unknown primitive `MutezOverflow
@@ -75,16 +54,6 @@ class TztTest(TestCase):
         # NOTE: failed to parse expression LexToken(_,'_',1,238)
         "transfertokens_00.tzt",
         "transfertokens_01.tzt",
-        # NOTE: big_map contains non-pushable arguments
-        "update_bigmapstringstring_00.tzt",
-        # NOTE: unknown primitive `Big_map`
-        "update_bigmapstringstring_01.tzt",
-        "update_bigmapstringstring_02.tzt",
-        "update_bigmapstringstring_03.tzt",
-        "update_bigmapstringstring_04.tzt",
-        "update_bigmapstringstring_05.tzt",
-        "update_bigmapstringstring_06.tzt",
-        "update_bigmapstringstring_07.tzt",
     ]
 
     def test_tzt(self) -> None:

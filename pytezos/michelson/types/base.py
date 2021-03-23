@@ -137,7 +137,7 @@ class MichelsonType(Micheline):
 
     @classmethod
     def is_pushable(cls):
-        if cls.prim in ['big_map', 'contract', 'operation', 'sapling_state', 'ticket']:
+        if cls.prim in ['big_map', 'operation', 'sapling_state', 'ticket']:
             return False
         elif cls.prim == 'lambda':
             return True
