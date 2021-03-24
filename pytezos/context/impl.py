@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Optional, Tuple
 
-from pytezos.logging import logger
 from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
+from pytezos.logging import logger
 from pytezos.michelson.micheline import get_script_section
 from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
@@ -176,7 +176,7 @@ class ExecutionContext(AbstractContext):
                 return None  # dummy callback
             else:
                 script = self.shell.contracts[address].script()
-                return get_script_section(script, name='parameter')
+                return get_script_section(script, name='parameter', cls=None, required=True)
         return None if address else self.parameter_expr
 
     def get_storage_expr(self):

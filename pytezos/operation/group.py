@@ -1,6 +1,7 @@
-from deprecation import deprecated  # type: ignore
 from pprint import pformat, pprint
-from typing import List, Optional, Any, Dict
+from typing import Any, Dict, List, Optional
+
+from deprecation import deprecated  # type: ignore
 
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
