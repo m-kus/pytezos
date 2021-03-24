@@ -7,10 +7,10 @@ import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
-# NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
-# and stopped after all tests are completed.
 from pytezos.sandbox.parameters import EDO
 
+# NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
+# and stopped after all tests are completed.
 node_container: Optional[DockerContainer] = None
 node_container_client: PyTezosClient = PyTezosClient()
 node_fitness: int = 1
@@ -29,7 +29,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
             cls._wait_for_connection()
             atexit.register(node_container.stop)
 
-        cls.activate(cls.PROTOCOL, reset=True)
+        cls.activate(cls.PROTOCOL, reset=False)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -66,6 +66,12 @@ class SandboxedNodeTestCase(unittest.TestCase):
         )
 
     @classmethod
+    def create_client(cls):
+        global node_container_client
+        node_container_client = PyTezosClient()
+        return cls.get_client()
+
+    @classmethod
     def _create_node_container(cls) -> DockerContainer:
         return DockerContainer(
             cls.IMAGE,
@@ -81,8 +87,9 @@ class SandboxedNodeTestCase(unittest.TestCase):
             except requests.exceptions.ConnectionError:
                 sleep(0.1)
 
-    def bake_block(self):
-        return self.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
+    @classmethod
+    def bake_block(cls):
+        return cls.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
 
     @property
     def client(self) -> PyTezosClient:
