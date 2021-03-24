@@ -4,8 +4,8 @@ from pytezos.sandbox.parameters import sandbox_addresses, EDO, FLORENCE
 
 # NOTE: Node won't be wiped between tests so alphabetical order of method names matters
 class SandboxTestCase(SandboxedNodeTestCase):
+
     def test_1_activate_protocol(self) -> None:
-        self.activate(EDO)
         block = self.client.shell.block()
         self.assertIsNotNone(block['header'].get('content'))
 

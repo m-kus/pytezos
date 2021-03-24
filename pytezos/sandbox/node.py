@@ -7,9 +7,10 @@ import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
-
 # NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
 # and stopped after all tests are completed.
+from pytezos.sandbox.parameters import EDO
+
 node_container: Optional[DockerContainer] = None
 node_container_client: PyTezosClient = PyTezosClient()
 node_fitness: int = 1
@@ -17,26 +18,33 @@ node_fitness: int = 1
 
 class SandboxedNodeTestCase(unittest.TestCase):
     IMAGE = 'bakingbad/sandboxed-node:v9.0-rc1-1'
-    PROTOCOL = 'PtEdo2Zk'
+    PROTOCOL = EDO
 
-    def run(self, result: Optional[unittest.TestResult] = None):
-        """ Stop after first error """
-        # FIXME: not working with pytest, type(result) == _pytest.unittest.TestCaseFunction
-        super().run(result)
+    @classmethod
+    def setUpClass(cls) -> None:
+        global node_container
+        if not node_container:
+            node_container = cls._create_node_container()
+            node_container.start()
+            cls._wait_for_connection()
+            atexit.register(node_container.stop)
 
-    def activate(self, protocol_alias: str, reset: bool = False):
-        return self.get_client().using(key='dictator') \
-            .activate_protocol(protocol_alias) \
-            .fill(block_id='genesis' if reset else 'head').sign().inject()
+        cls.activate(cls.PROTOCOL, reset=True)
 
-    def bake_block(self):
-        return self.get_client().using(key='bootstrap1') \
-            .bake_block() \
-            .fill().work().sign().inject()
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.activate(cls.PROTOCOL, reset=True)
 
-    @property
-    def client(self) -> PyTezosClient:
-        return self.get_client().using(key='bootstrap2')
+    @classmethod
+    def activate(cls, protocol_alias: str, reset: bool = False):
+        return (
+            cls.get_client()
+            .using(key='dictator')
+            .activate_protocol(protocol_alias)
+            .fill(block_id='genesis' if reset else 'head')
+            .sign()
+            .inject()
+        )
 
     @classmethod
     def get_node_url(cls) -> str:
@@ -64,15 +72,6 @@ class SandboxedNodeTestCase(unittest.TestCase):
         )
 
     @classmethod
-    def setUpClass(cls) -> None:
-        global node_container
-        if not node_container:
-            node_container = cls._create_node_container()
-            node_container.start()
-            cls._wait_for_connection()
-            atexit.register(node_container.stop)
-
-    @classmethod
     def _wait_for_connection(cls) -> None:
         client = cls.get_client()
         while True:
@@ -81,3 +80,10 @@ class SandboxedNodeTestCase(unittest.TestCase):
                 break
             except requests.exceptions.ConnectionError:
                 sleep(0.1)
+
+    def bake_block(self):
+        return self.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
+
+    @property
+    def client(self) -> PyTezosClient:
+        return self.get_client().using(key='bootstrap2')
