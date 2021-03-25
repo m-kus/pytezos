@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  notebook:
+    build: .
+    ports:
+      - 8888:8888
+
+  sandbox_node:
+    image: bakingbad/sandboxed-node:v8.2-2
+    ports:
+      - 8732:8732

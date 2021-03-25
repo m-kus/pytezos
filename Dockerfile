@@ -1,54 +1,30 @@
-ARG POETRY=1.0.5
-ARG PENDULUM=2.1.0
-ARG PYTEST=5.4
+FROM python:3.7-slim-buster
 
-FROM python:3-alpine AS build
-ARG POETRY
-COPY . /pytezos
-RUN apk update \
-	&& apk --no-cache add --virtual build-deps \
-	    build-base \
-		libffi-dev \
-		libressl-dev \
-	&& pip3 install cryptography==3.3.2 poetry==$POETRY \
-	&& cd /pytezos && poetry build
+RUN apt update && \
+    apt install -y build-essential pkg-config libsodium-dev libsecp256k1-dev libgmp-dev make curl git && \
+    rm -rf /var/lib/apt/lists/*
+RUN pip install poetry
+RUN useradd -ms /bin/bash jupyter
 
+RUN mkdir /home/jupyter/michelson-kernel
+RUN mkdir /home/jupyter/notebooks
+COPY Makefile pyproject.toml poetry.lock README.md /home/jupyter/michelson-kernel/
+# We want to copy our code at the last layer but not to break poetry's "packages" section
+RUN mkdir -p /home/jupyter/michelson-kernel/src/michelson_kernel && \
+    touch /home/jupyter/michelson-kernel/src/michelson_kernel/__init__.py && \ 
+    mkdir -p /home/jupyter/michelson-kernel/src/pytezos && \
+    touch /home/jupyter/michelson-kernel/src/pytezos/__init__.py
 
-FROM python:3-alpine
-ARG POETRY
-ARG PENDULUM
-ARG PYTEST
-COPY --from=build /pytezos/dist/*.whl /tmp/pytezos/
-RUN apk update \
-	&& apk --no-cache add --virtual build-deps \
-		build-base \
-		autoconf \
-		automake \
-		git \
-		gmp-dev \
-		isl \
-		libatomic \
-		libffi-dev \
-		libgomp \
-		libressl-dev \
-		libtool \
-		make \
-		mpfr4 \
-		mpc1 \
-		musl-dev \
-		openssl \
-	&& apk --no-cache add \
-		binutils \
-		libsodium-dev \
-	&& git clone https://github.com/bitcoin-core/secp256k1.git /tmp/secp256k1 && cd /tmp/secp256k1 \
-	&& ./autogen.sh \
-	&& ./configure \
-	&& make install \
-	&& cd / && rm -rf /tmp/secp256k1 \
-	&& pip3 install --no-cache-dir cryptography==3.3.2 poetry==$POETRY pytest~=$PYTEST \
-	&& pip3 install --no-build-isolation --no-cache-dir pendulum==$PENDULUM \
-	&& pip3 install --no-cache-dir /tmp/pytezos/*.whl && rm -rf /tmp/pytezos \
-	&& pip3 uninstall --yes poetry \
-	&& rm -rf ~/.cache/pip && apk del py-pip \
-	&& apk del build-deps \
-	&& rm -f /sbin/apk && rm -rf /etc/apk && rm -rf /lib/apk && rm -rf /usr/share/apk && rm -rf /var/lib/apk
+WORKDIR /home/jupyter/michelson-kernel
+RUN poetry config virtualenvs.in-project true
+RUN make install DEV=0
+
+COPY . /home/jupyter/michelson-kernel/
+RUN chown -R jupyter /home/jupyter/
+
+USER jupyter
+RUN make install-kernel
+
+WORKDIR /home/jupyter/notebooks
+EXPOSE 8888
+ENTRYPOINT [ "/home/jupyter/michelson-kernel/.venv/bin/jupyter", "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax" ]

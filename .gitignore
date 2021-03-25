@@ -139,3 +139,5 @@ dmypy.json
 cython_debug/
 
 .vscode
+.idea/
+*.ipynb
