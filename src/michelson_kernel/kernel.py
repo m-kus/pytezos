@@ -2,21 +2,19 @@ from traceback import format_exception
 from typing import Any, Dict, List, Optional, Tuple, cast
 
 from ipykernel.kernelbase import Kernel  # type: ignore
+from tabulate import tabulate
+
+from michelson_kernel import __version__
+from michelson_kernel.docs import docs
 from pytezos import MichelsonType, micheline_to_michelson
-from pytezos.michelson.instructions import (BigMapDiffInstruction,
-                                            CommitInstruction)
+from pytezos.michelson.instructions import BigMapDiffInstruction, CommitInstruction
 from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.micheline import (MichelineSequence,
-                                         MichelsonRuntimeError)
+from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParserError
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.tags import prim_tags
 from pytezos.michelson.types import OperationType, PairType
-from tabulate import tabulate
-
-from michelson_kernel import __version__
-from michelson_kernel.docs import docs
 
 static_macros = [
     'CMPEQ',

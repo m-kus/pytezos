@@ -3,9 +3,9 @@ import requests
 from os.path import dirname, join
 from pprint import pprint
 
-target_path = join(dirname(dirname(__file__)), 'michelson_kernel', 'docs.py')
-meta_url = 'https://gitlab.com/nomadic-labs/michelson-reference/-/raw/master/michelson-meta.yaml'
-sema_url = 'https://gitlab.com/nomadic-labs/michelson-reference/-/raw/master/michelson.json'
+target_path = join(dirname(dirname(__file__)), 'src', 'michelson_kernel', 'docs.py')
+meta_url = 'https://gitlab.com/tezos/michelson-reference/-/raw/master/michelson_reference/michelson-meta.yaml'
+sema_url = 'https://gitlab.com/tezos/michelson-reference/-/raw/master/michelson_reference/michelson.json'
 extra = {
     'RENAME': '',
     'CAST': '',

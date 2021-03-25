@@ -1,5 +1,4 @@
-docs = {
-    'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of an integer',
+docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of an integer',
     'ADD': 'ADD\n'
            'ADD :: nat : nat : A => nat : A\n'
            'ADD :: nat : int : A => int : A\n'
@@ -8,10 +7,17 @@ docs = {
            'ADD :: timestamp : int : A => timestamp : A\n'
            'ADD :: int : timestamp : A => timestamp : A\n'
            'ADD :: mutez : mutez : A => mutez : A\n'
+           'ADD :: bls12_381_g1 : bls12_381_g1 : A => bls12_381_g1 : A\n'
+           'ADD :: bls12_381_g2 : bls12_381_g2 : A => bls12_381_g2 : A\n'
+           'ADD :: bls12_381_fr : bls12_381_fr : A => bls12_381_fr : A\n'
            'Add two numerical values',
     'ADDRESS': 'ADDRESS\nADDRESS :: contract ty1 : A => address : A\nPush the address of a contract',
     'AMOUNT': 'AMOUNT\nAMOUNT :: A => mutez : A\nPush the amount of the current transaction',
-    'AND': 'AND\nAND :: bool : bool : A => bool : A\nAND :: nat : nat : A => nat : A\nBoolean and bitwise AND',
+    'AND': 'AND\n'
+           'AND :: bool : bool : A => bool : A\n'
+           'AND :: nat : nat : A => nat : A\n'
+           'AND :: int : nat : A => nat : A\n'
+           'Boolean and bitwise AND',
     'APPLY': 'APPLY\n'
              'APPLY :: ty1 : lambda ( pair ty1 ty2 ) ty3 : A => lambda ty2 ty3 : A\n'
              'Partially apply a tuplified function from the stack',
@@ -33,17 +39,20 @@ docs = {
               'Concatenate a string, byte sequence, string list or byte sequence list',
     'CONS': 'CONS\nCONS :: ty1 : list ty1 : A => list ty1 : A\nPrepend an element to a list',
     'CONTRACT': 'CONTRACT ty\n'
-                'CONTRACT ty1 :: address : A => option ( contract ty1 ) : A\n'
+                'CONTRACT ty :: address : A => option ( contract ty ) : A\n'
                 'Cast an address to a typed contract',
     'CREATE_ACCOUNT': '\nPush an account creation operation',
-    'CREATE_CONTRACT': 'CREATE_CONTRACT ty1 ty2 code\n'
-                       'CREATE_CONTRACT ty1 ty2 code :: option key_hash : mutez : ty1 : A => operation : address : A\n'
+    'CREATE_CONTRACT': 'CREATE_CONTRACT { parameter ty1 ; storage ty2 ; code instr1 }\n'
+                       'CREATE_CONTRACT { parameter ty1 ; storage ty2 ; code instr1 } :: option key_hash : mutez : ty2 '
+                       ': A => operation : address : A\n'
                        'Push a contract creation operation',
     'DIG': 'DIG n\nDIG n :: A @ ( ty1 : B ) => ty1 : ( A @ B )\nRetrieve the n\\ th element of the stack',
-    'DIP': 'DIP n code\nDIP n code :: A @ B => A @ C\nRun code protecting the top of the stack',
+    'DIP': 'DIP instr\nDIP instr :: ty : B => ty : C\nRun code protecting the top of the stack',
+    'DIPN': 'DIP n instr\nDIP n instr :: A @ B => A @ C\nRun code protecting the n topmost elements of the stack',
     'DROP': 'DROP n\nDROP n :: A @ B => B\nDrop the top n elements of the stack',
     'DUG': 'DUG n\nDUG n :: ty1 : ( A @ B ) => A @ ( ty1 : B )\nInsert the top element at depth n',
     'DUP': 'DUP\nDUP :: ty1 : A => ty1 : ty1 : A\nDuplicate the top of the stack',
+    'DUPN': 'DUP n\nDUP n :: A @ ty1 : B => ty1 : A @ ty1 : B\nDuplicate the n\\ th element of the stack',
     'EDIV': 'EDIV\n'
             'EDIV :: nat : nat : A => option ( pair nat nat ) : A\n'
             'EDIV :: nat : int : A => option ( pair int nat ) : A\n'
@@ -57,43 +66,60 @@ docs = {
                      'Build a new, empty big_map from kty to vty',
     'EMPTY_MAP': 'EMPTY_MAP kty vty\nEMPTY_MAP kty vty :: A => map kty vty : A\nBuild a new, empty map from kty to vty',
     'EMPTY_SET': 'EMPTY_SET cty\nEMPTY_SET cty :: A => set cty : A\nBuild a new, empty set for elements of type cty',
-    'EQ': 'EQ\nEQ :: int : A => bool : A\nCheck that the top of the stack EQuals zero',
+    'EQ': 'EQ\nEQ :: int : A => bool : A\nCheck that the top of the stack equals zero',
     'EXEC': 'EXEC\nEXEC :: ty1 : lambda ty1 ty2 : A => ty2 : A\nExecute a function from the stack',
     'EXPAND': '',
     'FAILWITH': 'FAILWITH\nFAILWITH :: ty1 : A => B\nExplicitly abort the current program',
-    'GE': 'GE\nGE :: int : A => bool : A\nCheck that the top of the stack is Greater Than or Equal to zero',
+    'GE': 'GE\nGE :: int : A => bool : A\nCheck that the top of the stack is greater than or equal to zero',
     'GET': 'GET\n'
            'GET :: kty : map kty vty : A => option vty : A\n'
            'GET :: kty : big_map kty vty : A => option vty : A\n'
            'Access an element in a map or big_map',
-    'GT': 'GT\nGT :: int : A => bool : A\nCheck that the top of the stack is Greater Than zero',
+    'GETN': 'GET n\n'
+            'GET ( 0 ) :: ty : A => ty : A\n'
+            "GET ( 2 * n ) :: pair ty0 .. tyN ty' : A => ty' : A\n"
+            "GET ( 2 * n + 1 ) :: pair ty0 .. tyN ty' ty'' : A => ty' : A\n"
+            'Access an element or a sub comb in a right comb',
+    'GET_AND_UPDATE': 'GET_AND_UPDATE\n'
+                      'GET_AND_UPDATE :: kty : option vty : map kty vty : A => option vty : map kty vty : A\n'
+                      'GET_AND_UPDATE :: kty : option vty : big_map kty vty : A => option vty : big_map kty vty : A\n'
+                      'A combination of the GET and UPDATE instructions',
+    'GT': 'GT\nGT :: int : A => bool : A\nCheck that the top of the stack is greater than zero',
     'HASH_KEY': 'HASH_KEY\nHASH_KEY :: key : A => key_hash : A\nCompute the Base58Check of a public key',
-    'IF': 'IF code1 code2\nIF code1 code2 :: bool : A => B\nConditional branching',
-    'IF_CONS': 'IF_CONS code1 code2\nIF_CONS code1 code2 :: list ty1 : A => B\nInspect a list',
-    'IF_LEFT': 'IF_LEFT code1 code2\nIF_LEFT code1 code2 :: or ty1 ty2 : A => B\nInspect a value of a union',
-    'IF_NONE': 'IF_NONE code1 code2\nIF_NONE code1 code2 :: option ty1 : A => B\nInspect an optional value',
+    'IF': 'IF instr1 instr2\nIF instr1 instr2 :: bool : A => B\nConditional branching',
+    'IF_CONS': 'IF_CONS instr1 instr2\nIF_CONS instr1 instr2 :: list ty : A => B\nInspect a list',
+    'IF_LEFT': 'IF_LEFT instr1 instr2\nIF_LEFT instr1 instr2 :: or ty1 ty2 : A => B\nInspect a value of a union',
+    'IF_NONE': 'IF_NONE instr1 instr2\nIF_NONE instr1 instr2 :: option ty1 : A => B\nInspect an optional value',
     'IMPLICIT_ACCOUNT': 'IMPLICIT_ACCOUNT\n'
                         'IMPLICIT_ACCOUNT :: key_hash : A => contract unit : A\n'
                         'Create an implicit account',
-    'INT': 'INT\nINT :: nat : A => int : A\nConvert a natural number to an integer',
+    'INT': 'INT\n'
+           'INT :: nat : A => int : A\n'
+           'INT :: bls12_381_fr : A => int : A\n'
+           'Convert a natural number or a BLS12-381 field element to an integer',
     'ISNAT': 'ISNAT\nISNAT :: int : A => option nat : A\nConvert a non-negative integer to a natural number',
-    'ITER': 'ITER code\n'
-            'ITER code :: list ty1 : A => A\n'
-            'ITER code :: set cty : A => A\n'
-            'ITER code :: map kty vty : A => A\n'
+    'ITER': 'ITER instr\n'
+            'ITER instr :: list ty : A => A\n'
+            'ITER instr :: set cty : A => A\n'
+            'ITER instr :: map kty vty : A => A\n'
             'Iterate over a set, list or map',
-    'LAMBDA': 'LAMBDA ty1 ty2 code\nLAMBDA ty1 ty2 code :: A => lambda ty1 ty2 : A\nPush a lambda onto the stack',
-    'LE': 'LE\nLE :: int : A => bool : A\nCheck that the top of the stack is Less Than or Equal to zero',
+    'JOIN_TICKETS': 'JOIN_TICKETS\n'
+                    'JOIN_TICKETS :: pair ( ticket cty ) ( ticket cty ) : A => option ( ticket cty ) : A\n'
+                    'Join two tickets into one',
+    'KECCAK': 'KECCAK\nKECCAK :: bytes : A => bytes : A\nCompute a Keccak-256 cryptographic hash',
+    'LAMBDA': 'LAMBDA ty1 ty2 instr\nLAMBDA ty1 ty2 instr :: A => lambda ty1 ty2 : A\nPush a lambda onto the stack',
+    'LE': 'LE\nLE :: int : A => bool : A\nCheck that the top of the stack is less than or equal to zero',
     'LEFT': 'LEFT ty2\nLEFT ty2 :: ty1 : A => or ty1 ty2 : A\nWrap a value in a union (left case)',
-    'LOOP': 'LOOP code\nLOOP code :: bool : A => A\nA generic loop',
-    'LOOP_LEFT': 'LOOP_LEFT code\nLOOP_LEFT code :: or ty1 ty2 : A => ty2 : A\nLoop with accumulator',
+    'LEVEL': 'LEVEL\nLEVEL :: A => nat : A\nPush the current block level',
+    'LOOP': 'LOOP instr\nLOOP instr :: bool : A => A\nA generic loop',
+    'LOOP_LEFT': 'LOOP_LEFT instr\nLOOP_LEFT instr :: or ty1 ty2 : A => ty2 : A\nLoop with accumulator',
     'LSL': 'LSL\nLSL :: nat : nat : A => nat : A\nLogically left shift a natural number',
     'LSR': 'LSR\nLSR :: nat : nat : A => nat : A\nLogically right shift a natural number',
-    'LT': 'LT\nLT :: int : A => bool : A\nCheck that the top of the stack is Less Than zero',
-    'MAP': 'MAP code\n'
-           'MAP code :: list ty1 : A => list ty2 : A\n'
-           'MAP code :: map kty ty1 : A => map kty ty2 : A\n'
-           'Apply the body expression to each element of a list or map.',
+    'LT': 'LT\nLT :: int : A => bool : A\nCheck that the top of the stack is less than zero',
+    'MAP': 'MAP instr\n'
+           'MAP instr :: list ty : A => list ty2 : A\n'
+           'MAP instr :: map kty ty1 : A => map kty ty2 : A\n'
+           'Apply instr to each element of a list or map.',
     'MEM': 'MEM\n'
            'MEM :: cty : set cty : A => bool : A\n'
            'MEM :: kty : map kty vty : A => bool : A\n'
@@ -106,11 +132,25 @@ docs = {
            'MUL :: int : int : A => int : A\n'
            'MUL :: mutez : nat : A => mutez : A\n'
            'MUL :: nat : mutez : A => mutez : A\n'
+           'MUL :: bls12_381_g1 : bls12_381_fr : A => bls12_381_g1 : A\n'
+           'MUL :: bls12_381_g2 : bls12_381_fr : A => bls12_381_g2 : A\n'
+           'MUL :: bls12_381_fr : bls12_381_fr : A => bls12_381_fr : A\n'
+           'MUL :: nat : bls12_381_fr : A => bls12_381_fr : A\n'
+           'MUL :: int : bls12_381_fr : A => bls12_381_fr : A\n'
+           'MUL :: bls12_381_fr : nat : A => bls12_381_fr : A\n'
+           'MUL :: bls12_381_fr : int : A => bls12_381_fr : A\n'
            'Multiply two numerical values',
-    'NEG': 'NEG\nNEG :: nat : A => int : A\nNEG :: int : A => int : A\nNegate a numerical value',
-    'NEQ': 'NEQ\nNEQ :: int : A => bool : A\nCheck that the top of the stack does Not EQual zero',
-    'NIL': 'NIL ty1\nNIL ty1 :: A => list ty1 : A\nPush an empty list',
-    'NONE': 'NONE ty1\nNONE ty1 :: A => option ty1 : A\nPush the absent optional value',
+    'NEG': 'NEG\n'
+           'NEG :: nat : A => int : A\n'
+           'NEG :: int : A => int : A\n'
+           'NEG :: bls12_381_g1 : A => bls12_381_g1 : A\n'
+           'NEG :: bls12_381_g2 : A => bls12_381_g2 : A\n'
+           'NEG :: bls12_381_fr : A => bls12_381_fr : A\n'
+           'Negate a numerical value',
+    'NEQ': 'NEQ\nNEQ :: int : A => bool : A\nCheck that the top of the stack is not equal to zero',
+    'NEVER': 'NEVER\nNEVER :: never : A => B\nClose an absurd branch',
+    'NIL': 'NIL ty\nNIL ty :: A => list ty : A\nPush an empty list',
+    'NONE': 'NONE ty\nNONE ty :: A => option ty : A\nPush the absent optional value',
     'NOOP': '{}\n{} :: A => A\nEmpty instruction sequence',
     'NOT': 'NOT\n'
            'NOT :: bool : A => bool : A\n'
@@ -119,30 +159,52 @@ docs = {
            'Boolean negation and bitwise complement',
     'NOW': 'NOW\nNOW :: A => timestamp : A\nPush block timestamp',
     'OR': 'OR\nOR :: bool : bool : A => bool : A\nOR :: nat : nat : A => nat : A\nBoolean and bitwise OR',
-    'PACK': 'PACK\nPACK :: ty1 : A => bytes : A\nSerialize data',
+    'PACK': 'PACK\nPACK :: ty : A => bytes : A\nSerialize data',
     'PAIR': "PAIR\nPAIR :: ty1 : ty2 : A => pair ty1 ty2 : A\nBuild a pair from the stack's top two elements",
-    'PUSH': 'PUSH ty1 x\nPUSH ty1 x :: A => ty1 : A\nPush a constant value of a given type onto the stack',
+    'PAIRING_CHECK': 'PAIRING_CHECK\n'
+                     'PAIRING_CHECK :: list ( pair bls12_381_g1 bls12_381_g2 ) : A => bool : A\n'
+                     'Check a BLS12-381 pairing',
+    'PAIRN': 'PAIR n\n'
+             'PAIR n :: ty1 : .... : tyN : A => pair ty1 .... tyN : A\n'
+             'Fold n values on the top of the stack into a right comb',
+    'PUSH': 'PUSH ty x\nPUSH ty x :: A => ty1 : A\nPush a constant value of a given type onto the stack',
+    'READ_TICKET': 'READ_TICKET\n'
+                   'READ_TICKET :: ticket cty : A => pair address cty nat : ticket cty : A\n'
+                   'Retrieve the information stored in a ticket. Also return the ticket.',
     'RENAME': '',
     'RIGHT': 'RIGHT ty1\nRIGHT ty1 :: ty2 : A => or ty1 ty2 : A\nWrap a value in a union (right case)',
+    'SAPLING_EMPTY_STATE': 'SAPLING_EMPTY_STATE ms\n'
+                           'SAPLING_EMPTY_STATE ms :: A => sapling_state ms : A\n'
+                           'Pushes an empty Sapling state on the stack',
+    'SAPLING_VERIFY_UPDATE': 'SAPLING_VERIFY_UPDATE\n'
+                             'SAPLING_VERIFY_UPDATE :: sapling_transaction ms : sapling_state ms : A => option ( pair '
+                             'int ( sapling_state ms ) ) : A\n'
+                             'Verify and apply a transaction on a Sapling state',
     'SELF': 'SELF\nSELF :: A => contract ty : A\nPush the current contract',
+    'SELF_ADDRESS': 'SELF_ADDRESS\nSELF_ADDRESS :: A => address : A\nPush the address of the current contract',
     'SENDER': 'SENDER\nSENDER :: A => address : A\nPush the contract that initiated the current internal transaction',
-    'SEQ': 'code1 ; code2\ncode1 ; code2 :: A => C\nInstruction sequence',
+    'SEQ': 'instr1 ; instr2\ninstr1 ; instr2 :: A => C\nInstruction sequence',
     'SET_DELEGATE': 'SET_DELEGATE\nSET_DELEGATE :: option key_hash : A => operation : A\nPush a delegation operation',
     'SHA256': 'SHA256\nSHA256 :: bytes : A => bytes : A\nCompute a SHA-256 cryptographic hash',
+    'SHA3': 'SHA3\nSHA3 :: bytes : A => bytes : A\nCompute a SHA3-256 cryptographic hash',
     'SHA512': 'SHA512\nSHA512 :: bytes : A => bytes : A\nCompute a SHA-512 cryptographic hash',
     'SIZE': 'SIZE\n'
             'SIZE :: set cty : A => nat : A\n'
             'SIZE :: map kty vty : A => nat : A\n'
-            'SIZE :: list ty1 : A => nat : A\n'
+            'SIZE :: list ty : A => nat : A\n'
             'SIZE :: string : A => nat : A\n'
             'SIZE :: bytes : A => nat : A\n'
-            'Obtain size of a string, list, set, map or byte sequence',
+            'Obtain size of a string, list, set, map or byte sequence bytes',
     'SLICE': 'SLICE\n'
              'SLICE :: nat : nat : string : A => option string : A\n'
              'SLICE :: nat : nat : bytes : A => option bytes : A\n'
              'Obtain a substring or subsequence of a string respectively byte sequence bytes',
     'SOME': 'SOME\nSOME :: ty1 : A => option ty1 : A\nWrap an existing optional value',
     'SOURCE': 'SOURCE\nSOURCE :: A => address : A\nPush the contract that initiated the current transaction',
+    'SPLIT_TICKET': 'SPLIT_TICKET\n'
+                    'SPLIT_TICKET :: ticket cty : pair nat nat : A => option ( pair ( ticket cty ) ( ticket cty ) ) : '
+                    'A\n'
+                    'Split a ticket in two',
     'STEPS_TO_QUOTA': '\nPush the remaining steps before the contract execution must terminate',
     'SUB': 'SUB\n'
            'SUB :: nat : nat : A => int : A\n'
@@ -154,38 +216,61 @@ docs = {
            'SUB :: mutez : mutez : A => mutez : A\n'
            'Subtract two numerical values',
     'SWAP': 'SWAP\nSWAP :: ty1 : ty2 : A => ty2 : ty1 : A\nSwap the top two elements of the stack',
+    'TICKET': 'TICKET\nTICKET :: cty : nat : A => ticket cty : A\nCreate a ticket',
     'TOP': '',
+    'TOTAL_VOTING_POWER': 'TOTAL_VOTING_POWER\n'
+                          'TOTAL_VOTING_POWER :: A => nat : A\n'
+                          'Return the total voting power of all contracts',
     'TRANSFER_TOKENS': 'TRANSFER_TOKENS\n'
-                       'TRANSFER_TOKENS :: ty1 : mutez : contract ty1 : A => operation : A\n'
+                       'TRANSFER_TOKENS :: ty : mutez : contract ty : A => operation : A\n'
                        'Push a transaction operation',
     'UNIT': 'UNIT\nUNIT :: A => unit : A\nPush the unit value onto the stack',
-    'UNPACK': 'UNPACK ty1\nUNPACK ty1 :: bytes : A => option ty1 : A\nDeserialize data, if valid',
+    'UNPACK': 'UNPACK ty\nUNPACK ty :: bytes : A => option ty : A\nDeserialize data, if valid',
+    'UNPAIR': 'UNPAIR\nUNPAIR :: pair ty1 ty2 : A => ty1 : ty2 : A\nSplit a pair into its components',
+    'UNPAIRN': 'UNPAIR n\n'
+               'UNPAIR n :: pair ty1 .... tyN : A => ty1 : .... : tyN : A\n'
+               'Unfold n values from a right comb on the top of the stack',
     'UPDATE': 'UPDATE\n'
               'UPDATE :: cty : bool : set cty : A => set cty : A\n'
               'UPDATE :: kty : option vty : map kty vty : A => map kty vty : A\n'
               'UPDATE :: kty : option vty : big_map kty vty : A => big_map kty vty : A\n'
               'Add or remove an element in a map, big_map or set',
-    'XOR': 'XOR\nXOR :: bool : bool : A => bool : A\nXOR :: nat : nat : A => nat : A\nBoolean and bitwise exclusive OR',
+    'UPDATEN': 'UPDATE n\n'
+               'UPDATE 0 :: ty1 : ty2 : A => ty1 : A\n'
+               "UPDATE ( 2 * n ) :: ty' : pair ty0 .. tyN ty'' : A => pair ty0 .. tyN ty' : A\n"
+               "UPDATE ( 2 * n + 1 ) :: ty' : pair ty0 .. tyN ty'' ty''' : A => pair ty0 .. tyN ty' ty''' : A\n"
+               'Update an element or a sub comb in a right comb',
+    'VOTING_POWER': 'VOTING_POWER\n'
+                    'VOTING_POWER :: key_hash : A => nat : A\n'
+                    'Return the voting power of a given contract',
+    'XOR': 'XOR\nXOR :: bool : bool : A => bool : A\nXOR :: nat : nat : A => nat : A\nBoolean and bitwise eXclusive OR',
     'address': 'address\nAddress of an untyped contract',
     'big_map': 'big_map kty vty\nA lazily deserialized map from kty to vty',
+    'bls12_381_fr': 'bls12_381_fr\nAn element of the BLS12-381 scalar field F\\ :sub:r',
+    'bls12_381_g1': 'bls12_381_g1\nA point on the BLS12-381 curve G\\ :sub:1',
+    'bls12_381_g2': 'bls12_381_g2\nA point on the BLS12-381 curve G\\ :sub:2',
     'bool': 'bool\nA boolean',
     'bytes': 'bytes\nA sequence of bytes',
     'chain_id': 'chain_id\nA chain identifier',
     'contract': "contract type\nAddress of a contract, where type is the contract's parameter type",
     'int': 'int\nAn arbitrary-precision integer',
-    'key': 'key\nA public cryptography key',
-    'key_hash': 'key_hash\nA hash of a public cryptography key',
+    'key': 'key\nA public cryptographic key',
+    'key_hash': 'key_hash\nA hash of a public cryptographic key',
     'lambda': 'lambda ty1 ty2\nA lambda with given parameter and return types',
     'list': 'list type\nA single, immutable, homogeneous linked list',
     'map': 'map kty vty\nAn immutable map from kty to vty',
     'mutez': 'mutez\nA specific type for manipulating tokens',
     'nat': 'nat\nAn arbitrary-precision natural number',
+    'never': 'never\nThe empty type',
     'operation': 'operation\nAn internal operation emitted by a contract',
-    'option': 'option type\nAn optional value',
+    'option': 'option ty\nAn optional value',
     'or': 'or ty1 ty2\nA union of two types',
-    'pair': 'pair ty1 ty2\nA pair of values',
+    'pair': 'pair ty1 ty2\nA pair or tuple of values',
+    'sapling_state': 'sapling_state n\nA Sapling state',
+    'sapling_transaction': 'sapling_transaction n\nA Sapling transaction',
     'set': 'set cty\nAn immutable set of comparable values of type cty',
     'signature': 'signature\nA cryptographic signature',
     'string': 'string\nA string of characters',
-    'timestamp': 'timestamp\nA real-world date',
+    'ticket': 'ticket cty\nA ticket used to authenticate information of type cty',
+    'timestamp': 'timestamp\nA real-world date.',
     'unit': 'unit\nThe type whose only value is Unit'}
