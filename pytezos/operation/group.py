@@ -31,7 +31,7 @@ validation_passes = {
     'seed_nonce_revelation': 2,
     'double_endorsement_evidence': 2,
     'double_baking_evidence': 2,
-    'activate_account': 2,
+    'activate_account': 3,
     'reveal': 3,
     'transaction': 3,
     'origination': 3,
