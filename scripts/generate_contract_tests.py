@@ -1,7 +1,7 @@
 from os.path import join, dirname, isdir, basename, splitext, exists
 from glob import glob
 
-base_dir = join(dirname(dirname(__file__)), 'tests', 'contract')
+base_dir = join(dirname(dirname(__file__)), 'tests', 'contract_tests')
 
 
 def read_template(name):

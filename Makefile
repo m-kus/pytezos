@@ -11,22 +11,28 @@ install:
 	git submodule update --init
 	poetry install
 
+notebook:
+	PYTHONPATH="$$PYTHONPATH:src" poetry run jupyter notebook
+
 isort:
-	poetry run isort pytezos
+	poetry run isort src
 
 pylint:
-	poetry run pylint pytezos || poetry run pylint-exit $$?
+	poetry run pylint src || poetry run pylint-exit $$?
 
 mypy:
-	poetry run mypy pytezos
+	poetry run mypy src
 
 lint: isort pylint mypy
 
 test:
-	poetry run pytest --cov-report=term-missing --cov=pytezos --cov-report=xml -v .
+	PYTHONPATH="$$PYTHONPATH:src" poetry run pytest --cov-report=term-missing --cov=pytezos --cov-report=xml -v .
 
 cover:
 	poetry run diff-cover coverage.xml
+
+build:
+	poetry build
 
 docs:
 	cd docs && rm -rf ./build && $(MAKE) html
