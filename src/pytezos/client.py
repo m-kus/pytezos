@@ -154,24 +154,26 @@ class PyTezosClient(ContextMixin, ContentMixin):
             context=self.context,
         )
 
-    def sign_message(self, message: Union[str, bytes]) -> str:
+    def sign_message(self, message: str, block: Union[str, int] = 'genesis') -> str:
         """Sign arbitrary message with guarantee that resulting operation won't be used onchain.
 
         :param message: Message to sign
-        :returns: Message signature
+        :param block: Specify block, defaults to genesis
+        :returns: Base58-encoded signature (non-generic)
         """
-        op = self.failing_noop(message).fill().sign()
-        return op
+        return self.key.sign(self.failing_noop(message).message(block=block))
 
-    def check_message(self, message: Union[str, bytes], public_key: str, signature: str) -> None:
+    def check_message(self, message: str, public_key: str, signature: str,
+                      block: str = 'genesis') -> None:
         """Check message signature
 
         :param message: Signed operation
-        :param public_key_hash: Signer's public key
+        :param public_key: Signer's public key
         :param signature: Message signature
+        :param block: Specify block, defaults to genesis
         """
         pk = Key.from_encoded_key(public_key)
         pk.verify(
             signature=signature,
-            message=message,
+            message=self.failing_noop(message).message(block=block),
         )

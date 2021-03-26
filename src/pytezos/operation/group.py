@@ -1,11 +1,11 @@
 from pprint import pformat
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from deprecation import deprecated  # type: ignore
 
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.crypto.encoding import base58_encode
+from pytezos.crypto.encoding import base58_encode, is_bh
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
@@ -50,7 +50,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         ]
         return '\n'.join(res)
 
-    def _spawn(self, **kwargs):
+    def _spawn(self, **kwargs) -> 'OperationGroup':
         return OperationGroup(
             context=self.context,
             contents=kwargs.get('contents', self.contents.copy()),
@@ -90,7 +90,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         counter: Optional[int] = None,
         ttl: Optional[int] = None,
         **kwargs
-    ):
+    ) -> 'OperationGroup':
         """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
@@ -178,6 +178,18 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return local_data
 
+    def message(self, block: Union[str, int] = 'genesis') -> bytes:
+        """Get payload for the failing noop operation
+
+        :param block: Specify operation branch (default is genesis)
+        :returns: Message bytes
+        """
+        if len(self.contents) != 1 or self.contents[0]['kind'] != 'failing_noop':
+            raise NotImplementedError('Use for signing messages only')
+
+        branch = block if is_bh(block) else self.shell.blocks[block].hash()
+        return b'\x03' + bytes.fromhex(self._spawn(branch=branch).forge())
+
     def autofill(
         self,
         gas_reserve: int = DEFAULT_GAS_RESERVE,
@@ -247,7 +259,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         opg.contents = list(map(fill_content, opg_with_metadata['contents']))
         return opg
 
-    def sign(self):
+    def sign(self) -> 'OperationGroup':
         """Sign the operation group with the key specified by `using`.
 
         :rtype: OperationGroup
