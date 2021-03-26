@@ -42,7 +42,7 @@ class FeesTest(TestCase):
         # Arrange
         node_gas_limit = 88888
         node_storage_limit = 66666
-        node_constants =  dict(
+        node_constants = dict(
             hard_gas_limit_per_operation=node_gas_limit,
             hard_storage_limit_per_operation=node_storage_limit,
         )

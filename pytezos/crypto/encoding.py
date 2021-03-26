@@ -20,7 +20,7 @@ base58_encodings = [
     (b"tz1",   36,   tb([6, 161, 159]),            20,   u"ed25519 public key hash"),
     (b"tz2",   36,   tb([6, 161, 161]),            20,   u"secp256k1 public key hash"),
     (b"tz3",   36,   tb([6, 161, 164]),            20,   u"p256 public key hash"),
-    (b"KT1",   36,   tb([2, 90, 121]),             20,   u"Originated address"),
+    (b"KT1",   36,   tb([2, 90, 121]),             20,   u"originated address"),
 
     (b"id",    30,   tb([153, 103]),               16,   u"cryptobox public key hash"),
 
@@ -46,6 +46,8 @@ base58_encodings = [
     (b"sig",   96,   tb([4, 130, 43]),             64,   u"generic signature"),
 
     (b'Net',   15,   tb([87, 82, 0]),              4,    u"chain id"),
+    (b'nce',   53,   tb([69, 220, 169]),           32,   u'seed nonce hash'),
+    (b'btz1',  37,   tb([1, 2, 49, 223]),          20,   u'blinded public key hash'),
 ]
 
 operation_tags = {

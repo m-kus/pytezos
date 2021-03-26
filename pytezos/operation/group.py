@@ -1,4 +1,4 @@
-from pprint import pformat, pprint
+from pprint import pformat
 from typing import Any, Dict, List, Optional
 
 from deprecation import deprecated  # type: ignore
@@ -14,23 +14,9 @@ from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE, MAX_OPE
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.forge import forge_operation_group
+from pytezos.operation.kind import validation_passes
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-
-# NOTE: Explaination: https://pytezos.baking-bad.org/tutorials/02.html#operation-group
-validation_passes = {
-    'endorsement': 0,
-    'proposal': 1,
-    'ballot': 1,
-    'seed_nonce_revelation': 2,
-    'double_endorsement_evidence': 2,
-    'double_baking_evidence': 2,
-    'activate_account': 2,
-    'reveal': 3,
-    'transaction': 3,
-    'origination': 3,
-    'delegation': 3,
-}
 
 
 class OperationGroup(ContextMixin, ContentMixin):
@@ -102,8 +88,8 @@ class OperationGroup(ContextMixin, ContentMixin):
     def fill(
         self,
         counter: Optional[int] = None,
-        branch_offset: Optional[int] = None,
         ttl: Optional[int] = None,
+        **kwargs
     ):
         """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
@@ -112,9 +98,10 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :rtype: OperationGroup
         """
-        if branch_offset is not None:
+        if kwargs.get('branch_offset') is not None:
             logger.warning('`branch_offset` argument is deprecated, use `ttl` instead')
-            ttl = MAX_OPERATIONS_TTL - branch_offset
+            ttl = MAX_OPERATIONS_TTL - kwargs['branch_offset']
+
         if ttl is None:
             ttl = self.context.get_operations_ttl()
         if not 0 < ttl <= MAX_OPERATIONS_TTL:
@@ -196,11 +183,11 @@ class OperationGroup(ContextMixin, ContentMixin):
         gas_reserve: int = DEFAULT_GAS_RESERVE,
         burn_reserve: int = DEFAULT_BURN_RESERVE,
         counter: Optional[int] = None,
-        branch_offset: Optional[int] = None,
         ttl: Optional[int] = None,
         fee: Optional[int] = None,
         gas_limit: Optional[int] = None,
         storage_limit: Optional[int] = None,
+        **kwargs
     ) -> 'OperationGroup':
         """Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
@@ -215,7 +202,11 @@ class OperationGroup(ContextMixin, ContentMixin):
             results of operation dry-run.
         :rtype: OperationGroup
         """
-        opg = self.fill(counter=counter, ttl=ttl, branch_offset=branch_offset)
+        if kwargs.get('branch_offset') is not None:
+            logger.warning('`branch_offset` argument is deprecated, use `ttl` instead')
+            ttl = MAX_OPERATIONS_TTL - kwargs['branch_offset']
+
+        opg = self.fill(counter=counter, ttl=ttl)
         opg_with_metadata = opg.run()
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
@@ -223,34 +214,31 @@ class OperationGroup(ContextMixin, ContentMixin):
         extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
 
         def fill_content(content: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-            nonlocal fee
-            nonlocal gas_limit
-            nonlocal storage_limit
+            if validation_passes[content['kind']] == 3:
+                _gas_limit, _storage_limit, _fee = gas_limit, storage_limit, fee
 
-            if validation_passes[content['kind']] != 3:
-                return None
+                if _gas_limit is None:
+                    _gas_limit = OperationResult.consumed_gas(content)
+                    if content['kind'] in ['origination', 'transaction']:
+                        _gas_limit += gas_reserve
 
-            if fee is None or gas_limit is None:
-                _consumed_gas = OperationResult.consumed_gas(content) + gas_reserve
+                if storage_limit is None:
+                    _paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
+                    _burned = OperationResult.burned(content)
+                    _storage_limit = _paid_storage_size_diff + _burned
+                    if content['kind'] in ['origination', 'transaction']:
+                        _storage_limit += burn_reserve
 
-                if fee is None:
-                    fee = calculate_fee(content, _consumed_gas, extra_size)
+                if _fee is None:
+                    _fee = calculate_fee(content, _gas_limit, extra_size)
 
-                if gas_limit is None:
-                    gas_limit = _consumed_gas + gas_reserve
-
-            if storage_limit is None:
-                _paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
-                _burned = OperationResult.burned(content)
-                storage_limit = _paid_storage_size_diff + _burned + burn_reserve
-
-            current_counter = int(content['counter'])
-            content.update(
-                gas_limit=str(gas_limit),
-                storage_limit=str(storage_limit),
-                fee=str(fee),
-                counter=str(current_counter + self.context.get_counter_offset())
-            )
+                current_counter = int(content['counter'])
+                content.update(
+                    gas_limit=str(_gas_limit),
+                    storage_limit=str(_storage_limit),
+                    fee=str(_fee),
+                    counter=str(current_counter + self.context.get_counter_offset())
+                )
 
             content.pop('metadata')
             logger.debug("autofilled transaction content: %s" % content)
@@ -301,25 +289,23 @@ class OperationGroup(ContextMixin, ContentMixin):
 
     def inject(
         self,
-        _async=None,
-        preapply: bool = True,
         check_result: bool = True,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
-        min_confirmations: int = 1,
+        min_confirmations: int = 0,
+        **kwargs
     ):
         """Inject the signed operation group.
 
-        :param preapply: do a preapply before injection
         :param check_result: raise RpcError in case operation is applied but has runtime errors
         :param num_blocks_wait: number of blocks to wait for injection
         :param time_between_blocks: override the corresponding parameter from constants
-        :param min_configrations: number of block injections to wait for before returning
+        :param min_confirmations: number of block injections to wait for before returning
         :returns: operation group with metadata (raw RPC response)
         """
-        if _async is not None:
+        if kwargs.get('_async'):
             logger.warning('`_async` argument is deprecated, use `min_confirmations` instead')
-            min_confirmations = 0 if _async is True else 1
+            min_confirmations = 0 if kwargs['_async'] is True else 1
 
         self.context.reset()
 

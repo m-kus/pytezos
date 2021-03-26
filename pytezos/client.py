@@ -112,12 +112,12 @@ class PyTezosClient(ContextMixin, ContentMixin):
 
     def using(self,
               shell: Optional[Union[ShellQuery, str]] = None,
-              key: Optional[Union[Key, str]] = None,
+              key: Optional[Union[Key, str, dict]] = None,
               mode: Optional[str] = None):
         """ Change current rpc endpoint and account (private key).
 
         :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
-        :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
+        :param key: base58 encoded key, path to the faucet file, faucet file itself, alias from tezos-client, or `Key`
         :param mode: whether to use `readable` or `optimized` encoding for parameters/storage/other
         :returns: A copy of current object with changes applied
         """

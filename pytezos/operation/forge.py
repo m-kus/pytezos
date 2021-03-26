@@ -1,19 +1,7 @@
-from pytezos.michelson.forge import (forge_address, forge_array, forge_base58, forge_bool, forge_micheline, forge_nat, forge_public_key,
-                                     forge_script)
+from pytezos.michelson.forge import (forge_address, forge_array, forge_base58, forge_bool, forge_micheline, forge_nat,
+                                     forge_public_key, forge_script)
+from pytezos.operation.kind import operation_tags
 
-operation_tags = {
-    'endorsement': 0,
-    'proposal': 5,
-    'ballot': 6,
-    'seed_nonce_revelation': 1,
-    'double_endorsement_evidence': 2,
-    'double_baking_evidence': 3,
-    'activate_account': 4,
-    'reveal': 107,
-    'transaction': 108,
-    'origination': 109,
-    'delegation': 110
-}
 reserved_entrypoints = {
     'default': b'\x00',
     'root': b'\x01',

@@ -1,15 +1,17 @@
-from pprint import pformat
+from pprint import pformat, pprint
 from typing import Any, Dict, List, Optional, Tuple
 
 import bson  # type: ignore
 
-from pytezos.block.forge import bump_fitness, forge_block_header, forge_protocol_data, forge_signed_operation
+from pytezos.block.forge import bump_fitness, forge_block_header, forge_protocol_data
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
+from pytezos.operation.kind import validation_passes
+from pytezos.sandbox.parameters import sandbox_params
 
 
 class BlockHeader(ContextMixin):
@@ -71,10 +73,15 @@ class BlockHeader(ContextMixin):
     @classmethod
     def bake_block(cls, context: ExecutionContext, min_fee: int = 0) -> 'BlockHeader':
         pending_operations = context.shell.mempool.pending_operations()  # type: ignore
-        operations: List[Dict[str, Any]] = [
-            op for op in pending_operations['applied']
-            if sum(map(lambda x: int(x['fee']), op['contents'])) >= min_fee  # handle batch case
-        ]
+        operations = [[], [], [], []]
+
+        for opg in pending_operations['applied']:
+            validation_pass = validation_passes[opg['contents'][0]['kind']]
+            if validation_pass == 3 \
+                    and sum(map(lambda x: int(x['fee']), opg['contents'])) < min_fee:
+                continue
+            operations[validation_pass].append(opg)
+
         # NOTE: Real values will be set during fill
         protocol_data = {
             "priority": 0,
@@ -82,7 +89,7 @@ class BlockHeader(ContextMixin):
         }
         return BlockHeader(
             context=context,
-            operations=[[], [], [], operations],  # TODO: group by validation pass
+            operations=operations,
             protocol_data=protocol_data,
         )
 
@@ -101,11 +108,19 @@ class BlockHeader(ContextMixin):
         :param block_id: head or genesis
         :rtype: BlockHeader
         """
+        pred_shell_header = self.shell.blocks[block_id].header.shell()
+        timestamp = optimize_timestamp(pred_shell_header['timestamp']) + 1
         protocol = self.shell.blocks[block_id].protocols()['next_protocol']
+        level = int(pred_shell_header['level']) + 1
+        dummy_signature = base58_encode(b'\x00' * 64, b'sig').decode()
+
         protocol_data = {
             'protocol': protocol,
             **self.protocol_data,
         }
+
+        if level % int(sandbox_params['blocks_per_commitment']) == 0:
+            protocol_data['seed_nonce_hash'] = base58_encode(b'\x00' * 32, b'nce').decode()
 
         if 'priority' in protocol_data:
             baker = self.key.public_key_hash()
@@ -113,8 +128,6 @@ class BlockHeader(ContextMixin):
             protocol_data['priority'] = next(item['priority']
                                              for item in baking_rights
                                              if item['delegate'] == baker)  # Fail if no rights
-
-        dummy_signature = base58_encode(b'\x00' * 64, b'sig').decode()
 
         operations = [
             [
@@ -137,25 +150,33 @@ class BlockHeader(ContextMixin):
             'operations': operations,
         }
 
-        pred_shell_header = self.shell.blocks[block_id].header.shell()
-        timestamp = optimize_timestamp(pred_shell_header['timestamp']) + 1
-
         res = self.shell.blocks[block_id].helpers.preapply.block.post(
             block=payload,
             sort=True,
             timestamp=timestamp,
         )
 
+        forged_operations = [
+            [
+                {
+                    'branch': operation['branch'],
+                    'data': operation['data']
+                }
+                for operation in operation_list['applied']
+            ]
+            for operation_list in res['operations']
+        ]
+
         return self._spawn(
             shell_header=res['shell_header'],
+            operations=forged_operations,
             protocol_data=protocol_data,
-            operations=operations,
             signature=dummy_signature,
         )
 
     def work(self):
         header = self
-        threshold = int(self.context.constants['proof_of_work_threshold'])
+        threshold = int(sandbox_params['proof_of_work_threshold'])
         nonce = 1
 
         while header.pow_stamp() > threshold:
@@ -192,6 +213,10 @@ class BlockHeader(ContextMixin):
         hash_digest = blake2b_32(data).digest()
         return int.from_bytes(hash_digest[:8], 'big')
 
+    def hash(self) -> str:
+        hash_digest = blake2b_32(self.binary_payload()).digest()
+        return base58_encode(hash_digest, b'B').decode()
+
     def sign(self):
         """Sign the block header with the key specified by `using`.
 
@@ -205,22 +230,11 @@ class BlockHeader(ContextMixin):
     def inject(self, force=False) -> str:
         """Inject the signed block header.
 
-        :returns: block hash
+        :returns: block hashblake2b_32(data).digest()
         """
-        operations = [
-            [
-                {
-                    'branch': operation['branch'],
-                    'data': forge_signed_operation(operation).hex(),
-                }
-                for operation in operation_list
-            ]
-            for operation_list in self.operations
-        ]
-
         payload = {
             "data": self.binary_payload().hex(),
-            "operations": operations,
+            "operations": self.operations,
         }
         return self.shell.injection.block.post(
             block=payload,

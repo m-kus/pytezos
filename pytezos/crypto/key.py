@@ -75,7 +75,8 @@ def validate_mnemonic(mnemonic: str, language: str = DEFAULT_LANGUAGE) -> None:
     m = Mnemonic(language)
     mnemonic = m.normalize_string(mnemonic).split(' ')
     if len(mnemonic) not in VALID_MNEMONIC_LENGTHS:
-        raise ValueError('Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, but it is not (%d).' % len(mnemonic))
+        raise ValueError('Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, '
+                         'but it is not (%d).' % len(mnemonic))
 
     idx = map(lambda x: bin(m.wordlist.index(x))[2:].zfill(11), mnemonic)
     b = ''.join(idx)
@@ -199,7 +200,11 @@ class Key(metaclass=InlineDocstring):
             passphrase = get_passphrase(passphrase)
 
             salt, encrypted_sk = encoded_key[:8], encoded_key[8:]
-            encryption_key = hashlib.pbkdf2_hmac(hash_name="sha512", password=passphrase, salt=salt, iterations=32768, dklen=32)
+            encryption_key = hashlib.pbkdf2_hmac(hash_name="sha512",
+                                                 password=passphrase,
+                                                 salt=salt,
+                                                 iterations=32768,
+                                                 dklen=32)
             encoded_key = pysodium.crypto_secretbox_open(
                 c=encrypted_sk,
                 nonce=b'\000' * 24,
@@ -282,17 +287,25 @@ class Key(metaclass=InlineDocstring):
         return cls.from_secret_exponent(secret_exponent, curve=curve, activation_code=activation_code)
 
     @classmethod
-    def from_faucet(cls, path: str) -> 'Key':
+    def from_faucet(cls, source: Union[str, dict]) -> 'Key':
         """Import key from a faucet file: https://faucet.tzalpha.net/
 
-        :param path: path to the json file
+        :param source: path to the json file
         :rtype: Key
         """
-        with open(expanduser(path), 'r') as f:
-            data = json.loads(f.read())
+        if isinstance(source, str):
+            with open(expanduser(source), 'r') as f:
+                data = json.loads(f.read())
+        elif isinstance(source, dict):
+            data = source
+        else:
+            raise ValueError(f'Unexpected source {source}')
 
         key = cls.from_mnemonic(
-            mnemonic=data['mnemonic'], passphrase=data.get('password', ''), email=data.get('email', ''), activation_code=data['secret']
+            mnemonic=data['mnemonic'],
+            passphrase=data.get('password', ''),
+            email=data.get('email', ''),
+            activation_code=data['secret']
         )
         if key.public_key_hash() != data['pkh']:
             raise ValueError('Failed to import')
@@ -321,7 +334,7 @@ class Key(metaclass=InlineDocstring):
         prefix, sk = value.split(':', maxsplit=1)
 
         if prefix == 'encrypted':
-            passphrase = get_passphrase()
+            passphrase = get_passphrase(passphrase)
             key = cls.from_encoded_key(sk, passphrase=passphrase)
             del passphrase
         else:
@@ -386,6 +399,19 @@ class Key(metaclass=InlineDocstring):
         pkh = blake2b(data=self.public_point, digest_size=20).digest()
         prefix = {b'ed': b'tz1', b'sp': b'tz2', b'p2': b'tz3'}[self.curve]
         return base58_encode(pkh, prefix).decode()
+
+    def blinded_public_key_hash(self) -> str:
+        """Creates base58 encoded commitment out of activation code (required) and public key hash
+
+        :return: blinded public key hash
+        """
+        if not self.activation_code:
+            raise ValueError("Activation code is undefined")
+
+        pkh = blake2b(data=self.public_point, digest_size=20).digest()
+        key = bytes.fromhex(self.activation_code)
+        blinded_pkh = blake2b(data=pkh, key=key, digest_size=20).digest()
+        return base58_encode(blinded_pkh, b'btz1').decode()
 
     def sign(self, message: Union[str, bytes], generic: bool = False):
         """Sign a raw sequence of bytes.

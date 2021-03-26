@@ -29,10 +29,6 @@ class SandboxedNodeTestCase(unittest.TestCase):
             cls._wait_for_connection()
             atexit.register(node_container.stop)
 
-        cls.activate(cls.PROTOCOL, reset=False)
-
-    @classmethod
-    def tearDownClass(cls) -> None:
         cls.activate(cls.PROTOCOL, reset=True)
 
     @classmethod
@@ -88,8 +84,8 @@ class SandboxedNodeTestCase(unittest.TestCase):
                 sleep(0.1)
 
     @classmethod
-    def bake_block(cls):
-        return cls.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
+    def bake_block(cls, min_fee: int = 0):
+        return cls.get_client().using(key='bootstrap1').bake_block(min_fee).fill().work().sign().inject()
 
     @property
     def client(self) -> PyTezosClient:

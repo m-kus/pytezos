@@ -117,7 +117,7 @@ class ContextMixin(metaclass=InlineDocstring):
 
     def _spawn_context(self,
                        shell: Optional[Union[ShellQuery, str]] = None,
-                       key: Optional[Union[Key, str]] = None,
+                       key: Optional[Union[Key, str, dict]] = None,
                        address: Optional[str] = None,
                        block_id: Optional[Union[str, int]] = None,
                        mode: Optional[str] = None) -> ExecutionContext:
@@ -144,6 +144,8 @@ class ContextMixin(metaclass=InlineDocstring):
                 key = Key.from_faucet(key)
             else:
                 key = Key.from_alias(key)
+        elif isinstance(key, dict):
+            key = Key.from_faucet(key)
         else:
             assert key is None or isinstance(key, Key), f'unexpected key {key}'
 
