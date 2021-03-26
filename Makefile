@@ -12,7 +12,7 @@ install:
 	poetry install
 
 notebook:
-	poetry run jupyter notebook
+	PYTHONPATH="$$PYTHONPATH:src" poetry run jupyter notebook
 
 isort:
 	poetry run isort src
@@ -26,7 +26,7 @@ mypy:
 lint: isort pylint mypy
 
 test:
-	poetry run pytest --cov-report=term-missing --cov=pytezos --cov-report=xml -v .
+	PYTHONPATH="$$PYTHONPATH:src" poetry run pytest --cov-report=term-missing --cov=pytezos --cov-report=xml -v .
 
 cover:
 	poetry run diff-cover coverage.xml

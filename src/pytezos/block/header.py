@@ -230,7 +230,7 @@ class BlockHeader(ContextMixin):
     def inject(self, force=False) -> str:
         """Inject the signed block header.
 
-        :returns: block hashblake2b_32(data).digest()
+        :returns: block hash
         """
         payload = {
             "data": self.binary_payload().hex(),

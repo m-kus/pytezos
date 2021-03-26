@@ -1,7 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
-from pytezos.operation.forge import forge_operation
 
 
 def bump_fitness(fitness: Tuple[str, str]) -> Tuple[str, str]:
