@@ -1,5 +1,5 @@
-from pprint import pformat, pprint
-from typing import Any, Dict, List, Optional, Tuple
+from pprint import pformat
+from typing import Any, Dict, List, Optional
 
 import bson  # type: ignore
 
@@ -73,7 +73,7 @@ class BlockHeader(ContextMixin):
     @classmethod
     def bake_block(cls, context: ExecutionContext, min_fee: int = 0) -> 'BlockHeader':
         pending_operations = context.shell.mempool.pending_operations()  # type: ignore
-        operations = [[], [], [], []]
+        operations: List[List[Dict[str, Any]]] = [[], [], [], []]
 
         for opg in pending_operations['applied']:
             validation_pass = validation_passes[opg['contents'][0]['kind']]
@@ -119,7 +119,7 @@ class BlockHeader(ContextMixin):
             **self.protocol_data,
         }
 
-        if level % int(sandbox_params['blocks_per_commitment']) == 0:
+        if level % int(sandbox_params['blocks_per_commitment']) == 0:  # type: ignore
             protocol_data['seed_nonce_hash'] = base58_encode(b'\x00' * 32, b'nce').decode()
 
         if 'priority' in protocol_data:
