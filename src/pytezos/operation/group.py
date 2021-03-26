@@ -159,10 +159,10 @@ class OperationGroup(ContextMixin, ContentMixin):
             }
         )
 
-    def forge(self, validate=True):
+    def forge(self, validate=False):
         """Convert json representation of the operation group into bytes.
 
-        :param validate: Forge remotely also and compare results, default is True
+        :param validate: Forge remotely also and compare results, default is False
         :returns: Hex string
         """
         payload = {
