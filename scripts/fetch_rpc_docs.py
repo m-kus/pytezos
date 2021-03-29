@@ -47,7 +47,6 @@ def parse_describe_output(data, root='/'):
 
 
 if __name__ == '__main__':
-    pytezos = pytezos.using('edonet')
     shell_docs = parse_describe_output(pytezos.shell.describe(recurse=True))
     chain_docs = parse_describe_output(pytezos.shell.describe.chains.main.mempool(recurse=True),
                                        root='/chains/{}/mempool')
@@ -56,6 +55,6 @@ if __name__ == '__main__':
     context_docs = parse_describe_output(pytezos.shell.describe.chains.main.blocks.head.context.raw.json(recurse=True),
                                          root='/chains/{}/blocks/{}/context/raw/json')
     docs = json.dumps({**shell_docs, **chain_docs, **block_docs, **context_docs}, indent=2)
-    output_path = join(dirname(dirname(__file__)), 'pytezos/rpc/docs.py')
+    output_path = join(dirname(dirname(__file__)), 'src/pytezos/rpc/docs.py')
     with open(output_path, 'w+') as f:
         f.write(f'rpc_docs = {docs}\n')

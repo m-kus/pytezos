@@ -13,6 +13,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+packages = [
+    { include = "pytezos", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
