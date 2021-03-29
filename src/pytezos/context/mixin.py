@@ -120,7 +120,8 @@ class ContextMixin(metaclass=InlineDocstring):
                        key: Optional[Union[Key, str, dict]] = None,
                        address: Optional[str] = None,
                        block_id: Optional[Union[str, int]] = None,
-                       mode: Optional[str] = None) -> ExecutionContext:
+                       mode: Optional[str] = None,
+                       script: Optional[dict] = None) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
                 shell = shell.split('.')[0]
@@ -154,13 +155,11 @@ class ContextMixin(metaclass=InlineDocstring):
                 script = self.shell.contracts[address].script()
             except RpcError as e:
                 raise RpcError(f'Contract {address} not found', *e.args) from e
-        else:
-            script = self.context.script
 
         return ExecutionContext(
             shell=shell or self.context.shell,
             key=key or self.context.key,
             address=address,
             block_id=block_id,
-            script=script,
+            script=script or self.context.script,
             mode=mode or self.context.mode)

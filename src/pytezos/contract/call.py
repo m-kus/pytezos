@@ -192,8 +192,16 @@ class ContractCall(ContextMixin):
         else:
             return self.run_operation()
 
-    def view(self):
-        """ Get return value of a view method.
+    def storage_view(self):
+        """ Get return value of an off-chain storage view.
+
+        :returns: Decoded parameters of a callback
+        """
+        res = self.interpret()
+        return res.storage  # type: ignore
+
+    def callback_view(self):
+        """ Get return value of an on-chain callback method
 
         :returns: Decoded parameters of a callback
         """
@@ -213,3 +221,7 @@ class ContractCall(ContextMixin):
             logger.debug('\n'.join(stdout))
             raise error
         return res
+
+    @deprecated(deprecated_in='3.0.4', removed_in='3.1.0', details='Use callback_view instead')
+    def view(self):
+        return self.callback_view()

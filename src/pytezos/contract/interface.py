@@ -213,19 +213,24 @@ class ContractInterface(ContextMixin):
 
     @cached_property
     def metadata(self) -> Optional[ContractMetadata]:
+        """ Get TZIP-016 contract metadata, if exists
+
+        :rtype: ContractMetadata
+        """
         metadata_url = self.metadata_url
         if metadata_url is None:
             return None
+
         logger.info('Trying to fetch contract metadata from `%s`', metadata_url)
         parsed_url = urlparse(metadata_url)
 
         if parsed_url.scheme in ('http', 'https'):
             # NOTE: KT1B34qXVRfQrScEaqjjt6cJ5G8LtVFZ7fSc
-            metadata = ContractMetadata.from_url(metadata_url)
+            metadata = ContractMetadata.from_url(metadata_url, self.context)
 
         elif parsed_url.scheme == 'ipfs':
             # NOTE: KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW
-            metadata = ContractMetadata.from_ipfs(parsed_url.netloc)
+            metadata = ContractMetadata.from_ipfs(parsed_url.netloc, self.context)
 
         elif parsed_url.scheme == 'tezos-storage':
             parts = parsed_url.path.split('/')
@@ -238,7 +243,8 @@ class ContractInterface(ContextMixin):
                 storage = ContractInterface.from_context(context).storage
             else:
                 raise NotImplementedError('Unknown metadata URL scheme')
-            metadata = ContractMetadata.from_storage(storage, parts[-1])
+            metadata_json = json.loads(storage['metadata'][parts[-1]]().decode())
+            metadata = ContractMetadata.from_json(metadata_json, self.context)
 
         elif parsed_url.scheme == 'sha256':
             raise NotImplementedError
@@ -246,14 +252,12 @@ class ContractInterface(ContextMixin):
         else:
             raise NotImplementedError('Unknown metadata URL scheme')
 
-        metadata.set_context(self.context)
         return metadata
 
     @cached_property
     def metadata_url(self) -> Optional[str]:
         try:
-            metadata_url_storage = self.storage['metadata'][''].data
-            return metadata_url_storage.to_python_object().decode()
+            return self.storage['metadata']['']().decode()
         # FIXME: Dirty
         except (KeyError, AssertionError):
             return None

@@ -4,6 +4,9 @@
 
 all: install lint test cover
 
+debug:
+	pip install . --force --no-deps
+
 update:
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/metadata-schema.json -O pytezos/contract/metadata-schema.json
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/examples/example-000.json -O tests/metadata/example-000.json
