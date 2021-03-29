@@ -5,13 +5,12 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests  # type: ignore
 from attr import dataclass
-from cattrs_extras.converter import Converter, suppress
+from cattrs_extras.converter import Converter, suppress  # type: ignore
 from jsonschema import validate as jsonschema_validate  # type: ignore
 
-from pytezos.context.mixin import ContextMixin
 from pytezos.context.impl import ExecutionContext
+from pytezos.context.mixin import ContextMixin
 from pytezos.contract.view import OffChainView
-from pytezos.jupyter import get_class_docstring
 
 
 def to_camelcase(string: str) -> str:
@@ -159,7 +158,7 @@ class ContractMetadata(ContextMixin):
         metadata_json = cls.fix_metadata_json(metadata_json)
         cls.validate_metadata_json(metadata_json)
         res = Converter().structure(metadata_json, ContractMetadata)
-        res.context = context
+        res.context = context if context else ExecutionContext()
         res.raw = metadata_json
         return res
 
