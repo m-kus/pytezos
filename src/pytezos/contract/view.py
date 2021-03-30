@@ -30,7 +30,7 @@ class OffChainView(ContextMixin):
     def __repr__(self):
         res = [
             super(OffChainView, self).__repr__(),
-            f'.name  # {self.name}',
+            f'.name\t{self.name}',
             f'\nBuiltin\n(*args, **kwargs)  # build view parameters (see typedef)',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',

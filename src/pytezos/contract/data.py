@@ -21,8 +21,8 @@ class ContractData(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractData, self).__repr__(),
-            f'.path  # {self.path}',
-            f'\nBuiltin\n()  # get as Python object',
+            f'.path\t{self.path}',
+            f'\nBuiltin\n()\t# get as Python object',
             f'[key]  # access child elements by name or index',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',

@@ -106,13 +106,13 @@ class ContextMixin(metaclass=InlineDocstring):
             '\nProperties'
         ]
         if self.context.key is not None:
-            res.append(f'.key  # {self.key.public_key_hash()}')
+            res.append(f'.key\t\t{self.key.public_key_hash()}')
         if self.context.shell is not None:
-            res.append(f'.shell  # {self.shell.node.uri}')
+            res.append(f'.shell\t\t{self.shell.node.uri}')
         if self.context.address is not None:
-            res.append(f'.address  # {self.address}')
+            res.append(f'.address\t{self.address}')
         if self.context.block_id is not None:
-            res.append(f'.block_id  # {self.block_id}')
+            res.append(f'.block_id\t{self.block_id}')
         return '\n'.join(res)
 
     def _spawn_context(self,

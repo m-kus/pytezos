@@ -115,11 +115,13 @@ class ContractMetadata(ContextMixin):
         res = [
             super().__repr__(),
             '\nMetadata',
-            f'name:\t\t{self.name or ""}',
-            f'description:\t{self.description or ""}',
-            f'license:\t{self.license.name if self.license else ""}',
-            f'authors:\t{", ".join(self.authors or [])}',
-            f'interfaces:\t{", ".join(self.interfaces or [])}',
+            f'.name\t\t{self.name or ""}',
+            f'.description\t{self.description or ""}',
+            f'.license\t{self.license.name if self.license else ""}',
+            f'.authors\t{", ".join(self.authors or [])}',
+            f'.interfaces\t{", ".join(self.interfaces or [])}',
+            f'.errors\t\t<{len(self.errors)}>',
+            f'.views\t\t<{len(self.views)}>',
             '\nStorage views',
             *list(map(lambda x: f'.{x}()', self.storage_view_impl))
         ]

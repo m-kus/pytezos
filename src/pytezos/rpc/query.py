@@ -77,8 +77,8 @@ class RpcQuery(metaclass=InlineDocstring):
         res = [
             super(RpcQuery, self).__repr__(),
             '\nProperties',
-            f'.path  # {self.path or "/"}',
-            f'.node  # {self.node.uri}',
+            f'.path\t{self.path or "/"}',
+            f'.node\t{self.node.uri}',
             self.__doc__
         ]
         return '\n'.join(res)

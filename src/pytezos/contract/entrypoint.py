@@ -22,8 +22,8 @@ class ContractEntrypoint(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractEntrypoint, self).__repr__(),
-            f'.entrypoint  # {self.entrypoint}',
-            f'\nBuiltin\n(*args, **kwargs)  # build transaction parameters (see typedef)',
+            f'.entrypoint\t{self.entrypoint}',
+            f'\nBuiltin\n(*args, **kwargs)\t# build transaction parameters (see typedef)',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',
             get_class_docstring(self.__class__)

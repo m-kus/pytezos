@@ -36,7 +36,7 @@ class ContractCall(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractCall, self).__repr__(),
-            f'.amount  # {self.amount}',
+            f'.amount\t{self.amount}',
             '\nParameters',
             pformat(self.parameters),
             '\nHelpers',

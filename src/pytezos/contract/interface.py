@@ -41,8 +41,8 @@ class ContractInterface(ContextMixin):
     def __repr__(self):
         res = [
             super().__repr__(),
-            '.storage  # access storage data at block `block_id`',
-            '.parameter  # root entrypoint',
+            '.storage\t# access storage data at block `block_id`',
+            '.parameter\t# root entrypoint',
             '\nEntrypoints',
             *list(map(lambda x: f'.{x}()', self.entrypoints)),
             '\nHelpers',
