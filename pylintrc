@@ -9,5 +9,7 @@ disable=
     too-many-arguments,
     too-many-locals,
     too-many-public-methods,
+    too-many-instance-attributes,
     too-few-public-methods,
-    bad-mcs-classmethod-argument
+    bad-mcs-classmethod-argument,
+    attribute-defined-outside-init

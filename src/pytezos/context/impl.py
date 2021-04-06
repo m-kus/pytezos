@@ -10,12 +10,13 @@ from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
 
+DEFAULT_IPFS_GATEWAY = 'https://ipfs.io/ipfs'
 
 class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
-                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None):
+                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=DEFAULT_IPFS_GATEWAY):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
@@ -55,6 +56,7 @@ class ExecutionContext(AbstractContext):
         self.tzt_big_maps = {}
         self.debug = False
         self._sandboxed: Optional[bool] = None
+        self.ipfs_gateway = ipfs_gateway.rstrip('/')
 
     def __copy__(self):
         raise ValueError("It's not allowed to copy context")
@@ -127,10 +129,10 @@ class ExecutionContext(AbstractContext):
                     operation = operation[1]
                 for content in operation.get('contents', []):
                     if content.get('source') == key_hash:
-                        logger.debug("pending transaction in mempool: %s" % content)
+                        logger.debug("pending transaction in mempool: %s", content)
                         counter_offset += 1
 
-        logger.debug("counter offset: %s" % counter_offset)
+        logger.debug("counter offset: %s", counter_offset)
         return counter_offset
 
     def register_big_map(self, ptr: int, copy=False) -> int:

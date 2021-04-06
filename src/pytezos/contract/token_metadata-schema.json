@@ -1,0 +1,238 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/asset",
+  "title": "Rich Metadata",
+  "definitions": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "General notes, abstracts, or summaries about the contents of an asset."
+        },
+        "minter": {
+          "type": "string",
+          "format": "tzaddress",
+          "description": "The tz address responsible for minting the asset."
+        },
+        "creators": {
+          "type": "array",
+          "description": "The primary person, people, or organization(s) responsible for creating the intellectual content of the asset.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "contributors": {
+          "type": "array",
+          "description": "The person, people, or organization(s) that have made substantial creative contributions to the asset.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishers": {
+          "type": "array",
+          "description": "The person, people, or organization(s) primarily responsible for distributing or making the asset available to others in its present form.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "A date associated with the creation or availability of the asset."
+        },
+        "blockLevel": {
+          "type": "integer",
+          "description": "Chain block level associated with the creation or availability of the asset."
+        },
+        "type": {
+          "type": "string",
+          "description": "A broad definition of the type of content of the asset."
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of tags that describe the subject or content of the asset.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "genres": {
+          "type": "array",
+          "description": "A list of genres that describe the subject or content of the asset.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "language": {
+          "type": "string",
+          "format": "https://tools.ietf.org/html/rfc1766",
+          "description": "The language of the intellectual content of the asset as defined in RFC 1776."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "A string or number used to uniquely identify the asset. Ex. URL, URN, UUID, ISBN, etc."
+        },
+        "rights": {
+          "type": "string",
+          "description": "A statement about the asset rights."
+        },
+        "rightUri": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Links to a statement of rights."
+        },
+        "artifactUri": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "A URI to the asset."
+        },
+        "displayUri": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "A URI to an image of the asset. Used for display purposes."
+        },
+        "thumbnailUri": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "A URI to an image of the asset for wallets and client applications to have a scaled down image to present to end-users. Reccomened maximum size of 350x350px."
+        },
+        "externalUri": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "A URI with additional information about the subject or content of the asset."
+        },
+        "isTransferable": {
+          "type": "boolean",
+          "description": "All tokens will be transferable by default to allow end-users to send them to other end-users. However, this field exists to serve in special cases where owners will not be able to transfer the token."
+        },
+        "isBooleanAmount": {
+          "type": "boolean",
+          "description": "Describes whether an account can have an amount of exactly 0 or 1. (The purpose of this field is for wallets to determine whether or not to display balance information and an amount field when transferring.)"
+        },
+        "shouldPreferSymbol": {
+          "type": "boolean",
+          "description": "Allows wallets to decide whether or not a symbol should be displayed in place of a name."
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/format"
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/attribute"
+          },
+          "description": "Custom attributes about the subject or content of the asset."
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/asset"
+          },
+          "description": "Facilitates the description of collections and other types of resources that contain multiple assets."
+        }
+      }
+    },
+    "format": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "A URI to the asset represented in this format."
+        },
+        "hash": {
+          "type": "string",
+          "description": "A checksum hash of the content of the asset in this format."
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "Media (MIME) type of the format."
+        },
+        "fileSize": {
+          "type": "integer",
+          "description": "Size in bytes of the content of the asset in this format."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "Filename for the asset in this format. For display purposes."
+        },
+        "duration": {
+          "type": "time",
+          "description": "Time duration of the content of the asset in this format."
+        },
+        "dimensions": {
+          "$ref": "#/definitions/dimensions",
+          "description": "Dimensions of the content of the asset in this format."
+        },
+        "dataRate": {
+          "$ref": "#/definitions/dataRate",
+          "description": "Data rate which the content of the asset in this format was captured at."
+        }
+      }
+    },
+    "attribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the attribute."
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the attribute."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the value. To be used for display purposes."
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "dataRate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "integer"
+        },
+        "unit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ]
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ]
+    }
+  }
+}

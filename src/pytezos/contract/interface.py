@@ -1,7 +1,9 @@
 import json
+import logging
 from decimal import Decimal
+from functools import lru_cache
 from os.path import exists, expanduser
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
 
 import requests
@@ -10,19 +12,32 @@ from deprecation import deprecated  # type: ignore
 
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.context.mixin import ExecutionContext
+from pytezos.contract.call import ContractCall
 from pytezos.contract.data import ContractData
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.contract.metadata import ContractMetadata
 from pytezos.contract.result import ContractCallResult
+from pytezos.contract.token_metadata import ContractTokenMetadata
 from pytezos.crypto.key import Key
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.group import OperationGroup
 from pytezos.rpc import ShellQuery
+
+
+class ContractTokenMetadataProxy:
+    """Get TZIP-21 contract token metadata by token_id
+    """
+    def __init__(self, fn: Callable) -> None:
+        self._fn = fn
+
+    def __getitem__(self, item):
+        return self._fn(item)
 
 
 class ContractInterface(ContextMixin):
@@ -32,8 +47,11 @@ class ContractInterface(ContextMixin):
 
     def __init__(self, context: ExecutionContext):
         super().__init__(context=context)
+        self._logger = logging.getLogger(__name__)
         self.entrypoints = self.program.parameter.list_entrypoints()
         for entrypoint, ty in self.entrypoints.items():
+            if entrypoint == 'token_metadata':
+                continue
             attr = ContractEntrypoint(context=context, entrypoint=entrypoint)
             attr.__doc__ = generate_pydoc(ty, entrypoint)
             setattr(self, entrypoint, attr)
@@ -253,6 +271,66 @@ class ContractInterface(ContextMixin):
             raise NotImplementedError('Unknown metadata URL scheme')
 
         return metadata
+
+    @property
+    def token_metadata(self) -> ContractTokenMetadataProxy:
+        """ Get TZIP-021 contract token metadata proxy
+
+        :rtype: ContractTokenMetadataProxy
+        """
+        return ContractTokenMetadataProxy(self._get_token_metadata)
+
+    @lru_cache
+    def _get_token_metadata(self, token_id: int) -> Optional[ContractTokenMetadata]:
+        token_metadata = self._get_token_metadata_from_view(token_id)
+        if token_metadata is None:
+            token_metadata = self._get_token_metadata_from_storage(token_id)
+        return token_metadata
+
+    def _get_token_metadata_from_storage(self, token_id: int) -> Optional[ContractTokenMetadata]:
+        self._logger.info('Trying to fetch token %s metadata from storage', token_id)
+        try:
+            token_metadata_url = self.storage['token_metadata'][token_id]['token_info']['']().decode()
+        # FIXME: Dirty
+        except (KeyError, AssertionError):
+            return None
+    
+        self._logger.info('Trying to fetch contract token metadata from `%s`', token_metadata_url)
+        parsed_url = urlparse(token_metadata_url)
+
+        if parsed_url.scheme in ('http', 'https'):
+            token_metadata = ContractTokenMetadata.from_url(token_metadata_url, self.context)
+
+        elif parsed_url.scheme == 'ipfs':
+            token_metadata = ContractTokenMetadata.from_ipfs(parsed_url.netloc, self.context)
+
+        elif parsed_url.scheme == 'tezos-storage':
+            parts = parsed_url.path.split('/')
+            if len(parts) == 1:
+                storage = self.storage
+            elif len(parts) == 2:
+                context = self._spawn_context(address=parsed_url.netloc)
+                storage = ContractInterface.from_context(context).storage
+            else:
+                raise NotImplementedError('Unknown metadata URL scheme')
+            token_metadata_json = json.loads(storage['metadata'][parts[-1]]().decode())
+            token_metadata = ContractTokenMetadata.from_json(token_metadata_json, self.context)
+
+        elif parsed_url.scheme == 'sha256':
+            raise NotImplementedError
+
+        else:
+            raise NotImplementedError('Unknown metadata URL scheme')
+
+        return token_metadata
+
+    def _get_token_metadata_from_view(self, token_id: int) -> Optional[ContractTokenMetadata]:
+        self._logger.info('Trying to fetch token %s metadata from off-chain view', token_id)
+        try:
+            token_metadata_json = self.metadata.tokenMetadata(token_id).storage_view()[1]
+            return ContractTokenMetadata.from_json(token_metadata_json)
+        except (KeyError, MichelsonRuntimeError):
+            return None
 
     @cached_property
     def metadata_url(self) -> Optional[str]:

@@ -1,0 +1,7 @@
+{
+  "name": "Tezos TZIP-21 Token",
+  "symbol": "TZ21",
+  "decimals": 8,
+  "shouldPreferSymbol": true,
+  "thumbnailUri": "ipfs://QmV3a1TAdCncfs84Gi9msDsDJVQBDt6Wb5gJRVuFRfrgtG"
+}

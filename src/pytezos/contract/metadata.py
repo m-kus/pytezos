@@ -166,7 +166,8 @@ class ContractMetadata(ContextMixin):
 
     @classmethod
     def from_ipfs(cls, multihash: str, context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
-        metadata_json = requests.get(f'https://ipfs.io/ipfs/{multihash}').json()  # TODO: specify gateway via env var
+        context = context or ExecutionContext()
+        metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}').json()
         return cls.from_json(metadata_json, context)
 
     @classmethod
