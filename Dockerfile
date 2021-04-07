@@ -40,6 +40,7 @@ RUN apk update \
 	&& apk --no-cache add \
 		binutils \
 		libsodium-dev \
+		gmp \
 	&& git clone https://github.com/bitcoin-core/secp256k1.git /tmp/secp256k1 && cd /tmp/secp256k1 \
 	&& ./autogen.sh \
 	&& ./configure \
