@@ -78,6 +78,7 @@ black = "^20.8b1"
 
 [tool.poetry.scripts]
 pytezos = 'pytezos.cli.cli:cli'
+michelson-kernel = 'michelson_kernel.cli:cli'
 
 [tool.isort]
 line_length = 140

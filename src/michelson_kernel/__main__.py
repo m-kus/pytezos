@@ -1,5 +1,4 @@
-from ipykernel.kernelapp import IPKernelApp  # type: ignore
+from michelson_kernel.cli import cli
 
-from michelson_kernel.kernel import MichelsonKernel
-
-IPKernelApp.launch_instance(kernel_class=MichelsonKernel)
+if __name__ == '__main__':
+    cli(prog_name='michelson-kernel')

@@ -2,6 +2,13 @@
 
 ![michelson](https://cdn-images-1.medium.com/max/800/1*r_kVx8Rsqa0TLcIaK_WUQw.gif)
 
+### Installation
+
+To install Michelson kernel at current environment run
+```shell
+$ michelson-kernel install
+```
+
 ### How it works
 * Technical details of the REPL implementation  
 https://forum.tezosagora.org/t/michelson-repl-in-a-jupyter-notebook/1749

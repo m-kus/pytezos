@@ -20,7 +20,7 @@ install:
 	poetry install --remove-untracked `if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
 
 install-kernel:
-	poetry run python post-install.py
+	poetry run python -m michelson_kernel install
 
 remove-kernel:
 	jupyter kernelspec uninstall michelson -f
