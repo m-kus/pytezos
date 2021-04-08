@@ -1,17 +1,12 @@
 import logging
 import logging.config
 
-DEFAULT_LOGGER_CONFIG = {
+DEFAULT_LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'brief': {
             'format': '%(message)s',
-        },
-    },
-    'loggers': {
-        'urllib3.connectionpool': {
-            'level': 'INFO',
         },
     },
     'handlers': {
@@ -21,12 +16,15 @@ DEFAULT_LOGGER_CONFIG = {
             'stream': 'ext://sys.stdout',
         }
     },
-    'root': { 
+    'root': {
         'handlers': ['default'],
         'level': 'INFO',
         'propagate': False
     }
 }
 
-logging.config.dictConfig(DEFAULT_LOGGER_CONFIG)
-logger = logging.getLogger()
+
+if not logging.getLogger().hasHandlers():
+    logging.config.dictConfig(DEFAULT_LOGGING_CONFIG)
+
+logger = logging.getLogger('pytezos')

@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 from typing import Optional, Union
 
@@ -6,7 +7,7 @@ from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.contract.call import ContractCall
 from pytezos.contract.interface import ContractInterface
 from pytezos.crypto.key import Key
-from pytezos.jupyter import get_class_docstring
+from pytezos.jupyter import get_class_docstring, is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup
@@ -129,6 +130,8 @@ class PyTezosClient(ContextMixin, ContentMixin):
 
     @loglevel.setter
     def loglevel(self, value: Union[str, int]) -> None:
+        if is_interactive():
+            logging.getLogger().setLevel(value)
         logger.setLevel(value)
 
     def activate_protocol(self, protocol_hash: str) -> BlockHeader:
