@@ -1,6 +1,6 @@
 import logging
 from decimal import Decimal
-from typing import Optional, Union
+from typing import List, Optional, Tuple, Union
 
 from pytezos.block.header import BlockHeader
 from pytezos.context.mixin import ContextMixin  # type: ignore
@@ -11,7 +11,9 @@ from pytezos.jupyter import get_class_docstring, is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup
+from pytezos.operation.result import OperationResult
 from pytezos.rpc import ShellQuery
+from pytezos.rpc.node import RpcError
 from pytezos.sandbox.parameters import get_protocol_parameters
 
 
@@ -180,3 +182,54 @@ class PyTezosClient(ContextMixin, ContentMixin):
             signature=signature,
             message=self.failing_noop(message).message(block=block),
         )
+
+    def wait(
+        self,
+        *operation_groups: OperationGroup,
+        check_result: bool = True,
+        min_confirmations: int = 1,
+        num_blocks_wait: int = 5,
+        time_between_blocks: Optional[int] = None,
+    ) -> Tuple[OperationGroup, ...]:
+
+        logger.info('Waiting for %s confirmations in %s blocks', min_confirmations, num_blocks_wait)
+        in_mempool = {opg: True for opg in operation_groups}
+        confirmations = {opg: 0 for opg in operation_groups}
+        for _ in range(num_blocks_wait):
+            logger.info('Waiting for the next block')
+            self.shell.wait_next_block(time_between_blocks=time_between_blocks)
+
+            for opg in operation_groups:
+
+                if in_mempool[opg]:
+                    try:
+                        pending_opg = self.shell.mempool.pending_operations[opg.opg_hash]
+                        if not OperationResult.is_applied(pending_opg):
+                            raise RpcError.from_errors(OperationResult.errors(pending_opg))
+                        logger.info('Operation %s is still in mempool', opg.opg_hash)
+                        continue
+                    except StopIteration:
+                        in_mempool[opg] = False
+
+                try:
+                    res = self.shell.blocks[-1:].find_operation(opg.opg_hash)
+                except StopIteration:
+                    logger.info('Operation %s not found in lastest block', opg.opg_hash)
+                    continue
+
+                if check_result:
+                    if not OperationResult.is_applied(res):
+                        raise RpcError.from_errors(OperationResult.errors(res))
+
+                confirmations[opg] += 1
+                logger.info('Got %s/%s confirmations of %s', confirmations[opg], min_confirmations, opg.opg_hash)
+
+            for value in confirmations.values():
+                if value < min_confirmations:
+                    break
+            else:
+                return operation_groups
+
+        required_confirmations = min_confirmations * len(operation_groups)
+        gathered_confirmations = sum(confirmations.values())
+        raise TimeoutError(f'Operations got {gathered_confirmations}/{required_confirmations} confirmations in {num_blocks_wait} blocks')

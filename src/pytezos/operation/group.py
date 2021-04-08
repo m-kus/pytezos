@@ -39,6 +39,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         self.chain_id = chain_id
         self.branch = branch
         self.signature = signature
+        self.opg_hash = None
 
     def __repr__(self):
         res = [
@@ -309,22 +310,15 @@ class OperationGroup(ContextMixin, ContentMixin):
     ):
         """Inject the signed operation group.
 
-        :param check_result: raise RpcError in case operation is applied but has runtime errors
-        :param num_blocks_wait: number of blocks to wait for injection
-        :param time_between_blocks: override the corresponding parameter from constants
-        :param min_confirmations: number of block injections to wait for before returning
         :returns: operation group with metadata (raw RPC response)
         """
-        if kwargs.get('_async'):
-            logger.warning('`_async` argument is deprecated, use `min_confirmations` instead')
-            min_confirmations = 0 if kwargs['_async'] is True else 1
-
         self.context.reset()
 
         opg_hash = self.shell.injection.operation.post(
             operation=self.binary_payload(),
             _async=False,
         )
+        self.opg_hash = opg_hash
 
         if min_confirmations == 0:
             return {
