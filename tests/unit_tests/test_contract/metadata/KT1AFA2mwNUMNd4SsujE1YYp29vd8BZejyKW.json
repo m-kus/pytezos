@@ -1,0 +1,16 @@
+{
+    "authors": [
+        "@hicetnunc2000 <hicetnunc2000@protonmail.com>"
+    ],
+    "description": "Hic et nunc DAO FA2 Token",
+    "homepage": "https://hicetnunc.xyz",
+    "interfaces": [
+        "TZIP-12"
+    ],
+    "license": {
+        "name": "MIT"
+    },
+    "name": "hDAO",
+    "repository": "https://github.com/hicetnunc2000",
+    "version": "2.0.0"
+}

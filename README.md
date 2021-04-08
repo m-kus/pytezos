@@ -38,7 +38,9 @@
 
 ## Installation
 
-```
+### From PyPi
+
+```shell
 $ pip install pytezos
 ```
 

@@ -1,19 +1,7 @@
 from pytezos.michelson.forge import (forge_address, forge_array, forge_base58, forge_bool, forge_micheline, forge_nat, forge_public_key,
                                      forge_script)
+from pytezos.operation.kind import operation_tags
 
-operation_tags = {
-    'endorsement': 0,
-    'proposal': 5,
-    'ballot': 6,
-    'seed_nonce_revelation': 1,
-    'double_endorsement_evidence': 2,
-    'double_baking_evidence': 3,
-    'activate_account': 4,
-    'reveal': 107,
-    'transaction': 108,
-    'origination': 109,
-    'delegation': 110
-}
 reserved_entrypoints = {
     'default': b'\x00',
     'root': b'\x01',
@@ -28,10 +16,8 @@ def has_parameters(content):
         if content['parameters']['entrypoint'] == 'default' \
                 and content['parameters']['value'] == {'prim': 'Unit'}:
             return False
-        else:
-            return True
-    else:
-        return False
+        return True
+    return False
 
 
 def forge_entrypoint(entrypoint) -> bytes:
@@ -51,6 +37,7 @@ def forge_operation(content) -> bytes:
     :param content: {.., "kind": "transaction", ...}
     """
     encode_content = {
+        'failing_noop': forge_failing_noop,
         'activate_account': forge_activate_account,
         'reveal': forge_reveal,
         'transaction': forge_transaction,
@@ -146,4 +133,10 @@ def forge_delegation(content):
     else:
         res += forge_bool(False)
 
+    return res
+
+
+def forge_failing_noop(content):
+    res = forge_nat(operation_tags[content['kind']])
+    res += forge_array(content['arbitrary'].encode())
     return res

@@ -82,9 +82,13 @@ def parse_micheline_value(val_expr, handlers: Dict[Tuple[str, int], Callable]):
 
 def parse_micheline_literal(val_expr, handlers: Dict[str, Callable]):
     assert isinstance(val_expr, dict), f'expected dict, got {pformat(val_expr)}'
-    core_type, value = next((k, v) for k, v in val_expr.items() if k[0] != '_' and k != 'annots')
+    try:
+        core_type, value = next((k, v) for k, v in val_expr.items() if k[0] != '_' and k != 'annots')
+    except StopIteration as e:
+        raise Exception(f'Can\'t parse literal `{val_expr}`') from e
     expected = ' or '.join(map(lambda x: f'`{x}`', handlers))
-    assert core_type in handlers, f'expected one of {expected}, got {core_type}'
+    if core_type not in handlers:
+        raise Exception(f'Expected one of {expected}, got {core_type}')
     handler = handlers[core_type]
     return handler(value)
 
@@ -177,7 +181,7 @@ class Micheline(metaclass=ErrorTrace):
                 try:
                     return cls.create_type(args=list(map(Micheline.match, args)), annots=annots)
                 except Exception as e:
-                    raise MichelsonRuntimeError(cls.prim, *e.args)
+                    raise MichelsonRuntimeError(cls.prim, *e.args) from e
             else:
                 literal = parse_micheline_literal(expr, {
                     'int': int,
@@ -281,8 +285,9 @@ class MichelineLiteral(Micheline):
 def validate_sections(sequence: Type[MichelineSequence], sections: Sequence[str]) -> None:
     if len(sequence.args) != len(sections):
         raise Exception(f'expected {len(sections)} sections, got {len(sequence.args)}')
-    if {arg.prim for arg in sequence.args} != set(sections):
-        raise Exception(f'Unknown sections, expected: {sections}')
+    sequence_sections = {arg.prim for arg in sequence.args}
+    if sequence_sections != set(sections):
+        raise Exception(f'Unknown sections {sequence_sections}, expected: {sections}')
 
 
 @overload

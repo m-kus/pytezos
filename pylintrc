@@ -8,5 +8,6 @@ disable=
     invalid-name,
     too-many-arguments,
     too-many-locals,
+    too-many-public-methods,
     too-few-public-methods,
     bad-mcs-classmethod-argument

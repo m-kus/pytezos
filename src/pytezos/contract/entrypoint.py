@@ -22,8 +22,8 @@ class ContractEntrypoint(ContextMixin):
     def __repr__(self):
         res = [
             super(ContractEntrypoint, self).__repr__(),
-            f'.entrypoint  # {self.entrypoint}',
-            f'\nBuiltin\n(*args, **kwargs)  # build transaction parameters (see typedef)',
+            f'.entrypoint\t{self.entrypoint}',
+            f'\nBuiltin\n(*args, **kwargs)\t# build transaction parameters (see typedef)',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',
             get_class_docstring(self.__class__)
@@ -47,8 +47,10 @@ class ContractEntrypoint(ContextMixin):
         else:
             py_obj = None
 
-        return ContractCall(context=self.context,
-                            parameters=self.encode(py_obj, self.context.mode))
+        return ContractCall(
+            context=self.context,
+            parameters=self.encode(py_obj, self.context.mode),
+        )
 
     def decode(self, value, entrypoint: Optional[str] = None) -> dict:
         """ Convert from Michelson to Python type system
@@ -79,4 +81,4 @@ class ContractEntrypoint(ContextMixin):
                 .to_parameters(mode=mode or self.context.mode)
         except MichelsonRuntimeError as e:
             logger.info(self.__doc__)
-            raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args)
+            raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args) from e

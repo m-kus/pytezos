@@ -1,0 +1,18 @@
+{
+    "views": [
+        {
+            "name": "getPet",
+            "pure": true,
+            "implementations": [
+                {
+                    "restApiQuery": {
+                        "specificationUri": "https://petstore.swagger.io/v2/swagger.json",
+                        "baseUri": "https://petstore.swagger.io/v2/",
+                        "path": "/pet/getPetById",
+                        "method": "GET"
+                    }
+                }
+            ]
+        }
+    ]
+}

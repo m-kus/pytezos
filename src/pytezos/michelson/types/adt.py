@@ -49,8 +49,11 @@ def wrap_or(obj, path) -> Nested:
 
 
 def wrap_pair(obj: dict, path='') -> Nested:
-    items = [obj[subpath] if subpath in obj else wrap_pair(obj, subpath)
-             for subpath in [path + '0', path + '1']]
+    items = [
+        obj[subpath] if subpath in obj else wrap_pair(obj, subpath)
+        for subpath
+        in [path + '0', path + '1']
+    ]
     return Nested(*items)
 
 

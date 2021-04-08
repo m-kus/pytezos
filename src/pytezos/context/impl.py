@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Optional, Tuple
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.context.abstract import get_originated_address
+from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
+from pytezos.logging import logger
 from pytezos.michelson.micheline import get_script_section
 from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
@@ -98,10 +98,40 @@ class ExecutionContext(AbstractContext):
 
     def get_counter(self) -> int:
         if self.counter is None:
-            assert self.key, f'key is undefined'
-            self.counter = int(self.shell.contracts[self.key.public_key_hash()]()['counter'])  # type: ignore
+            if not self.key:
+                raise Exception('key is undefined')
+            if not self.shell:
+                raise Exception('shell is undefined')
+
+            key_hash = self.key.public_key_hash()
+            self.counter = int(self.shell.contracts[key_hash]()['counter'])
+
         self.counter += 1
         return self.counter
+
+    def get_counter_offset(self) -> int:
+        """Return current count of pending transactions in mempool.
+        """
+        if self.key is None:
+            raise Exception('`key` is not set')
+        if self.shell is None:
+            raise Exception('`shell` is not set')
+
+        counter_offset = 0
+        key_hash = self.key.public_key_hash()
+        mempool = self.shell.mempool.pending_operations()
+
+        for operations in mempool.values():
+            for operation in operations:
+                if isinstance(operation, list):
+                    operation = operation[1]
+                for content in operation.get('contents', []):
+                    if content.get('source') == key_hash:
+                        logger.debug("pending transaction in mempool: %s" % content)
+                        counter_offset += 1
+
+        logger.debug("counter offset: %s" % counter_offset)
+        return counter_offset
 
     def register_big_map(self, ptr: int, copy=False) -> int:
         if copy:
@@ -140,13 +170,13 @@ class ExecutionContext(AbstractContext):
         assert amount <= balance, f'cannot spend {amount} tez, {balance} tez left'
         self.balance_update -= amount
 
-    def get_parameter_expr(self, address=None):
+    def get_parameter_expr(self, address=None) -> Optional[str]:
         if self.shell and address:
             if address == get_originated_address(0):
                 return None  # dummy callback
             else:
                 script = self.shell.contracts[address].script()
-                return get_script_section(script, name='parameter')
+                return get_script_section(script, name='parameter', cls=None, required=True)
         return None if address else self.parameter_expr
 
     def get_storage_expr(self):

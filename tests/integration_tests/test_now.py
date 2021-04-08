@@ -17,8 +17,8 @@ class TestNow(TestCase):
 
     @parameterized.expand([
         ('mainnet',),
-        ('edonet',),
-        ('delphinet',)
+        ('edo2net',),
+        ('delphinet',),
     ])
     def test_now(self, network):
         contract = ContractInterface.from_michelson(code).using(network)

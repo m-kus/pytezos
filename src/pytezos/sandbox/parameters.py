@@ -1,5 +1,32 @@
+from pytezos.crypto.key import Key
+
 EDO = 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
 FLORENCE = 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i'
+
+sandbox_commitment = {
+  "mnemonic": [
+    "arctic",
+    "blame",
+    "brush",
+    "economy",
+    "solar",
+    "swallow",
+    "canvas",
+    "live",
+    "vote",
+    "two",
+    "post",
+    "neutral",
+    "spare",
+    "split",
+    "fall"
+  ],
+  "secret": "7375ef222cc038001b6c8fb768246c86e994745b",
+  "amount": "38323962971",
+  "pkh": "tz1W86h1XuWy6awbNUTRUgs6nk8q5vqXQwgk",
+  "password": "ZuPOpZgMNM",
+  "email": "nbhcylbg.xllfjgrk@tezos.example.org"
+}
 
 sandbox_addresses = {
     'activator': 'tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV',
@@ -16,10 +43,12 @@ sandbox_params = {
         ['edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9', '4000000000000'],
         ['edpkuTXkJDGcFd5nh6VvMz8phXxU3Bi7h6hqgywNFi1vZTfQNnS1RV', '4000000000000'],
         ['edpkuFrRoDSEbJYgxRtLx2ps82UdaYc1WwfS9sE11yhauZt5DgCHbU', '4000000000000'],
-        ['edpkv8EUUH68jmo3f7Um5PezmfGrRF24gnfLpH3sVNwJnV5bVCxL2n', '4000000000000']
+        ['edpkv8EUUH68jmo3f7Um5PezmfGrRF24gnfLpH3sVNwJnV5bVCxL2n', '4000000000000'],
     ],
     'bootstrap_contracts': [],
-    'commitments': [],
+    'commitments': [
+        [Key.from_faucet(sandbox_commitment).blinded_public_key_hash(), '100500000000']
+    ],
     'preserved_cycles': 2.0,
     'blocks_per_cycle': 8.0,
     'blocks_per_commitment': 4.0,

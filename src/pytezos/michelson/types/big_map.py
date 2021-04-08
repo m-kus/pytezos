@@ -119,8 +119,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             return {'int': str(self.ptr)}
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
-        assert not comparable, f'big_map is not comparable'
         if lazy_diff:
+            assert not comparable, f'big_map is not comparable'
             res = super(BigMapType, self).to_python_object(try_unpack=try_unpack)
             removals = {key.to_python_object(try_unpack=try_unpack, comparable=True): None
                         for key in self.removed_keys}

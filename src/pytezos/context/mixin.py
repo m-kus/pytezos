@@ -106,21 +106,22 @@ class ContextMixin(metaclass=InlineDocstring):
             '\nProperties'
         ]
         if self.context.key is not None:
-            res.append(f'.key  # {self.key.public_key_hash()}')
+            res.append(f'.key\t\t{self.key.public_key_hash()}')
         if self.context.shell is not None:
-            res.append(f'.shell  # {self.shell.node.uri}')
+            res.append(f'.shell\t\t{self.shell.node.uri}')
         if self.context.address is not None:
-            res.append(f'.address  # {self.address}')
+            res.append(f'.address\t{self.address}')
         if self.context.block_id is not None:
-            res.append(f'.block_id  # {self.block_id}')
+            res.append(f'.block_id\t{self.block_id}')
         return '\n'.join(res)
 
     def _spawn_context(self,
                        shell: Optional[Union[ShellQuery, str]] = None,
-                       key: Optional[Union[Key, str]] = None,
+                       key: Optional[Union[Key, str, dict]] = None,
                        address: Optional[str] = None,
                        block_id: Optional[Union[str, int]] = None,
-                       mode: Optional[str] = None) -> ExecutionContext:
+                       mode: Optional[str] = None,
+                       script: Optional[dict] = None) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
                 shell = shell.split('.')[0]
@@ -144,6 +145,8 @@ class ContextMixin(metaclass=InlineDocstring):
                 key = Key.from_faucet(key)
             else:
                 key = Key.from_alias(key)
+        elif isinstance(key, dict):
+            key = Key.from_faucet(key)
         else:
             assert key is None or isinstance(key, Key), f'unexpected key {key}'
 
@@ -151,14 +154,12 @@ class ContextMixin(metaclass=InlineDocstring):
             try:
                 script = self.shell.contracts[address].script()
             except RpcError as e:
-                raise RpcError(f'Contract {address} not found', *e.args)
-        else:
-            script = self.context.script
+                raise RpcError(f'Contract {address} not found', *e.args) from e
 
         return ExecutionContext(
             shell=shell or self.context.shell,
             key=key or self.context.key,
             address=address,
             block_id=block_id,
-            script=script,
+            script=script or self.context.script,
             mode=mode or self.context.mode)

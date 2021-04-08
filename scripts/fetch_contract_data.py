@@ -1,5 +1,4 @@
 import requests
-import logging
 import json
 from os import makedirs
 from os.path import dirname, join, exists
@@ -7,7 +6,7 @@ from os.path import dirname, join, exists
 from pytezos.logging import logger
 
 network = 'mainnet'
-api_host = 'test.better-call.dev'
+api_host = 'api.better-call.dev'
 since = 1590969600
 
 
@@ -84,7 +83,7 @@ def fetch_contract_samples(max_count=100):
     contracts = iter_bcd_contracts(max_count=max_count)
     for contract in contracts:
         name = normalize_alias(contract.get('alias', '')) or contract['address']
-        folder = join(dirname(dirname(__file__)), 'tests', 'contract', name)
+        folder = join(dirname(dirname(__file__)), 'tests', 'contract_tests', name)
         if exists(folder):
             continue
         else:
