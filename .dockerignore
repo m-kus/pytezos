@@ -18,5 +18,7 @@ __pycache__
 .dockerignore
 .gitignore
 Dockerfile
+*.dockerfile
+docker-compose.yml
 LICENSE
 .git

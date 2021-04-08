@@ -3,7 +3,7 @@ services:
   notebook:
     build:
       context: .
-      dockerfile: Dockerfile.notebook
+      dockerfile: Kernel.dockerfile
     ports:
       - 8888:8888
 

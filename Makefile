@@ -56,10 +56,15 @@ image:
 
 docs:
 	cd docs && rm -rf ./build && $(MAKE) html && cd ..
-	python scripts/gen_docs_py.py
+
+kernel-docs:
+	python scripts/gen_kernel_docs_py.py
 
 rpc-docs:
 	python scripts/fetch_docs.py
+
+binder:
+
 
 release-patch:
 	bumpversion patch

@@ -5,6 +5,7 @@
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/bakingbad/pytezos)](https://hub.docker.com/r/bakingbad/pytezos)
 [![Made With](https://img.shields.io/badge/made%20with-python-blue.svg?)](ttps://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/baking-bad/pytezos/binder?filepath=michelson_quickstart.ipynb)
 
 
 * RPC query engine
@@ -111,7 +112,8 @@ but if you feel lucky you can try to install natively:
 5. Copy libsodium.dll to C:\Windows\System32\libsodium.dll
 
 ## Quick start
-Read [quick start guide](https://pytezos.org/quick_start.html)
+Read [quick start guide](https://pytezos.org/quick_start.html)  
+Learn how to [enable Jupyter with Michelson](./src/michelson_kernel/README.md)
 
 ## API reference
 Check out a complete [API reference](https://pytezos.org/contents.html)
@@ -124,76 +126,6 @@ you can display documentation for a particular class/method:
 >>> from pytezos import pytezos
 >>> pytezos
 ```
-
-## Jupyter kernel
-
-![michelson](https://cdn-images-1.medium.com/max/800/1*r_kVx8Rsqa0TLcIaK_WUQw.gif)
-
-### How it works
-* Technical details of the REPL implementation  
-https://forum.tezosagora.org/t/michelson-repl-in-a-jupyter-notebook/1749
-* Interactive tutorial demonstrating REPL features  
-https://mybinder.org/v2/gh/baking-bad/michelson-kernel/binder?filepath=michelson_quickstart.ipynb
-* Same, but a rendered version  
-https://nbviewer.jupyter.org/github/baking-bad/michelson-kernel/blob/binder/michelson_quickstart.ipynb
-
-### Sample notebooks
-Located in the current repository in a separate branch:  
-https://github.com/baking-bad/michelson-kernel/tree/binder
-
-### List of helpers
-These instructions are not Michelson primitives and thus cannot be used outside of the Jupyter.  
-In the Jupyter editor helpers are highlighted in blue.
-
-#### `DUMP`
-Returns the whole stack with values, types, and annotations if any.
-
-#### `DUMP n`
-Returns top `n` items from the stack.
-
-#### `PRINT "fmt"`
-Prints a formatted string to the stdout, referencing arbitrary stack elements is allowed:  
-`PRINT "This is the top element {0}, and this is the second {1}"`
-
-#### `DROP_ALL`
-Clears the stack.
-
-#### `EXPAND { code }`
-Expands Michelson macros:  
-`EXPAND { PAPAIIR }`
-
-#### `INCLUDE path`
-Loads Michelson source from the filesystem (absolute or relative path) `INCLUDE "test.tz"`, or from one of the Tezos networks `INCLUDE "mainnet:KT1VG2WtYdSWz5E7chTeAdDPZNy2MpP8pTfL"`. Initializes `parameter`, `storage`, and `code` sections. If loaded from the network, current storage is also written to the `STORAGE` variable and can be accessed later. 
-
-#### `PATCH prim value`
-Sets value for on of the context-dependent Michelson instructions: `AMOUNT`, `BALANCE`, `NOW`, `SOURCE`, `SENDER`, `CHAIN_ID`.
-
-#### `DEBUG bool`
-Enables or disables verbose output: `DEBUG False` or `DEBUG True`.
-
-#### `BIG_MAP_DIFF`
-Takes the top of the stack, searches for temporary `big_map` instances in that element, and displays what the big_map_diff would be like if it was a contract execution ending.
-
-#### `BEGIN %entrypoint (param_expr) (storage_expr)`
-Simulates the contract execution beginning. Requires `parameter` and `storage` sections initialized. Also, clears the stack.  
-The `%entrypoint` argument can be omitted, `%default` will be used in that case.  
-This helper also allocates temporary big_map instances if any in parameters or storage.  
-You can use `STORAGE` variable for the `storage_expr`, in case you have previously loaded it from the network.
-
-#### `COMMIT`
-Simulates the contract execution ending. Requires a `Pair` of operation list and valid storage on top of the stack. Returns a list of internal operations, new storage, and big_map_diff.
-
-#### `RESET`
-Clears the stack, deletes all big_map instances.
-
-#### `RESET "network"`
-Does the same as the version without parameters, but also initializes `NETWORK` and `CHAIN_ID` variables.  
-Can be used to set real network context in order to access blockchain data.
-
-#### `RUN %entrypoint (param_expr) (storage_expr)`
-Requires `code` section initializes. Internally calls `BEGIN`, then executes `code`, and finishes with `COMMIT`.
-
-Check out the articles and tutorial for more technical details, also you can take a look at the [implementation](https://github.com/baking-bad/pytezos/blob/master/pytezos/repl/helpers.py).
 
 ### Publications
 
@@ -208,24 +140,6 @@ https://medium.com/tezoscommons/preparing-for-the-tezos-hackathon-with-baking-ba
 
 * Introducing integration testing engine  
 https://medium.com/tezoscommons/testing-michelson-contracts-with-pytezos-513718499e93
-
-### Additional materials
-
-* Interacting with FA1.2 contract by TQTezos  
-https://assets.tqtezos.com/token-contracts/1-fa12-lorentz#interactusingpytezos
-* Deploying a contract by Vadim Manaenko  
-https://blog.aira.life/tezos-dont-forget-the-mother-console-fd2001261e50
-
-### Michelson test samples
-
-* In this repo  
-https://github.com/baking-bad/pytezos/tree/master/examples
-* Atomex (atomic swaps aka cross-chain transactions)  
-https://github.com/atomex-me/atomex-michelson/blob/master/tests/test_atomex.py
-* Atomex for FA1.2 (includes cross-contract interaction and views)  
-https://github.com/atomex-me/atomex-fa12-ligo/tree/master/tests
-* MultiAsset implementation tests (in a sandbox environment)  
-https://github.com/tqtezos/smart-contracts/tree/master/multi_asset/tezos_mac_tests
 
 ### Contact
 * Telegram chat: [@baking_bad_chat](https://t.me/baking_bad_chat)
