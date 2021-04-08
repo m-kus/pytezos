@@ -30,8 +30,8 @@ Michelson integration testing framework:
 ### Requirements
 
 * git
-* python 3.6+
-* pip 19.0.1+
+* python 3.7+
+* pip 20.2+
 
 You will also probably need to install several cryptographic packets.
 
