@@ -293,6 +293,7 @@ class ContractInterface(ContextMixin):
             token_metadata_url = self.storage['token_metadata'][token_id]['token_info']['']().decode()
         # FIXME: Dirty
         except (KeyError, AssertionError):
+            self._logger.info('Storage doesn\'t contain metadata URL for token %s', token_id)
             return None
     
         self._logger.info('Trying to fetch contract token metadata from `%s`', token_metadata_url)
@@ -329,7 +330,11 @@ class ContractInterface(ContextMixin):
         try:
             token_metadata_json = self.metadata.tokenMetadata(token_id).storage_view()[1]
             return ContractTokenMetadata.from_json(token_metadata_json)
-        except (KeyError, MichelsonRuntimeError):
+        except KeyError:
+            self._logger.info('There\'s no off-chain view named `token_metadata`')
+            return None
+        except MichelsonRuntimeError:
+            self._logger.info('Off-chain view has no token metadata for token_id %s', token_id)
             return None
 
     @cached_property
