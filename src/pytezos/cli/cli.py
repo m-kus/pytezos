@@ -8,7 +8,7 @@ from pprint import pformat
 from typing import Optional
 
 import click
-import docker
+import docker  # type: ignore
 
 from pytezos import ContractInterface, __version__, pytezos
 from pytezos.cli.github import create_deployment, create_deployment_status
