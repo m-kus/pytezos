@@ -198,6 +198,7 @@ class ContractInterface(ContextMixin):
         key: Optional[Union[Key, str]] = None,
         block_id: Optional[Union[str, int]] = None,
         mode: Optional[str] = None,
+        ipfs_gateway: Optional[str] = None,
     ) -> 'ContractInterface':
         """Change the block at which the current contract is inspected.
         Also, if address is undefined you can specify RPC endpoint, and private key.
@@ -216,6 +217,7 @@ class ContractInterface(ContextMixin):
                 address=self.context.address,
                 block_id=block_id,
                 mode=mode,
+                ipfs_gateway=ipfs_gateway,
             )
         )
 

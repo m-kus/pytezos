@@ -16,7 +16,7 @@ class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
-                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=DEFAULT_IPFS_GATEWAY):
+                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=None):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
@@ -56,7 +56,7 @@ class ExecutionContext(AbstractContext):
         self.tzt_big_maps = {}
         self.debug = False
         self._sandboxed: Optional[bool] = None
-        self.ipfs_gateway = ipfs_gateway.rstrip('/')
+        self.ipfs_gateway = (ipfs_gateway or DEFAULT_IPFS_GATEWAY).rstrip('/')
 
     def __copy__(self):
         raise ValueError("It's not allowed to copy context")

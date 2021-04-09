@@ -111,10 +111,13 @@ class PyTezosClient(ContextMixin, ContentMixin):
         """
         return ContractInterface.from_context(self._spawn_context(address=address))
 
-    def using(self,
-              shell: Optional[Union[ShellQuery, str]] = None,
-              key: Optional[Union[Key, str, dict]] = None,
-              mode: Optional[str] = None):
+    def using(
+        self,
+        shell: Optional[Union[ShellQuery, str]] = None,
+        key: Optional[Union[Key, str, dict]] = None,
+        mode: Optional[str] = None,
+        ipfs_gateway: Optional[str] = None,
+    ):
         """ Change current rpc endpoint and account (private key).
 
         :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
@@ -122,7 +125,14 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param mode: whether to use `readable` or `optimized` encoding for parameters/storage/other
         :returns: A copy of current object with changes applied
         """
-        return PyTezosClient(context=self._spawn_context(shell=shell, key=key, mode=mode))
+        return PyTezosClient(
+            context=self._spawn_context(
+                shell=shell,
+                key=key,
+                mode=mode,
+                ipfs_gateway=ipfs_gateway,
+            )
+        )
 
     @property
     def loglevel(self) -> int:

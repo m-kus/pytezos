@@ -1,7 +1,7 @@
 from os.path import exists, expanduser
 from typing import Optional, Union
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
+from pytezos.context.impl import DEFAULT_IPFS_GATEWAY, ExecutionContext  # type: ignore
 from pytezos.crypto.encoding import is_pkh, is_public_key
 from pytezos.crypto.key import Key, is_installed
 from pytezos.jupyter import InlineDocstring
@@ -115,13 +115,16 @@ class ContextMixin(metaclass=InlineDocstring):
             res.append(f'.block_id\t{self.block_id}')
         return '\n'.join(res)
 
-    def _spawn_context(self,
-                       shell: Optional[Union[ShellQuery, str]] = None,
-                       key: Optional[Union[Key, str, dict]] = None,
-                       address: Optional[str] = None,
-                       block_id: Optional[Union[str, int]] = None,
-                       mode: Optional[str] = None,
-                       script: Optional[dict] = None) -> ExecutionContext:
+    def _spawn_context(
+        self,
+        shell: Optional[Union[ShellQuery, str]] = None,
+        key: Optional[Union[Key, str, dict]] = None,
+        address: Optional[str] = None,
+        block_id: Optional[Union[str, int]] = None,
+        mode: Optional[str] = None,
+        script: Optional[dict] = None,
+        ipfs_gateway: Optional[str] = None,
+    ) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
                 shell = shell.split('.')[0]
@@ -162,4 +165,6 @@ class ContextMixin(metaclass=InlineDocstring):
             address=address,
             block_id=block_id,
             script=script or self.context.script,
-            mode=mode or self.context.mode)
+            mode=mode or self.context.mode,
+            ipfs_gateway=ipfs_gateway,
+        )
