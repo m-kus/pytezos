@@ -1,10 +1,13 @@
+import io
+import tarfile
 import sys
 from glob import glob
-from os.path import abspath, dirname, exists, join
+from os.path import abspath, dirname, exists, join, split
 from pprint import pformat
-from typing import Optional
+from typing import Optional, List
 
 import click
+import docker  # type: ignore
 
 from pytezos import ContractInterface, __version__, pytezos
 from pytezos.cli.github import create_deployment, create_deployment_status
@@ -22,23 +25,35 @@ kernel_json = {
     "codemirror_mode": "michelson",
 }
 
+SMARTPY_CLI_IMAGE = 'trufflesuite/smartpy-basic'
+
 
 def make_bcd_link(network, address):
     return f'https://better-call.dev/{network}/{address}'
 
 
-def get_contract(path):
+def get_local_contract_path(path, extension='tz'):
     if path is None:
-        files = glob('*.tz')
+        files = glob(f'*.{extension}')
         if len(files) != 1:
             raise Exception('No contracts found in working directory, specify --path implicitly')
-        contract = ContractInterface.from_file(abspath(files[0]))
-    elif exists(path):
+        path = abspath(files[0])
+    if exists(path):
+        return path
+    return False
+
+def get_contract(path):
+    path = get_local_contract_path(path)
+    if path:
         contract = ContractInterface.from_file(path)
     else:
         network, address = path.split(':')
         contract = pytezos.using(shell=network).contract(address)
     return contract
+
+
+def get_docker_client():
+    return docker.from_env()
 
 
 @click.group()
@@ -171,6 +186,117 @@ def deploy(
                 environment_url=bcd_link,
             )
             logger.info(status)
+
+
+@cli.command(help='Update containerized SmartPy CLI')
+@click.option('--tag', '-t', type=str, help='Version or tag to pull', default='latest')
+@click.pass_context
+def update_smartpy(
+    _ctx,
+    tag: str,
+):
+    client = get_docker_client()
+    logger.info('Will now pull latest SmartPy image, please stay put.')
+    for line in client.api.pull(f'{SMARTPY_CLI_IMAGE}:{tag}', stream=True, decode=True):
+        logger.info(line)
+    logger.info('Pulled SmartPy image successfully!')
+
+
+def run_smartpy_container(
+    tag: str = 'latest',
+    command: str = '',
+    files_to_add: List[str] = [],
+):
+    try:
+        client = get_docker_client()
+        container = client.containers.create(
+            image=f'{SMARTPY_CLI_IMAGE}:{tag}',
+            command=command,
+            detach=True,
+        )
+        buffer = io.BytesIO()
+        with tarfile.open(fileobj=buffer, mode='w:gz') as archive:
+            for filename in files_to_add:
+                with open(filename, 'rb') as current_file:
+                    current_file_data = current_file.read()
+                    current_file_buffer = io.BytesIO(initial_bytes=current_file_data)
+                    _, short_filename = split(filename)
+                    archive.add(filename, arcname=short_filename)
+        buffer.seek(0)
+        container.put_archive(
+            '/root/smartpy-cli/',
+            buffer,
+        )
+        container.start()
+        return container
+    except docker.errors.ImageNotFound:
+        logger.error('SmartPy compiler not found. Please run update-smartpy first.')
+
+
+@cli.command(help='Run SmartPy CLI command "test"')
+@click.option('--script', '-s', type=str, help='Path to script', default='script.py')
+@click.option('--output-directory', '-o', type=str, help='Output directory', default='./smartpy-output')
+@click.option('--protocol', type=click.Choice(['delphi', 'edo', 'florence', 'proto10']), help='Protocol to use', default='edo')
+@click.option('--detach', '-d', type=bool, help='Run container in detached mode', default=False)
+@click.option('--tag', '-t', type=str, help='Version or tag of SmartPy to use', default='latest')
+@click.pass_context
+def smartpy_test(
+    _ctx,
+    script: str,
+    output_directory: str,
+    detach: bool,
+    protocol: str,
+    tag: str,
+):
+    client = get_docker_client()
+    path = get_local_contract_path(script, extension='py')
+    if path:
+        _, script_name = split(path)
+        container = run_smartpy_container(
+            tag=tag,
+            command=f'test {script_name} {output_directory} --protocol {protocol}',
+            files_to_add=[path,]
+        )
+        if container is None:
+            raise Exception('Could not create container. Try running update-smartpy.')
+        if not detach:
+            for line in container.logs(stream=True):
+                print(line.decode('utf-8').rstrip())
+    else:
+        logger.error('No local script found. Please ensure a valid script is present or specify path.')
+
+
+@cli.command(help='Run SmartPy CLI command "compile"')
+@click.option('--script', '-s', type=str, help='Path to script', default='script.py')
+@click.option('--output-directory', '-o', type=str, help='Output directory', default='./smartpy-output')
+@click.option('--detach', '-d', type=bool, help='Run container in detached mode', default=False)
+@click.option('--protocol', type=click.Choice(['delphi', 'edo', 'florence', 'proto10']), help='Protocol to use', default='edo')
+@click.option('--tag', '-t', type=str, help='Version or tag of SmartPy to use', default='latest')
+@click.pass_context
+def smartpy_compile(
+    _ctx,
+    script: str,
+    output_directory: str,
+    detach: bool,
+    protocol: str,
+    tag: str,
+):
+    client = get_docker_client()
+    path = get_local_contract_path(script, extension='py')
+    if path:
+        _, script_name = split(path)
+        container = run_smartpy_container(
+            tag=tag,
+            command=f'compile {script_name} {output_directory} --protocol {protocol}',
+            files_to_add=[path,]
+        )
+        if container is None:
+            raise Exception('Could not create container. Try running update-smartpy.')
+        if not detach:
+            for line in container.logs(stream=True):
+                print(line.decode('utf-8').rstrip())
+    else:
+        logger.error('No local script found. Please ensure a valid script is present or specify path.')
 
 
 if __name__ == '__main__':
