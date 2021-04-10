@@ -52,6 +52,11 @@ class TestLigoCompiler(TestCase):
     def test_compile_contract(self):
         contract_tmp_file = self._tmp_path / "contract.ligo"
         contract_tmp_file.write_text(TEST_CONTRACT_TEXT)
+
+        # Must update image first because order of tests is not defined
+        result = self.runner.invoke(cli, ['update-ligo'])
+        self.assertEqual(result.exit_code, 0)
+
         result = self.runner.invoke(
             cli,
             [
