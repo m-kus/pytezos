@@ -188,13 +188,15 @@ def deploy(
 @cli.command(help='Run containerized sandbox')
 @click.option('--protocol', type=click.Choice(['Florence', 'Edo']), help='Protocol to use', default='Florence')
 @click.option('--port', '-p', type=int, help='Port to map container port to', default=8732)
-@click.option('--block-time', '-bt', type=int, help='Interval between calls to bake_block (in seconds)', default=1)
+@click.option('--block-time', '-bt', type=float, help='Interval between calls to bake_block (in seconds)', default=1.0)
+@click.option('--n-blocks', '-n', type=int, help='Number of blocks to bake')
 @click.pass_context
 def sandbox(
     _ctx,
     protocol: str,
     port: int,
-    block_time: int,
+    block_time: float,
+    n_blocks: int,
 ):
     client = get_docker_client()
     try:
@@ -217,12 +219,12 @@ def sandbox(
 
     atexit.register(node.stop)
 
-    logger.info('Giving node 2 seconds to start.')
+    logger.info('Giving node 5 seconds to start.')
 
     def end_waiting():
         logger.info('Waiting over.')
 
-    waiting_for_node_start_thread = threading.Timer(2, end_waiting)
+    waiting_for_node_start_thread = threading.Timer(5, end_waiting)
     waiting_for_node_start_thread.start()
     waiting_for_node_start_thread.join()
 
@@ -239,22 +241,19 @@ def sandbox(
         }[protocol]
     ).fill(block_id='genesis').sign().inject()
 
-    def bake_block(min_fee: int = 0):
-        logger.info('Baking block...')
+    def bake_block(block_idx: int = 0, min_fee: int = 0):
+        logger.info(f'Baking block {block_idx}...')
         block = pytezos_client.using(key='bootstrap1').bake_block(min_fee).fill().work().sign().inject()
         logger.info(f'Baked block: {block}')
         return block
 
-    try:
-        while True:
-            baker_thread = threading.Timer(block_time, bake_block)
-            baker_thread.daemon = True
-            baker_thread.start()
-            baker_thread.join()
-    except click.Abort:
-        logger.info('Aborted. Exiting.')
-        client.containers.stop(node)
-        return
+    block_idx = 0
+    while n_blocks is None or block_idx < n_blocks:
+        baker_thread = threading.Timer(block_time, bake_block, kwargs={'block_idx': block_idx})
+        baker_thread.daemon = True
+        baker_thread.start()
+        baker_thread.join()
+        block_idx += 1
 
 
 if __name__ == '__main__':
