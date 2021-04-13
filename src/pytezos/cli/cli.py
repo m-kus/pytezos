@@ -25,7 +25,7 @@ kernel_json = {
     "codemirror_mode": "michelson",
 }
 
-SMARTPY_CLI_IMAGE = 'trufflesuite/smartpy-basic'
+SMARTPY_CLI_IMAGE = 'bakingbad/smartpy-cli'
 
 
 def make_bcd_link(network, address):
@@ -206,6 +206,7 @@ def run_smartpy_container(
     tag: str = 'latest',
     command: str = '',
     files_to_add: List[str] = [],
+    mounts: List[docker.types.Mount] = [],
 ):
     try:
         client = get_docker_client()
@@ -213,6 +214,7 @@ def run_smartpy_container(
             image=f'{SMARTPY_CLI_IMAGE}:{tag}',
             command=command,
             detach=True,
+            mounts=mounts,
         )
         buffer = io.BytesIO()
         with tarfile.open(fileobj=buffer, mode='w:gz') as archive:
@@ -254,8 +256,15 @@ def smartpy_test(
         _, script_name = split(path)
         container = run_smartpy_container(
             tag=tag,
-            command=f'test {script_name} {output_directory} --protocol {protocol}',
-            files_to_add=[path,]
+            command=f'test /root/smartpy-cli/{script_name} /root/output --protocol {protocol}',
+            files_to_add=[path, ],
+            mounts=[
+                docker.types.Mount(
+                    target='/root/output',
+                    source=output_directory,
+                    type='bind'
+                )
+            ]
         )
         if container is None:
             raise Exception('Could not create container. Try running update-smartpy.')
@@ -287,8 +296,15 @@ def smartpy_compile(
         _, script_name = split(path)
         container = run_smartpy_container(
             tag=tag,
-            command=f'compile {script_name} {output_directory} --protocol {protocol}',
-            files_to_add=[path,]
+            command=f'compile /root/smartpy-cli/{script_name} /root/output --protocol {protocol}',
+            files_to_add=[path,],
+            mounts=[
+                docker.types.Mount(
+                    target='/root/output',
+                    source=output_directory,
+                    type='bind'
+                )
+            ]
         )
         if container is None:
             raise Exception('Could not create container. Try running update-smartpy.')
