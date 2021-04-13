@@ -186,6 +186,7 @@ def deploy(
 
 
 @cli.command(help='Run containerized sandbox')
+@click.option('--sandbox-image', type=str, help='Sandbox Docker image to use', default=SANDBOX_IMAGE)
 @click.option('--protocol', type=click.Choice(['Florence', 'Edo']), help='Protocol to use', default='Florence')
 @click.option('--port', '-p', type=int, help='Port to map container port to', default=8732)
 @click.option('--block-time', '-bt', type=float, help='Interval between calls to bake_block (in seconds)', default=1.0)
@@ -193,6 +194,7 @@ def deploy(
 @click.pass_context
 def sandbox(
     _ctx,
+    sandbox_image: str,
     protocol: str,
     port: int,
     block_time: float,
@@ -200,17 +202,17 @@ def sandbox(
 ):
     client = get_docker_client()
     try:
-        client.images.get(SANDBOX_IMAGE)
+        client.images.get(sandbox_image)
     except docker.errors.ImageNotFound:
         logger.info('Will now pull latest sandbox image, please stay put.')
-        image, tag = SANDBOX_IMAGE.split(':')
+        image, tag = sandbox_image.split(':')
         for line in client.api.pull(image, tag=tag, stream=True, decode=True):
             logger.info(line)
         logger.info('Pulled sandbox image successfully!')
 
     logger.info('Starting node.')
     node = client.containers.run(
-        SANDBOX_IMAGE,
+        sandbox_image,
         ports={
             '8732': ('localhost', port)
         },
