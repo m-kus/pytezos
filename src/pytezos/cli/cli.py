@@ -199,7 +199,7 @@ def update_smartpy(
     logger.info('Will now pull latest SmartPy image, please stay put.')
     for line in client.api.pull(f'{SMARTPY_CLI_IMAGE}:{tag}', stream=True, decode=True):
         logger.info(line)
-    logger.info('Pulled SmartPy image successfully!')
+    logger.info('Pulled SmartPy CLI image successfully!')
 
 
 def run_smartpy_container(
