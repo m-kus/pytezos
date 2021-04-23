@@ -17,8 +17,9 @@ node_fitness: int = 1
 
 
 class SandboxedNodeTestCase(unittest.TestCase):
-    IMAGE = 'bakingbad/sandboxed-node:v9.0-rc1-1'
-    PROTOCOL = EDO
+    IMAGE: str = 'bakingbad/sandboxed-node:v9.0-rc1-1'
+    PORT: Optional[int] = None
+    PROTOCOL: str = EDO
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -69,9 +70,12 @@ class SandboxedNodeTestCase(unittest.TestCase):
 
     @classmethod
     def _create_node_container(cls) -> DockerContainer:
-        return DockerContainer(
+        container = DockerContainer(
             cls.IMAGE,
         )
+        if cls.PORT:
+            container.ports[8732] = cls.PORT
+        return container
 
     @classmethod
     def _wait_for_connection(cls) -> None:
