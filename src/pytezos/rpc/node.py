@@ -95,7 +95,6 @@ class RpcNode:
         ]
         return '\n'.join(res)
 
-    @retry
     def request(self, method, path, **kwargs) -> requests.Response:
         logger.debug('>>>>> %s %s\n%s', method, path, json.dumps(kwargs, indent=4))
         res = self._session.request(
@@ -117,6 +116,7 @@ class RpcNode:
         logger.debug('<<<<< %s\n%s', res.status_code, json.dumps(res.json(), indent=4))
         return res
 
+    @retry
     def get(self, path, params=None, timeout=None):
         return self.request('GET', path, params=params, timeout=timeout).json()
 
