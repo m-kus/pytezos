@@ -142,7 +142,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             branch=branch,
         )
 
-    def run(self, block_id='head'):
+    def run(self, block_id: str = 'head'):
         """Simulate operation without signature checks.
 
         :param block_id: Specify a level at which this operation should be applied (default is head)
@@ -284,9 +284,13 @@ class OperationGroup(ContextMixin, ContentMixin):
         hash_digest = blake2b_32(self.binary_payload()).digest()
         return base58_encode(hash_digest, b'o').decode()
 
-    def run_operation(self):
-        # TODO: Docstring
-        return self.shell.blocks['head'].helpers.scripts.run_operation.post(self.json_payload())
+    def run_operation(self, block_id: str = 'head'):
+        """Simulate operation without signature checks.
+
+        :param block_id: Specify a level at which this operation should be applied (default is head)
+        :returns: RPC response from `run_operation`
+        """
+        return self.run(block_id)
 
     @deprecated(deprecated_in='3.1.0', removed_in='4.0.0', details='use `run_operation()` instead')
     def preapply(self):
