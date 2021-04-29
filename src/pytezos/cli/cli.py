@@ -203,16 +203,18 @@ def sandbox(
 
     blocks_baked = 0
     while True:
-        logger.info('Baking block %s...', blocks_baked)
-        block_hash = SandboxedNodeTestCase.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
-        logger.info('Baked block: %s', block_hash)
-        blocks_baked += 1
+        try:
+            logger.info('Baking block %s...', blocks_baked)
+            block_hash = SandboxedNodeTestCase.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
+            logger.info('Baked block: %s', block_hash)
+            blocks_baked += 1
 
-        if blocks and blocks_baked == blocks:
+            if blocks and blocks_baked == blocks:
+                break
+
+            time.sleep(interval)
+        except KeyboardInterrupt:
             break
-
-        time.sleep(interval)
-
 
 if __name__ == '__main__':
     cli(prog_name='pytezos')
