@@ -6,9 +6,10 @@ from tabulate import tabulate
 
 from michelson_kernel import __version__
 from michelson_kernel.docs import docs
-from pytezos import MichelsonType, micheline_to_michelson
+from pytezos import micheline_to_michelson
 from pytezos.michelson.instructions import BigMapDiffInstruction, CommitInstruction
 from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.jupyter import RunInstruction
 from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParserError
 from pytezos.michelson.repl import Interpreter
@@ -160,7 +161,7 @@ class MichelsonKernel(Kernel):
     ]
 
     def __init__(self, **kwargs):
-        super(MichelsonKernel, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.interpreter = Interpreter()
 
     def _stdout(self, text: str) -> None:
@@ -176,8 +177,8 @@ class MichelsonKernel(Kernel):
     def _find_stack_items(self, instructions: MichelineSequence, stack: MichelsonStack) -> Optional[List[MichelsonInstruction]]:
         for operation in instructions.items[::-1]:
             items = getattr(operation, 'items', None)
-            if isinstance(items, MichelineSequence):
-                stack_items = self._find_stack_items(instructions, stack)
+            if isinstance(items, list):
+                stack_items = self._find_stack_items(MichelineSequence(items), stack)
                 if stack_items:
                     return stack_items
             if not isinstance(operation, MichelsonInstruction):
@@ -190,13 +191,15 @@ class MichelsonKernel(Kernel):
         for instruction in instructions.items[::-1]:
             if isinstance(instruction, CommitInstruction) and instruction.lazy_diff:
                 return instruction.lazy_diff
-            elif isinstance(instruction, BigMapDiffInstruction) and instruction.lazy_diff:
+            if isinstance(instruction, BigMapDiffInstruction) and instruction.lazy_diff:
                 return instruction.lazy_diff
         return None
 
     def _find_contract_result(self, instructions: MichelineSequence) -> Optional[PairType]:
         for instruction in instructions.items[::-1]:
-            if isinstance(instruction, CommitInstruction):
+            if isinstance(instruction, MichelineSequence):
+                return self._find_contract_result(instruction)
+            if isinstance(instruction, (CommitInstruction, RunInstruction,)):
                 return instruction.result
         return None
 

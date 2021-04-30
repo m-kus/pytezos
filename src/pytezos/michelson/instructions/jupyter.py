@@ -4,14 +4,17 @@ from typing import Dict, List, Type, cast
 
 import strict_rfc3339  # type: ignore
 
+from typing import cast
 from pytezos.context.abstract import AbstractContext
 from pytezos.context.mixin import nodes
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelsonRuntimeError
+from pytezos.michelson.micheline import MichelineLiteral, MichelsonRuntimeError
 from pytezos.michelson.sections import ParameterSection, StorageSection
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType, OperationType, PairType
 from pytezos.michelson.types.base import MichelsonType
+from pytezos.rpc.node import RpcMultiNode, RpcNode
+from pytezos.rpc.shell import ShellQuery
 
 
 class DumpAllInstruction(MichelsonInstruction, prim='DUMP'):
@@ -62,7 +65,11 @@ class DebugInstruction(MichelsonInstruction, prim='DEBUG', args_len=1):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal = cls.args[0]
-        debug = bool(literal.get_int())  # type: ignore
+        if isinstance(literal.literal, bool):
+            debug = literal.literal
+        else:
+            debug = bool(literal.get_int())  # type: ignore
+
         context.debug = debug  # type: ignore
         return cls()
 
@@ -136,6 +143,31 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
         return cls(lazy_diff=lazy_diff, result=result)
 
 
+class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
+
+    def __init__(self, lazy_diff: List[Dict[str, str]], result, stack_items_added: int = 0) -> None:
+        super().__init__(stack_items_added)
+        self.lazy_diff = lazy_diff
+        self.result = result
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        from pytezos.michelson.program import MichelsonProgram
+
+        entrypoint, parameter_literal, storage_literal = cls.args  # type: ignore
+        entrypoint_str = entrypoint.get_string()  # type: ignore
+
+        parameter = parameter_literal.as_micheline_expr()
+        storage = storage_literal.as_micheline_expr()
+
+        program = MichelsonProgram.load(context, with_code=True).instantiate(entrypoint_str, parameter, storage)  # type: ignore
+        program.begin(stack, stdout, context)
+        program.execute(stack, stdout, context)
+        operations, storage, lazy_diff, res = program.end(stack, stdout)
+
+        return cls(lazy_diff=lazy_diff, result=res)
+
+
 class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):
 
     allowed_primitives = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
@@ -197,6 +229,7 @@ class PatchValueInstruction(MichelsonInstruction, prim='PATCH', args_len=2):
 class ResetInstruction(MichelsonInstruction, prim='RESET'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        context.shell = None  # type: ignore
         context.network = None  # type: ignore
         context.chain_id = None  # type: ignore
         context.big_maps = {}  # type: ignore
@@ -210,11 +243,20 @@ class ResetValueInstruction(MichelsonInstruction, prim='RESET', args_len=1):
         literal: Type[MichelineLiteral]
         literal = cls.args[0]  # type: ignore
 
-        network = literal.get_string()
-        if network not in nodes:
-            raise Exception(f'Expected one of {nodes}, got {network}')
+        shell = literal.get_string()
+        if shell not in nodes:
+            raise Exception(f'Expected one of {nodes}, got {shell}')
 
-        context.network = network  # type: ignore
+        if shell.endswith('.pool'):
+            shell = shell.split('.')[0]
+            assert shell in nodes, f'unknown network {shell}'
+            context.shell = ShellQuery(RpcMultiNode(nodes[shell]))  # type: ignore
+        elif shell in nodes:
+            context.shell = ShellQuery(RpcNode(nodes[shell][0]))  # type: ignore
+        else:
+            context.shell = ShellQuery(RpcNode(shell))  # type: ignore
+
+        context.network = shell  # type: ignore
         context.chain_id = context.shell.chains.main.chain_id()  # type: ignore
         context.big_maps = {}  # type: ignore
         stack.items = []

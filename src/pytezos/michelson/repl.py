@@ -47,7 +47,7 @@ class Interpreter:
         try:
             code_section = CodeSection.match(michelson_to_micheline(code))
             instructions = code_section.args[0].execute(self.stack, result.stdout, self.context)
-            result.instructions = cast(MichelineSequence, instructions)
+            result.instructions = MichelineSequence([instructions])
             result.stack = self.stack
         except (MichelsonParserError, MichelsonRuntimeError) as e:
             if self.context.debug:

@@ -162,6 +162,7 @@ prim_tags = {
     'DROP_ALL': b'\xEE',
     'BEGIN': b'\xEE',
     'COMMIT': b'\xEE',
+    'RUN': b'\xEE',
     'EXPAND': b'\xEE',
     'PATCH': b'\xEE',
     'RESET': b'\xEE',
