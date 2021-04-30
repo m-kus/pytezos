@@ -16,8 +16,11 @@ from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.tags import prim_tags
 from pytezos.michelson.types import OperationType, PairType
+from pytezos.michelson.types.domain import LambdaType
+from pytezos.michelson.types.list import ListType
+from pytezos.michelson.types.map import MapType
 from pytezos.michelson.types.option import OptionType
-from pytezos.crypto.encoding import base58_decode
+from pytezos.michelson.types.set import SetType
 
 static_macros = [
     'CMPEQ',
@@ -71,6 +74,22 @@ def parse_token(line: str, cursor_pos: int) -> Tuple[str, int, int]:
     return line[begin_pos:end_pos], begin_pos, end_pos
 
 
+def format_prim(item) -> str:
+    if isinstance(item, PairType) and item.items:
+        return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
+    if isinstance(item, OptionType) and item.item:
+        return f'{item.prim} ({item.item.prim})'
+    if isinstance(item, SetType) and item.items:
+        return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
+    if isinstance(item, ListType):
+        return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
+    if isinstance(item, MapType):
+        return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
+    if isinstance(item, type) and issubclass(item, LambdaType):
+        return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
+    return item.prim  # type: ignore
+
+
 def preformat_operations_table(items: List[OperationType]) -> List[Dict[str, Any]]:
     return [
         {
@@ -82,12 +101,13 @@ def preformat_operations_table(items: List[OperationType]) -> List[Dict[str, Any
 
 
 def preformat_storage_table(item) -> List[Dict[str, Any]]:
+    prim = format_prim(item)
     value = item.to_python_object()
     if isinstance(value, bytes):
         value = value.hex()
     return [
         {
-            'type': item.prim,
+            'type': prim,
             'value': value,
         }
     ]
@@ -96,21 +116,15 @@ def preformat_storage_table(item) -> List[Dict[str, Any]]:
 def preformat_stack_table(items: List[MichelsonInstruction]) -> List[Dict[str, Any]]:
     rows = []
     for i, item in enumerate(items):
-        if isinstance(item, PairType) and item.items:
-            type_ = f'pair ({" ".join(i.prim for i in item.items)})'
-        if isinstance(item, OptionType) and item.item:
-            type_ = f'option ({item.item.prim})'
-        else:
-            type_ = item.prim
-
-        value = item.to_python_object()
+        prim = format_prim(item)
+        value = item.to_python_object()  # type: ignore
         if isinstance(value, bytes):
             value = value.hex()
 
         rows.append(
             {
                 'index': i,
-                'type': type_,
+                'type': prim,
                 'value': value,  # type: ignore
             }
         )

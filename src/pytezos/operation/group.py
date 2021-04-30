@@ -187,7 +187,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         if len(self.contents) != 1 or self.contents[0]['kind'] != 'failing_noop':
             raise NotImplementedError('Use for signing messages only')
 
-        branch = block if is_bh(block) else self.shell.blocks[block].hash()
+        branch = block if is_bh(str(block)) else self.shell.blocks[block].hash()
         return b'\x03' + bytes.fromhex(self._spawn(branch=branch).forge())
 
     def autofill(

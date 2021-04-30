@@ -4,7 +4,6 @@ from typing import Dict, List, Type, cast
 
 import strict_rfc3339  # type: ignore
 
-from typing import cast
 from pytezos.context.abstract import AbstractContext
 from pytezos.context.mixin import nodes
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
@@ -13,6 +12,7 @@ from pytezos.michelson.sections import ParameterSection, StorageSection
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType, OperationType, PairType
 from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.core import FalseLiteral, TrueLiteral
 from pytezos.rpc.node import RpcMultiNode, RpcNode
 from pytezos.rpc.shell import ShellQuery
 
@@ -65,7 +65,7 @@ class DebugInstruction(MichelsonInstruction, prim='DEBUG', args_len=1):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         literal = cls.args[0]
-        if isinstance(literal.literal, bool):
+        if issubclass(literal, (TrueLiteral, FalseLiteral)):
             debug = literal.literal
         else:
             debug = bool(literal.get_int())  # type: ignore
