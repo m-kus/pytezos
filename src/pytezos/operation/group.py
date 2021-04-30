@@ -14,9 +14,9 @@ from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE, MAX_OPE
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.forge import forge_operation_group
-from pytezos.rpc.kind import validation_passes
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
+from pytezos.rpc.kind import validation_passes
 
 
 class OperationGroup(ContextMixin, ContentMixin):

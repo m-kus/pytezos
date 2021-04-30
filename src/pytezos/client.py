@@ -189,7 +189,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         min_confirmations: int = 1,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
-        prev_hash: Optional[dict] = None
+        prev_hash: Optional[str] = None
     ) -> Tuple[OperationGroup, ...]:
         """Wait for multiple injected operations to get enough confirmations
 
