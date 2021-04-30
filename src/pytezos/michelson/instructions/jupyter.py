@@ -154,6 +154,7 @@ class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         from pytezos.michelson.program import MichelsonProgram
 
+        stack.clear()
         entrypoint, parameter_literal, storage_literal = cls.args  # type: ignore
         entrypoint_str = entrypoint.get_string()  # type: ignore
 

@@ -96,13 +96,13 @@ def base58_decode(v: bytes) -> bytes:
             for encoding in base58_encodings
             if len(v) == encoding[1] and v.startswith(encoding[0])
         )
-    except StopIteration:
-        raise ValueError('Invalid encoding, prefix or length mismatch.')
+    except StopIteration as e:
+        raise ValueError('Invalid encoding, prefix or length mismatch.') from e
 
     return base58.b58decode_check(v)[prefix_len:]
 
 
-def     base58_encode(v: bytes, prefix: bytes) -> bytes:
+def base58_encode(v: bytes, prefix: bytes) -> bytes:
     """ Encode data using Base58 with checksum and add an according binary prefix in the end.
 
     :param v: Array of bytes
@@ -115,21 +115,23 @@ def     base58_encode(v: bytes, prefix: bytes) -> bytes:
             for encoding in base58_encodings
             if len(v) == encoding[3] and prefix == encoding[0]
         )
-    except StopIteration:
-        raise ValueError('Invalid encoding, prefix or length mismatch.')
+    except StopIteration as e:
+        raise ValueError('Invalid encoding, prefix or length mismatch.') from e
 
     return base58.b58encode_check(encoding[2] + v)
 
 
-def _validate(v, prefixes: list):
+def _validate(v: Union[str, bytes], prefixes: list):
+    if isinstance(v, str):
+        v = v.encode()
     v = scrub_input(v)
-    if any(map(lambda x: v.startswith(x), prefixes)):
+    if any(map(v.startswith, prefixes)):
         base58_decode(v)
     else:
         raise ValueError('Unknown prefix.')
 
 
-def validate_pkh(v):
+def validate_pkh(v: Union[str, bytes]):
     """ Ensure parameter is a public key hash (starts with b'tz1', b'tz2', b'tz3')
 
     :param v: string or bytes
@@ -138,7 +140,7 @@ def validate_pkh(v):
     return _validate(v, prefixes=[b'tz1', b'tz2', b'tz3'])
 
 
-def validate_sig(v):
+def validate_sig(v: Union[str, bytes]):
     """ Ensure parameter is a signature (starts with b'edsig', b'spsig', b'p2sig', b'sig')
 
     :param v: string or bytes
@@ -147,7 +149,7 @@ def validate_sig(v):
     return _validate(v, prefixes=[b'edsig', b'spsig', b'p2sig', b'sig'])
 
 
-def is_pkh(v) -> bool:
+def is_pkh(v: Union[str, bytes]) -> bool:
     """ Check if value is a public key hash.
     """
     try:
@@ -157,7 +159,7 @@ def is_pkh(v) -> bool:
     return True
 
 
-def is_sig(v) -> bool:
+def is_sig(v: Union[str, bytes]) -> bool:
     """ Check if value is a signature.
     """
     try:
@@ -167,7 +169,7 @@ def is_sig(v) -> bool:
     return True
 
 
-def is_bh(v) -> bool:
+def is_bh(v: Union[str, bytes]) -> bool:
     """ Check if value is a block hash.
     """
     try:
@@ -187,7 +189,7 @@ def is_ogh(v) -> bool:
     return True
 
 
-def is_kt(v) -> bool:
+def is_kt(v: Union[str, bytes]) -> bool:
     """ Check if value is a KT address.
     """
     try:
@@ -197,18 +199,17 @@ def is_kt(v) -> bool:
     return True
 
 
-def is_public_key(v) -> bool:
+def is_public_key(v: Union[str, bytes]) -> bool:
     """ Check if value is a public key.
     """
     try:
-        # FIXME: Should this function return True for private keys?
         _validate(v, prefixes=[b"edsk", b"edpk", b"spsk", b"p2sk", b"sppk", b"p2pk"])
     except (ValueError, TypeError):
         return False
     return True
 
 
-def is_chain_id(v) -> bool:
+def is_chain_id(v: Union[str, bytes]) -> bool:
     """ Check if value is a chain id.
     """
     try:
@@ -218,8 +219,10 @@ def is_chain_id(v) -> bool:
     return True
 
 
-def is_address(value: str) -> bool:
+def is_address(v: Union[str, bytes]) -> bool:
     """ Check if value is a tz/KT address
     """
-    address = value.split('%')[0]
+    if isinstance(v, bytes):
+        v = v.decode()
+    address = v.split('%')[0]
     return is_kt(address) or is_pkh(address)

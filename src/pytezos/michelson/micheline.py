@@ -177,8 +177,11 @@ class Micheline(metaclass=ErrorTrace):
 
                 # FIXME: We need entrypoint to be an argument
                 if prim == 'RUN':
-                    args = [{'string': annots[0][1:]}] + args  # type: ignore
-                    annots = []
+                    if annots:
+                        args = [{'string': annots[0][1:]}] + args  # type: ignore
+                        annots = []
+                    else:
+                        args = [{'string': 'default'}] + args  # type: ignore
 
                 args_len = len(args)
                 if (prim, args_len) not in Micheline.classes:

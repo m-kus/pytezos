@@ -16,6 +16,8 @@ from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.tags import prim_tags
 from pytezos.michelson.types import OperationType, PairType
+from pytezos.michelson.types.option import OptionType
+from pytezos.crypto.encoding import base58_decode
 
 static_macros = [
     'CMPEQ',
@@ -80,24 +82,39 @@ def preformat_operations_table(items: List[OperationType]) -> List[Dict[str, Any
 
 
 def preformat_storage_table(item) -> List[Dict[str, Any]]:
+    value = item.to_python_object()
+    if isinstance(value, bytes):
+        value = value.hex()
     return [
         {
             'type': item.prim,
-            'value': item.to_python_object(),
+            'value': value,
         }
     ]
 
 
 def preformat_stack_table(items: List[MichelsonInstruction]) -> List[Dict[str, Any]]:
-    return [
-        {
-            'index': i,
-            'type': item.prim,
-            # FIXME:
-            'value': item.to_python_object(),  # type: ignore
-        }
-        for i, item in enumerate(items)
-    ]
+    rows = []
+    for i, item in enumerate(items):
+        if isinstance(item, PairType) and item.items:
+            type_ = f'pair ({" ".join(i.prim for i in item.items)})'
+        if isinstance(item, OptionType) and item.item:
+            type_ = f'option ({item.item.prim})'
+        else:
+            type_ = item.prim
+
+        value = item.to_python_object()
+        if isinstance(value, bytes):
+            value = value.hex()
+
+        rows.append(
+            {
+                'index': i,
+                'type': type_,
+                'value': value,  # type: ignore
+            }
+        )
+    return rows
 
 
 def html_table(table: List[Dict[str, Any]], header: str) -> str:
