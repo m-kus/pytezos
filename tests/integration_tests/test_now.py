@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 
 from pytezos import ContractInterface, pytezos
 
@@ -14,6 +14,7 @@ code { DROP ;
 
 class TestNow(TestCase):
 
+    @skip
     def test_now(self):
         contract = ContractInterface.from_michelson(code).using('mainnet')
         now = pytezos.using('mainnet').now()
