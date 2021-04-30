@@ -282,7 +282,7 @@ class ContractInterface(ContextMixin):
         """
         return ContractTokenMetadataProxy(self._get_token_metadata)  # type: ignore
 
-    @lru_cache  # type: ignore
+    @lru_cache(maxsize=None)
     def _get_token_metadata(self, token_id: int) -> Optional[ContractTokenMetadata]:
         token_metadata = self._get_token_metadata_from_view(token_id)
         if token_metadata is None:
