@@ -1,4 +1,4 @@
-from typing import Any, Callable, Generator
+from typing import Any, Callable, Generator, Tuple
 
 from pytezos.crypto.encoding import is_bh
 from pytezos.jupyter import get_attr_docstring
@@ -113,7 +113,7 @@ class BlockSliceQuery(RpcQuery):
                 elif x > 0:
                     return x
                 else:
-                    assert False
+                    return 1
             else:
                 return self._getitem(x).header()['level']
 
@@ -199,11 +199,11 @@ class BlockSliceQuery(RpcQuery):
         if self._start < 0:
             levels = range(head, max(1, last - 1), -1)
         else:
-            levels = range(last, head, 1)
+            levels = range(last, head + 1, 1)
 
         for block_level in levels:
+            logger.debug(f'Looking for operation %s in block %s...' % (operation_group_hash, block_level))
             try:
-                logger.debug(f'checking level %s...' % block_level)
                 return self._getitem(block_level).operations[operation_group_hash]()
             except StopIteration:
                 continue

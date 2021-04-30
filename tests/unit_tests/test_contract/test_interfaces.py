@@ -2,6 +2,7 @@ from os.path import dirname, join
 from unittest import TestCase
 
 from pytezos import ContractInterface, Unit
+from pytezos.jupyter import is_interactive
 
 
 class TestInterfaces(TestCase):
@@ -51,3 +52,8 @@ class TestInterfaces(TestCase):
 
         res = ci.doNothing().interpret(storage=None)
         self.assertEqual(Unit, res.storage)
+
+    def test_docstring(self):
+        ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'macro_counter.tz'))
+        print(ci.increaseCounterBy)
+        self.assertFalse(is_interactive())

@@ -10,7 +10,7 @@ from pytezos.crypto.key import Key
 from pytezos.jupyter import get_class_docstring, is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
-from pytezos.operation.group import OperationGroup
+from pytezos.operation.group import OperationGroup, validation_passes
 from pytezos.operation.result import OperationResult
 from pytezos.rpc import ShellQuery
 from pytezos.rpc.node import RpcError
@@ -186,48 +186,60 @@ class PyTezosClient(ContextMixin, ContentMixin):
     def wait(
         self,
         *operation_groups: OperationGroup,
-        check_result: bool = True,
         min_confirmations: int = 1,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
+        prev_hash: Optional[dict] = None
     ) -> Tuple[OperationGroup, ...]:
+        """Wait for multiple injected operations to get enough confirmations
 
+        :param min_confirmations: number of block injections to wait for before returning
+        :param num_blocks_wait: number of blocks to wait for injection
+        :param time_between_blocks: override the corresponding parameter from constants
+        :param prev_hash: Current block hash (optional). If not set, current head is used.
+        """
         logger.info('Waiting for %s confirmations in %s blocks', min_confirmations, num_blocks_wait)
-        in_mempool = {opg: True for opg in operation_groups}
-        confirmations = {opg: 0 for opg in operation_groups}
+        confirmations = {opg.opg_hash: 0 for opg in operation_groups}
         for _ in range(num_blocks_wait):
             logger.info('Waiting for the next block')
-            self.shell.wait_next_block(time_between_blocks=time_between_blocks)
+            prev_hash = self.shell.wait_next_block(time_between_blocks=time_between_blocks, prev_hash=prev_hash)
+            block_operations = self.shell.blocks[prev_hash].operations.managers()
 
             for opg in operation_groups:
+                if confirmations[opg.opg_hash] == 0:
+                    res = next((item for item in block_operations if item['hash'] == opg.opg_hash), None)
+                    if res is not None:
+                        logger.info('Operation %s was included in block %s', opg.opg_hash, prev_hash)
+                        confirmations[opg.opg_hash] = 1
+                        if not OperationResult.is_applied(res):
+                            raise RpcError.from_errors(OperationResult.errors(res)) from None
+                else:
+                    confirmations[opg.opg_hash] += 1
+                    logger.info('Got %s/%s confirmations for %s',
+                                confirmations[opg.opg_hash], min_confirmations, opg.opg_hash)
 
-                if in_mempool[opg]:
-                    try:
-                        pending_opg = self.shell.mempool.pending_operations[opg.opg_hash]
-                        if not OperationResult.is_applied(pending_opg):
-                            raise RpcError.from_errors(OperationResult.errors(pending_opg))
-                        logger.info('Operation %s is still in mempool', opg.opg_hash)
-                        continue
-                    except StopIteration:
-                        in_mempool[opg] = False
+            if any(value == 0 for value in confirmations.values()):
+                pending_operations = self.shell.mempool.pending_operations.flatten()
+                for opg in operation_groups:
+                    if confirmations[opg.opg_hash] == 0:
+                        res = next((item for item in pending_operations if item['hash'] == opg.opg_hash), None)
+                        if res is not None:
+                            logger.info('Operation %s is still in mempool', opg.opg_hash)
+                            if not OperationResult.is_applied(res):
+                                raise RpcError.from_errors(OperationResult.errors(res)) from None
 
-                try:
-                    res = self.shell.blocks[-1:].find_operation(opg.opg_hash)
-                except StopIteration:
-                    logger.info('Operation %s not found in lastest block', opg.opg_hash)
-                    continue
+            for opg in operation_groups:
+                if confirmations[opg.opg_hash] == 0:
+                    confirmations[opg.opg_hash] = self.shell.get_confirmations(
+                        opg_hash=opg.opg_hash,
+                        kind=opg.contents[0]['kind'],
+                        branch=opg.branch,
+                        head=prev_hash
+                    )
+                    if confirmations[opg.opg_hash] == 0:
+                        raise ValueError(f'Operation {opg.opg_hash} is not found') from None
 
-                if check_result:
-                    if not OperationResult.is_applied(res):
-                        raise RpcError.from_errors(OperationResult.errors(res))
-
-                confirmations[opg] += 1
-                logger.info('Got %s/%s confirmations of %s', confirmations[opg], min_confirmations, opg.opg_hash)
-
-            for value in confirmations.values():
-                if value < min_confirmations:
-                    break
-            else:
+            if all(value >= min_confirmations for value in confirmations.values()):
                 return operation_groups
 
         required_confirmations = min_confirmations * len(operation_groups)

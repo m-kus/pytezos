@@ -10,7 +10,7 @@ from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
-from pytezos.operation.kind import validation_passes
+from pytezos.rpc.kind import validation_passes
 from pytezos.sandbox.parameters import sandbox_params
 
 

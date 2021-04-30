@@ -14,7 +14,7 @@ from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE, MAX_OPE
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.forge import forge_operation_group
-from pytezos.operation.kind import validation_passes
+from pytezos.rpc.kind import validation_passes
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 
@@ -32,6 +32,8 @@ class OperationGroup(ContextMixin, ContentMixin):
         chain_id: Optional[int] = None,
         branch: Optional[str] = None,
         signature: Optional[str] = None,
+        opg_hash: Optional[str] = None,
+        # TODO: metadata {balance_updates, operation_result}
     ):
         super().__init__(context=context)
         self.contents = contents or []
@@ -39,7 +41,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         self.chain_id = chain_id
         self.branch = branch
         self.signature = signature
-        self.opg_hash = None
+        self.opg_hash = opg_hash
 
     def __repr__(self):
         res = [
@@ -59,6 +61,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             chain_id=kwargs.get('chain_id', self.chain_id),
             branch=kwargs.get('branch', self.branch),
             signature=kwargs.get('signature', self.signature),
+            opg_hash=kwargs.get('opg_hash', self.opg_hash)
         )
 
     def json_payload(self) -> dict:
@@ -300,6 +303,26 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return self.run_operation()
 
+    def send(self,
+             gas_reserve: int = DEFAULT_GAS_RESERVE,
+             burn_reserve: int = DEFAULT_BURN_RESERVE,
+             min_confirmations: int = 0,
+             ttl: Optional[int] = None) -> 'OperationGroup':
+        """
+
+        :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
+        :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
+        :param min_confirmations: number of block injections to wait for before returning (default is 0, i.e. async mode)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :return: OperationGroup with hash filled
+        """
+        if ttl is None:
+            ttl = self.context.get_operations_ttl()
+
+        opg = self.autofill(gas_reserve=gas_reserve, burn_reserve=burn_reserve, ttl=ttl).sign()
+        res = opg.inject(min_confirmations=min_confirmations, num_blocks_wait=ttl)
+        return opg._spawn(opg_hash=res['hash'])
+
     def inject(
         self,
         check_result: bool = True,
@@ -310,6 +333,10 @@ class OperationGroup(ContextMixin, ContentMixin):
     ):
         """Inject the signed operation group.
 
+        :param check_result: raise RpcError in case operation is applied but has runtime errors
+        :param num_blocks_wait: number of blocks to wait for injection
+        :param time_between_blocks: override the corresponding parameter from constants
+        :param min_confirmations: number of block injections to wait for before returning
         :returns: operation group with metadata (raw RPC response)
         """
         self.context.reset()
@@ -318,7 +345,6 @@ class OperationGroup(ContextMixin, ContentMixin):
             operation=self.binary_payload(),
             _async=False,
         )
-        self.opg_hash = opg_hash
 
         if min_confirmations == 0:
             return {

@@ -2,7 +2,7 @@ from binascii import hexlify
 from datetime import datetime
 from functools import lru_cache
 from time import sleep
-from typing import Optional
+from typing import Optional, List
 
 import requests
 import simplejson as json
@@ -12,6 +12,7 @@ from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
 from pytezos.rpc.query import RpcQuery
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
+from pytezos.rpc.kind import validation_passes
 
 
 def make_operation_result(**kwargs):
@@ -74,12 +75,12 @@ class ShellQuery(RpcQuery, path=''):
 
     def wait_next_block(self,
                         delay_sec=1,
-                        block_hash=None,
+                        prev_hash=None,
                         time_between_blocks: Optional[int] = None,
                         max_iterations: Optional[int] = None):
         """ Wait until next block is finalized.
 
-        :param block_hash: Current block hash (optional). If not set, current head is used.
+        :param prev_hash: Current block hash (optional). If not set, current head is used.
         :param time_between_blocks: override the corresponding parameter from constants
         :param max_iterations: Manually set the number of iterations
         :param delay_sec: Sleep delay
@@ -88,14 +89,15 @@ class ShellQuery(RpcQuery, path=''):
             time_between_blocks = int(self.block.context.constants()["time_between_blocks"][0])  # type: ignore
 
         if time_between_blocks > 0:
-            header = self.head.header()
-            if block_hash is None:
-                block_hash = header['hash']
-
-            prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
-            elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
-            sleep_sec = 0 if elapsed_sec > time_between_blocks else time_between_blocks - elapsed_sec
-            logger.info('Wait %s seconds until block %s is finalized' % (sleep_sec, block_hash,))
+            if prev_hash is None:
+                header = self.head.header()
+                prev_hash = header['hash']
+                prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+                elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
+                sleep_sec = 0 if elapsed_sec > time_between_blocks else time_between_blocks - elapsed_sec
+            else:
+                sleep_sec = time_between_blocks
+            logger.info('Wait %s seconds until block %s is finalized' % (sleep_sec, prev_hash,))
             sleep(sleep_sec)
 
         if max_iterations is None:
@@ -103,11 +105,32 @@ class ShellQuery(RpcQuery, path=''):
 
         for i in range(max_iterations):
             current_block_hash = self.head.hash()
-            if current_block_hash == block_hash:
+            if current_block_hash == prev_hash:
                 sleep(delay_sec)
             else:
                 return current_block_hash
         raise StopIteration("Timeout")
+
+    def get_confirmations(self, opg_hash, kind, branch, head) -> int:
+        """Returns the number of blocks applied after the operation was included in chain
+
+        :param opg_hash: Operation group hash
+        :param kind: Operation kind ('transaction', 'origination', etc)
+        :param branch: Block ID one should stop the search at
+        :param head: Block ID one should start the search from
+        :return: Number of confirmations (0 if not found)
+        """
+        start = self.blocks[head].header()['level']
+        stop = self.blocks[branch].header()['level']
+        for level in range(start, stop, -1):
+            vp = validation_passes[kind]
+            hashes = self.blocks[level].operation_hashes[vp]()
+            for idx, _hash in enumerate(hashes):
+                if opg_hash == _hash:
+                    _ = self.blocks[level].operations[vp, idx]()
+                    logger.info('Operation %s was included in block %s', opg_hash, level)
+                    return start - level + 1
+        return 0
 
 
 class ChainQuery(RpcQuery, path='/chains/{}'):
@@ -152,10 +175,28 @@ class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operatio
                 elif isinstance(operation, list):
                     if operation[0] == item:
                         errors = operation[1].pop1('error', default=[])
-                        return {**make_operation_result(status=status, errors=errors), **operation[1]}
+                        return {**make_operation_result(status=status, errors=errors),
+                                **operation[1],
+                                'hash': operation[0]}
                 else:
                     assert False, operation
         raise StopIteration
+
+    def flatten(self) -> List[dict]:
+        operations_dict = self()
+        operations_list = list()
+        for status, operations in operations_dict.items():
+            for operation in operations:
+                if isinstance(operation, dict):
+                    operations_list.append({**make_operation_result(status=status), **operation})
+                elif isinstance(operation, list):
+                    errors = operation[1].pop1('error', default=[])
+                    operations_list.append({**make_operation_result(status=status, errors=errors),
+                                            **operation[1],
+                                            'hash': operation[0]})
+                else:
+                    assert False, operation
+        return operations_list
 
     def __repr__(self):
         res = [

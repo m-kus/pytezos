@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from pytezos import ContractInterface, pytezos
-from parameterized import parameterized
 
 code = """
 parameter unit;
@@ -15,13 +14,8 @@ code { DROP ;
 
 class TestNow(TestCase):
 
-    @parameterized.expand([
-        ('mainnet',),
-        ('edo2net',),
-        ('delphinet',),
-    ])
-    def test_now(self, network):
-        contract = ContractInterface.from_michelson(code).using(network)
-        now = pytezos.using(network).now()
+    def test_now(self):
+        contract = ContractInterface.from_michelson(code).using('mainnet')
+        now = pytezos.using('mainnet').now()
         res = contract.default().run_code()
         self.assertEqual(now, res.storage)
