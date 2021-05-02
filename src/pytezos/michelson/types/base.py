@@ -36,6 +36,9 @@ class undefined:
     def __lt__(self, other):
         return False
 
+    def __hash__(self):
+        return hash(None)
+
 
 Undefined = undefined()
 
