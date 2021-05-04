@@ -49,7 +49,10 @@ mypy:
 lint: isort pylint mypy
 
 test:
-	PYTHONPATH="$$PYTHONPATH:src" poetry run pytest --cov-report=term-missing --cov=pytezos --cov-report=xml -v .
+	poetry run nosetests --with-coverage tests --cover-package pytezos --cover-package michelson_kernel --cover-xml-file coverage.xml
+
+test-verbose:
+	poetry run nosetests -v --with-timer --with-coverage tests --cover-package pytezos --cover-package michelson_kernel --cover-xml-file coverage.xml
 
 cover:
 	poetry run diff-cover coverage.xml
