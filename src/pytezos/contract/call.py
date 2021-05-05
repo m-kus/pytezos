@@ -20,10 +20,6 @@ def skip_nones(**kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if v is not None}
 
 
-def is_edo(context: ExecutionContext) -> bool:
-    return context.shell.head.header()['protocol'].startswith('PtEdo')  # type: ignore
-
-
 class ContractCall(ContextMixin):
     """ Proxy class encapsulating a contract call: contract type scheme, contract address, parameters, and amount
     """
@@ -160,7 +156,7 @@ class ContractCall(ContextMixin):
             chain_id=chain_id or self.context.get_chain_id(),
             source=sender,
             payer=source,
-            balance=str(balance or 0) if is_edo(self.context) else None,
+            balance=str(balance or 0),
             gas=str(gas_limit) if gas_limit is not None else None
         )
         res = self.shell.blocks[self.block_id].helpers.scripts.run_code.post(query)
