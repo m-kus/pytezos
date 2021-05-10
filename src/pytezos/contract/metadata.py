@@ -13,7 +13,7 @@ from pytezos.context.mixin import ContextMixin
 from pytezos.contract.view import OffChainView
 
 
-def to_camelcase(string: str) -> str:
+def _to_camelcase(string: str) -> str:
     expression = re.compile("[^A-Za-z]+")
     words = expression.split(string)
     if len(words) == 1:
@@ -22,7 +22,7 @@ def to_camelcase(string: str) -> str:
     return ''.join(w.lower() if i == 0 else w.title() for i, w in enumerate(words))
 
 
-metadata_json_replace_table = {
+_metadata_json_replace_table = {
     '"return-type":': '"returnType":',
     '"michelson-storage-view":': '"michelsonStorageView":',
 }
@@ -107,7 +107,7 @@ class ContractMetadata(ContextMixin):
                     (impl for impl in view.implementations if isinstance(impl, MichelsonStorageViewImplementation)), None
                 )
                 if michelson_storage_impl is not None:
-                    name = to_camelcase(view.name)
+                    name = _to_camelcase(view.name)
                     self.storage_view_impl[name] = michelson_storage_impl.michelsonStorageView
 
     def __repr__(self) -> str:
@@ -149,7 +149,7 @@ class ContractMetadata(ContextMixin):
     def fix_metadata_json(metadata_json: Dict[str, Any]) -> Dict[str, Any]:
         """Fix invalid field casing in metadata JSON"""
         metadata_json_string = json.dumps(metadata_json)
-        for from_, to in metadata_json_replace_table.items():
+        for from_, to in _metadata_json_replace_table.items():
             metadata_json_string = metadata_json_string.replace(from_, to)
         return json.loads(metadata_json_string)
 

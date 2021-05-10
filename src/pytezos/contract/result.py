@@ -16,7 +16,7 @@ class ContractCallResult(OperationResult):
         :param context: execution context
         :rtype: ContractCallResult
         """
-        results: List['ContractCallResult'] = list()
+        results: List['OperationResult'] = list()
         for content in OperationResult.iter_contents(operation_group):
             if content['kind'] == 'transaction':
                 if content['destination'] == context.address:

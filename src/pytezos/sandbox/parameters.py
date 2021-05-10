@@ -1,31 +1,33 @@
+from typing import Any, Dict
+
 from pytezos.crypto.key import Key
 
 EDO = 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
 FLORENCE = 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i'
 
 sandbox_commitment = {
-  "mnemonic": [
-    "arctic",
-    "blame",
-    "brush",
-    "economy",
-    "solar",
-    "swallow",
-    "canvas",
-    "live",
-    "vote",
-    "two",
-    "post",
-    "neutral",
-    "spare",
-    "split",
-    "fall"
-  ],
-  "secret": "7375ef222cc038001b6c8fb768246c86e994745b",
-  "amount": "38323962971",
-  "pkh": "tz1W86h1XuWy6awbNUTRUgs6nk8q5vqXQwgk",
-  "password": "ZuPOpZgMNM",
-  "email": "nbhcylbg.xllfjgrk@tezos.example.org"
+    "mnemonic": [
+        "arctic",
+        "blame",
+        "brush",
+        "economy",
+        "solar",
+        "swallow",
+        "canvas",
+        "live",
+        "vote",
+        "two",
+        "post",
+        "neutral",
+        "spare",
+        "split",
+        "fall",
+    ],
+    "secret": "7375ef222cc038001b6c8fb768246c86e994745b",
+    "amount": "38323962971",
+    "pkh": "tz1W86h1XuWy6awbNUTRUgs6nk8q5vqXQwgk",
+    "password": "ZuPOpZgMNM",
+    "email": "nbhcylbg.xllfjgrk@tezos.example.org",
 }
 
 sandbox_addresses = {
@@ -37,7 +39,7 @@ sandbox_addresses = {
     'bootstrap1': 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
 }
 
-sandbox_params = {
+sandbox_params: Dict[str, Any] = {
     'bootstrap_accounts': [
         ['edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav', '4000000000000'],
         ['edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9', '4000000000000'],
@@ -47,7 +49,10 @@ sandbox_params = {
     ],
     'bootstrap_contracts': [],
     'commitments': [
-        [Key.from_faucet(sandbox_commitment).blinded_public_key_hash(), '100500000000']
+        [
+            Key.from_faucet(sandbox_commitment).blinded_public_key_hash(),
+            '100500000000',
+        ],
     ],
     'preserved_cycles': 2.0,
     'blocks_per_cycle': 8.0,
@@ -74,9 +79,9 @@ sandbox_params = {
     'quorum_max': 7000.0,
     'min_proposal_quorum': 500.0,
     'initial_endorsers': 0.0,
-    'delay_per_missing_endorsement': '1'
+    'delay_per_missing_endorsement': '1',
 }
 
 
-def get_protocol_parameters(protocol_hash):
+def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
     return sandbox_params

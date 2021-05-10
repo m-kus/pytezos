@@ -1,5 +1,5 @@
 from traceback import format_exception
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
 
 from ipykernel.kernelbase import Kernel  # type: ignore
 from tabulate import tabulate
@@ -74,7 +74,8 @@ def parse_token(line: str, cursor_pos: int) -> Tuple[str, int, int]:
     return line[begin_pos:end_pos], begin_pos, end_pos
 
 
-def format_prim(item) -> str:
+def format_prim(item: Union[MichelsonInstruction, Type[MichelsonInstruction]]) -> str:
+    """Recursively get type hint for given type"""
     if isinstance(item, PairType) and item.items:
         return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
     if isinstance(item, OptionType) and item.item:
@@ -87,7 +88,7 @@ def format_prim(item) -> str:
         return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
     if isinstance(item, type) and issubclass(item, LambdaType):
         return f'{item.prim} ({" ".join(format_prim(i) for i in item.args)})'
-    return item.prim  # type: ignore
+    return cast(str, item.prim)
 
 
 def preformat_operations_table(items: List[OperationType]) -> List[Dict[str, Any]]:
@@ -230,7 +231,13 @@ class MichelsonKernel(Kernel):
         for instruction in instructions.items[::-1]:
             if isinstance(instruction, MichelineSequence):
                 return self._find_contract_result(instruction)
-            if isinstance(instruction, (CommitInstruction, RunInstruction,)):
+            if isinstance(
+                instruction,
+                (
+                    CommitInstruction,
+                    RunInstruction,
+                ),
+            ):
                 return instruction.result
         return None
 

@@ -213,8 +213,7 @@ class ContractCall(ContextMixin):
         """
         if storage or source or sender or gas_limit:
             return self.run_code(storage=storage, source=source, sender=sender, gas_limit=gas_limit)
-        else:
-            return self.run_operation()
+        return self.run_operation()
 
     def storage_view(self):
         """Get return value of an off-chain storage view.

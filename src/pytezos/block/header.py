@@ -15,6 +15,8 @@ from pytezos.sandbox.parameters import sandbox_params
 
 
 class BlockHeader(ContextMixin):
+    """Representation of block creation call"""
+
     def __init__(
         self,
         context: ExecutionContext,
@@ -22,14 +24,14 @@ class BlockHeader(ContextMixin):
         operations: Optional[List[List[Dict[str, Any]]]] = None,
         shell_header: Optional[Dict[str, Any]] = None,
         signature: Optional[str] = None,
-    ):
+    ) -> None:
         super().__init__(context=context)
         self.protocol_data = protocol_data or {}
         self.operations = operations or []
         self.shell_header = shell_header or {}
         self.signature = signature
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super().__repr__(),
             '\nHeader',
@@ -50,12 +52,13 @@ class BlockHeader(ContextMixin):
         return '\n'.join(res)
 
     @classmethod
-    def activate_protocol(
-        cls,
-        protocol_hash: str,
-        parameters: Dict[str, Any],
-        context: ExecutionContext
-    ) -> 'BlockHeader':
+    def activate_protocol(cls, protocol_hash: str, parameters: Dict[str, Any], context: ExecutionContext) -> 'BlockHeader':
+        """Create call to bake genesis block with specified parameters
+
+        :param protocol_hash: protocol hash (ex. PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i)
+        :param parameters: protocol parameters
+        :param context: execution context
+        """
         prev_fitness = context.shell.head.header()['fitness']  # type: ignore
         protocol_data = {
             "content": {
@@ -72,13 +75,16 @@ class BlockHeader(ContextMixin):
 
     @classmethod
     def bake_block(cls, context: ExecutionContext, min_fee: int = 0) -> 'BlockHeader':
+        """Create call to bake new block
+
+        :param min_fee: Minimum fee of transaction to be included in block
+        """
         pending_operations = context.shell.mempool.pending_operations()  # type: ignore
         operations: List[List[Dict[str, Any]]] = [[], [], [], []]
 
         for opg in pending_operations['applied']:
             validation_pass = validation_passes[opg['contents'][0]['kind']]
-            if validation_pass == 3 \
-                    and sum(map(lambda x: int(x['fee']), opg['contents'])) < min_fee:
+            if validation_pass == 3 and sum(map(lambda x: int(x['fee']), opg['contents'])) < min_fee:
                 continue
             operations[validation_pass].append(opg)
 
@@ -125,9 +131,8 @@ class BlockHeader(ContextMixin):
         if 'priority' in protocol_data:
             baker = self.key.public_key_hash()
             baking_rights = self.shell.blocks[block_id].helpers.baking_rights(delegate=baker)
-            protocol_data['priority'] = next(item['priority']
-                                             for item in baking_rights
-                                             if item['delegate'] == baker)  # Fail if no rights
+            # NOTE: Fails if baker has no baking rights
+            protocol_data['priority'] = next(item['priority'] for item in baking_rights if item['delegate'] == baker)
 
         operations = [
             [
@@ -160,7 +165,7 @@ class BlockHeader(ContextMixin):
             [
                 {
                     'branch': operation['branch'],
-                    'data': operation['data']
+                    'data': operation['data'],
                 }
                 for operation in operation_list['applied']
             ]
@@ -174,7 +179,8 @@ class BlockHeader(ContextMixin):
             signature=dummy_signature,
         )
 
-    def work(self):
+    def work(self) -> 'BlockHeader':
+        """Perform calculations to find proof-of-work nonce"""
         header = self
         threshold = int(sandbox_params['proof_of_work_threshold'])
         nonce = 1
@@ -217,7 +223,7 @@ class BlockHeader(ContextMixin):
         hash_digest = blake2b_32(self.binary_payload()).digest()
         return base58_encode(hash_digest, b'B').decode()
 
-    def sign(self):
+    def sign(self) -> 'BlockHeader':
         """Sign the block header with the key specified by `using`.
 
         :rtype: BlockHeader

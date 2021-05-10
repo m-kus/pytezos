@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Type, cast, List
+from typing import Any, Dict, List, Optional, Tuple, Type, cast
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import base58_encode
@@ -88,6 +88,7 @@ class MichelsonProgram:
 
     @try_catch('BEGIN')
     def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
+        """Prepare stack for contract execution"""
         self.parameter_value.attach_context(context)
         self.storage_value.attach_context(context)
         res = PairType.from_comb([self.parameter_value.item, self.storage_value.item])
@@ -95,10 +96,12 @@ class MichelsonProgram:
         stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
+        """Execute contract in interpreter"""
         return cast(MichelsonInstruction, self.code.args[0].execute(stack, stdout, context))
 
     @try_catch('END')
     def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
+        """Finish contract execution"""
         res = cast(PairType, stack.pop1())
         if len(stack):
             raise Exception(f'Stack is not empty: {repr(stack)}')
@@ -209,6 +212,7 @@ class TztMichelsonProgram:
                 item.add(stack, stdout, context)
 
     def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:  # pylint: disable=no-self-use
+        """Prepare stack for contract execution"""
 
         for item in self.input.args[0].args[::-1]:
             if issubclass(item, StackEltInstruction):
@@ -217,9 +221,11 @@ class TztMichelsonProgram:
                 raise Exception('Only `Stack_elt` instructions can be used in `input` section', item)
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
+        """Execute contract in interpreter"""
         return cast(MichelsonInstruction, self.code.args[0].execute(stack, stdout, context))
 
     def end(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
+        """Finish contract execution"""
         for item in self.output.args[0].args:
             if not issubclass(item, StackEltInstruction):
                 raise Exception('Only `Stack_elt` instructions can be used in `output` section')

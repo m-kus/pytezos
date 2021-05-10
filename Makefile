@@ -41,7 +41,15 @@ isort:
 	poetry run isort src
 
 black:
+	poetry run black src/michelson_kernel
+	poetry run black src/pytezos/block
 	poetry run black src/pytezos/contract
+	poetry run black src/pytezos/michelson/program.py
+	poetry run black src/pytezos/michelson/repl.py
+	poetry run black src/pytezos/michelson/stack.py
+	poetry run black src/pytezos/michelson/tags.py
+	poetry run black src/pytezos/operation
+	poetry run black src/pytezos/sandbox
 
 pylint:
 	poetry run pylint src || poetry run pylint-exit $$?

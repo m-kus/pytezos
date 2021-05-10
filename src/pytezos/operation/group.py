@@ -34,7 +34,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         signature: Optional[str] = None,
         opg_hash: Optional[str] = None,
         # TODO: metadata {balance_updates, operation_result}
-    ):
+    ) -> None:
         super().__init__(context=context)
         self.contents = contents or []
         self.protocol = protocol
@@ -43,7 +43,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         self.signature = signature
         self.opg_hash = opg_hash
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super().__repr__(),
             '\nPayload',
@@ -61,12 +61,11 @@ class OperationGroup(ContextMixin, ContentMixin):
             chain_id=kwargs.get('chain_id', self.chain_id),
             branch=kwargs.get('branch', self.branch),
             signature=kwargs.get('signature', self.signature),
-            opg_hash=kwargs.get('opg_hash', self.opg_hash)
+            opg_hash=kwargs.get('opg_hash', self.opg_hash),
         )
 
-    def json_payload(self) -> dict:
-        """ Get JSON payload used for the injection.
-        """
+    def json_payload(self) -> Dict[str, Any]:
+        """Get JSON payload used for the injection."""
         return {
             'protocol': self.protocol,
             'branch': self.branch,
@@ -81,7 +80,7 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return bytes.fromhex(self.forge()) + forge_base58(self.signature)
 
-    def operation(self, content):
+    def operation(self, content: Dict[str, Any]) -> 'OperationGroup':
         """Create new operation group with extra content added.
 
         :param content: Kind-specific operation body
@@ -89,12 +88,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         """
         return self._spawn(contents=self.contents + [content])
 
-    def fill(
-        self,
-        counter: Optional[int] = None,
-        ttl: Optional[int] = None,
-        **kwargs
-    ) -> 'OperationGroup':
+    def fill(self, counter: Optional[int] = None, ttl: Optional[int] = None, **kwargs) -> 'OperationGroup':
         """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
@@ -163,7 +157,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             }
         )
 
-    def forge(self, validate=False):
+    def forge(self, validate=False) -> str:
         """Convert json representation of the operation group into bytes.
 
         :param validate: Forge remotely also and compare results, default is False
@@ -203,7 +197,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         fee: Optional[int] = None,
         gas_limit: Optional[int] = None,
         storage_limit: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> 'OperationGroup':
         """Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
@@ -211,10 +205,10 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
         :param counter: Override counter value (for manual handling)
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
-        :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
-        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of
+        :param fee: Explicitly set fee for operation. If not set fee will be calculated depending on results of operation dry-run.
+        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depending on results of
             operation dry-run.
-        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depeding on
+        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depending on
             results of operation dry-run.
         :rtype: OperationGroup
         """
@@ -253,7 +247,7 @@ class OperationGroup(ContextMixin, ContentMixin):
                     gas_limit=str(_gas_limit),
                     storage_limit=str(_storage_limit),
                     fee=str(_fee),
-                    counter=str(current_counter + self.context.get_counter_offset())
+                    counter=str(current_counter + self.context.get_counter_offset()),
                 )
 
             content.pop('metadata')
@@ -307,11 +301,13 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return self.run_operation()
 
-    def send(self,
-             gas_reserve: int = DEFAULT_GAS_RESERVE,
-             burn_reserve: int = DEFAULT_BURN_RESERVE,
-             min_confirmations: int = 0,
-             ttl: Optional[int] = None) -> 'OperationGroup':
+    def send(
+        self,
+        gas_reserve: int = DEFAULT_GAS_RESERVE,
+        burn_reserve: int = DEFAULT_BURN_RESERVE,
+        min_confirmations: int = 0,
+        ttl: Optional[int] = None,
+    ) -> 'OperationGroup':
         """
 
         :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
@@ -333,7 +329,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
         min_confirmations: int = 0,
-        **kwargs
+        **kwargs,
     ):
         """Inject the signed operation group.
 

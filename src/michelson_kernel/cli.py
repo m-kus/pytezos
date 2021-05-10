@@ -34,7 +34,7 @@ def install(_ctx) -> None:
         "argv": [sys.executable, "-m", "michelson_kernel", "run", "-f", "{connection_file}"],
         "display_name": "Michelson",
         "language": "michelson",
-        "codemirror_mode": "michelson"
+        "codemirror_mode": "michelson",
     }
     kernel_js_path = join(dirname(__file__), 'kernel.js')
 
@@ -49,7 +49,8 @@ def install(_ctx) -> None:
 
         kernel_spec.install_kernel_spec(td, 'michelson', prefix=sys.prefix)
 
-@cli.command(help='Install Michelson kernel in current environment')
+
+@cli.command(help='Remove Michelson kernel from current environment')
 @click.pass_context
 def remove(_ctx) -> None:
     kernel_spec = KernelSpecManager()

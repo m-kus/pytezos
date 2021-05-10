@@ -14,6 +14,8 @@ from pytezos.michelson.types import OperationType
 
 @dataclass(kw_only=True)
 class InterpreterResult:
+    """Result of running contract in interpreter"""
+
     operations = None
     storage = None
     lazy_diff = None
@@ -32,14 +34,17 @@ class Interpreter:
         self,
         extra_primitives: Optional[List[str]] = None,
         debug: bool = False,
-    ):
+    ) -> None:
         self.stack = MichelsonStack()
         self.context = ExecutionContext()
         self.context.debug = debug
         self.parser = MichelsonParser(debug=debug, extra_primitives=extra_primitives)
 
     def execute(self, code: str) -> InterpreterResult:
-        """Execute some code preserving current context and stack"""
+        """Execute some code preserving current context and stack
+
+        :param code: Michelson code
+        """
         result = InterpreterResult(stdout=[])
         stack_backup = deepcopy(self.stack)
         context_backup = deepcopy(self.context)
@@ -61,6 +66,7 @@ class Interpreter:
         return result
 
     def reset(self) -> None:
+        """Reset interpreter's stack and context"""
         self.stack = MichelsonStack()
         self.context = ExecutionContext()
 
@@ -68,7 +74,7 @@ class Interpreter:
     def run_code(
         parameter,
         storage,
-        script,
+        script: str,
         entrypoint='default',
         output_mode='readable',
         amount=None,
@@ -79,6 +85,20 @@ class Interpreter:
         block_id=None,
         **kwargs,
     ) -> Tuple[List[dict], Any, List[dict], List[str], Optional[Exception]]:
+        """Execute contract in interpreter
+
+        :param parameter: parameter expression
+        :param storage: storage expression
+        :param script: contract's Michelson code
+        :param entrypoint: contract entrypoint
+        :param output_mode: one of readable/optimized/legacy_optimized
+        :param amount: patch AMOUNT
+        :param chain_id: patch CHAIN_ID
+        :param source: patch SOURCE
+        :param sender: patch SENDER
+        :param balance: patch BALANCE
+        :param block_id: set block ID
+        """
         context = ExecutionContext(
             amount=amount,
             chain_id=chain_id,
@@ -108,11 +128,19 @@ class Interpreter:
 
     @staticmethod
     def run_view(
-        entrypoint,
+        entrypoint: str,
         parameter,
         storage,
         context: ExecutionContext,
     ) -> Tuple[Any, List[str], Optional[Exception]]:
+        """Execute view of contract loaded in context
+
+        :param entrypoint: contract entrypoint
+        :param parameter: parameter section
+        :param storage: storage section
+        :param context: execution context
+        :returns: [operations, stdout, error]
+        """
         ctx = ExecutionContext(
             shell=context.shell,
             key=context.key,
@@ -138,7 +166,7 @@ class Interpreter:
 
     @staticmethod
     def run_tzt(
-        script,
+        script: str,
         amount=None,
         chain_id=None,
         source=None,
@@ -147,6 +175,16 @@ class Interpreter:
         block_id=None,
         **kwargs,
     ) -> None:
+        """Execute TZT test suite code
+
+        :param script: test contract's Michelson code
+        :param amount: patch AMOUNT
+        :param chain_id: patch CHAIN_ID
+        :param source: patch SOURCE
+        :param sender: patch SENDER
+        :param balance: patch BALANCE
+        :param block_id: set block ID
+        """
         context = ExecutionContext(
             amount=amount,
             chain_id=chain_id,

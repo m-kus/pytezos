@@ -21,7 +21,7 @@ class OffChainView(ContextMixin):
         return_type: Dict[str, Any],
         code: List[Any],
     ) -> None:
-        super(OffChainView, self).__init__(context=context)
+        super().__init__(context=context)
         self.name = name
         self.param_expr = parameter or {'prim': 'unit'}
         self.rtype_expr = return_type
@@ -30,7 +30,7 @@ class OffChainView(ContextMixin):
 
     def __repr__(self) -> str:
         res = [
-            super(OffChainView, self).__repr__(),
+            super().__repr__(),
             f'.name\t{self.name}',
             f'\nBuiltin\n(*args, **kwargs)  # build view parameters (see typedef)',
             f'\nTypedef\n{self.__doc__}',

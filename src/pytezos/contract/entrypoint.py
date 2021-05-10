@@ -15,12 +15,12 @@ class ContractEntrypoint(ContextMixin):
     """Proxy class for spawning ContractCall instances."""
 
     def __init__(self, context: ExecutionContext, entrypoint: str) -> None:
-        super(ContractEntrypoint, self).__init__(context=context)
+        super().__init__(context=context)
         self.entrypoint = entrypoint
 
     def __repr__(self) -> str:
         res = [
-            super(ContractEntrypoint, self).__repr__(),
+            super().__repr__(),
             f'.entrypoint\t{self.entrypoint}',
             f'\nBuiltin\n(*args, **kwargs)\t# build transaction parameters (see typedef)',
             f'\nTypedef\n{self.__doc__}',

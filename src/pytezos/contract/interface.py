@@ -3,7 +3,7 @@ import logging
 from decimal import Decimal
 from functools import lru_cache
 from os.path import exists, expanduser
-from typing import Any, Callable, Dict, List, Optional, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union
 from urllib.parse import urlparse
 
 import requests
@@ -174,7 +174,7 @@ class ContractInterface(ContextMixin):
 
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `.storage[path][to][big_map][key]()` instead')
     def big_map_get(self, path):
-        """ Get BigMap entry as Python object by plain key and block height.
+        """Get BigMap entry as Python object by plain key and block height.
 
         :param path: Json path to the key (or just key to access default BigMap location). \
             Use `/` to separate nodes and `::` to separate tuple args. \
@@ -372,7 +372,7 @@ class ContractInterface(ContextMixin):
     def call(self) -> ContractEntrypoint:
         return self.parameter
 
-    def operation_result(self, operation_group: dict) -> List[ContractCallResult]:
+    def operation_result(self, operation_group: Dict[str, Any]) -> List[ContractCallResult]:
         """Get operation parameters, and resulting storage as Python objects.
         Can locate operation inside operation groups with multiple contents and/or internal operations.
 
@@ -381,7 +381,7 @@ class ContractInterface(ContextMixin):
         """
         return ContractCallResult.from_run_operation(operation_group, context=self.context)
 
-    def script(self, initial_storage=None, mode: Optional[str] = None) -> dict:
+    def script(self, initial_storage=None, mode: Optional[str] = None) -> Dict[str, Any]:
         """Generate script for contract origination.
 
         :param initial_storage: Python object, leave None to generate default (attach shell/key for smart fill)
@@ -413,7 +413,9 @@ class ContractInterface(ContextMixin):
         :rtype: OperationGroup
         """
         return OperationGroup(context=self._spawn_context()).origination(
-            script=self.script(initial_storage, mode=mode), balance=balance, delegate=delegate
+            script=self.script(initial_storage, mode=mode),
+            balance=balance,
+            delegate=delegate,
         )
 
 

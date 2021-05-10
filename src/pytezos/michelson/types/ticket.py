@@ -1,6 +1,6 @@
 from copy import copy
 from pprint import pformat
-from typing import List, Optional, Tuple, Type
+from typing import List, Optional, Tuple, Type, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.format import micheline_to_michelson
@@ -31,10 +31,12 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     @classmethod
     def from_comb(cls, comb: PairType) -> 'TicketType':
-        ticketer, item, amount = tuple(comb.iter_comb())  # type: AddressType, MichelsonType, NatType  # type: ignore
-        return cls(item=item,
-                   ticketer=str(ticketer),
-                   amount=int(amount))
+        ticketer, item, amount = cast(Tuple[AddressType, MichelsonType, NatType], tuple(comb.iter_comb()))
+        return cls(
+            item=item,
+            ticketer=str(ticketer),
+            amount=int(amount),
+        )
 
     @staticmethod
     def join(left: 'TicketType', right: 'TicketType') -> Optional['TicketType']:

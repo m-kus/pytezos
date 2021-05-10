@@ -141,7 +141,6 @@ prim_tags = {
     'SPLIT_TICKET': b'\x8A',
     'JOIN_TICKETS': b'\x8B',
     'GET_AND_UPDATE': b'\x8C',
-
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',
@@ -154,7 +153,6 @@ prim_tags = {
     'now': b'\xEE',
     'source': b'\xEE',
     'big_maps': b'\xEE',
-
     # FIXME: Dummy values for Jupyter, refactor macros
     'DUMP': b'\xEE',
     'PRINT': b'\xEE',

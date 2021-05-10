@@ -7,6 +7,7 @@ import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
+from pytezos.operation.group import OperationGroup
 from pytezos.sandbox.parameters import EDO
 
 # NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
@@ -17,6 +18,8 @@ node_fitness: int = 1
 
 
 class SandboxedNodeTestCase(unittest.TestCase):
+    """Perform tests with sanboxed node in Docker container"""
+
     IMAGE: str = 'bakingbad/sandboxed-node:v9.0-rc1-1'
     PORT: Optional[int] = None
     PROTOCOL: str = EDO
@@ -33,7 +36,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
         cls.activate(cls.PROTOCOL, reset=True)
 
     @classmethod
-    def activate(cls, protocol_alias: str, reset: bool = False):
+    def activate(cls, protocol_alias: str, reset: bool = False) -> OperationGroup:
         return (
             cls.get_client()
             .using(key='dictator')
@@ -57,13 +60,13 @@ class SandboxedNodeTestCase(unittest.TestCase):
         return node_container
 
     @classmethod
-    def get_client(cls):
+    def get_client(cls) -> PyTezosClient:
         return node_container_client.using(
             shell=cls.get_node_url(),
         )
 
     @classmethod
-    def create_client(cls):
+    def create_client(cls) -> PyTezosClient:
         global node_container_client
         node_container_client = PyTezosClient()
         return cls.get_client()
@@ -88,7 +91,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
                 sleep(0.1)
 
     @classmethod
-    def bake_block(cls, min_fee: int = 0):
+    def bake_block(cls, min_fee: int = 0) -> OperationGroup:
         return cls.get_client().using(key='bootstrap1').bake_block(min_fee).fill().work().sign().inject()
 
     @property
