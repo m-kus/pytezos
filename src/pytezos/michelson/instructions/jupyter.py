@@ -163,7 +163,7 @@ class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
 
         program = MichelsonProgram.load(context, with_code=True).instantiate(entrypoint_str, parameter, storage)  # type: ignore
         program.begin(stack, stdout, context)
-        program.execute(stack, stdout, context)
+        program.execute(stack, stdout, context)  # type: ignore
         operations, storage, lazy_diff, res = program.end(stack, stdout)
 
         return cls(lazy_diff=lazy_diff, result=res)

@@ -11,27 +11,26 @@ from pytezos.michelson.types.base import MichelsonType, generate_pydoc
 
 
 class ContractData(ContextMixin):
-
-    def __init__(self, context: ExecutionContext, data: MichelsonType, path='', title=None):
-        super(ContractData, self).__init__(context=context)
+    def __init__(self, context: ExecutionContext, data: MichelsonType, path='', title=None) -> None:
+        super().__init__(context=context)
         self.data = data
         self.path = path
         self.__doc__ = generate_pydoc(type(self.data), title=title)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
-            super(ContractData, self).__repr__(),
+            super().__repr__(),
             f'.path\t{self.path}',
             f'\nBuiltin\n()\t# get as Python object',
             f'[key]  # access child elements by name or index',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',
-            get_class_docstring(self.__class__)
+            get_class_docstring(self.__class__),
         ]
         return '\n'.join(res)
 
     def __getitem__(self, item: Union[str, int]) -> 'ContractData':
-        """ Access child elements by name or index (depending on the type)
+        """Access child elements by name or index (depending on the type)
 
         :param item: field name (str) or index (int)
         :rtype: ContractData
@@ -42,28 +41,28 @@ class ContractData(ContextMixin):
         return ContractData(self.context, res, path=f'{self.path}/{item}')
 
     def __call__(self, try_unpack=False):
-        """ Get Michelson value as a Python object
+        """Get Michelson value as a Python object
 
         :param try_unpack: try to unpack utf8-encoded strings or PACKed Michelson expressions
         """
         return self.data.to_python_object(try_unpack=try_unpack)
 
     def to_micheline(self, optimized=False):
-        """ Get as Micheline JSON expression
+        """Get as Micheline JSON expression
 
         :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
         """
         return self.data.to_micheline_value(mode='optimized' if optimized else 'readable')
 
     def to_michelson(self, optimized=False):
-        """ Get as Michelson value
+        """Get as Michelson value
 
         :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
         """
         return micheline_to_michelson(self.to_micheline(optimized=optimized))
 
     def decode(self, value):
-        """ Convert from Michelson to Python type system
+        """Convert from Michelson to Python type system
 
         :param value: Micheline JSON expression or Michelson value
         :return: Python object
@@ -73,17 +72,16 @@ class ContractData(ContextMixin):
         return type(self.data).from_micheline_value(value).to_python_object()
 
     def encode(self, py_obj, mode: Optional[str] = None):
-        """ Convert from Python to Michelson type system
+        """Convert from Python to Michelson type system
 
         :param py_obj: Python object
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
         :return: Micheline JSON expression
         """
-        return type(self.data).from_python_object(py_obj) \
-            .to_micheline_value(mode=mode or self.context.mode)
+        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode)
 
     def dummy(self):
-        """ Try to generate a dummy (empty) value
+        """Try to generate a dummy (empty) value
 
         :return: Python object
         """

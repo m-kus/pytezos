@@ -1,3 +1,4 @@
+from abc import abstractclassmethod
 from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
@@ -69,6 +70,6 @@ class MichelsonInstruction(Micheline):
         expr = dict(prim=cls.prim, annots=annots, args=args)
         return {k: v for k, v in expr.items() if v}
 
-    @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+    @abstractclassmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext) -> 'MichelsonInstruction':
         raise NotImplementedError

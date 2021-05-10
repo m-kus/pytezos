@@ -12,8 +12,7 @@ from pytezos.michelson.sections.parameter import ParameterSection
 
 
 class ContractEntrypoint(ContextMixin):
-    """ Proxy class for spawning ContractCall instances.
-    """
+    """Proxy class for spawning ContractCall instances."""
 
     def __init__(self, context: ExecutionContext, entrypoint: str) -> None:
         super(ContractEntrypoint, self).__init__(context=context)
@@ -26,12 +25,12 @@ class ContractEntrypoint(ContextMixin):
             f'\nBuiltin\n(*args, **kwargs)\t# build transaction parameters (see typedef)',
             f'\nTypedef\n{self.__doc__}',
             '\nHelpers',
-            get_class_docstring(self.__class__)
+            get_class_docstring(self.__class__),
         ]
         return '\n'.join(res)
 
     def __call__(self, *args, **kwargs) -> 'ContractCall':
-        """ Spawn a contract call proxy initialized with the entrypoint name
+        """Spawn a contract call proxy initialized with the entrypoint name
 
         :param args: entrypoint args
         :param kwargs: entrypoint key-value args
@@ -53,7 +52,7 @@ class ContractEntrypoint(ContextMixin):
         )
 
     def decode(self, value: Union[str, Dict[str, Any]], entrypoint: Optional[str] = None) -> Dict[str, Any]:
-        """ Convert from Michelson to Python type system
+        """Convert from Michelson to Python type system
 
         :param value: Micheline JSON expression or Michelson value
         :param entrypoint: overwrite current entrypoint (in case you want to parse tx parameters)
@@ -69,7 +68,7 @@ class ContractEntrypoint(ContextMixin):
         return py_obj
 
     def encode(self, py_obj, mode: Optional[str] = None) -> dict:
-        """ Encode transaction parameters from the given Python object
+        """Encode transaction parameters from the given Python object
 
         :param py_obj: Python object
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
@@ -77,8 +76,7 @@ class ContractEntrypoint(ContextMixin):
         """
         try:
             param_ty = ParameterSection.match(self.context.parameter_expr)
-            return param_ty.from_python_object({self.entrypoint: py_obj}) \
-                .to_parameters(mode=mode or self.context.mode)
+            return param_ty.from_python_object({self.entrypoint: py_obj}).to_parameters(mode=mode or self.context.mode)
         except MichelsonRuntimeError as e:
             logger.info(self.__doc__)
             raise ValueError(f'Unexpected arguments: {pformat(py_obj)}', *e.args) from e

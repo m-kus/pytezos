@@ -30,8 +30,8 @@ from pytezos.rpc import ShellQuery
 
 
 class ContractTokenMetadataProxy:
-    """Get TZIP-21 contract token metadata by token_id
-    """
+    """Get TZIP-21 contract token metadata by token_id"""
+
     def __init__(self, fn: Callable) -> None:
         self._fn = fn
 
@@ -232,7 +232,7 @@ class ContractInterface(ContextMixin):
 
     @cached_property
     def metadata(self) -> Optional[ContractMetadata]:
-        """ Get TZIP-016 contract metadata, if exists
+        """Get TZIP-016 contract metadata, if exists
 
         :rtype: ContractMetadata
         """
@@ -275,7 +275,7 @@ class ContractInterface(ContextMixin):
 
     @property
     def token_metadata(self) -> ContractTokenMetadataProxy:
-        """ Get TZIP-021 contract token metadata proxy
+        """Get TZIP-021 contract token metadata proxy
 
         :rtype: ContractTokenMetadataProxy
         """
