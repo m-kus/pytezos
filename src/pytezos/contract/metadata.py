@@ -87,6 +87,8 @@ class View:
 
 @dataclass(kw_only=True, repr=False)
 class ContractMetadata(ContextMixin):
+    """TZIP-16 contract metadata"""
+
     name: Optional[str] = None
     description: Optional[str] = None
     version: Optional[str] = None
@@ -96,22 +98,19 @@ class ContractMetadata(ContextMixin):
     errors: Optional[List[Union[StaticError, DynamicError]]] = None
     views: Optional[List[View]] = None
 
-    def __attrs_post_init__(self):
-        self.raw = {}
-        self.storage_view_impl = {}
+    def __attrs_post_init__(self) -> None:
+        self.raw: Dict[str, Any] = {}
+        self.storage_view_impl: Dict[str, Any] = {}
         if self.views:
             for view in self.views:
                 michelson_storage_impl = next(
-                    (impl
-                     for impl in view.implementations
-                     if isinstance(impl, MichelsonStorageViewImplementation)),
-                    None
+                    (impl for impl in view.implementations if isinstance(impl, MichelsonStorageViewImplementation)), None
                 )
                 if michelson_storage_impl is not None:
                     name = to_camelcase(view.name)
                     self.storage_view_impl[name] = michelson_storage_impl.michelsonStorageView
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super().__repr__(),
             '\nMetadata',
@@ -120,10 +119,10 @@ class ContractMetadata(ContextMixin):
             f'.license\t{self.license.name if self.license else ""}',
             f'.authors\t{", ".join(self.authors or [])}',
             f'.interfaces\t{", ".join(self.interfaces or [])}',
-            f'.errors\t\t<{len(self.errors)}>',
-            f'.views\t\t<{len(self.views)}>',
+            f'.errors\t\t<{len(self.errors or [])}>',
+            f'.views\t\t<{len(self.views or [])}>',
             '\nStorage views',
-            *list(map(lambda x: f'.{x}()', self.storage_view_impl))
+            *list(map(lambda x: f'.{x}()', self.storage_view_impl)),
         ]
         return '\n'.join(res)
 
@@ -132,11 +131,13 @@ class ContractMetadata(ContextMixin):
             return super().__getattribute__(name)
         try:
             impl = self.storage_view_impl[name]
-            return OffChainView(context=self.context,
-                                name=name,
-                                parameter=impl.parameter,
-                                return_type=impl.returnType,
-                                code=impl.code)
+            return OffChainView(
+                context=self.context,
+                name=name,
+                parameter=impl.parameter,
+                return_type=impl.returnType,
+                code=impl.code,
+            )
         except KeyError as e:
             raise KeyError(f'Unknown view `{name}`, available: {list(self.storage_view_impl.keys())}') from e
 
@@ -146,6 +147,7 @@ class ContractMetadata(ContextMixin):
     # FIXME: Unnecessary multiple JSON conversions
     @staticmethod
     def fix_metadata_json(metadata_json: Dict[str, Any]) -> Dict[str, Any]:
+        """Fix invalid field casing in metadata JSON"""
         metadata_json_string = json.dumps(metadata_json)
         for from_, to in metadata_json_replace_table.items():
             metadata_json_string = metadata_json_string.replace(from_, to)
@@ -153,10 +155,12 @@ class ContractMetadata(ContextMixin):
 
     @staticmethod
     def validate_metadata_json(metadata_json: Dict[str, Any]) -> None:
+        """Validate metadata JSON with JSONSchema"""
         jsonschema_validate(instance=metadata_json, schema=metadata_schema)
 
     @classmethod
     def from_json(cls, metadata_json: Dict[str, Any], context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
+        """Convert metadata from JSON object"""
         metadata_json = cls.fix_metadata_json(metadata_json)
         cls.validate_metadata_json(metadata_json)
         res = Converter().structure(metadata_json, ContractMetadata)
@@ -166,17 +170,20 @@ class ContractMetadata(ContextMixin):
 
     @classmethod
     def from_ipfs(cls, multihash: str, context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
+        """Fetch metadata from IPFS network by multihash"""
         context = context or ExecutionContext()
         metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}').json()
         return cls.from_json(metadata_json, context)
 
     @classmethod
     def from_url(cls, url: str, context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
+        """Fetch metadata from HTTP(S) URL"""
         metadata_json = requests.get(url).json()
         return cls.from_json(metadata_json, context)
 
     @classmethod
     def from_file(cls, path: str, context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
+        """Read metadata from JSON file by path"""
         with open(path) as f:
             metadata_json = json.load(f)
             return cls.from_json(metadata_json, context)

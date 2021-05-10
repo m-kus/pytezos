@@ -87,6 +87,9 @@ line_length = 140
 [tool.black]
 line-length = 140
 target-version = ['py37', 'py38']
+include = [
+    'src/pytezos/michelson/program'
+]
 skip-string-normalization = true
 
 [build-system]

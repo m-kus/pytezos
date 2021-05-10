@@ -12,7 +12,6 @@ from deprecation import deprecated  # type: ignore
 
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.context.mixin import ExecutionContext
-from pytezos.contract.call import ContractCall
 from pytezos.contract.data import ContractData
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.contract.metadata import ContractMetadata
@@ -45,7 +44,7 @@ class ContractInterface(ContextMixin):
 
     program: MichelsonProgram
 
-    def __init__(self, context: ExecutionContext):
+    def __init__(self, context: ExecutionContext) -> None:
         super().__init__(context=context)
         self._logger = logging.getLogger(__name__)
         self.entrypoints = self.program.parameter.list_entrypoints()
@@ -56,7 +55,7 @@ class ContractInterface(ContextMixin):
             attr.__doc__ = generate_pydoc(ty, entrypoint)
             setattr(self, entrypoint, attr)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super().__repr__(),
             '.storage\t# access storage data at block `block_id`',
@@ -106,7 +105,7 @@ class ContractInterface(ContextMixin):
         return ContractInterface.from_micheline(michelson_to_micheline(source), context)
 
     @staticmethod
-    def from_micheline(expression, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+    def from_micheline(expression: List[Dict[str, Any]], context: Optional[ExecutionContext] = None) -> 'ContractInterface':
         """Create contract from micheline expression.
 
         :param expression: [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
@@ -151,21 +150,21 @@ class ContractInterface(ContextMixin):
             return ContractInterface.from_michelson(source)
         return ContractInterface.from_micheline(source)
 
-    def to_micheline(self):
+    def to_micheline(self) -> List[Dict[str, Any]]:
         """Get contract script in Micheline JSON
 
         :return:  [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
         """
         return self.program.as_micheline_expr()
 
-    def to_michelson(self):
+    def to_michelson(self) -> str:
         """Get contract listing in formatted Michelson
 
         :return: string
         """
         return micheline_to_michelson(self.to_micheline())
 
-    def to_file(self, path):
+    def to_file(self, path: str) -> None:
         """Write contract source to a .tz file
 
         :param path: path to the file
@@ -297,7 +296,7 @@ class ContractInterface(ContextMixin):
         except (KeyError, AssertionError):
             self._logger.info('Storage doesn\'t contain metadata URL for token %s', token_id)
             return None
-    
+
         self._logger.info('Trying to fetch contract token metadata from `%s`', token_metadata_url)
         parsed_url = urlparse(token_metadata_url)
 

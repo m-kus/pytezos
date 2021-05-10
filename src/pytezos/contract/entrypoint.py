@@ -1,5 +1,5 @@
 from pprint import pformat
-from typing import Optional
+from typing import Any, Dict, Optional, Union
 
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.context.mixin import ExecutionContext
@@ -15,11 +15,11 @@ class ContractEntrypoint(ContextMixin):
     """ Proxy class for spawning ContractCall instances.
     """
 
-    def __init__(self, context: ExecutionContext, entrypoint: str):
+    def __init__(self, context: ExecutionContext, entrypoint: str) -> None:
         super(ContractEntrypoint, self).__init__(context=context)
         self.entrypoint = entrypoint
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super(ContractEntrypoint, self).__repr__(),
             f'.entrypoint\t{self.entrypoint}',
@@ -30,7 +30,7 @@ class ContractEntrypoint(ContextMixin):
         ]
         return '\n'.join(res)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> 'ContractCall':
         """ Spawn a contract call proxy initialized with the entrypoint name
 
         :param args: entrypoint args
@@ -52,7 +52,7 @@ class ContractEntrypoint(ContextMixin):
             parameters=self.encode(py_obj, self.context.mode),
         )
 
-    def decode(self, value, entrypoint: Optional[str] = None) -> dict:
+    def decode(self, value: Union[str, Dict[str, Any]], entrypoint: Optional[str] = None) -> Dict[str, Any]:
         """ Convert from Michelson to Python type system
 
         :param value: Micheline JSON expression or Michelson value
