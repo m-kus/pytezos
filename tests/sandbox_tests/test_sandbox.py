@@ -21,8 +21,8 @@ class SandboxTestCase(SandboxedNodeTestCase):
 
     def test_4_bake_block(self) -> None:
         self.bake_block()
-        bootstrap2 = self.client.shell.contracts[sandbox_addresses['bootstrap3']]()
-        self.assertEqual('4000000000042', bootstrap2['balance'])
+        bootstrap3 = self.client.shell.contracts[sandbox_addresses['bootstrap3']]()
+        self.assertEqual('4000000000042', bootstrap3['balance'])
 
     def test_5_rollback(self) -> None:
         self.activate(EDO, reset=True)

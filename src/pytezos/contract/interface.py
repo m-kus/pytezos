@@ -47,6 +47,7 @@ class ContractInterface(ContextMixin):
     def __init__(self, context: ExecutionContext) -> None:
         super().__init__(context=context)
         self._logger = logging.getLogger(__name__)
+        self._storage: Optional[ContractData] = None
         self.entrypoints = self.program.parameter.list_entrypoints()
         for entrypoint, ty in self.entrypoints.items():
             if entrypoint == 'token_metadata':
@@ -222,13 +223,47 @@ class ContractInterface(ContextMixin):
 
     @property
     def storage(self) -> ContractData:
-        if self.address:
+        if self._storage:
+            return self._storage
+        elif self.address:
             expr = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
             storage = self.program.storage.from_micheline_value(expr)
             storage.attach_context(self.context)
         else:
             storage = self.program.storage.dummy(self.context)
         return ContractData(self.context, storage.item, title="storage")
+
+    @storage.setter
+    def storage(self, storage: ContractData) -> None:
+        if self.address:
+            raise Exception('Can\'t set storage of deployed contract')
+        self._storage = storage
+
+    def storage_from_file(self, path: str) -> None:
+        """Load contract storage from file
+
+        :param path: path to .tz file
+        """
+        with open(path) as file:
+            expr = michelson_to_micheline(file.read())
+        self.storage_from_micheline(expr)
+
+    def storage_from_micheline(self, expression) -> None: 
+        """Load contract storage from Micheline expression
+
+        :param expression: Micheline expression
+        """
+        storage = self.program.storage.from_micheline_value(expression)
+        storage.attach_context(self.context)
+        self.storage = ContractData(self.context, storage.item, title="storage")
+
+    def storage_from_michelson(self, source: str) -> None:
+        """Load contract storage from Michelson code
+
+        :param source: Michelson code
+        """
+        expr = michelson_to_micheline(source)
+        self.storage_from_micheline(expr)
 
     @cached_property
     def metadata(self) -> Optional[ContractMetadata]:
