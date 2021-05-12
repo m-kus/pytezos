@@ -51,6 +51,7 @@ black:
 	poetry run black src/pytezos/michelson/tags.py
 	poetry run black src/pytezos/operation
 	poetry run black src/pytezos/rpc/helpers.py
+	poetry run black src/pytezos/rpc/node.py
 	poetry run black src/pytezos/rpc/protocol.py
 	poetry run black src/pytezos/rpc/shell.py
 	poetry run black src/pytezos/sandbox

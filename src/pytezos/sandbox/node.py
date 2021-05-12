@@ -45,7 +45,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
     def activate(cls, protocol_alias: str, reset: bool = False) -> OperationGroup:
         """Activate protocol."""
         return (
-            cls._get_client()
+            cls.get_client()
             .using(key='dictator')
             .activate_protocol(protocol_alias)
             .fill(block_id='genesis' if reset else 'head')
@@ -68,7 +68,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
         return node_container
 
     @classmethod
-    def _get_client(cls) -> PyTezosClient:
+    def get_client(cls) -> PyTezosClient:
         return node_container_client.using(
             shell=cls.get_node_url(),
         )
@@ -84,7 +84,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
 
     @classmethod
     def _wait_for_connection(cls) -> None:
-        client = cls._get_client()
+        client = cls.get_client()
         while True:
             try:
                 client.shell.node.get("/version/")
@@ -98,9 +98,9 @@ class SandboxedNodeTestCase(unittest.TestCase):
 
         :param min_fee: minimum fee of operation to be included in block
         """
-        return cls._get_client().using(key='bootstrap1').bake_block(min_fee).fill().work().sign().inject()
+        return cls.get_client().using(key='bootstrap1').bake_block(min_fee).fill().work().sign().inject()
 
     @property
     def client(self) -> PyTezosClient:
         """PyTezos client to interact with sandboxed node."""
-        return self._get_client().using(key='bootstrap2')
+        return self.get_client().using(key='bootstrap2')
