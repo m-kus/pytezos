@@ -75,7 +75,7 @@ image:
 	docker build . -t michelson-kernel
 
 docs:
-	cd docs && rm -rf ./build && $(MAKE) html && cd ..
+	poetry run sh -c "cd docs && rm -rf ./build && $(MAKE) html && cd .."
 
 kernel-docs:
 	python scripts/gen_kernel_docs_py.py
