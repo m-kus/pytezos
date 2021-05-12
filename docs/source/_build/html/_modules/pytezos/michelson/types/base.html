@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pytezos.michelson.types.base &mdash; PyTezos  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../contents.html" class="icon icon-home" alt="Documentation Home"> PyTezos
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integration_tests.html">Michelson integration tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pytezos_cli.html">Pytezos CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../high_level.html">High-level interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../crypto.html">Cryptography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../operation_groups.html">Building and parsing operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rpc_queries.html">RPC query engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../types.html">Michelson types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../instructions.html">Michelson instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Working with Michelson code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../repl.html">Michelson REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../inspect_proposals.html">Inspecting proposals</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../contents.html">PyTezos</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../contents.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pytezos.michelson.types.base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pytezos.michelson.types.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span><span class="p">,</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">pytezos.context.abstract</span> <span class="kn">import</span> <span class="n">AbstractContext</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">pytezos.michelson.forge</span> <span class="kn">import</span> <span class="n">forge_micheline</span><span class="p">,</span> <span class="n">unforge_micheline</span>
+<span class="kn">from</span> <span class="nn">pytezos.michelson.micheline</span> <span class="kn">import</span> <span class="n">Micheline</span>
+
+<span class="n">type_mappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;nat&#39;</span><span class="p">:</span> <span class="s1">&#39;int  /* Natural number */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;unit&#39;</span><span class="p">:</span> <span class="s1">&#39;None || Unit /* `from pytezos import Unit` for resolving None ambiguity */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bytes&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Hex string */ ||</span><span class="se">\n\t</span><span class="s1">bytes  /* Python byte string */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="s1">&#39;int  /* Unix time in seconds */ ||</span><span class="se">\n\t</span><span class="s1">string  /* Formatted datetime `%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ` */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mutez&#39;</span><span class="p">:</span> <span class="s1">&#39;int  /* Amount in `utz` (10^-6) */ ||</span><span class="se">\n\t</span><span class="s1">Decimal  /* Amount in `tz` */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;contract&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Base58 encoded `KT` address with optional entrypoint */&#39;</span>
+                <span class="s1">&#39; ||</span><span class="se">\n\t</span><span class="s1">None  /* when you need to avoid type checking */&#39;</span>
+                <span class="s1">&#39; ||</span><span class="se">\n\t</span><span class="s1">Undefined  /* `from pytezos import Undefined` for resolving None ambiguity  */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Base58 encoded `tz` or `KT` address */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Base58 encoded public key */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;key_hash&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Base58 encoded public key hash */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;signature&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Base58 encoded signature */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lambda&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Michelson source code */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;chain_id&#39;</span><span class="p">:</span> <span class="s1">&#39;str  /* Base58 encoded chain ID */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ticket&#39;</span><span class="p">:</span> <span class="s1">&#39;/* no literal form, tickets can only be created by another contract */&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;operation&#39;</span><span class="p">:</span> <span class="s1">&#39;/* no literal form, operations can only be spawned by another contract or lambda */&#39;</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="undefined"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.undefined">[docs]</a><span class="k">class</span> <span class="nc">undefined</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">undefined</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+<span class="n">Undefined</span> <span class="o">=</span> <span class="n">undefined</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="parse_name"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.parse_name">[docs]</a><span class="k">def</span> <span class="nf">parse_name</span><span class="p">(</span><span class="n">annots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">annots</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">sub_annots</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">annots</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_annots</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;multiple &quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">&quot; annotations are not allowed: </span><span class="si">{</span><span class="n">sub_annots</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="n">sub_annots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">sub_annots</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MichelsonType"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType">[docs]</a><span class="k">class</span> <span class="nc">MichelsonType</span><span class="p">(</span><span class="n">Micheline</span><span class="p">):</span>
+    <span class="n">field_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">type_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s1">&#39;MichelsonType&#39;</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># NOTE: for sorting</span>
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comparable</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;must be implemented for comparable types&#39;</span>
+
+    <span class="c1"># NOTE: for contains</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comparable</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;must be implemented for comparable types&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;forbidden&#39;</span>
+
+<div class="viewcode-block" id="MichelsonType.match"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.match">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;MichelsonType&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="s1">&#39;MichelsonType&#39;</span><span class="p">],</span> <span class="n">Micheline</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">expr</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.create_type"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.create_type">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                    <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s1">&#39;Micheline&#39;</span><span class="p">]],</span>
+                    <span class="n">annots</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;MichelsonType&#39;</span><span class="p">]:</span>
+        <span class="n">type_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">MichelsonType</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;big_map&#39;</span><span class="p">,</span> <span class="s1">&#39;option&#39;</span><span class="p">,</span> <span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">type_args</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">arg</span><span class="o">.</span><span class="n">field_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">prim</span><span class="si">}</span><span class="s1"> argument type cannot be annotated: %</span><span class="si">{</span><span class="n">arg</span><span class="o">.</span><span class="n">field_name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;big_map&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="n">type_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">is_comparable</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">prim</span><span class="si">}</span><span class="s1"> key type has to be comparable (not </span><span class="si">{</span><span class="n">type_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prim</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;big_map&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">type_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">is_big_map_friendly</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;impossible big_map value type&#39;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">field_name</span><span class="o">=</span><span class="n">parse_name</span><span class="p">(</span><span class="n">annots</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
+                                              <span class="n">type_name</span><span class="o">=</span><span class="n">parse_name</span><span class="p">(</span><span class="n">annots</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
+                                              <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+                                              <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="s1">&#39;MichelsonType&#39;</span><span class="p">],</span> <span class="n">res</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.get_anon_type"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.get_anon_type">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_anon_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;MichelsonType&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create_type</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.as_micheline_expr"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.as_micheline_expr">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">as_micheline_expr</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">annots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">type_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">annots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;:</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">type_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">field_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">annots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;%</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">field_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span><span class="o">.</span><span class="n">as_micheline_expr</span><span class="p">()</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">prim</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">prim</span><span class="p">,</span> <span class="n">annots</span><span class="o">=</span><span class="n">annots</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">expr</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="MichelsonType.generate_pydoc"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.generate_pydoc">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">generate_pydoc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">definitions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">inferred_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comparable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+            <span class="ow">or</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_state&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_transaction&#39;</span><span class="p">],</span> \
+            <span class="s1">&#39;defined for simple types only&#39;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="n">type_mappings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">definitions</span><span class="p">):</span>
+                <span class="n">definitions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">prim</span><span class="p">,</span> <span class="n">type_mappings</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">prim</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_comparable"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_comparable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_comparable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bls12_381_fr&#39;</span><span class="p">,</span> <span class="s1">&#39;bls12_381_g1&#39;</span><span class="p">,</span> <span class="s1">&#39;bls12_381_g2&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_state&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_transaction&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;big_map&#39;</span><span class="p">,</span> <span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;operation&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_comparable</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_passable"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_passable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_passable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;operation&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;lambda&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_passable</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_storable"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_storable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_storable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;operation&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;lambda&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_storable</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_pushable"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_pushable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_pushable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;big_map&#39;</span><span class="p">,</span> <span class="s1">&#39;operation&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_state&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;lambda&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_pushable</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_packable"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_packable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_packable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;big_map&#39;</span><span class="p">,</span> <span class="s1">&#39;operation&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_state&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;lambda&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_packable</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_duplicable"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_duplicable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_duplicable</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ticket&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;lambda&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_duplicable</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.is_big_map_friendly"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.is_big_map_friendly">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_big_map_friendly</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;big_map&#39;</span><span class="p">,</span> <span class="s1">&#39;operation&#39;</span><span class="p">,</span> <span class="s1">&#39;sapling_state&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prim</span> <span class="o">==</span> <span class="s1">&#39;lambda&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">is_big_map_friendly</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">args</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MichelsonType.unpack"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.unpack">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_packable</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">prim</span><span class="si">}</span><span class="s1"> cannot be packed&#39;</span>
+        <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05</span><span class="s1">&#39;</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;packed data should start with 05&#39;</span>
+        <span class="n">val_expr</span> <span class="o">=</span> <span class="n">unforge_micheline</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_micheline_value</span><span class="p">(</span><span class="n">val_expr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.from_literal"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.from_literal">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_literal</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">literal</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Micheline</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">literal</span><span class="o">.</span><span class="n">as_micheline_expr</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_micheline_value</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.dummy"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.dummy">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">dummy</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">AbstractContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="MichelsonType.from_micheline_value"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.from_micheline_value">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_micheline_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val_expr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="MichelsonType.from_python_object"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.from_python_object">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_python_object</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">py_obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="MichelsonType.to_micheline_value"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.to_micheline_value">[docs]</a>    <span class="k">def</span> <span class="nf">to_micheline_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;readable&#39;</span><span class="p">,</span> <span class="n">lazy_diff</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="MichelsonType.to_python_object"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.to_python_object">[docs]</a>    <span class="k">def</span> <span class="nf">to_python_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_unpack</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lazy_diff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">comparable</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="MichelsonType.to_literal"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.to_literal">[docs]</a>    <span class="k">def</span> <span class="nf">to_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Micheline</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="MichelsonType.attach_context"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.attach_context">[docs]</a>    <span class="k">def</span> <span class="nf">attach_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">AbstractContext</span><span class="p">,</span> <span class="n">big_map_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># NOTE: mutation</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MichelsonType.merge_lazy_diff"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.merge_lazy_diff">[docs]</a>    <span class="k">def</span> <span class="nf">merge_lazy_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lazy_diff</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.aggregate_lazy_diff"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.aggregate_lazy_diff">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate_lazy_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lazy_diff</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;readable&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;MichelsonType&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">prim</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;contract&#39;</span><span class="p">,</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span> <span class="s1">&#39;ticket&#39;</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.forge"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.forge">[docs]</a>    <span class="k">def</span> <span class="nf">forge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;readable&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">val_expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_micheline_value</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">forge_micheline</span><span class="p">(</span><span class="n">val_expr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MichelsonType.pack"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">legacy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_packable</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prim</span><span class="si">}</span><span class="s1"> cannot be packed&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forge</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;legacy_optimized&#39;</span> <span class="k">if</span> <span class="n">legacy</span> <span class="k">else</span> <span class="s1">&#39;optimized&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="MichelsonType.duplicate"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.MichelsonType.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_duplicable</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prim</span><span class="si">}</span><span class="s1"> is not duplicable&#39;</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="generate_pydoc"><a class="viewcode-back" href="../../../../types.html#pytezos.michelson.types.base.generate_pydoc">[docs]</a><span class="k">def</span> <span class="nf">generate_pydoc</span><span class="p">(</span><span class="n">ty</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">MichelsonType</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">definitions</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">top_def</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">generate_pydoc</span><span class="p">(</span><span class="n">definitions</span><span class="p">,</span> <span class="n">inferred_name</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">top_def</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">):</span>
+        <span class="n">definitions</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="n">ty</span><span class="o">.</span><span class="n">field_name</span> <span class="ow">or</span> <span class="n">ty</span><span class="o">.</span><span class="n">type_name</span> <span class="ow">or</span> <span class="s1">&#39;element&#39;</span><span class="p">,</span> <span class="n">top_def</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;$</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:</span><span class="se">\n\t</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">definitions</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Baking Bad
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Michelson integration tests &mdash; PyTezos  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pytezos CLI" href="pytezos_cli.html" />
+    <link rel="prev" title="Quick start" href="quick_start.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="contents.html" class="icon icon-home" alt="Documentation Home"> PyTezos
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Michelson integration tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-by-step-guide">Step by step guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-samples">Test samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#projects-using-pytezos">Projects using PyTezos</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytezos_cli.html">Pytezos CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high_level.html">High-level interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto.html">Cryptography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operation_groups.html">Building and parsing operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_queries.html">RPC query engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Michelson types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instructions.html">Michelson instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Working with Michelson code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="repl.html">Michelson REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inspect_proposals.html">Inspecting proposals</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="contents.html">PyTezos</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="contents.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Michelson integration tests</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/integration_tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="michelson-integration-tests">
+<h1>Michelson integration tests<a class="headerlink" href="#michelson-integration-tests" title="Permalink to this headline">¶</a></h1>
+<section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>Make sure you are familiar with the unittest package, if not - check out the docs: <a class="reference external" href="https://docs.python.org/3/library/unittest.html">https://docs.python.org/3/library/unittest.html</a></p>
+<p>Michelson tests are mostly based on two high-level interfaces:</p>
+<ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pytezos.contract.interface.ContractInterface</span></code> as a top-level entity</p></li>
+<li><p><a class="reference internal" href="high_level.html#pytezos.contract.call.ContractCall" title="pytezos.contract.call.ContractCall"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytezos.contract.call.ContractCall</span></code></a> for simulating contract calls</p></li>
+<li><p><a class="reference internal" href="high_level.html#pytezos.contract.result.ContractCallResult" title="pytezos.contract.result.ContractCallResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytezos.contract.result.ContractCallResult</span></code></a> for handling call results</p></li>
+</ul>
+<p>There are also two options of executing Michelson scripts:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="high_level.html#pytezos.contract.call.ContractCall.run_code" title="pytezos.contract.call.ContractCall.run_code"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pytezos.contract.call.ContractCall.run_code()</span></code></a> which uses standard RPC endpoint (i.e. remote Michelson interpreter)</p></li>
+<li><p><a class="reference internal" href="high_level.html#pytezos.contract.call.ContractCall.interpret" title="pytezos.contract.call.ContractCall.interpret"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pytezos.contract.call.ContractCall.interpret()</span></code></a> that uses built-in interpreter which is not guaranteed to behave exactly as the reference one</p></li>
+</ul>
+</section>
+<section id="step-by-step-guide">
+<h2>Step by step guide<a class="headerlink" href="#step-by-step-guide" title="Permalink to this headline">¶</a></h2>
+<p>Read this Medium article: <a class="reference external" href="https://medium.com/tezoscommons/testing-michelson-contracts-with-pytezos-513718499e93">https://medium.com/tezoscommons/testing-michelson-contracts-with-pytezos-513718499e93</a></p>
+</section>
+<section id="test-samples">
+<h2>Test samples<a class="headerlink" href="#test-samples" title="Permalink to this headline">¶</a></h2>
+<p>Check out test examples in this repo: <a class="reference external" href="https://github.com/baking-bad/pytezos/tree/master/examples">https://github.com/baking-bad/pytezos/tree/master/examples</a></p>
+</section>
+<section id="projects-using-pytezos">
+<h2>Projects using PyTezos<a class="headerlink" href="#projects-using-pytezos" title="Permalink to this headline">¶</a></h2>
+<p>See how PyTezos testing engine is used in production:</p>
+<ul>
+<li><p>Atomex
+<a class="reference external" href="https://github.com/atomex-me/atomex-michelson/blob/master/tests/test_atomex.py">https://github.com/atomex-me/atomex-michelson/blob/master/tests/test_atomex.py</a></p></li>
+<li><p>Atomex FA1.2
+<a class="reference external" href="https://github.com/atomex-me/atomex-fa12-ligo/tree/master/tests">https://github.com/atomex-me/atomex-fa12-ligo/tree/master/tests</a></p></li>
+<li><p>TQTezos MAC
+<a class="reference external" href="https://github.com/tqtezos/smart-contracts/tree/master/multi_asset/tezos_mac_tests">https://github.com/tqtezos/smart-contracts/tree/master/multi_asset/tezos_mac_tests</a></p></li>
+<li><p>Equisafe NYX
+<a class="reference external" href="https://gitlab.com/equisafe/nyx/-/tree/master/tests">https://gitlab.com/equisafe/nyx/-/tree/master/tests</a></p>
+<p>1. Loading contract
+- address
+- file
+2. Calling contract entrypoints
+Using node interpreter
+Using built-in interpreter run_code
+3. Accessing contract metadata
+interpret
+sandbox</p>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pytezos_cli.html" class="btn btn-neutral float-right" title="Pytezos CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quick_start.html" class="btn btn-neutral float-left" title="Quick start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Baking Bad
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

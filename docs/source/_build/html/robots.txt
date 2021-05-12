@@ -1,0 +1,3 @@
+User-agent: *
+
+Sitemap: https://baking-bad.github.io/pytezos/sitemap.xml

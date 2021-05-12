@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<meta content="Python SDK &amp; CLI for Tezos, Michelson REPL and integration testing framework" name="description" />
+<meta content="tezos, blockchain, python, library, sdk, cli, repl, testing, framework, rpc, michelson, micheline, contract" name="keywords" />
+<meta content="summary" name="twitter:card" />
+<meta content="&#64;TezosBakingBad" name="twitter:creator" />
+<meta content="PyTezos documentation | Baking Bad" name="twitter:title" />
+<meta content="Python SDK &amp; CLI for Tezos, Michelson REPL and integration testing framework" name="twitter:description" />
+<meta content="https://repository-images.githubusercontent.com/169243460/eb3da980-c1e1-11e9-9e60-6f32b60ddf38" name="twitter:image" />
+<meta content="https://pytezos.baking-bad.org" name="og:url" />
+<meta content="website" name="og:type" />
+<meta content="PyTezos documentation | Baking Bad" name="og:title" />
+<meta content="Python SDK &amp; CLI for Tezos, Michelson REPL and integration testing framework" name="og:description" />
+<meta content="https://repository-images.githubusercontent.com/169243460/eb3da980-c1e1-11e9-9e60-6f32b60ddf38" name="og:image" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Baking Bad &mdash; PyTezos  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick start" href="quick_start.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> PyTezos
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="integration_tests.html">Michelson integration tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytezos_cli.html">Pytezos CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high_level.html">High-level interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crypto.html">Cryptography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operation_groups.html">Building and parsing operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_queries.html">RPC query engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Michelson types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instructions.html">Michelson instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Working with Michelson code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="repl.html">Michelson REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inspect_proposals.html">Inspecting proposals</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">PyTezos</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Baking Bad</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contents.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="welcome-to-pytezos-reference">
+<h1>Welcome to PyTezos reference!<a class="headerlink" href="#welcome-to-pytezos-reference" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#set-key-and-rpc-node">Set key and RPC node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#activate-account">Activate account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#reveal-public-key">Reveal public key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#originate-contract">Originate contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#bulk-injecting">Bulk injecting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#call-an-entrypoint">Call an entrypoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#access-storage">Access storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#bigmap-lookup">BigMap lookup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#view-method">View method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="integration_tests.html">Michelson integration tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integration_tests.html#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration_tests.html#step-by-step-guide">Step by step guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration_tests.html#test-samples">Test samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration_tests.html#projects-using-pytezos">Projects using PyTezos</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytezos_cli.html">Pytezos CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytezos_cli.html#tutorials">Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytezos_cli.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytezos_cli.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="high_level.html">High-level interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="high_level.html#pytezos-client">PyTezos client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high_level.html#contract-interface">Contract interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high_level.html#contract-entrypoint-proxy">Contract entrypoint proxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high_level.html#contract-call-proxy">Contract call proxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high_level.html#contract-call-result">Contract call result</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high_level.html#contract-storage-proxy">Contract storage proxy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="crypto.html">Cryptography</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html#module-pytezos.crypto.key">Keys and signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crypto.html#module-pytezos.crypto.encoding">Encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operation_groups.html">Building and parsing operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operation_groups.html#operation-group">Operation group</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operation_groups.html#operation-result">Operation result</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operation_groups.html#module-pytezos.operation.fees">Fees and limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operation_groups.html#module-pytezos.operation.forge">Local forge</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_queries.html">RPC query engine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rpc_queries.html#module-pytezos.rpc.shell">Shell-level endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_queries.html#module-pytezos.rpc.protocol">Protocol-specific endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_queries.html#module-pytezos.rpc.helpers">RPC Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_queries.html#module-pytezos.rpc.search">Interval search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_queries.html#module-pytezos.rpc.node">Node wrapper and errors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Michelson types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.base">Base class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.core">Core types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.domain">Domain types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.big_map">Big map type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.bls">BLS types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.list">List type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.map">Map type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.operation">Operation type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.option">Option type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.pair">Pair type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.sapling">Sapling type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.set">Set type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.sum">Or type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#module-pytezos.michelson.types.ticket">Ticket type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="instructions.html">Michelson instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.base">Base Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.adt">ADT operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.arithmetic">Arithmetic operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.boolean">Boolean operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.compare">Comparison operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.control">Control flow operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.crypto">Crypto operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.generic">Generic operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.stack">Stack operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.struct">Operations with structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.tezos">Tezos-specific operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#module-pytezos.michelson.instructions.ticket">Ticket operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Working with Michelson code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.macros">Expanding macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.parse">Parsing AST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.format">Code formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.sections.parameter">Parameter section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.sections.storage">Storage section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.sections.code">Code section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-pytezos.michelson.program">Script wrapper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="repl.html">Michelson REPL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="repl.html#module-pytezos.michelson.repl">Interpreter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="repl.html#module-pytezos.michelson.stack">Michelson stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="repl.html#module-pytezos.context.impl">Execution context</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inspect_proposals.html">Inspecting proposals</a></li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="quick_start.html" class="btn btn-neutral float-right" title="Quick start" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Baking Bad
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
