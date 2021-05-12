@@ -47,9 +47,9 @@ class ContractCallResult(OperationResult):
 
     @classmethod
     def from_run_code(cls, response: Dict[str, Any], parameters, context: ExecutionContext) -> 'ContractCallResult':
-        """Parse a result of `run_code` execution.
+        """Parse a result of :py:meth:`pytezos.contract.call.ContractCall.run_code` execution.
 
-        :param response: RPC response (json)
+        :param response: RPC response (JSON)
         :param parameters: {"entrypoint": str, "value": $Micheline}
         :param context: execution context
         :rtype: ContractCallResult

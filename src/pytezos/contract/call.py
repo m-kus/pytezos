@@ -40,7 +40,7 @@ class ContractCall(ContextMixin):
         return '\n'.join(res)
 
     def with_amount(self, amount: Union[int, Decimal]) -> 'ContractCall':
-        """Send funds to the contract too.
+        """Set amount of funds to send with transaction to the contract.
 
         :param amount: amount in microtez (int) or tez (Decimal)
         :rtype: ContractCall
@@ -52,7 +52,7 @@ class ContractCall(ContextMixin):
         )
 
     def as_transaction(self) -> OperationGroup:
-        """Get operation content
+        """Get operation content.
 
         :rtype: OperationGroup
         """
@@ -68,7 +68,7 @@ class ContractCall(ContextMixin):
         return self.as_transaction().fill()
 
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5) -> OperationGroup:
-        """Send operation to blockchain"""
+        """Send operation to blockchain."""
         return (
             self.as_transaction()
             .autofill()
@@ -82,7 +82,7 @@ class ContractCall(ContextMixin):
         )
 
     def cmdline(self) -> str:
-        """Generate command line for tezos client."""
+        """Generate command line for tezos-client."""
         arg = micheline_to_michelson(self.parameters['value'], inline=True)
         source = self.key.public_key_hash()
         amount = format_tez(self.amount)
@@ -158,7 +158,7 @@ class ContractCall(ContextMixin):
         chain_id=None,
         gas_limit=None,
     ) -> ContractCallResult:
-        """Execute using RPC interpreter
+        """Execute using RPC interpreter.
 
         :param storage: initial storage as Python object, leave None if you want to generate a dummy one
         :param source: patch SOURCE
@@ -191,7 +191,7 @@ class ContractCall(ContextMixin):
         return ContractCallResult.from_run_code(res, parameters=self.parameters, context=self.context)
 
     def run_operation(self) -> ContractCallResult:
-        """Simulate operation using real context
+        """Simulate operation using real context.
 
         :rtype: ContractCallResult
         """
@@ -224,7 +224,7 @@ class ContractCall(ContextMixin):
         return res.storage  # type: ignore
 
     def callback_view(self):
-        """Get return value of an on-chain callback method
+        """Get return value of an on-chain callback method.
 
         :returns: Decoded parameters of a callback
         """
