@@ -43,12 +43,16 @@ isort:
 black:
 	poetry run black src/michelson_kernel
 	poetry run black src/pytezos/block
+	poetry run black src/pytezos/client.py
 	poetry run black src/pytezos/contract
 	poetry run black src/pytezos/michelson/program.py
 	poetry run black src/pytezos/michelson/repl.py
 	poetry run black src/pytezos/michelson/stack.py
 	poetry run black src/pytezos/michelson/tags.py
 	poetry run black src/pytezos/operation
+	poetry run black src/pytezos/rpc/helpers.py
+	poetry run black src/pytezos/rpc/protocol.py
+	poetry run black src/pytezos/rpc/shell.py
 	poetry run black src/pytezos/sandbox
 
 pylint:
@@ -57,7 +61,7 @@ pylint:
 mypy:
 	poetry run mypy src
 
-lint: isort pylint mypy
+lint: isort black pylint mypy
 
 test:
 	poetry run nosetests --with-coverage tests --cover-package pytezos --cover-package michelson_kernel --cover-xml-file coverage.xml

@@ -50,6 +50,7 @@ class ContentMixin:
     @inline_doc
     def seed_nonce_revelation(self, level: int, nonce: str) -> Dict[str, Any]:
         """Reveal the nonce committed operation in the previous cycle.
+
         More info https://tezos.stackexchange.com/questions/567/what-are-nonce-revelations
 
         :param level: When nonce hash was committed
@@ -68,7 +69,10 @@ class ContentMixin:
     def double_endorsement_evidence(self, op1: Dict[str, Any], op2: Dict[str, Any]) -> Dict[str, Any]:
         """Provide evidence of double endorsement (endorsing two different blocks at the same block height).
 
-        :param op1: Inline endorsement
+        Inline endorsement format:
+
+        .. code-block:: python
+
             {
                 "branch": $block_hash,
                 "operations": {
@@ -77,6 +81,8 @@ class ContentMixin:
                 },
                 "signature"?: $Signature
             }
+
+        :param op1: Inline endorsement
         :param op2: Inline endorsement
         :returns: dict or OperationGroup
         """
@@ -107,6 +113,7 @@ class ContentMixin:
     @inline_doc
     def activate_account(self, activation_code='', pkh='') -> Dict[str, Any]:
         """Activate recommended allocations for contributions to the TF fundraiser.
+
         More info https://activate.tezos.com/
 
         :param activation_code: Secret code from pdf, leave empty for autocomplete
@@ -124,6 +131,7 @@ class ContentMixin:
     @inline_doc
     def proposals(self, proposals, source='', period=0) -> Dict[str, Any]:
         """Submit and/or upvote proposals to amend the protocol.
+
         Can only be submitted during a proposal period.
         More info https://tezos.gitlab.io/master/whitedoc/voting.html
 
@@ -147,6 +155,7 @@ class ContentMixin:
     @inline_doc
     def ballot(self, proposal, ballot, source='', period=0) -> Dict[str, Any]:
         """Vote for a proposal in a given voting period.
+
         Can only be submitted during Testing_vote or Promotion_vote periods, and only once per period.
         More info https://tezos.gitlab.io/master/whitedoc/voting.html
 
@@ -176,12 +185,12 @@ class ContentMixin:
         gas_limit=0,
         storage_limit=0,
     ) -> Dict[str, Any]:
-        """ Reveal the public key associated with a tz address.
+        """Reveal the public key associated with a tz address.
 
         :param public_key: Public key to reveal, Base58 encoded
         :param source: Public key hash of the key revealed, leave None to use signatory address
-        :param counter: Current account counter, leave None for autocomplete \
-        (More info https://tezos.stackexchange.com/questions/632/how-counter-grows)
+        :param counter: Current account counter, leave None for autocomplete
+            (More info https://tezos.stackexchange.com/questions/632/how-counter-grows)
         :param fee: Leave None for autocomplete
         :param gas_limit: Leave None for autocomplete
         :param storage_limit: Leave None for autocomplete
@@ -212,6 +221,7 @@ class ContentMixin:
         storage_limit=0,
     ) -> Dict[str, Any]:
         """Transfer tez to a given address (implicit or originated).
+
         If the receiver is a smart contract, then optional parameters may be passed.
 
         :param source: Address from which funds will be sent, leave None to use signatory address
@@ -252,11 +262,11 @@ class ContentMixin:
         gas_limit=0,
         storage_limit=0,
     ) -> Dict[str, Any]:
-        """ Deploy smart contract (scriptless KT accounts are not used for delegation since Babylon)
+        """Deploy smart contract (scriptless KT accounts are not used for delegation since Babylon).
 
         :param script: {"code": $Micheline, "storage": $Micheline}
-        :param balance: Amount transferred on the balance, WARNING: there is no default way to withdraw funds. \
-        More info: https://tezos.stackexchange.com/questions/1315/can-i-withdraw-funds-from-an-empty-smart-contract
+        :param balance: Amount transferred on the balance, WARNING: there is no default way to withdraw funds.
+            More info: https://tezos.stackexchange.com/questions/1315/can-i-withdraw-funds-from-an-empty-smart-contract
         :param delegate: Set contract delegate, default None
         :param source: Address from which funds will be sent, leave None to use signatory address
         :param counter: Current account counter, leave None for autocomplete

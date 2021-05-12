@@ -134,10 +134,10 @@ class InvalidBlockQuery(RpcQuery, path='/chains/{}/invalid_blocks/{}'):
 
 class MempoolQuery(RpcQuery, path='/chains/{}/mempool'):
     def post(self, configuration):
-        """ Set operation filter rules.
+        """Set operation filter rules.
 
-        :param configuration: a JSON dictionary, known keys are `minimal_fees`, `minimal_nanotez_per_gas_unit`, \
-        `minimal_nanotez_per_byte`
+        :param configuration: a JSON dictionary, known keys are `minimal_fees`, `minimal_nanotez_per_gas_unit`,
+            `minimal_nanotez_per_byte`
         """
         return self._post(json=configuration)
 
@@ -207,7 +207,7 @@ class DescribeQuery(RpcQuery, path='/describe'):
         """Get RPCs documentation and input/output schema.
 
         :param recurse: Show information for child elements, default is True.
-        In some cases doesn't work without this flag.
+            In some cases doesn't work without this flag.
         """
         return super(DescribeQuery, self).__call__(recurse=recurse)
 
@@ -222,11 +222,15 @@ class DescribeQuery(RpcQuery, path='/describe'):
 
 class BlockInjectionQuery(RpcQuery, path='/injection/block'):
     def post(self, block, timestamp=None, _async=False, force=False, chain=None):
-        """ Inject a block in the node and broadcast it.
+        """Inject a block in the node and broadcast it.
+
         The `operations` embedded in `blockHeader` might be pre-validated using a contextual RPCs from the latest block
         (e.g. '/blocks/head/context/preapply').
 
-        :param block: Json input
+        block format:
+
+        .. code-block:: python
+
             {
                 "data": <hex-encoded block header>,
                 "operations": [ [ {
@@ -234,6 +238,8 @@ class BlockInjectionQuery(RpcQuery, path='/injection/block'):
                 "data": <hex-encoded operation>
                 } ... ] ... ]
             }
+
+        :param block: JSON input
         :param _async: By default, the RPC will wait for the block to be validated before answering, \
         set True if you don't want to.
         :param force:
@@ -253,13 +259,13 @@ class BlockInjectionQuery(RpcQuery, path='/injection/block'):
 
 class OperationInjectionQuery(RpcQuery, path='/injection/operation'):
     def post(self, operation, _async=False, chain=None):
-        """ Inject an operation in node and broadcast it.
+        """Inject an operation in node and broadcast it.
         The `signedOperationContents` should be constructed using a contextual RPCs from the latest block
         and signed by the client.
 
         :param operation: Hex-encoded operation data or bytes
-        :param _async: By default, the RPC will wait for the operation to be (pre-)validated before answering, \
-        set True if you don't want to.
+        :param _async: By default, the RPC will wait for the operation to be (pre-)validated before answering,
+            set True if you don't want to.
         :param chain: Optionally you can specify the chain
         :returns: ID of the operation
         """
@@ -279,7 +285,10 @@ class ProtocolInjectionQuery(RpcQuery, path='/injection/protocol'):
     def post(self, protocol, _async=False, force=False):
         """Inject a protocol in node.
 
-        :param protocol: Json input
+        protocol format:
+
+        .. code-block:: python
+
             {
                 "expected_env_version": <integer>,
                 "components": [{
@@ -289,6 +298,8 @@ class ProtocolInjectionQuery(RpcQuery, path='/injection/protocol'):
                      ...
                 ]}
             }
+
+        :param protocol: JSON input
         :param _async:
         :param force:
         :returns: ID of the protocol

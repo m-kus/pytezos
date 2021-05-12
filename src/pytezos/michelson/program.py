@@ -8,8 +8,18 @@ from pytezos.michelson.micheline import MichelineSequence, get_script_section, t
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.sections.tzt import (AmountSection, BalanceSection, BigMapsSection, ChainIdSection, InputSection, NowSection,
-                                            OutputSection, SelfSection, SenderSection, SourceSection)
+from pytezos.michelson.sections.tzt import (
+    AmountSection,
+    BalanceSection,
+    BigMapsSection,
+    ChainIdSection,
+    InputSection,
+    NowSection,
+    OutputSection,
+    SelfSection,
+    SenderSection,
+    SourceSection,
+)
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType, OperationType, PairType
 

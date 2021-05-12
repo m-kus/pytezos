@@ -109,7 +109,7 @@ We are interested in ``using`` method, which is responsible for setting up manag
    <function PyTezosClient.using at 0x7f47fc123550>
     Change current rpc endpoint and account (private key).
 
-    :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
+    :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of :class:`pytezos.rpc.shell.ShellQuery`
     :param key: base58 encoded key, path to the faucet file, alias from tezos-client, or instance of `Key`
     :returns: A copy of current object with changes applied
 

@@ -1,6 +1,6 @@
 import logging
 from decimal import Decimal
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 from pytezos.block.header import BlockHeader
 from pytezos.context.mixin import ContextMixin  # type: ignore
@@ -10,7 +10,7 @@ from pytezos.crypto.key import Key
 from pytezos.jupyter import get_class_docstring, is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
-from pytezos.operation.group import OperationGroup, validation_passes
+from pytezos.operation.group import OperationGroup
 from pytezos.operation.result import OperationResult
 from pytezos.rpc import ShellQuery
 from pytezos.rpc.node import RpcError
@@ -18,20 +18,24 @@ from pytezos.sandbox.parameters import get_protocol_parameters
 
 
 class PyTezosClient(ContextMixin, ContentMixin):
-    """ Entry point for a developer, start your script with:
-    `from pytezos import pytezos`
+    """Entry point for a developer, start your script with:
+
+    .. code-block:: python
+
+        from pytezos import pytezos
     """
 
     def __repr__(self):
         res = [
             super(PyTezosClient, self).__repr__(),
             '\nHelpers',
-            get_class_docstring(self.__class__)
+            get_class_docstring(self.__class__),
         ]
         return '\n'.join(res)
 
     def operation_group(self, protocol=None, branch=None, contents=None, signature=None) -> OperationGroup:
-        """ Create new operation group (multiple contents).
+        """Create new operation group (multiple contents).
+
         You can leave all fields empty in order to create an empty operation group.
 
         :param protocol: Leave None for autocomplete, unless you know what you are doing
@@ -45,11 +49,11 @@ class PyTezosClient(ContextMixin, ContentMixin):
             protocol=protocol,
             branch=branch,
             contents=contents,
-            signature=signature
+            signature=signature,
         )
 
     def operation(self, content: dict) -> OperationGroup:
-        """ Create an operation group with single content.
+        """Create an operation group with single content.
 
         :param content: Operation body (depending on `kind`)
         :rtype: OperationGroup
@@ -57,7 +61,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         return OperationGroup(context=self._spawn_context(), contents=[content])
 
     def bulk(self, *operations: Union[OperationGroup, ContractCall]) -> OperationGroup:
-        """ Batch multiple operations and contract calls in a single operation group
+        """Batch multiple operations and contract calls in a single operation group
 
         :param operations: a tuple of operations or contract calls
         :rtype: OperationGroup
@@ -73,7 +77,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
             'public_key': '',
             'fee': '0',
             'gas_limit': '0',
-            'storage_limit': '0'
+            'storage_limit': '0',
         }
         for opg in operations:
             if isinstance(opg, ContractCall):
@@ -85,7 +89,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         return OperationGroup(context=self._spawn_context(), contents=contents)
 
     def account(self, account_id=None) -> dict:
-        """ Shortcut for RPC contract request.
+        """Shortcut for RPC contract request.
 
         :param account_id: tz/KT address, leave None to show info about current key
         """
@@ -93,7 +97,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         return self.shell.contracts[address]()
 
     def balance(self) -> Decimal:
-        """ Get account balance
+        """Get account balance.
 
         :return: amount in tez
         """
@@ -101,12 +105,11 @@ class PyTezosClient(ContextMixin, ContentMixin):
         return (Decimal(balance_str) / 10 ** 6).quantize(Decimal('0.000001'))
 
     def now(self) -> int:
-        """ Timestamp of the latest block + block time (UTC).
-        """
+        """Timestamp of the latest block + block time (UTC)."""
         return self.context.get_now()
 
     def contract(self, address) -> ContractInterface:
-        """ Get a high-level interface for a given smart contract id.
+        """Get a high-level interface for a given smart contract id.
 
         :param address: KT address of a smart contract
         :rtype: ContractInterface
@@ -120,9 +123,9 @@ class PyTezosClient(ContextMixin, ContentMixin):
         mode: Optional[str] = None,
         ipfs_gateway: Optional[str] = None,
     ):
-        """ Change current rpc endpoint and account (private key).
+        """Change current RPC endpoint and account (private key).
 
-        :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of `ShellQuery`
+        :param shell: one of 'mainnet', '***net', or RPC node uri, or instance of :class:`pytezos.rpc.shell.ShellQuery`
         :param key: base58 encoded key, path to the faucet file, faucet file itself, alias from tezos-client, or `Key`
         :param mode: whether to use `readable` or `optimized` encoding for parameters/storage/other
         :returns: A copy of current object with changes applied
@@ -147,7 +150,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         logger.setLevel(value)
 
     def activate_protocol(self, protocol_hash: str) -> BlockHeader:
-        """ Initiate user-activated upgrade (sandbox only)
+        """Initiate user-activated upgrade (sandbox only)
 
         :param protocol_hash: Protocol hash
         :rtype: BlockHeader
@@ -155,11 +158,11 @@ class PyTezosClient(ContextMixin, ContentMixin):
         return BlockHeader.activate_protocol(
             protocol_hash=protocol_hash,
             parameters=get_protocol_parameters(protocol_hash),
-            context=self.context
+            context=self.context,
         )
 
     def bake_block(self, min_fee: int = 0) -> BlockHeader:
-        """ Create and inject new block with operations from mempool
+        """Create and inject new block with operations from mempool
 
         :param min_fee: filter operations by fee (default is 0)
         :rtype: BlockHeader
@@ -178,8 +181,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         """
         return self.key.sign(self.failing_noop(message).message(block=block))
 
-    def check_message(self, message: str, public_key: str, signature: str,
-                      block: str = 'genesis') -> None:
+    def check_message(self, message: str, public_key: str, signature: str, block: str = 'genesis') -> None:
         """Check message signature
 
         :param message: Signed operation
@@ -199,7 +201,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         min_confirmations: int = 1,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
-        prev_hash: Optional[str] = None
+        prev_hash: Optional[str] = None,
     ) -> Tuple[OperationGroup, ...]:
         """Wait for multiple injected operations to get enough confirmations
 
@@ -225,8 +227,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
                             raise RpcError.from_errors(OperationResult.errors(res)) from None
                 else:
                     confirmations[opg.opg_hash] += 1
-                    logger.info('Got %s/%s confirmations for %s',
-                                confirmations[opg.opg_hash], min_confirmations, opg.opg_hash)
+                    logger.info('Got %s/%s confirmations for %s', confirmations[opg.opg_hash], min_confirmations, opg.opg_hash)
 
             if any(value == 0 for value in confirmations.values()):
                 pending_operations = self.shell.mempool.pending_operations.flatten()
@@ -244,7 +245,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
                         opg_hash=opg.opg_hash,
                         kind=opg.contents[0]['kind'],
                         branch=opg.branch,
-                        head=prev_hash
+                        head=prev_hash,
                     )
                     if confirmations[opg.opg_hash] == 0:
                         raise ValueError(f'Operation {opg.opg_hash} is not found') from None
