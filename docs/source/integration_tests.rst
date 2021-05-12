@@ -81,7 +81,10 @@ Each method will return :class:`pytezos.contract.result.ContractCallResult` inst
 Deploying contract to sandboxed node
 --------------------------------------
 
-Another option is to deploy contract to sandboxed node and interact with it with real transactions. PyTezos has :class:`pytezos.sandbox.node.SandboxedNodeTestCase` helper to simplify spinning up sandboxed node in Docker. You can use `self.get_client` method to interact with it from within your tests.
+Another option is to deploy contract to sandboxed node and interact with it with real transactions. PyTezos has :class:`pytezos.sandbox.node.SandboxedNodeTestCase` helper to simplify spinning up sandboxed node in Docker. Use `self.client` interact with it from within your tests.
+
+.. autoclass:: pytezos.sandbox.node.SandboxedNodeTestCase
+   :members:
 
 .. code-block:: python
 
@@ -102,7 +105,7 @@ Another option is to deploy contract to sandboxed node and interact with it with
   class SandboxedContractTest(SandboxedNodeTestCase):
       def test_deploy_contract(self):
           # Create client
-          client = self.get_client().using(key='bootstrap1')
+          client = self.client.using(key='bootstrap1')
           client.reveal()
 
           # Originate contract with initial storage
