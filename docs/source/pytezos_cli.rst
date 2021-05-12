@@ -1,4 +1,4 @@
-Pytezos CLI
+PyTezos CLI
 =============
 
 Tutorials

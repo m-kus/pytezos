@@ -136,8 +136,8 @@ Sandboxed node will be rolled back to genesis block between run of multiple test
 Examples
 --------------
 
-Contract tests: https://github.com/baking-bad/pytezos/tree/master/tests/contract_tests
-Tests with sandboxed node: https://github.com/baking-bad/pytezos/tree/master/tests/sandbox_tests
+- Contract tests: https://github.com/baking-bad/pytezos/tree/master/tests/contract_tests
+- Tests with sandboxed node: https://github.com/baking-bad/pytezos/tree/master/tests/sandbox_tests
 
 Projects using PyTezos
 ------------------------

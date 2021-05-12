@@ -38,6 +38,7 @@ Welcome to PyTezos reference!
    code
    repl
    inspect_proposals
+   michelson_kernel
 
 Indices and tables
 ==================
