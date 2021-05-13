@@ -173,6 +173,15 @@ class Micheline(metaclass=ErrorTrace):
         elif isinstance(expr, dict):
             if expr.get('prim'):
                 prim, args, annots = parse_micheline_prim(expr)
+
+                # FIXME: We need entrypoint to be an argument
+                if prim == 'RUN':
+                    if annots:
+                        args = [{'string': annots[0][1:]}] + args  # type: ignore
+                        annots = []
+                    else:
+                        args = [{'string': 'default'}] + args  # type: ignore
+
                 args_len = len(args)
                 if (prim, args_len) not in Micheline.classes:
                     args_len = None  # type: ignore

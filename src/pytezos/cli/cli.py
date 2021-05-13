@@ -1,6 +1,7 @@
 import io
 import tarfile
 import sys
+import time
 from glob import glob
 from os.path import abspath, dirname, exists, join, split
 from pprint import pformat
@@ -16,6 +17,8 @@ from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
+from pytezos.sandbox.node import SandboxedNodeTestCase
+from pytezos.sandbox.parameters import EDO, FLORENCE
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {
@@ -314,6 +317,45 @@ def smartpy_compile(
     else:
         logger.error('No local script found. Please ensure a valid script is present or specify path.')
 
+@cli.command(help='Run containerized sandbox node')
+@click.option('--image', type=str, help='Docker image to use', default=SandboxedNodeTestCase.IMAGE)
+@click.option('--protocol', type=click.Choice(['florence', 'edo']), help='Protocol to use', default='florence')
+@click.option('--port', '-p', type=int, help='Port to expose', default=8732)
+@click.option('--interval', '-i', type=float, help='Interval between baked blocks (in seconds)', default=1.0)
+@click.option('--blocks', '-b', type=int, help='Number of blocks to bake before exit')
+@click.pass_context
+def sandbox(
+    _ctx,
+    image: str,
+    protocol: str,
+    port: int,
+    interval: float,
+    blocks: int,
+):
+    protocol = {
+        'edo': EDO,
+        'florence': FLORENCE,
+    }[protocol]
+
+    SandboxedNodeTestCase.PROTOCOL = protocol
+    SandboxedNodeTestCase.IMAGE = image
+    SandboxedNodeTestCase.PORT = port
+    SandboxedNodeTestCase.setUpClass()
+
+    blocks_baked = 0
+    while True:
+        try:
+            logger.info('Baking block %s...', blocks_baked)
+            block_hash = SandboxedNodeTestCase.get_client().using(key='bootstrap1').bake_block().fill().work().sign().inject()
+            logger.info('Baked block: %s', block_hash)
+            blocks_baked += 1
+
+            if blocks and blocks_baked == blocks:
+                break
+
+            time.sleep(interval)
+        except KeyboardInterrupt:
+            break
 
 if __name__ == '__main__':
     cli(prog_name='pytezos')

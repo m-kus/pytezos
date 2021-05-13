@@ -52,9 +52,10 @@ class Format:
     dataRate: Optional[DataRate] = None
 
 
-
 @dataclass(kw_only=True)
 class ContractTokenMetadata(ContextMixin):
+    """TZIP-21 token metadata"""
+
     name: Optional[str] = None
     symbol: Optional[str] = None
     decimals: int
@@ -97,10 +98,12 @@ class ContractTokenMetadata(ContextMixin):
 
     @staticmethod
     def validate_token_metadata_json(metadata_json: Dict[str, Any]) -> None:
+        """Validate token metadata JSON with JSONSchema"""
         jsonschema_validate(instance=metadata_json, schema=token_metadata_schema)
 
     @classmethod
     def from_json(cls, token_metadata_json: Dict[str, Any], context: Optional[ExecutionContext] = None) -> 'ContractTokenMetadata':
+        """Convert token metadata from JSON object"""
 
         for key, value in token_metadata_json.items():
             if isinstance(value, bytes):
@@ -116,17 +119,20 @@ class ContractTokenMetadata(ContextMixin):
 
     @classmethod
     def from_ipfs(cls, multihash: str, context: Optional[ExecutionContext] = None) -> 'ContractTokenMetadata':
+        """Fetch token metadata from IPFS network by multihash"""
         context = context or ExecutionContext()
         token_metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}').json()
         return cls.from_json(token_metadata_json, context)
 
     @classmethod
     def from_url(cls, url: str, context: Optional[ExecutionContext] = None) -> 'ContractTokenMetadata':
+        """Fetch token metadata from HTTP(S) URL"""
         token_metadata_json = requests.get(url).json()
         return cls.from_json(token_metadata_json, context)
 
     @classmethod
     def from_file(cls, path: str, context: Optional[ExecutionContext] = None) -> 'ContractTokenMetadata':
+        """Read token metadata from JSON file by path"""
         with open(path) as f:
             token_metadata_json = json.load(f)
             return cls.from_json(token_metadata_json, context)

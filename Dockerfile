@@ -32,6 +32,7 @@ RUN apk update \
 		libgomp \
 		libressl-dev \
 		libtool \
+		zeromq-dev \
 		make \
 		mpfr4 \
 		mpc1 \
@@ -46,6 +47,7 @@ RUN apk update \
 	&& ./configure \
 	&& make install \
 	&& cd / && rm -rf /tmp/secp256k1 \
+	&& pip3 install --upgrade pip setuptools wheel \
 	&& pip3 install --no-cache-dir cryptography==3.3.2 poetry==$POETRY pytest~=$PYTEST \
 	&& pip3 install --no-build-isolation --no-cache-dir pendulum==$PENDULUM \
 	&& pip3 install --no-cache-dir /tmp/pytezos/*.whl && rm -rf /tmp/pytezos \

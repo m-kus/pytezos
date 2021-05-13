@@ -5,8 +5,9 @@
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/bakingbad/pytezos)](https://hub.docker.com/r/bakingbad/pytezos)
 [![Made With](https://img.shields.io/badge/made%20with-python-blue.svg?)](ttps://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/baking-bad/pytezos/master?filepath=michelson_quickstart.ipynb)
 
-Python SDK for Tezos:
+
 * RPC query engine
 * Cryptography
 * Building and parsing operations
@@ -14,42 +15,87 @@ Python SDK for Tezos:
 * Local forging/packing & vice versa
 * Working with Michelson AST
 
-PyTezos CLI:
+#### PyTezos CLI
 * Generating contract parameter/storage schema
 * Activating and revealing accounts
 * Deploying contracts (+ GitHub integration)
 
-Michelson REPL:
+#### Michelson REPL
 * Builtin interpreter (reimplemented)
 * Set of extra helpers (stack visualization, blockchain context mocking)
 
-Michelson integration testing framework:
+#### Michelson Jupyter kernel
+* Custom interpreter with runtime type checker
+* Syntax highlighting, autocomplete with `Tab`
+* In-place docstrings with `Shift+Tab`
+* Macros support
+* Verbose execution logging
+* Debug helpers
+
+#### Michelson integration testing framework
 * Writing integration tests using `unittest` package
 * Simulating contract execution using remote intepreter (via RPC) or builtin one
 
-### Requirements
 
-* git
-* python 3.7+
-* pip 20.2+
+## Installation
 
-You will also probably need to install several cryptographic packets.
+### From PyPi
+
+```shell
+$ pip install pytezos
+```
+
+### [Google Colab](https://colab.research.google.com)
+
+`````python
+>>> !apt install libsodium-dev libsecp256k1-dev libgmp-dev
+>>> !pip install pytezos
+`````
+
+### Docker container
+Verified & minified images for CI/CD https://hub.docker.com/r/bakingbad/pytezos/tags
+```shell
+$ # 1. Use image from registry
+$ docker pull bakingbad/pytezos
+$ # or build it yourself
+$ docker build . -t pytezos
+$ # 2. Use included docker-compose.yml
+$ docker-compose up -d notebook
+```
+
+### Building from sources
+
+Requirements:
+* Python 3.7+
+* [Poetry](https://python-poetry.org/docs/#installation)
+* libsodium, libsecp256k1, gmp
+* make
+
+```shell
+$ # prepare environment
+$ make install
+# # run full CI with tests
+$ make
+```
+
+You need to install cryptographic packages before building the project:
 
 #### Linux
 
-Use apt or your favourite package manager:
-```
+
+##### Ubuntu, Debian and other apt-based distributions
+```shell
 $ sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev
 ```
-Also, ensure wheel package is installed:
-```
-$ pip install wheel
-```
 
+##### Arch Linux
+```shell
+$ sudo pacman -Syu --needed libsodium libsecp256k1 gmp
+```
 #### MacOS
 
-Use homebrew:
-```
+[Homebrew](https://brew.sh/) needs to be installed.
+```shell
 $ brew tap cuber/homebrew-libsecp256k1
 $ brew install libsodium libsecp256k1 gmp
 ```
@@ -65,32 +111,14 @@ but if you feel lucky you can try to install natively:
 4. Extract the Win64/Release/v143/dynamic/libsodium.dll from the zip file
 5. Copy libsodium.dll to C:\Windows\System32\libsodium.dll
 
-### Installation
+## Quick start
+Read [quick start guide](https://pytezos.org/quick_start.html)  
+Learn how to [enable Jupyter with Michelson](./src/michelson_kernel/README.md)
 
-```
-$ pip install pytezos
-```
-
-#### Google Colab
-
-`````python
->>> !apt install libsodium-dev libsecp256k1-dev libgmp-dev
->>> !pip install pytezos
-`````
-
-#### Docker container
-Verified & minified images for CI/CD https://hub.docker.com/r/bakingbad/pytezos/tags
-```
-docker pull bakingbad/pytezos
-```
-
-### Quick start
-Read [quick start guide](https://pytezos.org/quick_start.html)
-
-### API reference
+## API reference
 Check out a complete [API reference](https://pytezos.org/contents.html)
 
-#### Inline documentation
+### Inline documentation
 If you are working in Jupyter/Google Colab or any other interactive console, 
 you can display documentation for a particular class/method:
 
@@ -113,28 +141,12 @@ https://medium.com/tezoscommons/preparing-for-the-tezos-hackathon-with-baking-ba
 * Introducing integration testing engine  
 https://medium.com/tezoscommons/testing-michelson-contracts-with-pytezos-513718499e93
 
-### Additional materials
-
-* Interacting with FA1.2 contract by TQTezos  
-https://assets.tqtezos.com/token-contracts/1-fa12-lorentz#interactusingpytezos
-* Deploying a contract by Vadim Manaenko  
-https://blog.aira.life/tezos-dont-forget-the-mother-console-fd2001261e50
-
-### Michelson test samples
-
-* In this repo  
-https://github.com/baking-bad/pytezos/tree/master/examples
-* Atomex (atomic swaps aka cross-chain transactions)  
-https://github.com/atomex-me/atomex-michelson/blob/master/tests/test_atomex.py
-* Atomex for FA1.2 (includes cross-contract interaction and views)  
-https://github.com/atomex-me/atomex-fa12-ligo/tree/master/tests
-* MultiAsset implementation tests (in a sandbox environment)  
-https://github.com/tqtezos/smart-contracts/tree/master/multi_asset/tezos_mac_tests
-
 ### Contact
 * Telegram chat: [@baking_bad_chat](https://t.me/baking_bad_chat)
 * Slack channel: [#baking-bad](https://tezos-dev.slack.com/archives/CV5NX7F2L)
 
-### About
-The project was initially started by Arthur Breitman, now it's maintained by Baking Bad team.
-PyTezos development is supported by Tezos Foundation.
+## Credits
+* The project was initially started by Arthur Breitman, now it's maintained by Baking Bad team.
+* Baking Bad is supported by Tezos Foundation
+* Michelson test set from the Tezos repo is used to ensure the interpreter workability
+* Michelson structured documentation by Nomadic Labs is used for inline help

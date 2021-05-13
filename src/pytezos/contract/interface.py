@@ -3,7 +3,7 @@ import logging
 from decimal import Decimal
 from functools import lru_cache
 from os.path import exists, expanduser
-from typing import Any, Callable, Dict, List, Optional, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Union
 from urllib.parse import urlparse
 
 import requests
@@ -12,7 +12,6 @@ from deprecation import deprecated  # type: ignore
 
 from pytezos.context.mixin import ContextMixin  # type: ignore
 from pytezos.context.mixin import ExecutionContext
-from pytezos.contract.call import ContractCall
 from pytezos.contract.data import ContractData
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.contract.metadata import ContractMetadata
@@ -31,8 +30,8 @@ from pytezos.rpc import ShellQuery
 
 
 class ContractTokenMetadataProxy:
-    """Get TZIP-21 contract token metadata by token_id
-    """
+    """Get TZIP-21 contract token metadata by token_id"""
+
     def __init__(self, fn: Callable) -> None:
         self._fn = fn
 
@@ -45,7 +44,7 @@ class ContractInterface(ContextMixin):
 
     program: MichelsonProgram
 
-    def __init__(self, context: ExecutionContext):
+    def __init__(self, context: ExecutionContext) -> None:
         super().__init__(context=context)
         self._logger = logging.getLogger(__name__)
         self.entrypoints = self.program.parameter.list_entrypoints()
@@ -56,7 +55,7 @@ class ContractInterface(ContextMixin):
             attr.__doc__ = generate_pydoc(ty, entrypoint)
             setattr(self, entrypoint, attr)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super().__repr__(),
             '.storage\t# access storage data at block `block_id`',
@@ -106,7 +105,7 @@ class ContractInterface(ContextMixin):
         return ContractInterface.from_micheline(michelson_to_micheline(source), context)
 
     @staticmethod
-    def from_micheline(expression, context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+    def from_micheline(expression: List[Dict[str, Any]], context: Optional[ExecutionContext] = None) -> 'ContractInterface':
         """Create contract from micheline expression.
 
         :param expression: [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
@@ -151,21 +150,21 @@ class ContractInterface(ContextMixin):
             return ContractInterface.from_michelson(source)
         return ContractInterface.from_micheline(source)
 
-    def to_micheline(self):
+    def to_micheline(self) -> List[Dict[str, Any]]:
         """Get contract script in Micheline JSON
 
         :return:  [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
         """
         return self.program.as_micheline_expr()
 
-    def to_michelson(self):
+    def to_michelson(self) -> str:
         """Get contract listing in formatted Michelson
 
         :return: string
         """
         return micheline_to_michelson(self.to_micheline())
 
-    def to_file(self, path):
+    def to_file(self, path: str) -> None:
         """Write contract source to a .tz file
 
         :param path: path to the file
@@ -175,7 +174,7 @@ class ContractInterface(ContextMixin):
 
     @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `.storage[path][to][big_map][key]()` instead')
     def big_map_get(self, path):
-        """ Get BigMap entry as Python object by plain key and block height.
+        """Get BigMap entry as Python object by plain key and block height.
 
         :param path: Json path to the key (or just key to access default BigMap location). \
             Use `/` to separate nodes and `::` to separate tuple args. \
@@ -233,7 +232,7 @@ class ContractInterface(ContextMixin):
 
     @cached_property
     def metadata(self) -> Optional[ContractMetadata]:
-        """ Get TZIP-016 contract metadata, if exists
+        """Get TZIP-016 contract metadata, if exists
 
         :rtype: ContractMetadata
         """
@@ -276,13 +275,13 @@ class ContractInterface(ContextMixin):
 
     @property
     def token_metadata(self) -> ContractTokenMetadataProxy:
-        """ Get TZIP-021 contract token metadata proxy
+        """Get TZIP-021 contract token metadata proxy
 
         :rtype: ContractTokenMetadataProxy
         """
-        return ContractTokenMetadataProxy(self._get_token_metadata)
+        return ContractTokenMetadataProxy(self._get_token_metadata)  # type: ignore
 
-    @lru_cache
+    @lru_cache(maxsize=None)
     def _get_token_metadata(self, token_id: int) -> Optional[ContractTokenMetadata]:
         token_metadata = self._get_token_metadata_from_view(token_id)
         if token_metadata is None:
@@ -297,7 +296,7 @@ class ContractInterface(ContextMixin):
         except (KeyError, AssertionError):
             self._logger.info('Storage doesn\'t contain metadata URL for token %s', token_id)
             return None
-    
+
         self._logger.info('Trying to fetch contract token metadata from `%s`', token_metadata_url)
         parsed_url = urlparse(token_metadata_url)
 
@@ -373,7 +372,7 @@ class ContractInterface(ContextMixin):
     def call(self) -> ContractEntrypoint:
         return self.parameter
 
-    def operation_result(self, operation_group: dict) -> List[ContractCallResult]:
+    def operation_result(self, operation_group: Dict[str, Any]) -> List[ContractCallResult]:
         """Get operation parameters, and resulting storage as Python objects.
         Can locate operation inside operation groups with multiple contents and/or internal operations.
 
@@ -382,7 +381,7 @@ class ContractInterface(ContextMixin):
         """
         return ContractCallResult.from_run_operation(operation_group, context=self.context)
 
-    def script(self, initial_storage=None, mode: Optional[str] = None) -> dict:
+    def script(self, initial_storage=None, mode: Optional[str] = None) -> Dict[str, Any]:
         """Generate script for contract origination.
 
         :param initial_storage: Python object, leave None to generate default (attach shell/key for smart fill)
@@ -414,7 +413,9 @@ class ContractInterface(ContextMixin):
         :rtype: OperationGroup
         """
         return OperationGroup(context=self._spawn_context()).origination(
-            script=self.script(initial_storage, mode=mode), balance=balance, delegate=delegate
+            script=self.script(initial_storage, mode=mode),
+            balance=balance,
+            delegate=delegate,
         )
 
 

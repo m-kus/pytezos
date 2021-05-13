@@ -17,7 +17,8 @@ from pytezos.michelson.instructions.generic import (ConcatInstruction, NeverInst
                                                     UnitInstruction, UnpackInstruction)
 from pytezos.michelson.instructions.jupyter import (BeginInstruction, BigMapDiffInstruction, CommitInstruction, DebugInstruction,
                                                     DropAllInstruction, DumpAllInstruction, DumpInstruction, PatchInstruction,
-                                                    PatchValueInstruction, PrintInstruction, ResetInstruction, ResetValueInstruction)
+                                                    PatchValueInstruction, PrintInstruction, ResetInstruction, ResetValueInstruction,
+                                                    RunInstruction)
 from pytezos.michelson.instructions.stack import (DigInstruction, DropInstruction, DropnInstruction, DugInstruction, DupInstruction,
                                                   DupnInstruction, PushInstruction, RenameInstruction, SwapInstruction)
 from pytezos.michelson.instructions.struct import (ConsInstruction, EmptyBigMapInstruction, EmptyMapInstruction, EmptySetInstruction,

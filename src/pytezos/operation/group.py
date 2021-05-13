@@ -14,9 +14,9 @@ from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE, MAX_OPE
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
 from pytezos.operation.forge import forge_operation_group
-from pytezos.operation.kind import validation_passes
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
+from pytezos.rpc.kind import validation_passes
 
 
 class OperationGroup(ContextMixin, ContentMixin):
@@ -32,15 +32,18 @@ class OperationGroup(ContextMixin, ContentMixin):
         chain_id: Optional[int] = None,
         branch: Optional[str] = None,
         signature: Optional[str] = None,
-    ):
+        opg_hash: Optional[str] = None,
+        # TODO: metadata {balance_updates, operation_result}
+    ) -> None:
         super().__init__(context=context)
         self.contents = contents or []
         self.protocol = protocol
         self.chain_id = chain_id
         self.branch = branch
         self.signature = signature
+        self.opg_hash = opg_hash
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [
             super().__repr__(),
             '\nPayload',
@@ -58,11 +61,11 @@ class OperationGroup(ContextMixin, ContentMixin):
             chain_id=kwargs.get('chain_id', self.chain_id),
             branch=kwargs.get('branch', self.branch),
             signature=kwargs.get('signature', self.signature),
+            opg_hash=kwargs.get('opg_hash', self.opg_hash),
         )
 
-    def json_payload(self) -> dict:
-        """ Get JSON payload used for the injection.
-        """
+    def json_payload(self) -> Dict[str, Any]:
+        """Get JSON payload used for the injection."""
         return {
             'protocol': self.protocol,
             'branch': self.branch,
@@ -77,7 +80,7 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return bytes.fromhex(self.forge()) + forge_base58(self.signature)
 
-    def operation(self, content):
+    def operation(self, content: Dict[str, Any]) -> 'OperationGroup':
         """Create new operation group with extra content added.
 
         :param content: Kind-specific operation body
@@ -85,12 +88,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         """
         return self._spawn(contents=self.contents + [content])
 
-    def fill(
-        self,
-        counter: Optional[int] = None,
-        ttl: Optional[int] = None,
-        **kwargs
-    ) -> 'OperationGroup':
+    def fill(self, counter: Optional[int] = None, ttl: Optional[int] = None, **kwargs) -> 'OperationGroup':
         """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
@@ -142,7 +140,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             branch=branch,
         )
 
-    def run(self, block_id='head'):
+    def run(self, block_id: str = 'head'):
         """Simulate operation without signature checks.
 
         :param block_id: Specify a level at which this operation should be applied (default is head)
@@ -159,7 +157,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             }
         )
 
-    def forge(self, validate=False):
+    def forge(self, validate=False) -> str:
         """Convert json representation of the operation group into bytes.
 
         :param validate: Forge remotely also and compare results, default is False
@@ -187,7 +185,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         if len(self.contents) != 1 or self.contents[0]['kind'] != 'failing_noop':
             raise NotImplementedError('Use for signing messages only')
 
-        branch = block if is_bh(block) else self.shell.blocks[block].hash()
+        branch = block if is_bh(str(block)) else self.shell.blocks[block].hash()
         return b'\x03' + bytes.fromhex(self._spawn(branch=branch).forge())
 
     def autofill(
@@ -199,7 +197,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         fee: Optional[int] = None,
         gas_limit: Optional[int] = None,
         storage_limit: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> 'OperationGroup':
         """Fill the gaps and then simulate the operation in order to calculate fee, gas/storage limits.
 
@@ -207,10 +205,10 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
         :param counter: Override counter value (for manual handling)
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
-        :param fee: Explicitly set fee for operation. If not set fee will be calculated depeding on results of operation dry-run.
-        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depeding on results of
+        :param fee: Explicitly set fee for operation. If not set fee will be calculated depending on results of operation dry-run.
+        :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depending on results of
             operation dry-run.
-        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depeding on
+        :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depending on
             results of operation dry-run.
         :rtype: OperationGroup
         """
@@ -249,7 +247,7 @@ class OperationGroup(ContextMixin, ContentMixin):
                     gas_limit=str(_gas_limit),
                     storage_limit=str(_storage_limit),
                     fee=str(_fee),
-                    counter=str(current_counter + self.context.get_counter_offset())
+                    counter=str(current_counter + self.context.get_counter_offset()),
                 )
 
             content.pop('metadata')
@@ -284,9 +282,13 @@ class OperationGroup(ContextMixin, ContentMixin):
         hash_digest = blake2b_32(self.binary_payload()).digest()
         return base58_encode(hash_digest, b'o').decode()
 
-    def run_operation(self):
-        # TODO: Docstring
-        return self.shell.blocks['head'].helpers.scripts.run_operation.post(self.json_payload())
+    def run_operation(self, block_id: str = 'head'):
+        """Simulate operation without signature checks.
+
+        :param block_id: Specify a level at which this operation should be applied (default is head)
+        :returns: RPC response from `run_operation`
+        """
+        return self.run(block_id)
 
     @deprecated(deprecated_in='3.1.0', removed_in='4.0.0', details='use `run_operation()` instead')
     def preapply(self):
@@ -299,13 +301,35 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         return self.run_operation()
 
+    def send(
+        self,
+        gas_reserve: int = DEFAULT_GAS_RESERVE,
+        burn_reserve: int = DEFAULT_BURN_RESERVE,
+        min_confirmations: int = 0,
+        ttl: Optional[int] = None,
+    ) -> 'OperationGroup':
+        """
+
+        :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
+        :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
+        :param min_confirmations: number of block injections to wait for before returning (default is 0, i.e. async mode)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :return: OperationGroup with hash filled
+        """
+        if ttl is None:
+            ttl = self.context.get_operations_ttl()
+
+        opg = self.autofill(gas_reserve=gas_reserve, burn_reserve=burn_reserve, ttl=ttl).sign()
+        res = opg.inject(min_confirmations=min_confirmations, num_blocks_wait=ttl)
+        return opg._spawn(opg_hash=res['hash'])
+
     def inject(
         self,
         check_result: bool = True,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
         min_confirmations: int = 0,
-        **kwargs
+        **kwargs,
     ):
         """Inject the signed operation group.
 
@@ -315,10 +339,6 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param min_confirmations: number of block injections to wait for before returning
         :returns: operation group with metadata (raw RPC response)
         """
-        if kwargs.get('_async'):
-            logger.warning('`_async` argument is deprecated, use `min_confirmations` instead')
-            min_confirmations = 0 if kwargs['_async'] is True else 1
-
         self.context.reset()
 
         opg_hash = self.shell.injection.operation.post(

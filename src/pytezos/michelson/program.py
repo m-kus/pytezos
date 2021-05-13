@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple, Type, cast
+from typing import Any, Dict, List, Optional, Tuple, Type, cast
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import base58_encode
@@ -8,24 +8,37 @@ from pytezos.michelson.micheline import MichelineSequence, get_script_section, t
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.sections.tzt import (AmountSection, BalanceSection, BigMapsSection, ChainIdSection, InputSection, NowSection,
-                                            OutputSection, SelfSection, SenderSection, SourceSection)
+from pytezos.michelson.sections.tzt import (
+    AmountSection,
+    BalanceSection,
+    BigMapsSection,
+    ChainIdSection,
+    InputSection,
+    NowSection,
+    OutputSection,
+    SelfSection,
+    SenderSection,
+    SourceSection,
+)
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import ListType, OperationType, PairType
 
 
 class MichelsonProgram:
+    """Michelson .tz contract interpreter interface"""
+
     parameter: Type[ParameterSection]
     storage: Type[StorageSection]
     code: Type[CodeSection]
 
-    def __init__(self, entrypoint: str, parameter: ParameterSection, storage: StorageSection):
+    def __init__(self, entrypoint: str, parameter: ParameterSection, storage: StorageSection) -> None:
         self.entrypoint = entrypoint
         self.parameter_value = parameter
         self.storage_value = storage
 
     @staticmethod
-    def load(context: ExecutionContext, with_code=False):
+    def load(context: ExecutionContext, with_code=False) -> Type['MichelsonProgram']:
+        """Create MichelsonProgram type from filled context"""
         cls = type(
             MichelsonProgram.__name__,
             (MichelsonProgram,),
@@ -39,6 +52,7 @@ class MichelsonProgram:
 
     @staticmethod
     def create(sequence: Type[MichelineSequence]) -> Type['MichelsonProgram']:
+        """Create MichelsonProgram type from micheline"""
         validate_sections(sequence, ('parameter', 'storage', 'code'))
         cls = type(
             MichelsonProgram.__name__,
@@ -59,7 +73,7 @@ class MichelsonProgram:
         return MichelsonProgram.create(seq)
 
     @classmethod
-    def as_micheline_expr(cls):
+    def as_micheline_expr(cls) -> List[Dict[str, Any]]:
         return [
             cls.parameter.as_micheline_expr(),
             cls.storage.as_micheline_expr(),
@@ -73,7 +87,8 @@ class MichelsonProgram:
         return cls(entrypoint, parameter_value, storage_value)
 
     @try_catch('BEGIN')
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
+        """Prepare stack for contract execution"""
         self.parameter_value.attach_context(context)
         self.storage_value.attach_context(context)
         res = PairType.from_comb([self.parameter_value.item, self.storage_value.item])
@@ -81,19 +96,18 @@ class MichelsonProgram:
         stdout.append(format_stdout(f'BEGIN %{self.entrypoint}', [], [res]))
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
+        """Execute contract in interpreter"""
         return cast(MichelsonInstruction, self.code.args[0].execute(stack, stdout, context))
 
     @try_catch('END')
     def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
+        """Finish contract execution"""
         res = cast(PairType, stack.pop1())
         if len(stack):
             raise Exception(f'Stack is not empty: {repr(stack)}')
         res.assert_type_equal(
             PairType.create_type(
-                args=[
-                    ListType.create_type(args=[OperationType]),
-                    self.storage.args[0]
-                ],
+                args=[ListType.create_type(args=[OperationType]), self.storage.args[0]],
             ),
             message='list of operations + resulting storage',
         )
@@ -105,6 +119,8 @@ class MichelsonProgram:
 
 
 class TztMichelsonProgram:
+    """Michelson .tzt contract interpreter interface"""
+
     code: Type[CodeSection]
     input: Type[InputSection]
     output: Type[OutputSection]
@@ -112,6 +128,7 @@ class TztMichelsonProgram:
 
     @staticmethod
     def load(context: ExecutionContext, with_code=False):
+        """Create TztMichelsonProgram type from filled context"""
         cls = type(
             TztMichelsonProgram.__name__,
             (TztMichelsonProgram,),
@@ -126,6 +143,7 @@ class TztMichelsonProgram:
 
     @staticmethod
     def create(sequence: Type[MichelineSequence]) -> Type['TztMichelsonProgram']:
+        """Create TztMichelsonProgram type from micheline"""
         validate_sections(sequence, ('input', 'output', 'code'))
         cls = type(
             TztMichelsonProgram.__name__,
@@ -147,7 +165,7 @@ class TztMichelsonProgram:
         return TztMichelsonProgram.create(seq)
 
     @classmethod
-    def as_micheline_expr(cls):
+    def as_micheline_expr(cls) -> List[Dict[str, Any]]:
         # TODO: Serialize all sections
         return [
             cls.code.as_micheline_expr(),
@@ -193,7 +211,8 @@ class TztMichelsonProgram:
                     raise Exception('Only `Big_map` instructions can be used in `big_maps` section')
                 item.add(stack, stdout, context)
 
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext):  # pylint: disable=no-self-use
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:  # pylint: disable=no-self-use
+        """Prepare stack for contract execution"""
 
         for item in self.input.args[0].args[::-1]:
             if issubclass(item, StackEltInstruction):
@@ -202,9 +221,11 @@ class TztMichelsonProgram:
                 raise Exception('Only `Stack_elt` instructions can be used in `input` section', item)
 
     def execute(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> MichelsonInstruction:
+        """Execute contract in interpreter"""
         return cast(MichelsonInstruction, self.code.args[0].execute(stack, stdout, context))
 
     def end(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
+        """Finish contract execution"""
         for item in self.output.args[0].args:
             if not issubclass(item, StackEltInstruction):
                 raise Exception('Only `Stack_elt` instructions can be used in `output` section')

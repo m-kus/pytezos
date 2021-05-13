@@ -10,3 +10,16 @@ tests
 *.ipynb
 *.json
 *.zip
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+.dockerignore
+.gitignore
+Dockerfile
+binder/Dockerfile
+*.dockerfile
+docker-compose.yml
+LICENSE
+.git

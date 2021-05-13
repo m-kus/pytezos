@@ -1,6 +1,6 @@
 from datetime import datetime
 from itertools import count
-from typing import Iterator
+from typing import Iterator, Tuple
 
 import bson  # type: ignore
 import pendulum

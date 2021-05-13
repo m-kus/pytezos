@@ -1,13 +1,12 @@
 import functools
 import operator
-from typing import List
+from typing import Any, Dict, Iterator, List
 
 from pytezos.rpc.errors import RpcError
 
 
 class OperationResult:
-    """ Operation result representation + useful parsing helpers for operation group
-    """
+    """Operation result representation + useful parsing helpers for operation group"""
 
     def __init__(self, **props):
         self.props = props
@@ -18,12 +17,12 @@ class OperationResult:
         res = [
             super(OperationResult, self).__repr__(),
             '\nProperties',
-            *list(map(lambda x: f'.{x}', self.props))
+            *list(map(lambda x: f'.{x}', self.props)),
         ]
         return '\n'.join(res)
 
     @staticmethod
-    def iter_contents(operation_group: dict):
+    def iter_contents(operation_group: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         """ Lazily iterate operation group contents including internal operations.
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
@@ -38,7 +37,7 @@ class OperationResult:
                 yield {'internal': True, **result}
 
     @staticmethod
-    def iter_results(operation_group: dict):
+    def iter_results(operation_group: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         """ Lazily iterate operation results including internal operation results.
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
@@ -52,48 +51,58 @@ class OperationResult:
                 yield content['metadata']['operation_result']
 
     @staticmethod
-    def consumed_gas(operation_group) -> int:
+    def consumed_gas(operation_group: Dict[str, Any]) -> int:
         """ Get total consumed gas for an operation group (recursively).
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
-        return sum(map(lambda x: int(x.get('consumed_gas', '0')),
-                       OperationResult.iter_results(operation_group)))
+        return sum(
+            map(
+                lambda x: int(x.get('consumed_gas', '0')),
+                OperationResult.iter_results(operation_group),
+            ),
+        )
 
     @staticmethod
-    def paid_storage_size_diff(operation_group) -> int:
+    def paid_storage_size_diff(operation_group: Dict[str, Any]) -> int:
         """ Get total paid storage size diff for an operation group (recursively).
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
-        return sum(map(lambda x: int(x.get('paid_storage_size_diff', '0')),
-                       OperationResult.iter_results(operation_group)))
+        return sum(
+            map(
+                lambda x: int(x.get('paid_storage_size_diff', '0')),
+                OperationResult.iter_results(operation_group),
+            ),
+        )
 
     @staticmethod
-    def burned(operation_group) -> int:
+    def burned(operation_group: Dict[str, Any]) -> int:
         """ Get total burned (due to account allocations) for an operation group (recursively).
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
-        return sum(map(
-            lambda x: 257 if x.get('allocated_destination_contract') or x.get('originated_contracts') else 0,
-            OperationResult.iter_results(operation_group)))
+        return sum(
+            map(
+                lambda x: 257 if x.get('allocated_destination_contract') or x.get('originated_contracts') else 0,
+                OperationResult.iter_results(operation_group),
+            )
+        )
 
     @staticmethod
-    def is_applied(operation_group) -> bool:
+    def is_applied(operation_group: Dict[str, Any]) -> bool:
         """ Check if ALL operations in a group are applied.
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
         OR a single content {"kind": "transaction", ...}
         """
-        return all(map(lambda x: x['status'] == 'applied',
-                       OperationResult.iter_results(operation_group)))
+        return all(map(lambda x: x['status'] == 'applied', OperationResult.iter_results(operation_group)))
 
     @staticmethod
-    def errors(operation_group: dict) -> list:
+    def errors(operation_group: Dict[str, Any]) -> List[Dict[str, Any]]:
         """ Collect errors from all operation results in a group.
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
@@ -101,13 +110,12 @@ class OperationResult:
         :returns: list of errors [{"id": "", ...}]
         """
         all_errors = (
-            result.get("errors", []) if result["status"] != "applied" else []
-            for result in OperationResult.iter_results(operation_group)
+            result.get("errors", []) if result["status"] != "applied" else [] for result in OperationResult.iter_results(operation_group)
         )
         return functools.reduce(operator.iconcat, all_errors, [])
 
     @staticmethod
-    def originated_contracts(operation_group: dict) -> list:
+    def originated_contracts(operation_group: Dict[str, Any]) -> List[str]:
         """ Collect originated contract addresses from all operation results in a group.
 
         :param operation_group: {"branch": "B...", "contents": [...], ...} \
@@ -120,7 +128,7 @@ class OperationResult:
         return originated_contracts
 
     @staticmethod
-    def get_contents(operation_group: dict, **predicates):
+    def get_contents(operation_group: Dict[str, Any], **predicates) -> List[Dict[str, Any]]:
         def match(x):
             return all(map(lambda pred: x.get(pred[0]) == pred[1], predicates.items()))
 
@@ -130,7 +138,7 @@ class OperationResult:
             return list(filter(match, OperationResult.iter_contents(operation_group)))
 
     @staticmethod
-    def get_result(content):
+    def get_result(content: Dict[str, Any]) -> Dict[str, Any]:
         if content.get('metadata'):
             return content['metadata']['operation_result']
         elif content.get('result'):
@@ -139,7 +147,7 @@ class OperationResult:
             assert False, content
 
     @classmethod
-    def from_operation_group(cls, operation_group: dict, **predicates) -> List['OperationResult']:
+    def from_operation_group(cls, operation_group: Dict[str, Any], **predicates) -> List['OperationResult']:
         """ Initialize with operation group contents.
 
         :param operation_group: operation_group: {"branch": "B...", "contents": [...], ...} \
@@ -161,8 +169,8 @@ class OperationResult:
         return list(map(dispatch, contents))
 
     @classmethod
-    def from_origination(cls, content: dict):
-        """ Initialize with origination content.
+    def from_origination(cls, content: Dict[str, Any]) -> 'OperationResult':
+        """Initialize with origination content.
 
         :param content:
         :rtype: OperationResult
@@ -170,12 +178,12 @@ class OperationResult:
         operation_result = cls.get_result(content)
         return cls(
             storage=content['script']['storage'],
-            originated_contracts=operation_result['originated_contracts']
+            originated_contracts=operation_result['originated_contracts'],
         )
 
     @classmethod
-    def from_transaction(cls, content: dict):
-        """ Initialize with transaction content.
+    def from_transaction(cls, content: Dict[str, Any]) -> 'OperationResult':
+        """Initialize with transaction content.
 
         :param content:
         :rtype: OperationResult
@@ -186,5 +194,5 @@ class OperationResult:
             storage=operation_result.get('storage'),
             lazy_diff=operation_result.get('lazy_diff', []),
             # TODO: if it is already an internal operation, we should think... (build a tree?)
-            operations=cls.get_contents(content, source=content['destination'])
+            operations=cls.get_contents(content, source=content['destination']),
         )

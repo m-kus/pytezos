@@ -1,27 +1,36 @@
-from pytezos.michelson.forge import (forge_address, forge_array, forge_base58, forge_bool, forge_micheline, forge_nat, forge_public_key,
-                                     forge_script)
-from pytezos.operation.kind import operation_tags
+from typing import Any, Dict
+
+from pytezos.michelson.forge import (
+    forge_address,
+    forge_array,
+    forge_base58,
+    forge_bool,
+    forge_micheline,
+    forge_nat,
+    forge_public_key,
+    forge_script,
+)
+from pytezos.rpc.kind import operation_tags
 
 reserved_entrypoints = {
     'default': b'\x00',
     'root': b'\x01',
     'do': b'\x02',
     'set_delegate': b'\x03',
-    'remove_delegate': b'\x04'
+    'remove_delegate': b'\x04',
 }
 
 
-def has_parameters(content):
+def has_parameters(content: Dict[str, Any]) -> bool:
     if content.get('parameters'):
-        if content['parameters']['entrypoint'] == 'default' \
-                and content['parameters']['value'] == {'prim': 'Unit'}:
+        if content['parameters']['entrypoint'] == 'default' and content['parameters']['value'] == {'prim': 'Unit'}:
             return False
         return True
     return False
 
 
 def forge_entrypoint(entrypoint) -> bytes:
-    """ Encode Michelson contract entrypoint into the byte form.
+    """Encode Michelson contract entrypoint into the byte form.
 
     :param entrypoint: string
     """
@@ -31,8 +40,8 @@ def forge_entrypoint(entrypoint) -> bytes:
         return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
 
 
-def forge_operation(content) -> bytes:
-    """ Forge operation content (locally).
+def forge_operation(content: Dict[str, Any]) -> bytes:
+    """Forge operation content (locally).
 
     :param content: {.., "kind": "transaction", ...}
     """
@@ -42,7 +51,7 @@ def forge_operation(content) -> bytes:
         'reveal': forge_reveal,
         'transaction': forge_transaction,
         'origination': forge_origination,
-        'delegation': forge_delegation
+        'delegation': forge_delegation,
     }
     encode_proc = encode_content.get(content['kind'])
     if not encode_proc:
@@ -51,8 +60,8 @@ def forge_operation(content) -> bytes:
     return encode_proc(content)
 
 
-def forge_operation_group(operation_group):
-    """ Forge operation group (locally).
+def forge_operation_group(operation_group: Dict[str, Any]) -> bytes:
+    """Forge operation group (locally).
 
     :param operation_group: {"branch": "B...", "contents": [], ...}
     """
@@ -61,14 +70,14 @@ def forge_operation_group(operation_group):
     return res
 
 
-def forge_activate_account(content: dict):
+def forge_activate_account(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_base58(content['pkh'])
     res += bytes.fromhex(content['secret'])
     return res
 
 
-def forge_reveal(content):
+def forge_reveal(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_address(content['source'], tz_only=True)
     res += forge_nat(int(content['fee']))
@@ -79,7 +88,7 @@ def forge_reveal(content):
     return res
 
 
-def forge_transaction(content):
+def forge_transaction(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_address(content['source'], tz_only=True)
     res += forge_nat(int(content['fee']))
@@ -99,7 +108,7 @@ def forge_transaction(content):
     return res
 
 
-def forge_origination(content):
+def forge_origination(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_address(content['source'], tz_only=True)
     res += forge_nat(int(content['fee']))
@@ -119,7 +128,7 @@ def forge_origination(content):
     return res
 
 
-def forge_delegation(content):
+def forge_delegation(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_address(content['source'], tz_only=True)
     res += forge_nat(int(content['fee']))
@@ -136,7 +145,7 @@ def forge_delegation(content):
     return res
 
 
-def forge_failing_noop(content):
+def forge_failing_noop(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_array(content['arbitrary'].encode())
     return res

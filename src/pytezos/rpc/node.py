@@ -1,11 +1,32 @@
 import json
+import time
+from functools import wraps
 from pprint import pformat
 
 import requests
+import requests.exceptions
 from simplejson import JSONDecodeError
 
 from pytezos.logging import logger
 
+REQUEST_RETRY_COUNT = 3
+REQUEST_RETRY_SLEEP = 1
+
+
+def retry(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        for attempt in range(REQUEST_RETRY_COUNT):
+            logger.debug('Node request attempt %s/%s', attempt + 1, REQUEST_RETRY_COUNT)
+            try:
+                return fn(*args, **kwargs)
+            except requests.exceptions.ConnectionError as e:
+                if attempt + 1 == REQUEST_RETRY_COUNT:
+                    raise e
+                logger.warning(e)
+                time.sleep(REQUEST_RETRY_SLEEP)
+
+    return wrapper
 
 def urljoin(*args):
     return "/".join(map(lambda x: str(x).strip('/'), args))
@@ -95,6 +116,7 @@ class RpcNode:
         logger.debug('<<<<< %s\n%s', res.status_code, json.dumps(res.json(), indent=4))
         return res
 
+    @retry
     def get(self, path, params=None, timeout=None):
         return self.request('GET', path, params=params, timeout=timeout).json()
 

@@ -1,10 +1,11 @@
 from decimal import Decimal
+from typing import Any, Dict, Optional, Union
 
 from pytezos.jupyter import inline_doc
 
 
-def format_mutez(value) -> str:
-    """ Format amount in mutez (10^-6).
+def format_mutez(value: Optional[Union[int, Decimal]]) -> str:
+    """Format amount in mutez (10^-6).
 
     :param value: can be None (==0), Decimal (treated as tez), int (treated as mutez)
     :returns: amount in mutez, stringified
@@ -18,8 +19,8 @@ def format_mutez(value) -> str:
     return str(value)
 
 
-def format_tez(value) -> Decimal:
-    """ Format amount in tez.
+def format_tez(value: Optional[Union[int, Decimal]]) -> Decimal:
+    """Format amount in tez.
 
     :param value: can be None (==0), Decimal (treated as tez), int (treated as mutez)
     :rtype: Decimal
@@ -29,40 +30,43 @@ def format_tez(value) -> Decimal:
 
 
 class ContentMixin:
-
-    def operation(self, content):
+    def operation(self, content: Dict[str, Any]):
         return content
 
     @inline_doc
-    def endorsement(self, level: int):
-        """ Endorse a block.
+    def endorsement(self, level: int) -> Dict[str, Any]:
+        """Endorse a block.
 
         :param level: Endorsed level
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'endorsement',
-            'level': str(level)
-        })
+        return self.operation(
+            {
+                'kind': 'endorsement',
+                'level': str(level),
+            }
+        )
 
     @inline_doc
-    def seed_nonce_revelation(self, level: int, nonce):
-        """ Reveal the nonce committed operation in the previous cycle.
+    def seed_nonce_revelation(self, level: int, nonce: str) -> Dict[str, Any]:
+        """Reveal the nonce committed operation in the previous cycle.
         More info https://tezos.stackexchange.com/questions/567/what-are-nonce-revelations
 
         :param level: When nonce hash was committed
         :param nonce: Hex string
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'seed_nonce_revelation',
-            'level': str(level),
-            'nonce': nonce
-        })
+        return self.operation(
+            {
+                'kind': 'seed_nonce_revelation',
+                'level': str(level),
+                'nonce': nonce,
+            }
+        )
 
     @inline_doc
-    def double_endorsement_evidence(self, op1: dict, op2: dict):
-        """ Provide evidence of double endorsement (endorsing two different blocks at the same block height).
+    def double_endorsement_evidence(self, op1: Dict[str, Any], op2: Dict[str, Any]) -> Dict[str, Any]:
+        """Provide evidence of double endorsement (endorsing two different blocks at the same block height).
 
         :param op1: Inline endorsement
             {
@@ -76,45 +80,50 @@ class ContentMixin:
         :param op2: Inline endorsement
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'double_endorsement_evidence',
-            'op1': op1,
-            'op2': op2
-        })
+        return self.operation(
+            {
+                'kind': 'double_endorsement_evidence',
+                'op1': op1,
+                'op2': op2,
+            }
+        )
 
     @inline_doc
-    def double_baking_evidence(self, bh1, bh2):
-        """ Provide evidence of double baking (two different blocks at the same height).
+    def double_baking_evidence(self, bh1: str, bh2: str) -> Dict[str, Any]:
+        """Provide evidence of double baking (two different blocks at the same height).
 
         :param bh1: First block hash
         :param bh2: Second block hash
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'double_baking_evidence',
-            'bh1': bh1,
-            'bh2': bh2
-        })
+        return self.operation(
+            {
+                'kind': 'double_baking_evidence',
+                'bh1': bh1,
+                'bh2': bh2,
+            }
+        )
 
     @inline_doc
-    def activate_account(self, activation_code='', pkh=''):
-        """ Activate recommended allocations for contributions to the TF fundraiser.
+    def activate_account(self, activation_code='', pkh='') -> Dict[str, Any]:
+        """Activate recommended allocations for contributions to the TF fundraiser.
         More info https://activate.tezos.com/
 
         :param activation_code: Secret code from pdf, leave empty for autocomplete
         :param pkh: Public key hash, leave empty for autocomplete
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'activate_account',
-            'pkh': pkh,
-            'secret': activation_code
-        })
+        return self.operation(
+            {
+                'kind': 'activate_account',
+                'pkh': pkh,
+                'secret': activation_code,
+            }
+        )
 
     @inline_doc
-    def proposals(self, proposals,
-                  source='', period=0):
-        """ Submit and/or upvote proposals to amend the protocol.
+    def proposals(self, proposals, source='', period=0) -> Dict[str, Any]:
+        """Submit and/or upvote proposals to amend the protocol.
         Can only be submitted during a proposal period.
         More info https://tezos.gitlab.io/master/whitedoc/voting.html
 
@@ -126,17 +135,18 @@ class ContentMixin:
         if not isinstance(proposals, list):
             proposals = [proposals]
 
-        return self.operation({
-            'kind': 'proposals',
-            'source': source,
-            'period': str(period),
-            'proposals': proposals
-        })
+        return self.operation(
+            {
+                'kind': 'proposals',
+                'source': source,
+                'period': str(period),
+                'proposals': proposals,
+            }
+        )
 
     @inline_doc
-    def ballot(self, proposal, ballot,
-               source='', period=0):
-        """ Vote for a proposal in a given voting period.
+    def ballot(self, proposal, ballot, source='', period=0) -> Dict[str, Any]:
+        """Vote for a proposal in a given voting period.
         Can only be submitted during Testing_vote or Promotion_vote periods, and only once per period.
         More info https://tezos.gitlab.io/master/whitedoc/voting.html
 
@@ -146,17 +156,26 @@ class ContentMixin:
         :param period: Number of the current voting period, leave None for autocomplete
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'ballot',
-            'source': source,
-            'period': str(period),
-            'proposal': proposal,
-            'ballot': ballot
-        })
+        return self.operation(
+            {
+                'kind': 'ballot',
+                'source': source,
+                'period': str(period),
+                'proposal': proposal,
+                'ballot': ballot,
+            }
+        )
 
     @inline_doc
-    def reveal(self, public_key='',
-               source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
+    def reveal(
+        self,
+        public_key='',
+        source='',
+        counter=0,
+        fee=0,
+        gas_limit=0,
+        storage_limit=0,
+    ) -> Dict[str, Any]:
         """ Reveal the public key associated with a tz address.
 
         :param public_key: Public key to reveal, Base58 encoded
@@ -168,20 +187,31 @@ class ContentMixin:
         :param storage_limit: Leave None for autocomplete
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'reveal',
-            'source': source,
-            'fee': format_mutez(fee),
-            'counter': str(counter),
-            'gas_limit': str(gas_limit),
-            'storage_limit': str(storage_limit),
-            'public_key': public_key
-        })
+        return self.operation(
+            {
+                'kind': 'reveal',
+                'source': source,
+                'fee': format_mutez(fee),
+                'counter': str(counter),
+                'gas_limit': str(gas_limit),
+                'storage_limit': str(storage_limit),
+                'public_key': public_key,
+            }
+        )
 
     @inline_doc
-    def transaction(self, destination, amount=0, parameters=None,
-                    source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
-        """ Transfer tez to a given address (implicit or originated).
+    def transaction(
+        self,
+        destination,
+        amount=0,
+        parameters=None,
+        source='',
+        counter=0,
+        fee=0,
+        gas_limit=0,
+        storage_limit=0,
+    ) -> Dict[str, Any]:
+        """Transfer tez to a given address (implicit or originated).
         If the receiver is a smart contract, then optional parameters may be passed.
 
         :param source: Address from which funds will be sent, leave None to use signatory address
@@ -202,7 +232,7 @@ class ContentMixin:
             'gas_limit': str(gas_limit),
             'storage_limit': str(storage_limit),
             'amount': format_mutez(amount),
-            'destination': destination
+            'destination': destination,
         }
 
         if parameters is not None:
@@ -211,8 +241,17 @@ class ContentMixin:
         return self.operation(content)
 
     @inline_doc
-    def origination(self, script, balance=0, delegate=None,
-                    source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
+    def origination(
+        self,
+        script,
+        balance=0,
+        delegate=None,
+        source='',
+        counter=0,
+        fee=0,
+        gas_limit=0,
+        storage_limit=0,
+    ) -> Dict[str, Any]:
         """ Deploy smart contract (scriptless KT accounts are not used for delegation since Babylon)
 
         :param script: {"code": $Micheline, "storage": $Micheline}
@@ -234,7 +273,7 @@ class ContentMixin:
             'gas_limit': str(gas_limit),
             'storage_limit': str(storage_limit),
             'balance': format_mutez(balance),
-            'script': script
+            'script': script,
         }
 
         if delegate is not None:
@@ -243,9 +282,16 @@ class ContentMixin:
         return self.operation(content)
 
     @inline_doc
-    def delegation(self, delegate='',
-                   source='', counter=0, fee=0, gas_limit=0, storage_limit=0):
-        """ Delegate funds or register yourself as a delegate.
+    def delegation(
+        self,
+        delegate='',
+        source='',
+        counter=0,
+        fee=0,
+        gas_limit=0,
+        storage_limit=0,
+    ) -> Dict[str, Any]:
+        """Delegate funds or register yourself as a delegate.
 
         :param delegate: tz address of delegate, leave None to register yourself as a delegate
         :param source: Address from which funds will be delegated, leave None to use signatory address
@@ -255,24 +301,28 @@ class ContentMixin:
         :param storage_limit: Leave None for autocomplete
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'delegation',
-            'source': source,
-            'fee': format_mutez(fee),
-            'counter': str(counter),
-            'gas_limit': str(gas_limit),
-            'storage_limit': str(storage_limit),
-            'delegate': delegate
-        })
+        return self.operation(
+            {
+                'kind': 'delegation',
+                'source': source,
+                'fee': format_mutez(fee),
+                'counter': str(counter),
+                'gas_limit': str(gas_limit),
+                'storage_limit': str(storage_limit),
+                'delegate': delegate,
+            }
+        )
 
     @inline_doc
-    def failing_noop(self, arbitrary: str):
+    def failing_noop(self, arbitrary: str) -> Dict[str, Any]:
         """Operation to sign arbitrary data without the risk it will be used onchain.
 
         :param arbitrary: Message to sign
         :returns: dict or OperationGroup
         """
-        return self.operation({
-            'kind': 'failing_noop',
-            'arbitrary': arbitrary,
-        })
+        return self.operation(
+            {
+                'kind': 'failing_noop',
+                'arbitrary': arbitrary,
+            }
+        )

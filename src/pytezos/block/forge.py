@@ -17,7 +17,7 @@ def forge_int_fixed(value: int, length: int) -> bytes:
     return value.to_bytes(length, 'big')
 
 
-def forge_command(command):
+def forge_command(command: str) -> bytes:
     if command == 'activate':
         return b'\x00'
     raise NotImplementedError(command)
@@ -33,7 +33,7 @@ def forge_priority(priority: int) -> bytes:
 
 def forge_content(content: Dict[str, Any]) -> bytes:
     res = b''
-    res += forge_command(content.get('command'))
+    res += forge_command(content['command'])
     res += forge_base58(content['hash'])
     res += forge_fitness(content['fitness'])
     res += bytes.fromhex(content['protocol_parameters'])

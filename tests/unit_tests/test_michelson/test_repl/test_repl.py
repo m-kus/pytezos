@@ -189,7 +189,7 @@ class InterpreterTest(TestCase):
         commit_instruction = next(
             (
                 i
-                for i in result.instructions.items[::-1]
+                for i in result.instructions.items[0].items[::-1]
                 if isinstance(i, CommitInstruction)
             )
         )
@@ -293,7 +293,7 @@ class InterpreterTest(TestCase):
         commit_instruction = next(
             (
                 i
-                for i in result.instructions.items[::-1]
+                for i in result.instructions.items[0].items[::-1]
                 if isinstance(i, CommitInstruction)
             )
         )

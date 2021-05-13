@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.michelson.program import MichelsonProgram
@@ -6,18 +6,17 @@ from pytezos.operation.result import OperationResult
 
 
 class ContractCallResult(OperationResult):
-    """ Encapsulates the result of a contract invocation.
-    """
+    """Encapsulates the result of a contract invocation."""
 
     @classmethod
-    def from_run_operation(cls, operation_group: dict, context: ExecutionContext) -> List['ContractCallResult']:
-        """ Get a list of results from an operation group content with metadata.
+    def from_run_operation(cls, operation_group: Dict[str, Any], context: ExecutionContext) -> List['ContractCallResult']:
+        """Get a list of results from an operation group content with metadata.
 
         :param operation_group: {..., "contents": [{..., kind: "transaction", ...}]}
         :param context: execution context
         :rtype: ContractCallResult
         """
-        results = list()
+        results: List['OperationResult'] = list()
         for content in OperationResult.iter_contents(operation_group):
             if content['kind'] == 'transaction':
                 if content['destination'] == context.address:
@@ -47,8 +46,8 @@ class ContractCallResult(OperationResult):
         return list(map(decode_result, results))
 
     @classmethod
-    def from_run_code(cls, response: dict, parameters, context: ExecutionContext):
-        """ Parse a result of `run_code` execution.
+    def from_run_code(cls, response: Dict[str, Any], parameters, context: ExecutionContext) -> 'ContractCallResult':
+        """Parse a result of `run_code` execution.
 
         :param response: RPC response (json)
         :param parameters: {"entrypoint": str, "value": $Micheline}
@@ -63,5 +62,5 @@ class ContractCallResult(OperationResult):
             parameters=parameters.to_python_object(),
             storage=extended_storage.to_python_object(lazy_diff=True),
             lazy_diff=response.get('lazy_diff', []),
-            operations=response.get('operations', [])
+            operations=response.get('operations', []),
         )

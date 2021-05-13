@@ -8,9 +8,9 @@ from pytezos.jupyter import InlineDocstring
 from pytezos.rpc import RpcMultiNode, RpcNode, ShellQuery
 from pytezos.rpc.errors import RpcError
 
-default_network = 'edo2net'
+default_network = 'florencenet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
-default_key_hash = 'tz1cnQZXoznhduu4MVWfJF6GSyP6mMHMbbWa'
+default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 
 alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'  # for flextesa sandbox
 alice_key_hash = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
@@ -19,14 +19,12 @@ dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'  # for t
 
 nodes = {
     'mainnet': ['https://mainnet-tezos.giganode.io/',
-                'https://rpc.tzkt.io/mainnet/',
                 'https://api.tez.ie/',
-                'https://tezos-prod.cryptonomic-infra.tech/chains/main/blocks/head'],
+                'https://tezos-prod.cryptonomic-infra.tech/'],
     'sandbox': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
-    'delphinet': ['https://rpc.tzkt.io/delphinet/'],
-    'edonet': ['https://rpc.tzkt.io/edonet/'],
-    'edo2net': ['https://rpc.tzkt.io/edo2net/']
+    'florencenet': ['https://florence-tezos.giganode.io/'],
+    'edo2net': ['https://edonet-tezos.giganode.io/']
 }
 keys = {
     'alice': alice_key,
