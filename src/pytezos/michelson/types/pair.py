@@ -121,13 +121,19 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
             py_obj = tuple(py_obj)
 
         if isinstance(py_obj, tuple) or isinstance(py_obj, dict):
-            _, key_to_path, idx_to_path = cls.get_type_layout()
+            path_to_key, key_to_path, idx_to_path = cls.get_type_layout()
             if isinstance(py_obj, tuple):
                 py_obj = {idx_to_path[i]: value for i, value in enumerate(py_obj)}
             else:
                 assert key_to_path, f'expected named type'
                 py_obj = {key_to_path[key]: value for key, value in py_obj.items()}
-            return cls.from_python_object(wrap_pair(py_obj))
+            try:
+                return cls.from_python_object(wrap_pair(py_obj))
+            except KeyError as e:
+                if not isinstance(path_to_key, dict):
+                    path_to_key = {v: f'{k}th' for k, v in idx_to_path.items()}
+                field = path_to_key.get(e.args[0], 'some')
+                raise KeyError(f'Missing {field} field')
         elif isinstance(py_obj, Nested):
             value = tuple(cls.args[i].from_python_object(py_obj[i]) for i in [0, 1])
             return cls(value)

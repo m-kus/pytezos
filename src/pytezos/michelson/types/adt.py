@@ -49,6 +49,9 @@ def wrap_or(obj, path) -> Nested:
 
 
 def wrap_pair(obj: dict, path='') -> Nested:
+    if all(not x.startswith(path) for x in obj):
+        raise KeyError(path)
+
     items = [
         obj[subpath] if subpath in obj else wrap_pair(obj, subpath)
         for subpath
