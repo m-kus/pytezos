@@ -1,20 +1,13 @@
 import io
-<<<<<<< HEAD
-import tarfile
+
 import sys
+import tarfile
+from glob import glob
+from os.path import abspath, dirname, exists, join, split
+from pprint import pformat
 import time
-from glob import glob
-from os.path import abspath, dirname, exists, join, split
-from pprint import pformat
-from typing import Optional, List
-=======
-import sys
-import tarfile
-from glob import glob
-from os.path import abspath, dirname, exists, join, split
-from pprint import pformat
 from typing import List, Optional
->>>>>>> 7fb0fdb (Putting contract files into ligo container)
+
 
 import click
 import docker  # type: ignore
