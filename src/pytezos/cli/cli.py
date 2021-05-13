@@ -1,13 +1,11 @@
 import io
-
 import sys
 import tarfile
+import time
 from glob import glob
 from os.path import abspath, dirname, exists, join, split
 from pprint import pformat
-import time
 from typing import List, Optional
-
 
 import click
 import docker  # type: ignore
