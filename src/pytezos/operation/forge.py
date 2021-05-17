@@ -52,6 +52,8 @@ def forge_operation(content: Dict[str, Any]) -> bytes:
         'transaction': forge_transaction,
         'origination': forge_origination,
         'delegation': forge_delegation,
+        'endorsement': lambda x: b'',
+        'endorsement_with_slot': lambda x: b'',
     }
     encode_proc = encode_content.get(content['kind'])
     if not encode_proc:

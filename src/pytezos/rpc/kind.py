@@ -2,6 +2,7 @@
 validation_passes = {
     'failing_noop': -1,
     'endorsement': 0,
+    'endorsement_with_slot': 0,
     'proposal': 1,
     'ballot': 1,
     'seed_nonce_revelation': 2,
@@ -15,6 +16,7 @@ validation_passes = {
 }
 operation_tags = {
     'endorsement': 0,
+    'endorsement_with_slot': 0,
     'proposal': 5,
     'ballot': 6,
     'seed_nonce_revelation': 1,

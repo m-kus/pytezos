@@ -48,6 +48,17 @@ class ContentMixin:
         )
 
     @inline_doc
+    def endorsement_with_slot(self, endorsement, slot) -> Dict[str, Any]:
+        return self.operation(
+            {
+                'kind': 'endorsement_with_slot',
+                'endorsement': endorsement,
+                'slot': slot,
+            }
+        )
+
+
+    @inline_doc
     def seed_nonce_revelation(self, level: int, nonce: str) -> Dict[str, Any]:
         """Reveal the nonce committed operation in the previous cycle.
 
