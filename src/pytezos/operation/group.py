@@ -167,7 +167,21 @@ class OperationGroup(ContextMixin, ContentMixin):
             'branch': self.branch,
             'contents': self.contents,
         }
+
+        # NOTE: endorsement signature must be included when forging endorsement_with_slot locally...
+        if self.contents[0]['kind'] == 'endorsement_with_slot' and 'signature' not in self.contents[0]['endorsement']['operations']:
+            endorsement = OperationGroup(
+                self.context,
+                [ContentMixin().endorsement(int(self.contents[0]['endorsement']['operations']['level']))]
+            )
+            endorsement = endorsement.fill().sign()
+            self.contents[0]['endorsement']['operations']['signature'] = endorsement.signature
+
         local_data = forge_operation_group(payload).hex()
+
+        # NOTE: ...but not remotely
+        if self.contents[0]['kind'] == 'endorsement_with_slot' and 'signature' in self.contents[0]['endorsement']['operations']:
+            del self.contents[0]['endorsement']['operations']['signature']
 
         if validate:
             remote_data = self.shell.blocks[self.branch].helpers.forge.operations.post(payload)

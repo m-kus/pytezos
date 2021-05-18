@@ -25,6 +25,6 @@ class TransactionCounterTestCase(SandboxedNodeTestCase):
             },
             slot=1,
         )
-        eds = eds.fill()
-        print(json.dumps(eds.json_payload(), indent=4))
-        eds.run_operation()
+        eds = eds.fill().sign()
+        print(json.dumps(eds.json_payload()))
+        eds.forge(True)

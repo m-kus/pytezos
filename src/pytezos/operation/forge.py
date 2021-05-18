@@ -5,6 +5,7 @@ from pytezos.michelson.forge import (
     forge_array,
     forge_base58,
     forge_bool,
+    forge_int,
     forge_micheline,
     forge_nat,
     forge_public_key,
@@ -39,7 +40,6 @@ def forge_entrypoint(entrypoint) -> bytes:
     else:
         return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
 
-
 def forge_operation(content: Dict[str, Any]) -> bytes:
     """Forge operation content (locally).
 
@@ -52,8 +52,8 @@ def forge_operation(content: Dict[str, Any]) -> bytes:
         'transaction': forge_transaction,
         'origination': forge_origination,
         'delegation': forge_delegation,
-        'endorsement': lambda x: b'',
-        'endorsement_with_slot': lambda x: b'',
+        'endorsement': forge_endorsement,
+        'endorsement_with_slot': forge_endorsement_with_slot,
     }
     encode_proc = encode_content.get(content['kind'])
     if not encode_proc:
@@ -144,6 +144,27 @@ def forge_delegation(content: Dict[str, Any]) -> bytes:
     else:
         res += forge_bool(False)
 
+    return res
+
+
+def forge_endorsement(content: Dict[str, Any]) -> bytes:
+    res = forge_nat(operation_tags[content['kind']])
+    res += forge_int(int(content['level']))
+    return res
+
+
+def forge_inline_endorsement(content: Dict[str, Any]) -> bytes:
+    res = forge_base58(content['branch'])
+    res += forge_nat(operation_tags[content['operations']['kind']])
+    res += forge_int(content['operations']['level'])
+    res += forge_base58(content['signature'])
+    return res
+
+
+def forge_endorsement_with_slot(content: Dict[str, Any]) -> bytes:
+    res = forge_nat(operation_tags[content['kind']])
+    res += forge_array(forge_inline_endorsement(content['endorsement']))
+    res += forge_nat(content['slot'], 2)
     return res
 
 

@@ -65,7 +65,7 @@ def unforge_int(data: bytes) -> (int, int):  # type: ignore
     return value, length
 
 
-def forge_nat(value) -> bytes:
+def forge_nat(value: int, len_bytes=1) -> bytes:
     """ Encode a number using LEB128 encoding (Zarith).
 
     :param int value: the value to encode
@@ -89,7 +89,7 @@ def forge_nat(value) -> bytes:
 
         buf.append(byte)
 
-    return bytes(buf)
+    return bytes(buf).rjust(len_bytes, b'\0')
 
 
 def unforge_chain_id(data: bytes) -> str:
