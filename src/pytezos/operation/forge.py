@@ -155,7 +155,8 @@ def forge_endorsement(content: Dict[str, Any]) -> bytes:
 
 def forge_inline_endorsement(content: Dict[str, Any]) -> bytes:
     res = forge_base58(content['branch'])
-    res += forge_nat(operation_tags[content['operations']['kind']])
+    # FIXME: Why 4 bytes?
+    res += forge_nat(operation_tags[content['operations']['kind']], 4)
     res += forge_int(content['operations']['level'])
     res += forge_base58(content['signature'])
     return res

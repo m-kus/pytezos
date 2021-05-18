@@ -16,7 +16,7 @@ validation_passes = {
 }
 operation_tags = {
     'endorsement': 0,
-    'endorsement_with_slot': 0,
+    'endorsement_with_slot': 10,
     'proposal': 5,
     'ballot': 6,
     'seed_nonce_revelation': 1,
