@@ -1,5 +1,5 @@
 from contextlib import suppress
-from typing import Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import base58  # type: ignore
 import strict_rfc3339  # type: ignore
@@ -40,8 +40,16 @@ def forge_int(value: int) -> bytes:
     return bytes(res)
 
 
+def forge_int16(value: int) -> bytes:
+    return value.to_bytes(2, 'big')
+
+
+def forge_int32(value: int) -> bytes:
+    return value.to_bytes(4, 'big')
+
+
 def unforge_int(data: bytes) -> (int, int):  # type: ignore
-    """ Decode signed unbounded integer from bytes.
+    """Decode signed unbounded integer from bytes.
 
     :param data: Encoded integer
     :returns: tuple(parsed integer, length in bytes)
@@ -65,8 +73,8 @@ def unforge_int(data: bytes) -> (int, int):  # type: ignore
     return value, length
 
 
-def forge_nat(value: int, len_bytes=1) -> bytes:
-    """ Encode a number using LEB128 encoding (Zarith).
+def forge_nat(value: int) -> bytes:
+    """Encode a number using LEB128 encoding (Zarith).
 
     :param int value: the value to encode
     :returns: encoded value
@@ -79,7 +87,7 @@ def forge_nat(value: int, len_bytes=1) -> bytes:
     more = True
 
     while more:
-        byte = value & 0x7f
+        byte = value & 0x7F
         value >>= 7
 
         if value:
@@ -89,11 +97,11 @@ def forge_nat(value: int, len_bytes=1) -> bytes:
 
         buf.append(byte)
 
-    return bytes(buf).rjust(len_bytes, b'\0')
+    return bytes(buf)
 
 
 def unforge_chain_id(data: bytes) -> str:
-    """ Decode chain id from byte form.
+    """Decode chain id from byte form.
 
     :param data: encoded chain id.
     :returns: base58 encoded chain id
@@ -102,7 +110,7 @@ def unforge_chain_id(data: bytes) -> str:
 
 
 def unforge_signature(data: bytes) -> str:
-    """ Decode signature from byte form.
+    """Decode signature from byte form.
 
     :param data: encoded signature.
     :returns: base58 encoded signature (generic)
@@ -111,13 +119,12 @@ def unforge_signature(data: bytes) -> str:
 
 
 def forge_bool(value: bool) -> bytes:
-    """ Encode boolean value into bytes.
-    """
+    """Encode boolean value into bytes."""
     return b'\xff' if value else b'\x00'
 
 
 def forge_base58(value: str) -> bytes:
-    """ Encode base58 string into bytes.
+    """Encode base58 string into bytes.
 
     :param value: base58 encoded value (with checksum)
     """
@@ -125,7 +132,7 @@ def forge_base58(value: str) -> bytes:
 
 
 def optimize_timestamp(value: str) -> int:
-    """ Convert time string to timestamp.
+    """Convert time string to timestamp.
 
     :param value: RFC3339 time string or timestamp
     """
@@ -134,8 +141,9 @@ def optimize_timestamp(value: str) -> int:
         return int(strict_rfc3339.rfc3339_to_timestamp(value))
     return int(value)
 
+
 def forge_address(value: str, tz_only=False) -> bytes:
-    """ Encode address or key hash into bytes.
+    """Encode address or key hash into bytes.
 
     :param value: base58 encoded address or key_hash
     :param tz_only: True indicates that it's a key_hash (will be encoded in a more compact form)
@@ -157,8 +165,8 @@ def forge_address(value: str, tz_only=False) -> bytes:
     return res[1:] if tz_only else res
 
 
-def unforge_address(data: bytes):
-    """ Decode address or key_hash from bytes.
+def unforge_address(data: bytes) -> str:
+    """Decode address or key_hash from bytes.
 
     :param data: encoded address or key_hash
     :returns: base58 encoded address
@@ -166,7 +174,7 @@ def unforge_address(data: bytes):
     tz_prefixes = {
         b'\x00\x00': b'tz1',
         b'\x00\x01': b'tz2',
-        b'\x00\x02': b'tz3'
+        b'\x00\x02': b'tz3',
     }
 
     for bin_prefix, tz_prefix in tz_prefixes.items():
@@ -179,8 +187,8 @@ def unforge_address(data: bytes):
         return base58_encode(data[1:], tz_prefixes[b'\x00' + data[:1]]).decode()
 
 
-def forge_contract(value) -> bytes:
-    """ Encode a value of contract type (address + optional entrypoint) into bytes.
+def forge_contract(value: str) -> bytes:
+    """Encode a value of contract type (address + optional entrypoint) into bytes.
 
     :param value: 'tz12345' or 'tz12345%default'
     """
@@ -192,8 +200,8 @@ def forge_contract(value) -> bytes:
     return res
 
 
-def unforge_contract(data: bytes):
-    """ Decode contract (address + optional entrypoint) from bytes
+def unforge_contract(data: bytes) -> str:
+    """Decode contract (address + optional entrypoint) from bytes
 
     :param data: encoded contract
     :returns: base58 encoded address and entrypoint (if exists) separated by `%`
@@ -204,8 +212,8 @@ def unforge_contract(data: bytes):
     return res
 
 
-def forge_public_key(value) -> bytes:
-    """ Encode public key into bytes.
+def forge_public_key(value: str) -> bytes:
+    """Encode public key into bytes.
 
     :param value: public key in in base58 form
     """
@@ -223,7 +231,7 @@ def forge_public_key(value) -> bytes:
 
 
 def unforge_public_key(data: bytes) -> str:
-    """ Decode public key from byte form.
+    """Decode public key from byte form.
 
     :param data: encoded public key.
     :returns: base58 encoded public key
@@ -231,13 +239,13 @@ def unforge_public_key(data: bytes) -> str:
     key_prefix = {
         b'\x00': b'edpk',
         b'\x01': b'sppk',
-        b'\x02': b'p2pk'
+        b'\x02': b'p2pk',
     }
     return base58_encode(data[1:], key_prefix[data[:1]]).decode()
 
 
-def forge_array(data, len_bytes=4) -> bytes:
-    """ Encode array of bytes (prepend length).
+def forge_array(data: bytes, len_bytes=4) -> bytes:
+    """Encode array of bytes (prepend length).
 
     :param data: list of bytes
     :param len_bytes: number of bytes to store array length
@@ -245,8 +253,8 @@ def forge_array(data, len_bytes=4) -> bytes:
     return len(data).to_bytes(len_bytes, 'big') + data
 
 
-def unforge_array(data, len_bytes=4) -> tuple:
-    """ Decode array of bytes.
+def unforge_array(data: bytes, len_bytes=4) -> tuple:
+    """Decode array of bytes.
 
     :param data: encoded array
     :param len_bytes: number of bytes to store array length
@@ -255,11 +263,11 @@ def unforge_array(data, len_bytes=4) -> tuple:
     assert len(data) >= len_bytes, f'not enough bytes to parse array length, wanted {len_bytes}'
     length = int.from_bytes(data[:len_bytes], 'big')
     assert len(data) >= len_bytes + length, f'not enough bytes to parse array body, wanted {length}'
-    return data[len_bytes:len_bytes+length], len_bytes+length
+    return data[len_bytes : len_bytes + length], len_bytes + length
 
 
-def forge_micheline(data) -> bytes:
-    """ Encode a Micheline expression into the byte form.
+def forge_micheline(data: Union[List, Dict]) -> bytes:
+    """Encode a Micheline expression into the byte form.
 
     :param data: Micheline expression
     """
@@ -308,8 +316,8 @@ def forge_micheline(data) -> bytes:
     return b''.join(res)
 
 
-def unforge_micheline(data: bytes):
-    """ Parse Micheline JSON from bytes.
+def unforge_micheline(data: bytes) -> Union[List, Dict]:
+    """Parse Micheline JSON from bytes.
 
     :param data: Forged Micheline expression
     :returns: Micheline JSON
@@ -379,8 +387,8 @@ def unforge_micheline(data: bytes):
     return result
 
 
-def forge_script(script) -> bytes:
-    """ Encode an origination script into the byte form.
+def forge_script(script: Dict[str, Any]) -> bytes:
+    """Encode an origination script into the byte form.
 
     :param script: {"code": "$Micheline_expression", "storage": "$Micheline_expression"}
     """

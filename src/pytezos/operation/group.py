@@ -75,8 +75,8 @@ class OperationGroup(ContextMixin, ContentMixin):
 
     def binary_payload(self) -> bytes:
         """Get binary payload used for injection/hash calculation."""
-        # if self.contents[0]['kind'] == 'endorsement_with_slot':
-        #     return bytes.fromhex(self.forge())
+        if self.contents[0]['kind'] == 'endorsement_with_slot':
+            return bytes.fromhex(self.forge())
         if not self.signature:
             raise ValueError('Not signed')
 

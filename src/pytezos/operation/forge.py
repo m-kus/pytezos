@@ -6,6 +6,8 @@ from pytezos.michelson.forge import (
     forge_base58,
     forge_bool,
     forge_int,
+    forge_int16,
+    forge_int32,
     forge_micheline,
     forge_nat,
     forge_public_key,
@@ -39,6 +41,7 @@ def forge_entrypoint(entrypoint) -> bytes:
         return reserved_entrypoints[entrypoint]
     else:
         return b'\xff' + forge_array(entrypoint.encode(), len_bytes=1)
+
 
 def forge_operation(content: Dict[str, Any]) -> bytes:
     """Forge operation content (locally).
@@ -156,7 +159,7 @@ def forge_endorsement(content: Dict[str, Any]) -> bytes:
 def forge_inline_endorsement(content: Dict[str, Any]) -> bytes:
     res = forge_base58(content['branch'])
     # FIXME: Why 4 bytes?
-    res += forge_nat(operation_tags[content['operations']['kind']], 4)
+    res += forge_int32(operation_tags[content['operations']['kind']])
     res += forge_int(content['operations']['level'])
     res += forge_base58(content['signature'])
     return res
@@ -165,7 +168,7 @@ def forge_inline_endorsement(content: Dict[str, Any]) -> bytes:
 def forge_endorsement_with_slot(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
     res += forge_array(forge_inline_endorsement(content['endorsement']))
-    res += forge_nat(content['slot'], 2)
+    res += forge_int16(content['slot'])
     return res
 
 

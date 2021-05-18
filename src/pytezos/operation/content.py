@@ -57,7 +57,6 @@ class ContentMixin:
             }
         )
 
-
     @inline_doc
     def seed_nonce_revelation(self, level: int, nonce: str) -> Dict[str, Any]:
         """Reveal the nonce committed operation in the previous cycle.

@@ -45,6 +45,7 @@ black:
 	poetry run black src/pytezos/block
 	poetry run black src/pytezos/client.py
 	poetry run black src/pytezos/contract
+	poetry run black src/pytezos/michelson/forge.py
 	poetry run black src/pytezos/michelson/program.py
 	poetry run black src/pytezos/michelson/repl.py
 	poetry run black src/pytezos/michelson/stack.py
