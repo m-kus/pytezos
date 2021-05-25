@@ -22,7 +22,7 @@ def _retry(fn: Callable, backoff=2):
             logger.debug('Node request attempt %s/%s', attempt, REQUEST_RETRY_COUNT)
             try:
                 return fn(*args, **kwargs)
-            except requests.exceptions.ConnectionError as e:
+            except (requests.exceptions.ConnectionError, RpcError) as e:
                 if attempt >= REQUEST_RETRY_COUNT:
                     raise e
                 logger.warning(e)
