@@ -10,7 +10,7 @@ from simplejson import JSONDecodeError
 
 from pytezos.logging import logger
 
-REQUEST_RETRY_COUNT = 3
+REQUEST_RETRY_COUNT = 5
 REQUEST_RETRY_SLEEP = 1
 
 
