@@ -14,18 +14,20 @@ REQUEST_RETRY_COUNT = 3
 REQUEST_RETRY_SLEEP = 1
 
 
-def _retry(fn: Callable):
+def _retry(fn: Callable, backoff=2):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        for attempt in range(REQUEST_RETRY_COUNT):
-            logger.debug('Node request attempt %s/%s', attempt + 1, REQUEST_RETRY_COUNT)
+        delay = REQUEST_RETRY_SLEEP
+        for attempt in range(1, REQUEST_RETRY_COUNT + 1):
+            logger.debug('Node request attempt %s/%s', attempt, REQUEST_RETRY_COUNT)
             try:
                 return fn(*args, **kwargs)
             except requests.exceptions.ConnectionError as e:
-                if attempt + 1 == REQUEST_RETRY_COUNT:
+                if attempt >= REQUEST_RETRY_COUNT:
                     raise e
                 logger.warning(e)
-                time.sleep(REQUEST_RETRY_SLEEP)
+                time.sleep(delay)
+                delay *= backoff
 
     return wrapper
 
