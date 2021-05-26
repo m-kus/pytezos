@@ -340,6 +340,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param num_blocks_wait: number of blocks to wait for injection
         :param time_between_blocks: override the corresponding parameter from constants
         :param min_confirmations: number of block injections to wait for before returning
+        :param kwargs: additional keyword arguments to pass to self.shell.wait_next_block
         :returns: operation group with metadata (raw RPC response)
         """
         self.context.reset()
@@ -361,7 +362,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         confirmations = 0
         for _ in range(num_blocks_wait):
             logger.info('Waiting for the next block')
-            self.shell.wait_next_block(time_between_blocks=time_between_blocks)
+            self.shell.wait_next_block(time_between_blocks=time_between_blocks, **kwargs)
 
             if in_mempool:
                 try:
