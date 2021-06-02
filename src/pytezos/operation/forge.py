@@ -152,15 +152,14 @@ def forge_delegation(content: Dict[str, Any]) -> bytes:
 
 def forge_endorsement(content: Dict[str, Any]) -> bytes:
     res = forge_nat(operation_tags[content['kind']])
-    res += forge_int(int(content['level']))
+    res += forge_int32(int(content['level']))
     return res
 
 
 def forge_inline_endorsement(content: Dict[str, Any]) -> bytes:
     res = forge_base58(content['branch'])
-    # FIXME: Why 4 bytes?
-    res += forge_int32(operation_tags[content['operations']['kind']])
-    res += forge_int(content['operations']['level'])
+    res += forge_nat(operation_tags[content['operations']['kind']])
+    res += forge_int32(int(content['operations']['level']))
     res += forge_base58(content['signature'])
     return res
 

@@ -48,7 +48,13 @@ class ContentMixin:
         )
 
     @inline_doc
-    def endorsement_with_slot(self, endorsement, slot) -> Dict[str, Any]:
+    def endorsement_with_slot(self, endorsement: dict, slot: int):
+        """Wrap endorsement
+
+        :param endorsement: Inlined endorsement
+        :param slot: Minimum of the slots endorsed
+        :returns: dict or OperationGroup
+        """
         return self.operation(
             {
                 'kind': 'endorsement_with_slot',
@@ -58,7 +64,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def seed_nonce_revelation(self, level: int, nonce: str) -> Dict[str, Any]:
+    def seed_nonce_revelation(self, level: int, nonce: str):
         """Reveal the nonce committed operation in the previous cycle.
 
         More info https://tezos.stackexchange.com/questions/567/what-are-nonce-revelations
@@ -76,7 +82,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def double_endorsement_evidence(self, op1: Dict[str, Any], op2: Dict[str, Any]) -> Dict[str, Any]:
+    def double_endorsement_evidence(self, op1: Dict[str, Any], op2: Dict[str, Any]):
         """Provide evidence of double endorsement (endorsing two different blocks at the same block height).
 
         Inline endorsement format:
@@ -105,7 +111,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def double_baking_evidence(self, bh1: str, bh2: str) -> Dict[str, Any]:
+    def double_baking_evidence(self, bh1: str, bh2: str):
         """Provide evidence of double baking (two different blocks at the same height).
 
         :param bh1: First block hash
@@ -121,7 +127,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def activate_account(self, activation_code='', pkh='') -> Dict[str, Any]:
+    def activate_account(self, activation_code='', pkh=''):
         """Activate recommended allocations for contributions to the TF fundraiser.
 
         More info https://activate.tezos.com/
@@ -139,7 +145,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def proposals(self, proposals, source='', period=0) -> Dict[str, Any]:
+    def proposals(self, proposals, source='', period=0):
         """Submit and/or upvote proposals to amend the protocol.
 
         Can only be submitted during a proposal period.
@@ -163,7 +169,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def ballot(self, proposal, ballot, source='', period=0) -> Dict[str, Any]:
+    def ballot(self, proposal, ballot, source='', period=0):
         """Vote for a proposal in a given voting period.
 
         Can only be submitted during Testing_vote or Promotion_vote periods, and only once per period.
@@ -194,7 +200,7 @@ class ContentMixin:
         fee=0,
         gas_limit=0,
         storage_limit=0,
-    ) -> Dict[str, Any]:
+    ):
         """Reveal the public key associated with a tz address.
 
         :param public_key: Public key to reveal, Base58 encoded
@@ -229,7 +235,7 @@ class ContentMixin:
         fee=0,
         gas_limit=0,
         storage_limit=0,
-    ) -> Dict[str, Any]:
+    ):
         """Transfer tez to a given address (implicit or originated).
 
         If the receiver is a smart contract, then optional parameters may be passed.
@@ -271,7 +277,7 @@ class ContentMixin:
         fee=0,
         gas_limit=0,
         storage_limit=0,
-    ) -> Dict[str, Any]:
+    ):
         """Deploy smart contract (scriptless KT accounts are not used for delegation since Babylon).
 
         :param script: {"code": $Micheline, "storage": $Micheline}
@@ -310,7 +316,7 @@ class ContentMixin:
         fee=0,
         gas_limit=0,
         storage_limit=0,
-    ) -> Dict[str, Any]:
+    ):
         """Delegate funds or register yourself as a delegate.
 
         :param delegate: tz address of delegate, leave None to register yourself as a delegate
@@ -334,7 +340,7 @@ class ContentMixin:
         )
 
     @inline_doc
-    def failing_noop(self, arbitrary: str) -> Dict[str, Any]:
+    def failing_noop(self, arbitrary: str):
         """Operation to sign arbitrary data without the risk it will be used onchain.
 
         :param arbitrary: Message to sign
