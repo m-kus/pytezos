@@ -5,7 +5,7 @@ from deprecation import deprecated  # type: ignore
 
 from pytezos.context.impl import ExecutionContext  # type: ignore
 from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.crypto.encoding import base58_encode, is_bh, base58_decode
+from pytezos.crypto.encoding import base58_decode, base58_encode, is_bh
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
@@ -269,6 +269,8 @@ class OperationGroup(ContextMixin, ContentMixin):
             raise ValueError('Mixed validation passes')
 
         if validation_pass == 0:
+            if self.chain_id is None:
+                raise ValueError('Chain ID is undefined, run .fill first')
             watermark = b'\x02' + base58_decode(self.chain_id.encode())
         else:
             watermark = b'\x03'
@@ -415,18 +417,12 @@ class OperationGroup(ContextMixin, ContentMixin):
             raise ValueError(f'No endorsing rights for delegate `{delegate}` at level `{level}`')
 
         slot = rights[0]['slots'][0]
-        endorsement = {
-            'branch': self.branch,
-            'operations': {
-                'kind': 'endorsement',
-                'level': level
-            },
-            'signature': self.signature
-        }
+        endorsement = {'branch': self.branch, 'operations': {'kind': 'endorsement', 'level': level}, 'signature': self.signature}
 
         return OperationGroup(
             context=self.context,
             branch=self.branch,
             chain_id=self.chain_id,
             protocol=self.protocol,
-            contents=[ContentMixin().endorsement_with_slot(endorsement=endorsement, slot=slot)])
+            contents=[ContentMixin().endorsement_with_slot(endorsement=endorsement, slot=slot)],
+        )
