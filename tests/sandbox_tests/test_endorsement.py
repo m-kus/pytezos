@@ -7,7 +7,6 @@ logging.getLogger().setLevel(0)
 
 
 class TransactionCounterTestCase(SandboxedNodeTestCase):
-    PROTOCOL = FLORENCE
 
     def test_endorsement(self):
         self.bake_block()

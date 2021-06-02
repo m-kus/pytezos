@@ -8,7 +8,7 @@ from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
-from pytezos.sandbox.parameters import EDO
+from pytezos.sandbox.parameters import FLORENCE
 
 # NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
 # and stopped after all tests are completed.
@@ -26,7 +26,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
     PORT: Optional[int] = None
     "Port to expose to host machine"
 
-    PROTOCOL: str = EDO
+    PROTOCOL: str = FLORENCE
     "Hash of protocol to activate"
 
     @classmethod
