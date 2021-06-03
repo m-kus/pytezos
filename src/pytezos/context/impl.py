@@ -242,13 +242,17 @@ class ExecutionContext(AbstractContext):
         self.big_maps_expr = expr
 
     def get_big_map_value(self, ptr: int, key_hash: str):
-        if self.tzt or ptr < 0:
+        if self.tzt or (ptr not in self.big_maps):
             return None
-        assert self.shell, f'shell is undefined'
+        ptr, _ = self.big_maps[ptr]
+        if ptr < 0:
+            return None
+        if self.shell is None:
+            raise ValueError(f'Shell is undefined, cannot connect to network')
         try:
             return self.shell.blocks[self.block_id].context.big_maps[ptr][key_hash]()
         except RpcError:
-            return None
+            return None  # TODO: special exception/value | Key does not exist
 
     def register_sapling_state(self, ptr: int):
         raise NotImplementedError

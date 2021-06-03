@@ -311,7 +311,7 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
         def is_upvote(op):
             return any(
                 map(
-                    lambda x: x['kind'] == 'proposal' and proposal_id in x.get('proposals', []),
+                    lambda x: x['kind'] == 'proposals' and proposal_id in x.get('proposals', []),
                     op['contents'],
                 )
             )

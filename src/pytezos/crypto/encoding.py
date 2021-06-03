@@ -56,7 +56,7 @@ operation_tags = {
     'double_endorsement_evidence': 2,
     'double_baking_evidence': 3,
     'account_activation': 4,
-    'proposal': 5,
+    'proposals': 5,
     'ballot': 6,
     'reveal': 7,
     'transaction': 8,

@@ -151,7 +151,7 @@ class ContextMixin(metaclass=InlineDocstring):
         else:
             assert key is None or isinstance(key, Key), f'unexpected key {key}'
 
-        if isinstance(address, str):
+        if script is None and isinstance(address, str):
             try:
                 script = self.shell.contracts[address].script()
             except RpcError as e:

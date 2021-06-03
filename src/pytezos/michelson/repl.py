@@ -132,14 +132,14 @@ class Interpreter:
         parameter,
         storage,
         context: ExecutionContext,
-    ) -> Tuple[Any, List[str], Optional[Exception]]:
+    ) -> Tuple[Any, Any, List[str], Optional[Exception]]:
         """Execute view of contract loaded in context
 
         :param entrypoint: contract entrypoint
         :param parameter: parameter section
         :param storage: storage section
         :param context: execution context
-        :returns: [operations, stdout, error]
+        :returns: [operations, storage, stdout, error]
         """
         ctx = ExecutionContext(
             shell=context.shell,
@@ -157,12 +157,11 @@ class Interpreter:
             res.execute(stack, stdout, context)
             _, _, _, pair = res.end(stack, stdout)
             operations = cast(List[OperationType], list(pair.items[0]))
-            if not len(operations) == 1:
-                raise Exception('Multiple internal operations, not sure which one to pick')
-            return operations[0].to_python_object(), stdout, None
+            storage = pair.items[1]
+            return [op.to_python_object() for op in operations], storage.to_python_object(), stdout, None
         except MichelsonRuntimeError as e:
             stdout.append(e.format_stdout())
-            return None, stdout, e
+            return None, None, stdout, e
 
     @staticmethod
     def run_tzt(

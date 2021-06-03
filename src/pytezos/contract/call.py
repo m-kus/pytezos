@@ -220,8 +220,16 @@ class ContractCall(ContextMixin):
 
         :returns: Decoded parameters of a callback
         """
-        res = self.interpret()
-        return res.storage  # type: ignore
+        _, storage, stdout, error = Interpreter.run_view(
+            parameter=self.parameters['value'],
+            entrypoint=self.parameters['entrypoint'],
+            storage={'prim': 'None'},
+            context=self.context,
+        )
+        if error:
+            logger.debug('\n'.join(stdout))
+            raise error
+        return storage  # type: ignore
 
     def callback_view(self):
         """Get return value of an on-chain callback method.
@@ -234,16 +242,18 @@ class ContractCall(ContextMixin):
             storage_ty = StorageSection.match(self.context.storage_expr)
             initial_storage = storage_ty.dummy(self.context).to_micheline_value(lazy_diff=True)
 
-        res, stdout, error = Interpreter.run_view(
+        operations, _, stdout, error = Interpreter.run_view(
             parameter=self.parameters['value'],
             entrypoint=self.parameters['entrypoint'],
             storage=initial_storage,
             context=self.context,
         )
+        if not len(operations) == 1:
+            raise Exception('Multiple internal operations, not sure which one to pick')
         if error:
             logger.debug('\n'.join(stdout))
             raise error
-        return res
+        return operations[0]
 
     @deprecated(deprecated_in='3.0.4', removed_in='3.1.0', details='Use callback_view instead')
     def view(self):
