@@ -1,6 +1,6 @@
 from decimal import Decimal
 from pprint import pformat
-from typing import Union
+from typing import Union, Optional
 
 from deprecation import deprecated  # type: ignore
 
@@ -14,6 +14,7 @@ from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.sections.storage import StorageSection
 from pytezos.operation.content import format_mutez, format_tez
 from pytezos.operation.group import OperationGroup
+from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE
 
 
 def skip_nones(**kwargs) -> dict:
@@ -63,10 +64,31 @@ class ContractCall(ContextMixin):
         )
 
     @property  # type: ignore
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `as_transaction()` instead')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `as_transaction()` instead')
     def operation_group(self) -> OperationGroup:
         return self.as_transaction().fill()
 
+    def send(
+        self,
+        gas_reserve: int = DEFAULT_GAS_RESERVE,
+        burn_reserve: int = DEFAULT_BURN_RESERVE,
+        min_confirmations: int = 0,
+        ttl: Optional[int] = None,
+    ) -> 'OperationGroup':
+        """Fill, sign, and broadcast the transaction
+
+        :param gas_reserve: Add a safe reserve for dynamically calculated gas limit (default is 100).
+        :param burn_reserve: Add a safe reserve for dynamically calculated storage limit (default is 100).
+        :param min_confirmations: number of block injections to wait for before returning (default is 0, i.e. async mode)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :return: OperationGroup with hash filled
+        """
+        return self.as_transaction().send(gas_reserve=gas_reserve,
+                                          burn_reserve=burn_reserve,
+                                          min_confirmations=min_confirmations,
+                                          ttl=ttl)
+
+    @deprecated(deprecated_in='3.2.2', removed_in='4.0.0', details='use `send()` instead')
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5) -> OperationGroup:
         """Send operation to blockchain."""
         return (

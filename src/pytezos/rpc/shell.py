@@ -2,8 +2,11 @@ from binascii import hexlify
 from datetime import datetime
 from functools import lru_cache
 from time import sleep
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Generator
+from collections import defaultdict
+import itertools
 
+import deprecation
 import requests
 import simplejson as json
 
@@ -58,6 +61,132 @@ class ShellQuery(RpcQuery, path=''):
         """Shortcut for `chains.main.mempool`"""
         return self.chains.main.mempool
 
+    def wait_blocks(self,
+                    current_block_hash: str,
+                    max_blocks: int = 1,
+                    max_priority: int = 2,
+                    yield_current=False,
+                    time_between_blocks: Optional[int] = None)\
+            -> Generator[str, None, None]:
+        """Iterates over future blocks (waits and yields block hash)
+
+        :param current_block_hash: hash of the current block (head)
+        :param max_blocks: number of blocks to iterate (not including the current one)
+        :param max_priority: wait for blocks with lower priority (increased timeout)
+        :param yield_current: yield current block hash at the very beginning
+        :param time_between_blocks: override protocol constant
+        :return: block hashes
+        """
+        prev_block_hash = None
+        block_delay, secondary_delay = list(map(int, self.block.context.constants()["time_between_blocks"]))
+        if time_between_blocks:
+            block_delay = time_between_blocks
+
+        if yield_current:
+            yield current_block_hash
+
+        for _ in range(max_blocks):
+            header = self.blocks[current_block_hash].header()
+            if prev_block_hash and prev_block_hash != header['predecessor']:
+                raise StopIteration('Reorg detected, expected predecessor %s instead of %s',
+                                    prev_block_hash, header['predecessor'])
+
+            prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+            elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
+            sleep_sec = 0 if elapsed_sec > block_delay else (block_delay - elapsed_sec)
+
+            logger.info('Sleep %d seconds until block %s is superseded', sleep_sec, current_block_hash)
+            sleep(sleep_sec)
+
+            next_block_hash = None
+            timeout = block_delay + secondary_delay * max_priority
+            logger.info('Waiting for a new block (%d sec timeout)', timeout)
+
+            for delay in range(timeout):
+                next_block_hash = self.head.hash()
+                if current_block_hash == next_block_hash:
+                    sleep(1)
+                else:
+                    logger.info('Found new block %s (%d sec delay)', next_block_hash, delay)
+                    break
+
+            if current_block_hash != next_block_hash:
+                yield next_block_hash
+                prev_block_hash = current_block_hash
+                current_block_hash = next_block_hash
+            else:
+                raise TimeoutError('Reached timeout (%d sec) while waiting for the next block', timeout)
+
+    def wait_operations(self,
+                        opg_hashes: List[str],
+                        ttl: int,
+                        min_confirmations: int,
+                        current_block_hash: Optional[str] = None,
+                        time_between_blocks: Optional[int] = None) -> List[dict]:
+        """Wait for one or many operations gain enough confirmations
+
+        :param opg_hashes: list of operation hashes
+        :param ttl: max time-to-live value (in mempool)
+        :param min_confirmations: minimum number of blocks after inclusion to wait for
+        :param current_block_hash: current block hash (head)
+        :param time_between_blocks: override protocol constant
+        :return: list of operation contents with metadata
+        """
+
+        confirmations = defaultdict(int)
+        pending = set(opg_hashes)
+        operations = list()
+        block_hash = current_block_hash
+
+        if block_hash is None:
+            block_hash = self.head.hash()
+
+        for block_hash in self.wait_blocks(block_hash,
+                                           max_blocks=ttl,
+                                           yield_current=True,
+                                           time_between_blocks=time_between_blocks):
+            if len(pending) > 0:
+                mempool = set(map(lambda x: x['hash'], self.mempool.pending_operations.flatten()))
+                for opg_hash in opg_hashes:
+                    if opg_hash in pending:
+                        if opg_hash in mempool:
+                            logger.info('Operation %s is still in mempool', opg_hash)
+                        else:
+                            logger.info('Operation %s has left mempool', opg_hash)
+                            pending.remove(opg_hash)
+
+            if len(pending) < len(opg_hashes):
+                included = self.blocks[block_hash].operation_hashes()
+                for i, vp in enumerate(included):
+                    for j, opg_hash in enumerate(vp):
+                        if opg_hash in opg_hashes and opg_hash not in confirmations:
+                            logger.info('Operation %s has been included to block %s', opg_hash, block_hash)
+                            confirmations[opg_hash] = 0  # initialize
+                            operations.append(self.blocks[block_hash].operations[i][j]())
+
+            for opg_hash in confirmations:
+                confirmations[opg_hash] += 1
+                logger.info('Operation %s has %d/%d confirmations',
+                            opg_hash, confirmations[opg_hash], min_confirmations)
+
+            if len(operations) == len(opg_hashes):
+                break
+
+        if len(operations) < len(opg_hashes):
+            raise StopIteration('Only %d of %d operations were included, stopping',
+                                len(operations), len(opg_hashes))
+
+        for _ in self.wait_blocks(block_hash,
+                                  max_blocks=min_confirmations - 1,
+                                  time_between_blocks=time_between_blocks):
+            for opg_hash in opg_hashes:
+                confirmations[opg_hash] += 1
+                logger.info('Operation %s has %d/%d confirmations',
+                            opg_hash, confirmations[opg_hash], min_confirmations)
+
+        return operations
+
+    @deprecation.deprecated(deprecated_in='3.2.2', removed_in='4.0.0')
     def wait_next_block(
         self,
         delay_sec=1,
@@ -182,7 +311,7 @@ class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operatio
                         }
                     )
                 elif isinstance(operation, list):
-                    errors = operation[1].pop1('error', default=[])
+                    errors = operation[1].pop('error', [])
                     operations_list.append(
                         {
                             **make_operation_result(status=status, errors=errors),

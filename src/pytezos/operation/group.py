@@ -342,7 +342,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param min_confirmations: number of block injections to wait for before returning
         :returns: operation group with metadata (raw RPC response)
         """
-        self.context.reset()
+        self.context.reset()  # reset counter
 
         opg_hash = self.shell.injection.operation.post(
             operation=self.binary_payload(),
@@ -356,39 +356,18 @@ class OperationGroup(ContextMixin, ContentMixin):
                 **self.json_payload(),
             }
 
-        logger.info('Waiting for %s confirmations in %s blocks', min_confirmations, num_blocks_wait)
-        in_mempool = True
-        confirmations = 0
-        for _ in range(num_blocks_wait):
-            logger.info('Waiting for the next block')
-            self.shell.wait_next_block(time_between_blocks=time_between_blocks)
+        operations = self.shell.wait_operations(
+            opg_hashes=[opg_hash],
+            ttl=num_blocks_wait,
+            min_confirmations=min_confirmations,
+            time_between_blocks=time_between_blocks)
 
-            if in_mempool:
-                try:
-                    pending_opg = self.shell.mempool.pending_operations[opg_hash]
-                    if not OperationResult.is_applied(pending_opg):
-                        raise RpcError.from_errors(OperationResult.errors(pending_opg))
-                    logger.info('Operation %s is still in mempool', opg_hash)
-                    continue
-                except StopIteration:
-                    in_mempool = False
+        assert len(operations) == 1
+        if check_result:
+            if not OperationResult.is_applied(operations[0]):
+                raise RpcError.from_errors(OperationResult.errors(operations[0]))
 
-            try:
-                res = self.shell.blocks[-1:].find_operation(opg_hash)
-            except StopIteration:
-                logger.info('Operation %s not found in lastest block', opg_hash)
-                continue
-
-            if check_result:
-                if not OperationResult.is_applied(res):
-                    raise RpcError.from_errors(OperationResult.errors(res))
-
-            confirmations += 1
-            logger.info('Got %s/%s confirmations', confirmations, min_confirmations)
-            if confirmations == min_confirmations:
-                return res
-
-        raise TimeoutError(f'Operation {opg_hash} got {confirmations} confirmations in {num_blocks_wait} blocks')
+        return operations[0]
 
     @deprecated(deprecated_in='3.1.0', removed_in='4.0.0', details='use `run_operation()` instead')
     def result(self) -> List[OperationResult]:

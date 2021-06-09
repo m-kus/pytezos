@@ -1,5 +1,4 @@
 import logging
-from unittest.mock import patch
 
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses
@@ -15,7 +14,7 @@ class WaitHelpersTestCase(SandboxedNodeTestCase):
             client.transaction(destination=sandbox_addresses['bootstrap3'], amount=1000).send()
             for _ in range(2)
         ]
-        with self.assertRaises(StopIteration):
+        with self.assertRaises(TimeoutError):
             client.wait(*operations, num_blocks_wait=1, time_between_blocks=1)
 
         self.bake_block()
@@ -24,7 +23,7 @@ class WaitHelpersTestCase(SandboxedNodeTestCase):
             client.transaction(destination=sandbox_addresses['bootstrap3'], amount=1000).send()
             for _ in range(2)
         ])
-        with self.assertRaises(StopIteration):
+        with self.assertRaises(TimeoutError):
             client.wait(*operations, num_blocks_wait=1, time_between_blocks=1)
 
         head_hash = client.shell.head.hash()
