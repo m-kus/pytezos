@@ -357,10 +357,8 @@ class OperationGroup(ContextMixin, ContentMixin):
             }
 
         operations = self.shell.wait_operations(
-            opg_hashes=[opg_hash],
-            ttl=num_blocks_wait,
-            min_confirmations=min_confirmations,
-            time_between_blocks=time_between_blocks)
+            opg_hashes=[opg_hash], ttl=num_blocks_wait, min_confirmations=min_confirmations, time_between_blocks=time_between_blocks
+        )
 
         assert len(operations) == 1
         if check_result:

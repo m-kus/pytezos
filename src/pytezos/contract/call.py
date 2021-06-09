@@ -1,6 +1,6 @@
 from decimal import Decimal
 from pprint import pformat
-from typing import Union, Optional
+from typing import Optional, Union
 
 from deprecation import deprecated  # type: ignore
 
@@ -12,9 +12,9 @@ from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.sections.storage import StorageSection
+from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE
 from pytezos.operation.content import format_mutez, format_tez
 from pytezos.operation.group import OperationGroup
-from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE
 
 
 def skip_nones(**kwargs) -> dict:
@@ -83,10 +83,7 @@ class ContractCall(ContextMixin):
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :return: OperationGroup with hash filled
         """
-        return self.as_transaction().send(gas_reserve=gas_reserve,
-                                          burn_reserve=burn_reserve,
-                                          min_confirmations=min_confirmations,
-                                          ttl=ttl)
+        return self.as_transaction().send(gas_reserve=gas_reserve, burn_reserve=burn_reserve, min_confirmations=min_confirmations, ttl=ttl)
 
     @deprecated(deprecated_in='3.2.2', removed_in='4.0.0', details='use `send()` instead')
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5) -> OperationGroup:

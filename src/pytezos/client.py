@@ -1,6 +1,6 @@
 import logging
 from decimal import Decimal
-from typing import Optional, List, Union
+from typing import List, Optional, Union
 
 from pytezos.block.header import BlockHeader
 from pytezos.context.mixin import ContextMixin  # type: ignore
@@ -210,10 +210,16 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param time_between_blocks: override the corresponding parameter from constants
         :param prev_hash: Current block hash (optional). If not set, current head is used.
         """
+        opg_hashes = []
+        for opg in operation_groups:
+            if opg.opg_hash is None:
+                raise ValueError('All operations must have hash assigned')
+            opg_hashes.append(opg.opg_hash)
+
         return self.shell.wait_operations(
-            opg_hashes=[opg.opg_hash for opg in operation_groups],
+            opg_hashes=opg_hashes,
             ttl=num_blocks_wait,
             min_confirmations=min_confirmations,
             current_block_hash=prev_hash,
-            time_between_blocks=time_between_blocks
+            time_between_blocks=time_between_blocks,
         )

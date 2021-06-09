@@ -102,10 +102,7 @@ class OffChainView(ContextMixin):
             py_obj = None
 
         return ContractCall(
-            context=self._spawn_context(
-                address=self.address,
-                script=self.script
-            ),
+            context=self._spawn_context(address=self.address, script=self.script),
             parameters=self.encode(py_obj),
         )
 
