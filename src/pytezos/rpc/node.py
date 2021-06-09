@@ -1,33 +1,12 @@
 import json
-import time
-from functools import wraps
 from pprint import pformat
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 import requests.exceptions
 from simplejson import JSONDecodeError
 
 from pytezos.logging import logger
-
-REQUEST_RETRY_COUNT = 3
-REQUEST_RETRY_SLEEP = 1
-
-
-def _retry(fn: Callable):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        for attempt in range(REQUEST_RETRY_COUNT):
-            logger.debug('Node request attempt %s/%s', attempt + 1, REQUEST_RETRY_COUNT)
-            try:
-                return fn(*args, **kwargs)
-            except requests.exceptions.ConnectionError as e:
-                if attempt + 1 == REQUEST_RETRY_COUNT:
-                    raise e
-                logger.warning(e)
-                time.sleep(REQUEST_RETRY_SLEEP)
-
-    return wrapper
 
 
 def _urljoin(*args: str) -> str:
@@ -93,7 +72,6 @@ class RpcNode:
         if not isinstance(uri, list):
             uri = [uri]
         self.uri = uri
-        self._session = requests.Session()
 
     def __repr__(self) -> str:
         res = [
@@ -113,7 +91,7 @@ class RpcNode:
         :returns: node response
         """
         logger.debug('>>>>> %s %s\n%s', method, path, json.dumps(kwargs, indent=4))
-        res = self._session.request(
+        res = requests.request(
             method=method,
             url=_urljoin(self.uri[0], path),
             headers={
@@ -132,7 +110,6 @@ class RpcNode:
         logger.debug('<<<<< %s\n%s', res.status_code, json.dumps(res.json(), indent=4))
         return res
 
-    @_retry
     def get(self, path: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None) -> requests.Response:
         return self.request('GET', path, params=params, timeout=timeout).json()
 

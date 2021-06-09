@@ -78,9 +78,12 @@ class ShellQuery(RpcQuery, path=''):
         :return: block hashes
         """
         prev_block_hash: Optional[str] = None
-        block_delay, secondary_delay = list(map(int, self.context.constants()["time_between_blocks"]))
+
         if time_between_blocks:
-            block_delay = time_between_blocks
+            block_delay, secondary_delay = time_between_blocks, 0
+        else:
+            tbb = self.blocks[current_block_hash].context.constants()["time_between_blocks"]
+            block_delay, secondary_delay = int(tbb[0]), int(tbb[1])
 
         if yield_current:
             yield current_block_hash
