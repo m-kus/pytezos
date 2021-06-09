@@ -1,5 +1,4 @@
 from binascii import hexlify
-from collections import defaultdict
 from datetime import datetime
 from functools import lru_cache
 from time import sleep
@@ -138,7 +137,7 @@ class ShellQuery(RpcQuery, path=''):
         :return: list of operation contents with metadata
         """
 
-        confirmations = defaultdict(int)
+        confirmations = dict()
         pending = set(opg_hashes)
         operations = list()
         block_hash = current_block_hash
