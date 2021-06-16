@@ -35,7 +35,7 @@ def get_passphrase(passphrase: PassphraseInput = None, alias: Optional[str] = No
 
 class CryptoExtraFallback:
     def __getattr__(self, item):
-        raise NotImplementedError(
+        raise ImportError(
             "Please, install packages libsodium-dev, libsecp256k1-dev, and libgmp-dev, "
             "and Python libraries pysodium, secp256k1, and fastecdsa"
         )
