@@ -24,9 +24,9 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
 
     def __lt__(self, other: 'PairType'):  # type: ignore
         for i, item in enumerate(self.items):
-            if item < other.items[i]:
-                return True
-        return False
+            if item > other.items[i]:
+                return False
+        return True
 
     def __hash__(self):
         return hash(self.items)
