@@ -1540,7 +1540,7 @@ six = "*"
 
 [[package]]
 name = "tabulate"
-version = "0.7.7"
+version = "0.8.9"
 description = "Pretty-print tabular data"
 category = "main"
 optional = false
@@ -1763,7 +1763,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "2da43b5573f65ef220d6c954fe6871b6d22193ba6659c9d34522ed53c51e599b"
+content-hash = "a8ea597c6f6efa317b1059013870c2ba35d89baaef3d853567d5fbbce988ca02"
 
 [metadata.files]
 alabaster = [
@@ -2702,8 +2702,8 @@ swagger-spec-validator = [
     {file = "swagger_spec_validator-2.7.3-py2.py3-none-any.whl", hash = "sha256:d1514ec7e3c058c701f27cc74f85ceb876d6418c9db57786b9c54085ed5e29eb"},
 ]
 tabulate = [
-    {file = "tabulate-0.7.7-py2.py3-none-any.whl", hash = "sha256:1f07f6252b20cdc4ed744b598b5fa8362638988b50a62f3e2ad76c97fc02eef2"},
-    {file = "tabulate-0.7.7.tar.gz", hash = "sha256:83a0b8e17c09f012090a50e1e97ae897300a72b35e0c86c0b53d3bd2ae86d8c6"},
+    {file = "tabulate-0.8.9-py3-none-any.whl", hash = "sha256:d7c013fe7abbc5e491394e10fa845f8f32fe54f8dc60c6622c6cf482d25d47e4"},
+    {file = "tabulate-0.8.9.tar.gz", hash = "sha256:eb1d13f25760052e8931f2ef80aaf6045a6cceb47514db8beab24cded16f13a7"},
 ]
 terminado = [
     {file = "terminado-0.9.5-py3-none-any.whl", hash = "sha256:3838414888b49a96145e277fd707a26a0fdb4bdaba88bb677a44abb68e3a1041"},
