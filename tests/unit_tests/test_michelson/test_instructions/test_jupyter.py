@@ -204,11 +204,11 @@ class JupyterInstructionsTest(TestCase):
             parameter unit ;
             code {
                 PUSH int 1;
-                RESET "edo2net";
+                RESET "florencenet";
             }
         """
         self._execute_code(code)
 
         self.assertEqual([], self.stack.items)
-        self.assertEqual('edo2net', self.context.network)
+        self.assertEqual('florencenet', self.context.network)
         self.assertEqual('some_chain_id', self.context.chain_id)
