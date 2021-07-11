@@ -3,7 +3,7 @@ from typing import Type, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.context.abstract import get_originated_address
-from pytezos.crypto.encoding import is_address, is_chain_id, is_kt, is_pkh, is_public_key, is_sig
+from pytezos.crypto.encoding import is_address, is_chain_id, is_kt, is_pkh, is_public_key, is_sig, base58_decode
 from pytezos.michelson.forge import (forge_address, forge_base58, forge_contract, forge_public_key, optimize_timestamp, unforge_address,
                                      unforge_chain_id, unforge_contract, unforge_public_key, unforge_signature)
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
@@ -122,6 +122,35 @@ class AddressType(StringType, prim='address'):
 
 
 class KeyType(StringType, prim='key'):
+
+    @property
+    def raw(self) -> bytes:
+        return base58_decode(self.value.encode())
+
+    @property
+    def prefix(self) -> str:
+        return self.value[:4]
+
+    def __lt__(self, other: 'KeyType') -> bool:
+        """
+        Keys are ordered as follows: edpk < sppk < p2pk
+        All keys are in compressed form in Tezos (flag | X) where flag specifies if Y is odd or even
+        https://crypto.stackexchange.com/questions/70754/ec-key-compression
+        For secp256r1 (aka p256) we need to cut the first byte (for unknown reason)
+        """
+        curves = {
+            'edpk': (0, 0),
+            'sppk': (1, 0),
+            'p2pk': (2, 1)
+        }
+        res = curves[self.prefix][0] - curves[other.prefix][0]
+        if res < 0:
+            return True
+        elif res > 0:
+            return False
+        else:
+            offset = curves[self.prefix][1]
+            return self.raw[offset:] < other.raw[offset:]
 
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'KeyType':

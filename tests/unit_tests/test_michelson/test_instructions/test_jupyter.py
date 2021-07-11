@@ -196,19 +196,19 @@ class JupyterInstructionsTest(TestCase):
 
     @patch('pytezos.rpc.node.RpcNode.get', Mock(return_value='some_chain_id'))
     def test_reset_value(self):
-        self.context.shell = ShellQuery(RpcNode('https://rpc.tzkt.io/edonet'))
-        self.context.network = 'mainnet'
+        self.context.shell = ShellQuery(RpcNode('https://testnet-tezos.giganode.io/'))
+        self.context.network = 'testnet'
         self.context.chain_id = 'ch21n1d'
         code = """
             storage unit ;
             parameter unit ;
             code {
                 PUSH int 1;
-                RESET "edo2net";
+                RESET "mainnet";
             }
         """
         self._execute_code(code)
 
         self.assertEqual([], self.stack.items)
-        self.assertEqual('edo2net', self.context.network)
+        self.assertEqual('mainnet', self.context.network)
         self.assertEqual('some_chain_id', self.context.chain_id)
