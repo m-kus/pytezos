@@ -443,7 +443,7 @@ We have our contracts deployed and ready to be invoked, let's see the list of en
 
     Properties
     .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
-    .shell  # https://rpc.tzkt.io/edo2net/ (edo2net)
+    .shell  # https://rpc.tzkt.io/florencenet/ (florencenet)
     .address  # KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X
     .block_id  # head
     .entrypoint  # default
@@ -491,7 +491,7 @@ And for the wallet:
 
     Properties
     .key  # tz1Ne4yzDRQPd5HFz6sTaCYCNHwFubT2MWsB
-    .shell  # https://rpc.tzkt.io/edo2net/ (edo2net)
+    .shell  # https://rpc.tzkt.io/florencenet/ (florencenet)
     .address  # KT1H4x2tanAMtKW94HrCbpA9nRssfXX7LRj8
     .block_id  # head
     .entrypoint  # default

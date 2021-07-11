@@ -9,6 +9,7 @@ from pytezos.context.impl import ExecutionContext
 class TestContext(TestCase):
     def test_sandboxed(self) -> None:
         # Arrange
+        # TODO: Update with florencenet response
         public_version_response = {
             "version": {"major": 8, "minor": 2, "additional_info": "release"},
             "network_version": {"chain_name": "TEZOS_EDO2NET_2021-02-11T14:00:00Z", "distributed_db_version": 1, "p2p_version": 1},

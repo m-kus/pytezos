@@ -94,7 +94,7 @@ def parameter(_ctx, action: str, path: Optional[str]) -> None:
 
 @cli.command(help='Activate and reveal key from the faucet file')
 @click.option('--path', '-p', type=str, help='Path to the .json file downloaded from https://faucet.tzalpha.net/')
-@click.option('--network', '-n', type=str, default=default_network, help='Default is edo2net')
+@click.option('--network', '-n', type=str, default=default_network, help='Default is florencenet')
 @click.pass_context
 def activate(_ctx, path: str, network: str) -> None:
     ptz = pytezos.using(key=path, shell=network)
@@ -133,7 +133,7 @@ def activate(_ctx, path: str, network: str) -> None:
 @cli.command(help='Deploy contract to the specified network')
 @click.option('--path', '-p', type=str, help='Path to the .tz file')
 @click.option('--storage', type=str, default=None, help='Storage in JSON format (not Micheline)')
-@click.option('--network', '-n', type=str, default=default_network, help='Default is edo2net')
+@click.option('--network', '-n', type=str, default=default_network, help='Default is florencenet')
 @click.option('--key', type=str, default=None)
 @click.option('--github-repo-slug', type=str, default=None)
 @click.option('--github-oauth-token', type=str, default=None)
