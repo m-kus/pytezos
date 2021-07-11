@@ -3,7 +3,7 @@ from typing import Type, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.context.abstract import get_originated_address
-from pytezos.crypto.encoding import is_address, is_chain_id, is_kt, is_pkh, is_public_key, is_sig, base58_decode
+from pytezos.crypto.encoding import base58_decode, is_address, is_chain_id, is_kt, is_pkh, is_public_key, is_sig
 from pytezos.michelson.forge import (forge_address, forge_base58, forge_contract, forge_public_key, optimize_timestamp, unforge_address,
                                      unforge_chain_id, unforge_contract, unforge_public_key, unforge_signature)
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
@@ -131,7 +131,7 @@ class KeyType(StringType, prim='key'):
     def prefix(self) -> str:
         return self.value[:4]
 
-    def __lt__(self, other: 'KeyType') -> bool:
+    def __lt__(self, other: 'KeyType') -> bool:  # type: ignore
         """
         Keys are ordered as follows: edpk < sppk < p2pk
         All keys are in compressed form in Tezos (flag | X) where flag specifies if Y is odd or even

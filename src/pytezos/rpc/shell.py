@@ -4,9 +4,9 @@ from functools import lru_cache
 from time import sleep
 from typing import Any, Dict, Generator, List, Optional
 
-from deprecation import deprecated  # type: ignore
 import requests
 import simplejson as json
+from deprecation import deprecated  # type: ignore
 
 from pytezos.crypto.encoding import base58_decode
 from pytezos.jupyter import get_attr_docstring
