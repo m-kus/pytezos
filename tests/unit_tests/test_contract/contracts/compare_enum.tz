@@ -1,0 +1,13 @@
+{ parameter unit ;
+  storage (or (or (unit %banned) (unit %changed)) (unit %initial)) ;
+  code { CDR ;
+         PUSH unit Unit ;
+         RIGHT (or unit unit) ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         EQ ;
+         IF { DROP ; PUSH unit Unit ; RIGHT unit ; LEFT unit } {} ;
+         NIL operation ;
+         PAIR } }

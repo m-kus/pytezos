@@ -16,7 +16,9 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         super(PairType, self).__init__()
         self.items = items
 
-    def __eq__(self, other: 'PairType'):  # type: ignore
+    def __eq__(self, other):  # type: ignore
+        if not isinstance(other, PairType):
+            return False
         return all(
             item == other.items[i]
             for i, item in enumerate(self.items)

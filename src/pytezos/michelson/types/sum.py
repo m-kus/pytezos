@@ -28,7 +28,9 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
     def __iter__(self) -> Generator[Optional[MichelsonType], None, None]:
         yield from self.items  # type: ignore
 
-    def __eq__(self, other: 'OrType'):  # type: ignore
+    def __eq__(self, other):  # type: ignore
+        if not isinstance(other, OrType):
+            return False
         return all(
             item == other.items[i]
             for i, item in enumerate(self.items)

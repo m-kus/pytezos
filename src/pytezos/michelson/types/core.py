@@ -41,7 +41,9 @@ class StringType(MichelsonType, prim='string'):
     def __lt__(self, other: 'StringType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'StringType'):  # type: ignore
+    def __eq__(self, other):  # type: ignore
+        if not isinstance(other, StringType):
+            return False
         return self.value == other.value
 
     def __hash__(self):
@@ -100,7 +102,9 @@ class IntType(MichelsonType, prim='int'):
     def __lt__(self, other: 'IntType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'IntType'):  # type: ignore
+    def __eq__(self, other):  # type: ignore
+        if not isinstance(other, IntType):
+            return False
         return self.value == other.value
 
     def __hash__(self):
@@ -167,7 +171,9 @@ class BytesType(MichelsonType, prim='bytes'):
     def __lt__(self, other: 'BytesType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'BytesType'):  # type: ignore
+    def __eq__(self, other):  # type: ignore
+        if not isinstance(other, BytesType):
+            return False
         return self.value == other.value
 
     def __hash__(self):
@@ -233,7 +239,9 @@ class BoolType(MichelsonType, prim='bool'):
     def __lt__(self, other: 'BoolType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other: 'BoolType'):  # type: ignore
+    def __eq__(self, other):  # type: ignore
+        if not isinstance(other, BoolType):
+            return False
         return self.value == other.value
 
     def __hash__(self):
