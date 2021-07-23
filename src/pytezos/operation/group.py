@@ -90,12 +90,23 @@ class OperationGroup(ContextMixin, ContentMixin):
         """
         return self._spawn(contents=self.contents + [content])
 
-    def fill(self, counter: Optional[int] = None, ttl: Optional[int] = None, **kwargs) -> 'OperationGroup':
+    def fill(
+        self,
+        counter: Optional[int] = None,
+        ttl: Optional[int] = None,
+        gas_limit: Optional[int] = None,
+        storage_limit: Optional[int] = None,
+        minimal_nanotez_per_gas_unit: Optional[int] = None,
+        **kwargs
+    ) -> 'OperationGroup':
         """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :param counter: Override counter value (for manual handling)
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :param gas_limit: Override gas_limit value (for manual handling)
+        :param storage_limit: Override storage_limit value (for manual handling)
+        :param minimal_nanotez_per_gas_unit: Override minimal_nanotez_per_gas_unit constant (for manual handling)
         :rtype: OperationGroup
         """
         if kwargs.get('branch_offset') is not None:
@@ -108,12 +119,12 @@ class OperationGroup(ContextMixin, ContentMixin):
             raise Exception('`ttl` has to be in range (0, 60]')
 
         chain_id = self.chain_id or self.context.get_chain_id()
+        protocol = self.protocol or self.context.get_protocol()
         branch = self.branch or self.shell.blocks[f'head-{MAX_OPERATIONS_TTL - ttl}'].hash()
-        protocol = self.protocol or self.shell.head.header()['protocol']
         source = self.key.public_key_hash()
 
         if counter is not None:
-            self.context.set_counter(counter)
+            self.context.set_counter(counter - 1)  # which is supposedly the current state (head)
 
         replace_map = {
             'pkh': source,
@@ -123,9 +134,9 @@ class OperationGroup(ContextMixin, ContentMixin):
             'secret': lambda x: self.key.activation_code,
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
-            'fee': lambda x: str(default_fee(x)),
-            'gas_limit': lambda x: str(default_gas_limit(x, self.context.constants)),
-            'storage_limit': lambda x: str(default_storage_limit(x, self.context.constants)),
+            'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, self.context.constants)),
+            'storage_limit': lambda x: str(storage_limit) if storage_limit is not None else str(default_storage_limit(x, self.context.constants)),
+            'fee': lambda x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)),
         }
 
         def fill_content(content):
@@ -326,12 +337,41 @@ class OperationGroup(ContextMixin, ContentMixin):
         res = opg.inject(min_confirmations=min_confirmations, num_blocks_wait=ttl)
         return opg._spawn(opg_hash=res['hash'])
 
+    def send_async(
+        self,
+        ttl: int,
+        counter: int,
+        gas_limit: int,
+        storage_limit: int,
+        minimal_nanotez_per_gas_unit: Optional[int] = None,
+    ) -> 'OperationGroup':
+        """
+        Send operation without simulation or pre-validation
+
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :param counter: Set counter value
+        :param gas_limit: Set gas_limit value
+        :param storage_limit: Set storage_limit value
+        :param minimal_nanotez_per_gas_unit: Override minimal_nanotez_per_gas_unit constant
+        :rtype: OperationGroup
+        """
+        opg = self.fill(
+            counter=counter,
+            ttl=ttl,
+            gas_limit=gas_limit,
+            storage_limit=storage_limit,
+            minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit
+        ).sign()
+        res = opg.inject(prevalidate=False)
+        return opg._spawn(opg_hash=res['hash'])
+
     def inject(
         self,
         check_result: bool = True,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
         min_confirmations: int = 0,
+        prevalidate: bool = True,
         **kwargs,
     ):
         """Inject the signed operation group.
@@ -340,13 +380,14 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param num_blocks_wait: number of blocks to wait for injection
         :param time_between_blocks: override the corresponding parameter from constants
         :param min_confirmations: number of block injections to wait for before returning
+        :param prevalidate: ask node to pre-validate the operation before the injection (True by default)
         :returns: operation group with metadata (raw RPC response)
         """
         self.context.reset()  # reset counter
 
         opg_hash = self.shell.injection.operation.post(
             operation=self.binary_payload(),
-            _async=False,
+            _async=not prevalidate,
         )
 
         if min_confirmations == 0:

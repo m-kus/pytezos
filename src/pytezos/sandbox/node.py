@@ -1,7 +1,10 @@
 import atexit
+import logging
 import unittest
 from time import sleep
 from typing import Optional
+from concurrent.futures import ThreadPoolExecutor, wait, CancelledError
+from threading import Event
 
 import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
@@ -15,6 +18,8 @@ from pytezos.sandbox.parameters import FLORENCE
 node_container: Optional[DockerContainer] = None
 node_container_client: PyTezosClient = PyTezosClient()
 node_fitness: int = 1
+
+executor: Optional[ThreadPoolExecutor] = None
 
 
 class SandboxedNodeTestCase(unittest.TestCase):
@@ -104,3 +109,40 @@ class SandboxedNodeTestCase(unittest.TestCase):
     def client(self) -> PyTezosClient:
         """PyTezos client to interact with sandboxed node."""
         return self.get_client().using(key='bootstrap2')
+
+
+class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
+
+    TIME_BETWEEN_BLOCKS = 3
+
+    @staticmethod
+    def autobake(time_between_blocks: int, node_url: str, key: str, exit_event: Event):
+        logging.info("Baker thread started")
+        client = PyTezosClient().using(shell=node_url, key=key)
+        ptr = 0
+        while not exit_event.is_set():
+            if ptr % time_between_blocks == 0:
+                client.bake_block().fill().work().sign().inject()
+            sleep(1)
+            ptr += 1
+        logging.info("Baker thread stopped")
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        global executor  # pylint: disable=global-statement
+        if not executor:
+            executor = ThreadPoolExecutor(1)
+        cls.exit_event = Event()
+        cls.baker = executor.submit(
+            cls.autobake,
+            cls.TIME_BETWEEN_BLOCKS,
+            cls.get_node_url(),
+            'bootstrap1',
+            cls.exit_event
+        )
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.exit_event.set()
+        wait([cls.baker])

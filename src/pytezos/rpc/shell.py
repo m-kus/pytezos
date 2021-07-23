@@ -100,7 +100,7 @@ class ShellQuery(RpcQuery, path=''):
             sleep(sleep_sec)
 
             next_block_hash: Optional[str] = None
-            timeout = block_delay + secondary_delay * max_priority
+            timeout = block_delay + secondary_delay * max_priority + 1
             logger.info('Waiting for a new block (%d sec timeout)', timeout)
 
             for delay in range(timeout):

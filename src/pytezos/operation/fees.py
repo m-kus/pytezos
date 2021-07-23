@@ -19,6 +19,7 @@ def calculate_fee(
     consumed_gas: int,
     extra_size: int,
     reserve=10,
+    minimal_nanotez_per_gas_unit: Optional[int] = 0
 ) -> int:
     """Calculate minimal required operation fee.
 
@@ -28,12 +29,16 @@ def calculate_fee(
     :param reserve: safe reserve, just in case
     """
     size = len(forge_operation(content)) + extra_size
-    fee = MINIMAL_FEES + MINIMAL_MUTEZ_PER_BYTE * size + int(MINIMAL_MUTEZ_PER_GAS_UNIT * consumed_gas)
+    if minimal_nanotez_per_gas_unit is None:
+        minimal_nanotez_per_gas_unit = MINIMAL_MUTEZ_PER_GAS_UNIT * 1000
+    fee = MINIMAL_FEES + MINIMAL_MUTEZ_PER_BYTE * size + int(minimal_nanotez_per_gas_unit * consumed_gas / 1000)
     return fee + reserve
 
 
 def default_fee(
     content: Dict[str, Any],
+    gas_limit: Optional[int] = None,
+    minimal_nanotez_per_gas_unit: Optional[int] = None
 ) -> int:
     """Take hard gas limit instead of precise amount (no simulation) and calculate fee.
 
@@ -41,8 +46,9 @@ def default_fee(
     """
     return calculate_fee(
         content=content,
-        consumed_gas=default_gas_limit(content),
+        consumed_gas=gas_limit if gas_limit is not None else default_gas_limit(content),
         extra_size=32 + 64 + 3 * 3,  # branch, signature, fee:gas_limit:storage_limit mutez values (+3 bytes)
+        minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit
     )
 
 

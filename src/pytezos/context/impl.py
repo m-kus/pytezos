@@ -14,7 +14,7 @@ DEFAULT_IPFS_GATEWAY = 'https://ipfs.io/ipfs'
 
 class ExecutionContext(AbstractContext):
 
-    def __init__(self, amount=None, chain_id=None, source=None, sender=None, balance=None,
+    def __init__(self, amount=None, chain_id=None, protocol=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
                  key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=None):
         self.key: Optional[Key] = key
@@ -30,6 +30,7 @@ class ExecutionContext(AbstractContext):
         self.sender = sender
         self.source = source
         self.chain_id = chain_id
+        self.protocol = protocol
         self.voting_power = voting_power
         self.total_voting_power = total_voting_power
         self.tzt = tzt
@@ -331,6 +332,14 @@ class ExecutionContext(AbstractContext):
             return self.shell.chains.main.chain_id()
         else:
             return self.get_dummy_chain_id()
+
+    def get_protocol(self) -> str:
+        if self.protocol:
+            return self.protocol
+        elif self.shell:
+            return self.shell.head.header()['protocol']
+        else:
+            raise NotImplementedError
 
     def get_dummy_address(self) -> str:
         if self.key:
