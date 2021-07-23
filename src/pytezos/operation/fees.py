@@ -15,11 +15,7 @@ MINIMAL_MUTEZ_PER_GAS_UNIT = 0.1
 
 
 def calculate_fee(
-    content: Dict[str, Any],
-    consumed_gas: int,
-    extra_size: int,
-    reserve=10,
-    minimal_nanotez_per_gas_unit: Optional[int] = 0
+    content: Dict[str, Any], consumed_gas: int, extra_size: int, reserve=10, minimal_nanotez_per_gas_unit: Optional[int] = 0
 ) -> int:
     """Calculate minimal required operation fee.
 
@@ -30,16 +26,12 @@ def calculate_fee(
     """
     size = len(forge_operation(content)) + extra_size
     if minimal_nanotez_per_gas_unit is None:
-        minimal_nanotez_per_gas_unit = MINIMAL_MUTEZ_PER_GAS_UNIT * 1000
+        minimal_nanotez_per_gas_unit = int(MINIMAL_MUTEZ_PER_GAS_UNIT * 1000)
     fee = MINIMAL_FEES + MINIMAL_MUTEZ_PER_BYTE * size + int(minimal_nanotez_per_gas_unit * consumed_gas / 1000)
     return fee + reserve
 
 
-def default_fee(
-    content: Dict[str, Any],
-    gas_limit: Optional[int] = None,
-    minimal_nanotez_per_gas_unit: Optional[int] = None
-) -> int:
+def default_fee(content: Dict[str, Any], gas_limit: Optional[int] = None, minimal_nanotez_per_gas_unit: Optional[int] = None) -> int:
     """Take hard gas limit instead of precise amount (no simulation) and calculate fee.
 
     :param content: operation content {..., "kind": "transaction", ... }
@@ -48,7 +40,7 @@ def default_fee(
         content=content,
         consumed_gas=gas_limit if gas_limit is not None else default_gas_limit(content),
         extra_size=32 + 64 + 3 * 3,  # branch, signature, fee:gas_limit:storage_limit mutez values (+3 bytes)
-        minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit
+        minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit,
     )
 
 

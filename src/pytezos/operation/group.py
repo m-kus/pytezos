@@ -97,7 +97,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         gas_limit: Optional[int] = None,
         storage_limit: Optional[int] = None,
         minimal_nanotez_per_gas_unit: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> 'OperationGroup':
         """Try to fill all fields left unfilled, use approximate fees
         (not optimal, use `autofill` to simulate operation and get precise values).
@@ -135,7 +135,9 @@ class OperationGroup(ContextMixin, ContentMixin):
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
             'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, self.context.constants)),
-            'storage_limit': lambda x: str(storage_limit) if storage_limit is not None else str(default_storage_limit(x, self.context.constants)),
+            'storage_limit': lambda x: str(storage_limit)
+            if storage_limit is not None
+            else str(default_storage_limit(x, self.context.constants)),
             'fee': lambda x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)),
         }
 
@@ -360,7 +362,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             ttl=ttl,
             gas_limit=gas_limit,
             storage_limit=storage_limit,
-            minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit
+            minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit,
         ).sign()
         res = opg.inject(prevalidate=False)
         return opg._spawn(opg_hash=res['hash'])

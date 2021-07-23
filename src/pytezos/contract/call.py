@@ -58,10 +58,7 @@ class ContractCall(ContextMixin):
         :rtype: OperationGroup
         """
         return OperationGroup(context=self._spawn_context()).transaction(
-            destination=self.address,
-            amount=self.amount,
-            parameters=self.parameters,
-            **kwargs
+            destination=self.address, amount=self.amount, parameters=self.parameters, **kwargs
         )
 
     @property  # type: ignore
@@ -87,12 +84,12 @@ class ContractCall(ContextMixin):
         return self.as_transaction().send(gas_reserve=gas_reserve, burn_reserve=burn_reserve, min_confirmations=min_confirmations, ttl=ttl)
 
     def send_async(
-            self,
-            ttl: int,
-            counter: int,
-            gas_limit: int,
-            storage_limit: int,
-            minimal_nanotez_per_gas_unit: Optional[int] = None,
+        self,
+        ttl: int,
+        counter: int,
+        gas_limit: int,
+        storage_limit: int,
+        minimal_nanotez_per_gas_unit: Optional[int] = None,
     ) -> 'OperationGroup':
         """
         Send operation without simulation or pre-validation
@@ -105,9 +102,12 @@ class ContractCall(ContextMixin):
         :rtype: OperationGroup
         """
         return self.as_transaction().send_async(
-            ttl=ttl, counter=counter,
-            gas_limit=gas_limit, storage_limit=storage_limit,
-            minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit)
+            ttl=ttl,
+            counter=counter,
+            gas_limit=gas_limit,
+            storage_limit=storage_limit,
+            minimal_nanotez_per_gas_unit=minimal_nanotez_per_gas_unit,
+        )
 
     @deprecated(deprecated_in='3.2.2', removed_in='4.0.0', details='use `send()` instead')
     def inject(self, _async=True, preapply=True, check_result=True, num_blocks_wait=5) -> OperationGroup:

@@ -1,10 +1,10 @@
 import atexit
 import logging
 import unittest
-from time import sleep
-from typing import Optional
-from concurrent.futures import ThreadPoolExecutor, wait, CancelledError
+from concurrent.futures import CancelledError, ThreadPoolExecutor, wait, Future
 from threading import Event
+from time import sleep
+from typing import Optional, Any
 
 import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
@@ -112,6 +112,8 @@ class SandboxedNodeTestCase(unittest.TestCase):
 
 
 class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
+    exit_event: Optional[Event] = None
+    baker: Optional[Future[Any]] = None
 
     TIME_BETWEEN_BLOCKS = 3
 
@@ -133,16 +135,12 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
         global executor  # pylint: disable=global-statement
         if not executor:
             executor = ThreadPoolExecutor(1)
-        cls.exit_event = Event()
-        cls.baker = executor.submit(
-            cls.autobake,
-            cls.TIME_BETWEEN_BLOCKS,
-            cls.get_node_url(),
-            'bootstrap1',
-            cls.exit_event
-        )
+        cls.exit_event = Event()  # type: ignore
+        cls.baker = executor.submit(cls.autobake, cls.TIME_BETWEEN_BLOCKS, cls.get_node_url(), 'bootstrap1', cls.exit_event)
 
     @classmethod
     def tearDownClass(cls) -> None:
+        assert cls.exit_event
+        assert cls.baker
         cls.exit_event.set()
         wait([cls.baker])
