@@ -57,3 +57,7 @@ class TestInterfaces(TestCase):
         ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'macro_counter.tz'))
         print(ci.increaseCounterBy)
         self.assertFalse(is_interactive())
+
+    def test_top_field_annot(self):
+        ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'top_field_annot.tz'))
+        print(ci.buyTicket)

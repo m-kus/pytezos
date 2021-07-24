@@ -35,7 +35,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
                     annots: Optional[list] = None,
                     **kwargs) -> Type['ParameterSection']:
         root_name = parse_name(annots, prefix='%')  # type: ignore
-        root_type = args[0]
+        root_type = cast(Type[MichelsonType], args[0])
         if issubclass(root_type, OrType):
             if not root_name:
                 root_name = root_type.field_name  # type: ignore
@@ -44,9 +44,8 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
                 assert isinstance(flat_args, dict), f'expected a named type, got {flat_args}'
                 root_name = 'root' if 'default' in flat_args else 'default'
         else:
-            assert args[0].field_name is None, f'only top-or can be annotated, got ({args[0].prim} %{args[0].field_name})'  # type: ignore
             if not root_name:
-                root_name = 'default'
+                root_name = root_type.field_name or 'default'
         res = type(cls.__name__, (cls,), dict(args=args, root_name=root_name, **kwargs))
         return cast(Type['ParameterSection'], res)
 

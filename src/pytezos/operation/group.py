@@ -120,7 +120,7 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         chain_id = self.chain_id or self.context.get_chain_id()
         protocol = self.protocol or self.context.get_protocol()
-        branch = self.branch or self.shell.blocks[f'head-{MAX_OPERATIONS_TTL - ttl}'].hash()
+        branch = self.branch or self.shell.blocks[f'head~{MAX_OPERATIONS_TTL - ttl}'].hash()
         source = self.key.public_key_hash()
 
         if counter is not None:

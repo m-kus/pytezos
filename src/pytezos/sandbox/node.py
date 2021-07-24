@@ -113,7 +113,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
 
 class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
     exit_event: Optional[Event] = None
-    baker: Optional[Future[Any]] = None
+    baker: Optional[Future] = None
 
     TIME_BETWEEN_BLOCKS = 3
 

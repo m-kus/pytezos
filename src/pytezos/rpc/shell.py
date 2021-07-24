@@ -14,6 +14,7 @@ from pytezos.logging import logger
 from pytezos.rpc.kind import validation_passes
 from pytezos.rpc.query import RpcQuery
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
+from pytezos.rpc.protocol import BlockQuery, BlocksQuery
 
 
 def make_operation_result(**kwargs):
@@ -22,18 +23,18 @@ def make_operation_result(**kwargs):
 
 class ShellQuery(RpcQuery, path=''):
     @property
-    def blocks(self):
+    def blocks(self) -> BlocksQuery:
         """Shortcut for `chains.main.blocks`"""
         return self.chains.main.blocks
 
     @property
-    def head(self):
+    def head(self) -> BlockQuery:
         """Shortcut for `blocks.head`"""
         return self.blocks.head
 
     @property  # type: ignore
     @lru_cache(maxsize=None)
-    def block(self):
+    def block(self) -> BlockQuery:
         """Cached head block, useful if you just want to explore things."""
         return self.blocks[self.head.hash()]
 

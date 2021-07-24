@@ -15,7 +15,7 @@ MINIMAL_MUTEZ_PER_GAS_UNIT = 0.1
 
 
 def calculate_fee(
-    content: Dict[str, Any], consumed_gas: int, extra_size: int, reserve=10, minimal_nanotez_per_gas_unit: Optional[int] = 0
+    content: Dict[str, Any], consumed_gas: int, extra_size: int, reserve=10, minimal_nanotez_per_gas_unit: Optional[int] = None
 ) -> int:
     """Calculate minimal required operation fee.
 
