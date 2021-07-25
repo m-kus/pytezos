@@ -92,6 +92,7 @@ class BlockHeader(ContextMixin):
         protocol_data = {
             "priority": 0,
             "proof_of_work_nonce": "0000000000000000",
+            # TODO: "liquidity_baking_escape_vote": False
         }
         return BlockHeader(
             context=context,

@@ -95,7 +95,7 @@ class ShellQuery(RpcQuery, path=''):
 
             prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
             elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
-            sleep_sec = 0 if elapsed_sec > block_delay else (block_delay - elapsed_sec)
+            sleep_sec = 1 if elapsed_sec > block_delay else (block_delay - elapsed_sec + 1)
 
             logger.info('Sleep %d seconds until block %s is superseded', sleep_sec, current_block_hash)
             sleep(sleep_sec)

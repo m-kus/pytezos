@@ -4,6 +4,7 @@ from pytezos.crypto.key import Key
 
 EDO = 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
 FLORENCE = 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i'
+GRANADA = 'PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV'
 
 sandbox_commitment = {
     "mnemonic": [
@@ -74,7 +75,6 @@ sandbox_params: Dict[str, Any] = {
     'endorsement_reward': ['1250000', '833333'],
     'cost_per_byte': '250',
     'hard_storage_limit_per_operation': '60000',
-    'test_chain_duration': '1966080',
     'quorum_min': 2000.0,
     'quorum_max': 7000.0,
     'min_proposal_quorum': 500.0,
@@ -84,4 +84,16 @@ sandbox_params: Dict[str, Any] = {
 
 
 def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
-    return sandbox_params
+    if protocol_hash == GRANADA:
+        return {
+            **sandbox_params,
+            'minimal_block_delay': '0',
+            'liquidity_baking_subsidy': '2500000',
+            'liquidity_baking_sunset_level': 2032928.0,
+            'liquidity_baking_escape_ema_threshold': 1000000.0
+        }
+    else:
+        return {
+            **sandbox_params,
+            'test_chain_duration': '1966080'
+        }

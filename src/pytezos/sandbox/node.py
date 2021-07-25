@@ -11,7 +11,7 @@ from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
-from pytezos.sandbox.parameters import FLORENCE
+from pytezos.sandbox.parameters import FLORENCE, GRANADA
 
 # NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
 # and stopped after all tests are completed.
@@ -25,7 +25,7 @@ executor: Optional[ThreadPoolExecutor] = None
 class SandboxedNodeTestCase(unittest.TestCase):
     """Perform tests with sanboxed node in Docker container."""
 
-    IMAGE: str = 'bakingbad/sandboxed-node:v9.0-rc1-1'
+    IMAGE: str = 'bakingbad/sandboxed-node:v9.4-1'
     "Docker image to use"
 
     PORT: Optional[int] = None
