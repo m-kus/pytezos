@@ -83,7 +83,7 @@ class ShellQuery(RpcQuery, path=''):
             block_delay, secondary_delay = time_between_blocks, 0
         else:
             tbb = self.blocks[current_block_hash].context.constants()["time_between_blocks"]
-            block_delay, secondary_delay = int(tbb[0]), int(tbb[1])
+            block_delay, secondary_delay = int(tbb[0]), 0 if len(tbb) == 1 else int(tbb[1])
 
         if yield_current:
             yield current_block_hash
