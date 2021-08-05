@@ -291,11 +291,13 @@ class ContractCall(ContextMixin):
             storage=initial_storage,
             context=self.context,
         )
-        if not len(operations) == 1:
-            raise Exception('Multiple internal operations, not sure which one to pick')
         if error:
             logger.debug('\n'.join(stdout))
             raise error
+        if not operations:
+            raise Exception('No operation could be interpreted')
+        if len(operations) > 1:
+            raise Exception('Multiple internal operations, not sure which one to pick')
         return operations[0]
 
     @deprecated(deprecated_in='3.0.4', removed_in='3.1.0', details='Use callback_view instead')
