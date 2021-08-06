@@ -10,3 +10,9 @@ class FindOperationTestCase(SandboxedNodeAutoBakeTestCase):
             .send(min_confirmations=1)
 
         self.client.shell.blocks[-10:0].find_operation(opg.opg_hash)
+
+    def test_2_sleep(self) -> None:
+        level_from = self.client.shell.head.level()
+        self.client.sleep(2)
+        level_to = self.client.shell.head.level()
+        self.assertEqual(2, level_to - level_from)

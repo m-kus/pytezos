@@ -204,7 +204,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         prev_hash: Optional[str] = None,
         block_timeout: Optional[int] = None,
     ) -> List[dict]:
-        """Wait for multiple injected operations to get enough confirmations
+        """Wait for multiple injected operations get enough confirmations
 
         :param min_confirmations: number of block injections to wait for before returning
         :param num_blocks_wait: number of blocks to wait for injection
@@ -212,6 +212,9 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param prev_hash: Current block hash (optional). If not set, current head is used.
         :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         """
+        if len(operation_groups) == 0:
+            raise ValueError('At least one operation group has to be passed to the args')
+
         opg_hashes = []
         for opg in operation_groups:
             if opg.opg_hash is None:
@@ -226,3 +229,21 @@ class PyTezosClient(ContextMixin, ContentMixin):
             time_between_blocks=time_between_blocks,
             block_timeout=block_timeout,
         )
+
+    def sleep(self,
+              num_blocks: int,
+              time_between_blocks: Optional[int] = None,
+              block_timeout: Optional[int] = None) -> List[str]:
+        """Sleeps until a certain amount of blocks appended to the chain
+
+        :param num_blocks: number of blocks to wait for
+        :param time_between_blocks: override the corresponding parameter from constants
+        :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
+        """
+        block_hash = self.shell.head.hash()
+        return list(self.shell.wait_blocks(
+            current_block_hash=block_hash,
+            max_blocks=num_blocks,
+            time_between_blocks=time_between_blocks,
+            block_timeout=block_timeout
+        ))
