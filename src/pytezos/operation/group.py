@@ -372,6 +372,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         check_result: bool = True,
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
+        block_timeout: Optional[int] = None,
         min_confirmations: int = 0,
         prevalidate: bool = True,
         **kwargs,
@@ -381,6 +382,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param check_result: raise RpcError in case operation is applied but has runtime errors
         :param num_blocks_wait: number of blocks to wait for injection
         :param time_between_blocks: override the corresponding parameter from constants
+        :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         :param min_confirmations: number of block injections to wait for before returning
         :param prevalidate: ask node to pre-validate the operation before the injection (True by default)
         :returns: operation group with metadata (raw RPC response)
@@ -400,7 +402,11 @@ class OperationGroup(ContextMixin, ContentMixin):
             }
 
         operations = self.shell.wait_operations(
-            opg_hashes=[opg_hash], ttl=num_blocks_wait, min_confirmations=min_confirmations, time_between_blocks=time_between_blocks
+            opg_hashes=[opg_hash],
+            ttl=num_blocks_wait,
+            min_confirmations=min_confirmations,
+            time_between_blocks=time_between_blocks,
+            block_timeout=block_timeout
         )
 
         assert len(operations) == 1

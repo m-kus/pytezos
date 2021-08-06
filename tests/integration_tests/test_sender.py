@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 
 from pytezos import ContractInterface
 
@@ -15,6 +15,7 @@ source = 'KT1WhouvVKZFH94VXj9pa8v4szvfrBwXoBUj'
 sender = 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'
 
 
+@skip
 class SenderContractTest(TestCase):
 
     @classmethod

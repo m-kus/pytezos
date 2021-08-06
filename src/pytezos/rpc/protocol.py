@@ -89,7 +89,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         """
         metadata = self.head.metadata()
         return BlockSliceQuery(
-            start=metadata['level']['level'] - metadata['level']['voting_period_position'],
+            start=metadata['level_info']['level'] - metadata['level_info']['voting_period_position'],
             stop='head',
             node=self.node,
             path=self._wild_path,
@@ -104,7 +104,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         """
         metadata = self.head.metadata()
         return BlockSliceQuery(
-            start=metadata['level']['level'] - metadata['level']['cycle_position'],
+            start=metadata['level_info']['level'] - metadata['level_info']['cycle_position'],
             stop='head',
             node=self.node,
             path=self._wild_path,
@@ -131,20 +131,15 @@ class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
 
     def voting_period(self) -> int:
         """Get voting period for this block from metadata."""
-        return self.metadata()['level']['voting_period']
+        return self.metadata()['level_info']['voting_period']
 
     def level(self) -> int:
-        """Get level for this block from metadata."""
-        try:
-            return self.metadata()['level']['level']
-        except KeyError as exc:
-            # FIXME: Dirty hack for genesis block
-            # raise Exception('Can\'t get block level from metadata. It seems like node is not fully initialized yet.') from exc
-            return 0
+        """Get level for this block from header."""
+        return self.header()['level']
 
     def cycle(self) -> int:
         """Get cycle for this block from metadata."""
-        return self.metadata()['level']['cycle']
+        return self.metadata()['level_info']['cycle']
 
     def protocol_parameters(self):
         """Get decoded protocol parameters if they do exist in the header"""

@@ -43,7 +43,7 @@ class ContentMixin:
         return self.operation(
             {
                 'kind': 'endorsement',
-                'level': str(level),
+                'level': level,
             }
         )
 

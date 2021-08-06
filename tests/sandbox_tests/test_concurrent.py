@@ -29,13 +29,13 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
 
     def test_2_batch_multiple_calls(self) -> None:
         contract = self.get_contract()
-        txs = [contract.increment(i) for i in range(50)]
+        txs = [contract.increment(i) for i in range(10)]
         opg = self.client.bulk(*txs).autofill()
         opg.sign().inject(
             time_between_blocks=self.TIME_BETWEEN_BLOCKS,
             min_confirmations=1
         )
-        self.assertEqual(1225, int(contract.storage()))
+        self.assertEqual(45, int(contract.storage()))
 
     def test_3_send_multiple_calls(self) -> None:
         contract = self.get_contract()

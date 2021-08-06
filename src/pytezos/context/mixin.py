@@ -8,7 +8,7 @@ from pytezos.jupyter import InlineDocstring
 from pytezos.rpc import RpcMultiNode, RpcNode, ShellQuery
 from pytezos.rpc.errors import RpcError
 
-default_network = 'florencenet'
+default_network = 'granadanet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
 default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 
@@ -22,6 +22,7 @@ nodes = {
                 'https://api.tez.ie/',
                 'https://tezos-prod.cryptonomic-infra.tech/'],
     'sandbox': ['http://127.0.0.1:8732/'],
+    'sandboxnet': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
     'florencenet': ['https://testnet-tezos.giganode.io'],
     'granadanet': ['https://rpc.tzkt.io/granadanet']

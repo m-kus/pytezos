@@ -1,10 +1,10 @@
 import atexit
 import logging
 import unittest
-from concurrent.futures import CancelledError, ThreadPoolExecutor, wait, Future
+from concurrent.futures import CancelledError, Future, ThreadPoolExecutor, wait
 from threading import Event
 from time import sleep
-from typing import Optional, Any
+from typing import Any, Optional
 
 import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
@@ -31,7 +31,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
     PORT: Optional[int] = None
     "Port to expose to host machine"
 
-    PROTOCOL: str = FLORENCE
+    PROTOCOL: str = GRANADA
     "Hash of protocol to activate"
 
     @classmethod

@@ -202,6 +202,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         num_blocks_wait: int = 5,
         time_between_blocks: Optional[int] = None,
         prev_hash: Optional[str] = None,
+        block_timeout: Optional[int] = None,
     ) -> List[dict]:
         """Wait for multiple injected operations to get enough confirmations
 
@@ -209,6 +210,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param num_blocks_wait: number of blocks to wait for injection
         :param time_between_blocks: override the corresponding parameter from constants
         :param prev_hash: Current block hash (optional). If not set, current head is used.
+        :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         """
         opg_hashes = []
         for opg in operation_groups:
@@ -222,4 +224,5 @@ class PyTezosClient(ContextMixin, ContentMixin):
             min_confirmations=min_confirmations,
             current_block_hash=prev_hash,
             time_between_blocks=time_between_blocks,
+            block_timeout=block_timeout,
         )

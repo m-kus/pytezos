@@ -216,16 +216,14 @@ class PeriodQuery(RpcQuery):
     __val_key__ = ''
 
     def _get_item(self, item) -> BlockSliceQuery:
-        lvl = self.head.metadata()['level']
+        lvl = self.head.metadata()['level_info']
         blocks_per_period = int((lvl['level'] - lvl[self.__pos_key__] - 1) / lvl[self.__val_key__])
 
         def get_range(x):
-            if x > 0:
-                start_lvl = (x - 1) * blocks_per_period + 1
-            elif x < 0:
-                start_lvl = (lvl[self.__val_key__] + x + 1) * blocks_per_period + 1
+            if x >= 0:
+                start_lvl = (max(1, x) - 1) * blocks_per_period + 1
             else:
-                assert False
+                start_lvl = (lvl[self.__val_key__] + x + 1) * blocks_per_period + 1
 
             stop_lvl = start_lvl + blocks_per_period - 1
             if stop_lvl > lvl['level']:

@@ -52,7 +52,7 @@ def forge_protocol_data(protocol_data: Dict[str, Any]) -> bytes:
             res += forge_base58(protocol_data['seed_nonce_hash'])
         else:
             res += b'\x00'
-        # TODO: res += b'\xFF' if protocol_data['liquidity_baking_escape_vote'] else b'\x00';
+        res += b'\xFF' if protocol_data['liquidity_baking_escape_vote'] else b'\x00'
     return res
 
 

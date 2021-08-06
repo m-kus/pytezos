@@ -12,9 +12,11 @@ from pytezos.crypto.encoding import base58_decode
 from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
 from pytezos.rpc.kind import validation_passes
+from pytezos.rpc.protocol import BlockQuery, BlocksQuery
 from pytezos.rpc.query import RpcQuery
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
-from pytezos.rpc.protocol import BlockQuery, BlocksQuery
+
+MAX_BLOCK_TIMEOUT = 86400
 
 
 def make_operation_result(**kwargs):
@@ -67,6 +69,7 @@ class ShellQuery(RpcQuery, path=''):
         max_priority: int = 2,
         yield_current=False,
         time_between_blocks: Optional[int] = None,
+        block_timeout: Optional[int] = None,
     ) -> Generator[str, None, None]:
         """Iterates over future blocks (waits and yields block hash)
 
@@ -75,15 +78,17 @@ class ShellQuery(RpcQuery, path=''):
         :param max_priority: wait for blocks with lower priority (increased timeout)
         :param yield_current: yield current block hash at the very beginning
         :param time_between_blocks: override protocol constant
+        :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         :return: block hashes
         """
         prev_block_hash: Optional[str] = None
 
-        if time_between_blocks:
-            block_delay, secondary_delay = time_between_blocks, 0
-        else:
-            tbb = self.blocks[current_block_hash].context.constants()["time_between_blocks"]
-            block_delay, secondary_delay = int(tbb[0]), int(tbb[1])
+        if time_between_blocks is None:
+            constants = self.blocks[current_block_hash].context.constants()
+            time_between_blocks = int(constants.get('minimal_block_delay', constants['time_between_blocks'][0]))
+
+        if block_timeout is None:
+            block_timeout = MAX_BLOCK_TIMEOUT
 
         if yield_current:
             yield current_block_hash
@@ -95,16 +100,14 @@ class ShellQuery(RpcQuery, path=''):
 
             prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
             elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
-            sleep_sec = 1 if elapsed_sec > block_delay else (block_delay - elapsed_sec + 1)
+            sleep_sec = 1 if elapsed_sec > time_between_blocks else (time_between_blocks - elapsed_sec + 1)
 
             logger.info('Sleep %d seconds until block %s is superseded', sleep_sec, current_block_hash)
             sleep(sleep_sec)
 
             next_block_hash: Optional[str] = None
-            timeout = block_delay + secondary_delay * max_priority + 1
-            logger.info('Waiting for a new block (%d sec timeout)', timeout)
 
-            for delay in range(timeout):
+            for delay in range(block_timeout):
                 next_block_hash = self.head.hash()
                 if current_block_hash == next_block_hash:
                     sleep(1)
@@ -118,7 +121,7 @@ class ShellQuery(RpcQuery, path=''):
                 prev_block_hash = current_block_hash
                 current_block_hash = next_block_hash
             else:
-                raise TimeoutError('Reached timeout (%d sec) while waiting for the next block', timeout)
+                raise TimeoutError('Reached timeout (%d sec) while waiting for the next block', block_timeout)
 
     def wait_operations(
         self,
@@ -127,6 +130,7 @@ class ShellQuery(RpcQuery, path=''):
         min_confirmations: int,
         current_block_hash: Optional[str] = None,
         time_between_blocks: Optional[int] = None,
+        block_timeout: Optional[int] = None,
     ) -> List[dict]:
         """Wait for one or many operations gain enough confirmations
 
@@ -135,6 +139,7 @@ class ShellQuery(RpcQuery, path=''):
         :param min_confirmations: minimum number of blocks after inclusion to wait for
         :param current_block_hash: current block hash (head)
         :param time_between_blocks: override protocol constant
+        :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         :return: list of operation contents with metadata
         """
 
@@ -146,7 +151,13 @@ class ShellQuery(RpcQuery, path=''):
         if block_hash is None:
             block_hash = self.head.hash()
 
-        for block_hash in self.wait_blocks(block_hash, max_blocks=ttl, yield_current=True, time_between_blocks=time_between_blocks):
+        for block_hash in self.wait_blocks(
+            current_block_hash=block_hash,
+            max_blocks=ttl,
+            yield_current=True,
+            time_between_blocks=time_between_blocks,
+            block_timeout=block_timeout,
+        ):
             if len(pending) > 0:
                 mempool = set(map(lambda x: x['hash'], self.mempool.pending_operations.flatten()))
                 for opg_hash in opg_hashes:
