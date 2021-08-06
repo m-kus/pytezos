@@ -194,7 +194,7 @@ class ShellQuery(RpcQuery, path=''):
 
         return operations
 
-    @deprecated(deprecated_in='3.2.2', removed_in='4.0.0')
+    @deprecated(deprecated_in='3.2.2', removed_in='4.0.0', details=f'Use wait_blocks() instead')
     def wait_next_block(
         self,
         delay_sec=1,
