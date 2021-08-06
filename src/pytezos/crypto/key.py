@@ -73,12 +73,12 @@ def blake2b_32(v=b''):
 
 def validate_mnemonic(mnemonic: str, language: str = DEFAULT_LANGUAGE) -> None:
     m = Mnemonic(language)
-    mnemonic = m.normalize_string(mnemonic).split(' ')
-    if len(mnemonic) not in VALID_MNEMONIC_LENGTHS:
+    mnemonic_words = m.normalize_string(mnemonic).split(' ')
+    if len(mnemonic_words) not in VALID_MNEMONIC_LENGTHS:
         raise ValueError('Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, '
-                         'but it is not (%d).' % len(mnemonic))
+                         'but it is not (%d).' % len(mnemonic_words))
 
-    idx = map(lambda x: bin(m.wordlist.index(x))[2:].zfill(11), mnemonic)
+    idx = map(lambda x: bin(m.wordlist.index(x))[2:].zfill(11), mnemonic_words)
     b = ''.join(idx)
     l = len(b)
     d = b[: l // 33 * 32]

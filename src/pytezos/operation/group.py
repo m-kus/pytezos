@@ -406,7 +406,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             ttl=num_blocks_wait,
             min_confirmations=min_confirmations,
             time_between_blocks=time_between_blocks,
-            block_timeout=block_timeout
+            block_timeout=block_timeout,
         )
 
         assert len(operations) == 1

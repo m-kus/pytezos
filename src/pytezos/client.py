@@ -230,10 +230,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
             block_timeout=block_timeout,
         )
 
-    def sleep(self,
-              num_blocks: int,
-              time_between_blocks: Optional[int] = None,
-              block_timeout: Optional[int] = None) -> List[str]:
+    def sleep(self, num_blocks: int, time_between_blocks: Optional[int] = None, block_timeout: Optional[int] = None) -> List[str]:
         """Sleeps until a certain amount of blocks appended to the chain
 
         :param num_blocks: number of blocks to wait for
@@ -241,9 +238,8 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         """
         block_hash = self.shell.head.hash()
-        return list(self.shell.wait_blocks(
-            current_block_hash=block_hash,
-            max_blocks=num_blocks,
-            time_between_blocks=time_between_blocks,
-            block_timeout=block_timeout
-        ))
+        return list(
+            self.shell.wait_blocks(
+                current_block_hash=block_hash, max_blocks=num_blocks, time_between_blocks=time_between_blocks, block_timeout=block_timeout
+            )
+        )
