@@ -33,7 +33,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         branch: Optional[str] = None,
         signature: Optional[str] = None,
         opg_hash: Optional[str] = None,
-        # TODO: metadata {balance_updates, operation_result}
+        opg_result: Optional[Dict[str, Any]] = None
     ) -> None:
         super().__init__(context=context)
         self.contents = contents or []
@@ -42,6 +42,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         self.branch = branch
         self.signature = signature
         self.opg_hash = opg_hash
+        self.opg_result = opg_result
 
     def __repr__(self) -> str:
         res = [
@@ -62,6 +63,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             branch=kwargs.get('branch', self.branch),
             signature=kwargs.get('signature', self.signature),
             opg_hash=kwargs.get('opg_hash', self.opg_hash),
+            opg_result=kwargs.get('opg_result', self.opg_result),
         )
 
     def json_payload(self) -> Dict[str, Any]:
@@ -337,7 +339,7 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         opg = self.autofill(gas_reserve=gas_reserve, burn_reserve=burn_reserve, ttl=ttl).sign()
         res = opg.inject(min_confirmations=min_confirmations, num_blocks_wait=ttl)
-        return opg._spawn(opg_hash=res['hash'])
+        return opg._spawn(opg_hash=res['hash'], opg_result=res)
 
     def send_async(
         self,

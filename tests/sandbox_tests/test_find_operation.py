@@ -1,5 +1,6 @@
 from pytezos.sandbox.node import SandboxedNodeAutoBakeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses
+from pytezos.operation.result import OperationResult
 
 
 class FindOperationTestCase(SandboxedNodeAutoBakeTestCase):
@@ -16,3 +17,11 @@ class FindOperationTestCase(SandboxedNodeAutoBakeTestCase):
         self.client.sleep(2)
         level_to = self.client.shell.head.level()
         self.assertEqual(2, level_to - level_from)
+
+    def test_3_consumed_gas(self) -> None:
+        opg = self.client \
+            .transaction(destination=sandbox_addresses['bootstrap3'], amount=1000)\
+            .send(min_confirmations=1)
+
+        consumed_gas = OperationResult.consumed_gas(opg.opg_result)
+        self.assertGreater(consumed_gas, 0)

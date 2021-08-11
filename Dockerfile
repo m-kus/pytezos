@@ -2,7 +2,7 @@ ARG POETRY=1.0.5
 ARG PENDULUM=2.1.0
 ARG PYTEST=5.4
 
-FROM python:3-alpine AS build
+FROM python:3-alpine3.13 AS build
 ARG POETRY
 COPY . /pytezos
 RUN apk update \
@@ -14,7 +14,7 @@ RUN apk update \
 	&& cd /pytezos && poetry build
 
 
-FROM python:3-alpine
+FROM python:3-alpine3.13
 ARG POETRY
 ARG PENDULUM
 ARG PYTEST

@@ -78,7 +78,7 @@ build:
 	poetry build
 
 image:
-	docker build . -t michelson-kernel
+	docker build . -t bakingbad/pytezos:latest
 
 docs:
 	poetry run sh -c "cd docs && rm -rf ./build && $(MAKE) html && cd .."
@@ -88,9 +88,6 @@ kernel-docs:
 
 rpc-docs:
 	python scripts/fetch_docs.py
-
-binder:
-
 
 release-patch:
 	bumpversion patch
