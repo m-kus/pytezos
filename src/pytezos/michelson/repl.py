@@ -158,6 +158,13 @@ class Interpreter:
             _, _, _, pair = res.end(stack, stdout)
             operations = cast(List[OperationType], list(pair.items[0]))
             storage = pair.items[1]
+            # Note: the `storage` returned by the Michelson interpreter above is not
+            # required to include the full annotations specified in the contract's storage.
+            # The lack of annotations affects calls to `to_python_object()`, causing the storage
+            # you get back from the view to not always be converted to the same object
+            # as if you called ContractInterface.storage() directly.
+            # Re-parsing using the contract's storage section here to recover the annotations.
+            storage = program.storage.from_micheline_value(storage.to_micheline_value())
             return [op.to_python_object() for op in operations], storage.to_python_object(), stdout, None
         except MichelsonRuntimeError as e:
             stdout.append(e.format_stdout())

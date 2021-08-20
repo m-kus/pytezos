@@ -33,7 +33,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         branch: Optional[str] = None,
         signature: Optional[str] = None,
         opg_hash: Optional[str] = None,
-        opg_result: Optional[Dict[str, Any]] = None
+        opg_result: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(context=context)
         self.contents = contents or []
