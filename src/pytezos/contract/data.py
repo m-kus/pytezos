@@ -52,7 +52,7 @@ class ContractData(ContextMixin):
 
         :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
         """
-        return self.data.to_micheline_value(mode='optimized' if optimized else 'readable')
+        return self.data.to_micheline_value(mode='optimized' if optimized else 'readable', lazy_diff=True)
 
     def to_michelson(self, optimized=False):
         """Get as Michelson value
@@ -62,23 +62,24 @@ class ContractData(ContextMixin):
         return micheline_to_michelson(self.to_micheline(optimized=optimized))
 
     def decode(self, value):
-        """Convert from Michelson to Python type system
+        """Convert from Michelson or Micheline to Python type system
 
         :param value: Micheline JSON expression or Michelson value
         :return: Python object
         """
         if isinstance(value, str):
             value = michelson_to_micheline(value)
-        return type(self.data).from_micheline_value(value).to_python_object()
+        return type(self.data).from_micheline_value(value).to_python_object(lazy_diff=True)
 
     def encode(self, py_obj, mode: Optional[str] = None):
-        """Convert from Python to Michelson type system
+        """Convert from Python to Micheline type system
 
         :param py_obj: Python object
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
         :return: Micheline JSON expression
         """
-        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode)
+        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode,
+                                                                             lazy_diff=True)
 
     def dummy(self):
         """Try to generate a dummy (empty) value

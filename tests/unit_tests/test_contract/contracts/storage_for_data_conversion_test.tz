@@ -1,0 +1,27 @@
+Pair (Pair (Pair (Pair "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" False) None)
+            (Pair { Elt 1 "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" ;
+                    Elt 2 "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" ;
+                    Elt 3 "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" ;
+                    Elt 4 "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" ;
+                    Elt 5 "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" }
+                  6)
+            { Elt (Pair "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+                        "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+                        1)
+                  Unit }
+            { Elt 1
+                  (Pair 1
+                        { Elt "" 0x68747470733a2f2f6578616d706c652e636f6d2f7368696e79546f6b656e2f31 }) ;
+              Elt 2
+                  (Pair 2
+                        { Elt "" 0x68747470733a2f2f6578616d706c652e636f6d2f7368696e79546f6b656e2f32 }) ;
+              Elt 3
+                  (Pair 3
+                        { Elt "" 0x68747470733a2f2f6578616d706c652e636f6d2f7368696e79546f6b656e2f33 }) ;
+              Elt 4
+                  (Pair 4
+                        { Elt "" 0x68747470733a2f2f6578616d706c652e636f6d2f7368696e79546f6b656e2f34 }) ;
+              Elt 5
+                  (Pair 5
+                        { Elt "" 0x68747470733a2f2f6578616d706c652e636f6d2f7368696e79546f6b656e2f35 }) })
+      { Elt "" 0x68747470733a2f2f6578616d706c652e636f6d2f7368696e79546f6b656e }
