@@ -1,5 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
+
+from mnemonic import Mnemonic
 from parameterized import parameterized
 
 from pytezos.crypto.key import Key
@@ -117,6 +119,11 @@ class TestCrypto(TestCase):
     ])
     def test_bad_mnemonic(self, mnemonic):
         self.assertRaises(ValueError, Key.from_mnemonic, mnemonic)
+
+    def test_french_mnemonic(self):
+        # Ensure that English isn't the only language supported for loading keys
+        mnemonic = Mnemonic('french').generate(128)
+        self.assertIsNotNone(Key.from_mnemonic(mnemonic, validate=True, language='french'))
 
     def test_regression_p256_short_sig(self):
         key = Key.from_encoded_key('p2sk3xPfYsoExTVi7bGSH2KoHgpxFNqewUczHkLtQvr1bwnbhzGM9Y')

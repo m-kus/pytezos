@@ -256,6 +256,7 @@ class Key(metaclass=InlineDocstring):
         validate: bool = True,
         curve: bytes = b'ed',
         activation_code: Optional[str] = None,
+        language: str = DEFAULT_LANGUAGE
     ) -> 'Key':
         """Creates a key object from a bip39 mnemonic.
 
@@ -265,13 +266,14 @@ class Key(metaclass=InlineDocstring):
         :param validate: whether to check mnemonic or not
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
         :param activation_code: secret for initializing account balance
+        :param language: The language used for the mnemonic. This is needed for validation
         :rtype: Key
         """
         if isinstance(mnemonic, list):
             mnemonic = ' '.join(mnemonic)
 
         if validate:
-            validate_mnemonic(mnemonic)
+            validate_mnemonic(mnemonic, language=language)
 
         seed = Mnemonic.to_seed(mnemonic, passphrase=email + passphrase)
 
