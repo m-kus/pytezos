@@ -52,7 +52,7 @@ class ContractData(ContextMixin):
 
         :param optimized: use optimized data form for some domain types (timestamp, address, etc.)
         """
-        return self.data.to_micheline_value(mode='optimized' if optimized else 'readable', lazy_diff=True)
+        return self.data.to_micheline_value(mode='optimized' if optimized else 'readable', lazy_diff=None)
 
     def to_michelson(self, optimized=False):
         """Get as Michelson value
@@ -69,7 +69,7 @@ class ContractData(ContextMixin):
         """
         if isinstance(value, str):
             value = michelson_to_micheline(value)
-        return type(self.data).from_micheline_value(value).to_python_object(lazy_diff=True)
+        return type(self.data).from_micheline_value(value).to_python_object(lazy_diff=None)
 
     def encode(self, py_obj, mode: Optional[str] = None):
         """Convert from Python to Micheline type system
@@ -79,7 +79,7 @@ class ContractData(ContextMixin):
         :return: Micheline JSON expression
         """
         return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode,
-                                                                             lazy_diff=True)
+                                                                             lazy_diff=None)
 
     def dummy(self):
         """Try to generate a dummy (empty) value
