@@ -266,7 +266,7 @@ class Key(metaclass=InlineDocstring):
         :param validate: whether to check mnemonic or not
         :param curve: b'sp' for secp251k1, b'p2' for P256/secp256r1, b'ed' for Ed25519 (default)
         :param activation_code: secret for initializing account balance
-        :param language: The language used for the mnemonic. This is needed for validation
+        :param language: The English label for the language of the mnemonic. This is needed for validation
         :rtype: Key
         """
         if isinstance(mnemonic, list):
