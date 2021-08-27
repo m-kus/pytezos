@@ -105,14 +105,20 @@ class BlockHeader(ContextMixin):
             signature=kwargs.get('signature', self.signature),
         )
 
-    def fill(self, block_id='head') -> 'BlockHeader':
+    def fill(self, block_id='head', timestamp: Optional[int] = None) -> 'BlockHeader':
         """Fill missing fields essential for preapply
 
         :param block_id: head or genesis
+        :param timestamp: override header timestamp (unix seconds).
+            NOTE that the minimal block granularity in Tezos is 1 sec, so you cannot bake faster that once per second.
+            You also cannot bake with timestamp in the future, it will end with error.
+            The workaround is to set the genesis block timestamp to zero (or very old date)
+            so that you can continuously increase it by 1 sec.
         :rtype: BlockHeader
         """
         pred_shell_header = self.shell.blocks[block_id].header.shell()
-        timestamp = optimize_timestamp(pred_shell_header['timestamp']) + 1
+        if timestamp is None:
+            timestamp = optimize_timestamp(pred_shell_header['timestamp']) + 1
         protocol = self.shell.blocks[block_id].protocols()['next_protocol']
         level = int(pred_shell_header['level']) + 1
         dummy_signature = base58_encode(b'\x00' * 64, b'sig').decode()
