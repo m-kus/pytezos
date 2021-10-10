@@ -78,8 +78,7 @@ class ContractData(ContextMixin):
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
         :return: Micheline JSON expression
         """
-        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode,
-                                                                             lazy_diff=None)
+        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode, lazy_diff=None)
 
     def dummy(self):
         """Try to generate a dummy (empty) value
