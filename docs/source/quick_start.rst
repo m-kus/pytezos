@@ -745,4 +745,20 @@ PyTezos allows you to keep that address empty and get the view result:
      'nat_2': 8200000},
     {'owner': 'tz2QegZQXyz8b74iTdaqKsGRF7YQb88Wu9CS', 'token_id': 0, 'nat_2': 0}]
 
+Get Contract Balance
+--------------------
+
+Looking for a balance for a contract involves interacting with the contract context. You can inspect the context object to see the methods, or read about it here - :class:`pytezos.context.impl.ExecutionContext`
+
+The context object holds general functions for retriving data about a contract/address, including the `get_balance()` call.
+
+.. code-block:: python
+
+   >>> kolibri_oven = pytezos.using('mainnet').contract('KT1KH3wH4sneEevPVW7AACiVKMjhTvmXLSK6')
+   >>> print([x for x in dir(kolibri_oven.context) if x.startswith('get_')])
+   ['get_amount', 'get_amount_expr', 'get_balance', 'get_balance_expr', 'get_big_map_diff', 'get_big_map_value', 'get_big_maps_expr', 'get_chain_id', 'get_chain_id_expr', 'get_code_expr', 'get_counter', 'get_counter_offset', 'get_dummy_address', 'get_dummy_chain_id', 'get_dummy_key_hash', 'get_dummy_lambda', 'get_dummy_public_key', 'get_dummy_signature', 'get_input_expr', 'get_level', 'get_now', 'get_now_expr', 'get_operations_ttl', 'get_originated_address', 'get_output_expr', 'get_parameter_expr', 'get_sapling_state_diff', 'get_self_address', 'get_self_expr', 'get_sender', 'get_sender_expr', 'get_source', 'get_source_expr', 'get_storage_expr', 'get_tmp_big_map_id', 'get_tmp_sapling_state_id', 'get_total_voting_power', 'get_voting_power']
+
+   >>> kolibri_oven_balance = kolibri_oven.context.get_balance()
+   >>> print("Kolibri oven {} has XTZ balance {}".format(kolibri_oven.address, kolibri_oven_balance / 1e6))
+   Kolibri oven KT1KH3wH4sneEevPVW7AACiVKMjhTvmXLSK6 has XTZ balance 191.869689
 
