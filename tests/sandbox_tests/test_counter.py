@@ -1,4 +1,5 @@
 import logging
+from pprint import pprint
 
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses
@@ -41,7 +42,14 @@ class TransactionCounterTestCase(SandboxedNodeTestCase):
         self.assertEqual(1, len(pending_operations['applied']))
         self.assertEqual(1, len(pending_operations['branch_delayed']))
 
-    def test_4_force_bake(self) -> None:
+    def test_4_reuse_counter(self) -> None:
+        self.client.transaction(destination=sandbox_addresses['bootstrap3'], amount=13) \
+            .send_async(ttl=60, counter=5, gas_limit=15000, storage_limit=0)  # override delayed tx
+        pending_operations = self.client.shell.mempool.pending_operations()
+        self.assertEqual(2, len(pending_operations['applied']))
+        self.assertEqual(1, len(pending_operations['branch_delayed']))
+
+    def test_5_force_bake(self) -> None:
         self.bake_block(min_fee=0)
         pending_operations = self.client.shell.mempool.pending_operations()
-        self.assertEqual(1, len(pending_operations['applied']))
+        self.assertEqual(1, len(pending_operations['branch_refused']))

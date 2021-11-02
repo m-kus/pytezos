@@ -25,7 +25,7 @@ executor: Optional[ThreadPoolExecutor] = None
 class SandboxedNodeTestCase(unittest.TestCase):
     """Perform tests with sanboxed node in Docker container."""
 
-    IMAGE: str = 'bakingbad/sandboxed-node:v9.4-1'
+    IMAGE: str = 'bakingbad/sandboxed-node:v10.3-1'
     "Docker image to use"
 
     PORT: Optional[int] = None
