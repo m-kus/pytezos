@@ -13,7 +13,7 @@ from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
 from pytezos.sandbox.parameters import LATEST
 
-DOCKER_TAG = 'auto-release'
+DOCKER_IMAGE = 'bakingbad/sandboxed-node:v11.0-1'
 
 # NOTE: Container object is a singleton which will be used in all tests inherited from class _SandboxedNodeTestCase
 # and stopped after all tests are completed.
@@ -27,7 +27,7 @@ executor: Optional[ThreadPoolExecutor] = None
 class SandboxedNodeTestCase(unittest.TestCase):
     """Perform tests with sanboxed node in Docker container."""
 
-    IMAGE: str = f'bakingbad/sandboxed-node:{DOCKER_TAG}'
+    IMAGE: str = DOCKER_IMAGE
     "Docker image to use"
 
     PORT: Optional[int] = None
