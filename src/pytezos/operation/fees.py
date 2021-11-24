@@ -59,7 +59,8 @@ def default_gas_limit(
         'reveal': 1000,
         'delegation': 1000,
         'origination': constants['hard_gas_limit_per_operation'],
-        'transaction': constants['hard_gas_limit_per_operation']
+        'transaction': constants['hard_gas_limit_per_operation'],
+        'register_global_constant': constants['hard_gas_limit_per_operation']
         if content.get('destination', '').startswith('KT')
         else DEFAULT_TRANSACTION_GAS_LIMIT,
     }
@@ -81,7 +82,8 @@ def default_storage_limit(
         'reveal': 0,
         'delegation': 0,
         'origination': constants['hard_storage_limit_per_operation'],
-        'transaction': constants['hard_storage_limit_per_operation']
+        'transaction': constants['hard_storage_limit_per_operation'],
+        'register_global_constant': constants['hard_storage_limit_per_operation']
         if content.get('destination', '').startswith('KT')
         else DEFAULT_TRANSACTION_STORAGE_LIMIT,
     }

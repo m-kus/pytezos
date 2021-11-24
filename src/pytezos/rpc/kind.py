@@ -13,6 +13,7 @@ validation_passes = {
     'transaction': 3,
     'origination': 3,
     'delegation': 3,
+    'register_global_constant': 3,
 }
 operation_tags = {
     'endorsement': 0,
