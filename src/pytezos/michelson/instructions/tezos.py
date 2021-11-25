@@ -304,3 +304,10 @@ class ViewInstruction(MichelsonInstruction, prim='VIEW', args_len=2):
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [input_value, view_address], [res]))  # type: ignore
         return cls(stack_items_added=1)
+
+
+class OpenChestInstruction(MichelsonInstruction, prim='OPEN_CHEST'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        raise NotImplementedError

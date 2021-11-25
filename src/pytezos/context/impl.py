@@ -6,8 +6,8 @@ from pytezos.context.abstract import AbstractContext, get_originated_address  # 
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.logging import logger
-from pytezos.michelson.micheline import get_script_section, get_script_sections
 from pytezos.michelson.forge import forge_micheline, forge_script_expr
+from pytezos.michelson.micheline import get_script_section, get_script_sections, MichelineT
 from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
@@ -187,7 +187,7 @@ class ExecutionContext(AbstractContext):
                 return None  # dummy callback
             else:
                 script = self.shell.contracts[address].script()
-                expr = get_script_section(script, name='parameter', cls=None, required=True)
+                expr = get_script_section(script, name='parameter', cls=None, required=True)  # type: ignore
         elif address:
             return None
         else:
@@ -197,7 +197,7 @@ class ExecutionContext(AbstractContext):
     def get_storage_expr(self, address=None) -> Optional[dict]:
         if self.shell and address:
             script = self.shell.contracts[address].script()
-            expr = get_script_section(script, name='storage', cls=None, required=True)
+            expr = get_script_section(script, name='storage', cls=None, required=True)  # type: ignore
         elif address:
             return None
         else:

@@ -13,3 +13,4 @@ from pytezos.michelson.types.sapling import SaplingStateType, SaplingTransaction
 from pytezos.michelson.types.set import SetType
 from pytezos.michelson.types.sum import OrType
 from pytezos.michelson.types.ticket import TicketType
+from pytezos.michelson.types.chest import ChestType, ChestKeyType

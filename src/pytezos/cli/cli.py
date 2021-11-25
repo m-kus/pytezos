@@ -1,9 +1,8 @@
+import atexit
 import io
 import sys
 import tarfile
 import time
-import atexit
-import requests
 from glob import glob
 from os.path import abspath, dirname, exists, join, split
 from pprint import pformat
@@ -11,6 +10,8 @@ from typing import List, Optional
 
 import click
 import docker  # type: ignore
+import requests
+from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos import ContractInterface, __version__, pytezos
 from pytezos.cli.github import create_deployment, create_deployment_status
@@ -21,8 +22,6 @@ from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.sandbox.node import DOCKER_IMAGE
 from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU
-
-from testcontainers.core.generic import DockerContainer  # type: ignore
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {

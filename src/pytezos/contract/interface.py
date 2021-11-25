@@ -142,7 +142,7 @@ class ContractInterface(ContextMixin):
             shell=context.shell if context else None,
             key=context.key if context else None,
             script=dict(code=code_expr),
-            global_constants=context.global_constants if context else None
+            global_constants=context.global_constants if context else None,
         )
         return cls(context)
 
