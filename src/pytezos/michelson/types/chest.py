@@ -1,4 +1,4 @@
-from pytezos.michelson.types import BytesType
+from pytezos.michelson.types.core import BytesType
 
 
 class ChestType(BytesType, prim='chest'):
