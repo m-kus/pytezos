@@ -21,9 +21,7 @@ class JupyterInstructionsTest(TestCase):
 
     def _execute_code(self, code, parameter=None, storage=None) -> None:
         micheline = michelson_to_micheline(code)
-        sequence = MichelineSequence.match(micheline)
-
-        program = MichelsonProgram.create(sequence)(
+        program = MichelsonProgram.match(micheline)(
             'default', parameter or ParameterSection(UnitType()), storage or StorageSection(UnitType())
         )
         program.execute(self.stack, self.stdout, self.context)

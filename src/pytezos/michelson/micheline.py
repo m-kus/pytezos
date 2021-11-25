@@ -255,6 +255,16 @@ class MichelineSequence(Micheline):
         return cls([arg.execute(stack, stdout, context) for arg in cls.args])
 
 
+class GlobalConstant(Micheline, prim='constant', args_len=1):
+
+    @classmethod
+    def create_type(cls,
+                    args: List[Type['Micheline']],
+                    annots: Optional[list] = None,
+                    **kwargs) -> Type['Micheline']:
+        raise RuntimeError('Please, register global constants in advance using context helpers')
+
+
 class MichelineLiteral(Micheline):
 
     @classmethod

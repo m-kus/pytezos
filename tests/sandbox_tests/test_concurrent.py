@@ -45,7 +45,7 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
         self.client.context.protocol = self.client.context.get_protocol()
         txs = [
             contract.increment(i).send_async(
-                ttl=60,
+                ttl=120,
                 counter=counter + idx,
                 storage_limit=10,
                 gas_limit=50000,

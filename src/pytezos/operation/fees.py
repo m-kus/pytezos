@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional
 
 from pytezos.operation.forge import forge_operation
 
-# NOTE: Correct for PtEdo2Zk
 DEFAULT_CONSTANTS = dict(
     hard_gas_limit_per_operation=1040000,
     hard_storage_limit_per_operation=60000,
@@ -59,10 +58,11 @@ def default_gas_limit(
         'reveal': 1000,
         'delegation': 1000,
         'origination': constants['hard_gas_limit_per_operation'],
-        'transaction': constants['hard_gas_limit_per_operation'],
+        'transaction': (
+            constants['hard_gas_limit_per_operation']
+            if content.get('destination', '').startswith('KT')
+            else DEFAULT_TRANSACTION_GAS_LIMIT),
         'register_global_constant': constants['hard_gas_limit_per_operation']
-        if content.get('destination', '').startswith('KT')
-        else DEFAULT_TRANSACTION_GAS_LIMIT,
     }
     return values[content['kind']]
 
@@ -82,9 +82,10 @@ def default_storage_limit(
         'reveal': 0,
         'delegation': 0,
         'origination': constants['hard_storage_limit_per_operation'],
-        'transaction': constants['hard_storage_limit_per_operation'],
+        'transaction': (
+            constants['hard_storage_limit_per_operation']
+            if content.get('destination', '').startswith('KT')
+            else DEFAULT_TRANSACTION_STORAGE_LIMIT),
         'register_global_constant': constants['hard_storage_limit_per_operation']
-        if content.get('destination', '').startswith('KT')
-        else DEFAULT_TRANSACTION_STORAGE_LIMIT,
     }
     return values[content['kind']]

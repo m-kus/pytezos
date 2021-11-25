@@ -132,12 +132,17 @@ class ContractInterface(ContextMixin):
         :param context: optional execution context
         :rtype: ContractInterface
         """
-        program = MichelsonProgram.match(expression)
+        if context is not None:
+            code_expr = context.resolve_global_constants(expression)
+        else:
+            code_expr = expression
+        program = MichelsonProgram.match(code_expr)
         cls = type(ContractInterface.__name__, (ContractInterface,), dict(program=program))
         context = ExecutionContext(
             shell=context.shell if context else None,
             key=context.key if context else None,
-            script=dict(code=expression),
+            script=dict(code=code_expr),
+            global_constants=context.global_constants if context else None
         )
         return cls(context)
 

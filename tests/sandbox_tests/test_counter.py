@@ -44,7 +44,7 @@ class TransactionCounterTestCase(SandboxedNodeTestCase):
 
     def test_4_reuse_counter(self) -> None:
         self.client.transaction(destination=sandbox_addresses['bootstrap3'], amount=13) \
-            .send_async(ttl=60, counter=5, gas_limit=15000, storage_limit=0)  # override delayed tx
+            .send_async(ttl=120, counter=5, gas_limit=15000, storage_limit=0)  # override delayed tx
         pending_operations = self.client.shell.mempool.pending_operations()
         self.assertEqual(2, len(pending_operations['applied']))
         self.assertEqual(1, len(pending_operations['branch_delayed']))

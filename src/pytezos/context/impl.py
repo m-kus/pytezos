@@ -7,6 +7,7 @@ from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.logging import logger
 from pytezos.michelson.micheline import get_script_section, get_script_sections
+from pytezos.michelson.forge import forge_micheline, forge_script_expr
 from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
@@ -18,7 +19,8 @@ class ExecutionContext(AbstractContext):
 
     def __init__(self, amount=None, chain_id=None, protocol=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
-                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=None):
+                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=None,
+                 global_constants=None):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
@@ -58,6 +60,7 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps = {}
         self.tzt_big_maps = {}
+        self.global_constants = global_constants or {}
         self.debug = False
         self._sandboxed: Optional[bool] = None
         self.ipfs_gateway = (ipfs_gateway or DEFAULT_IPFS_GATEWAY).rstrip('/')
@@ -100,6 +103,7 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps.clear()
         self.tzt_big_maps.clear()
+        self.global_constants.clear()
 
     def set_counter(self, counter: int):
         self.counter = counter
@@ -183,25 +187,33 @@ class ExecutionContext(AbstractContext):
                 return None  # dummy callback
             else:
                 script = self.shell.contracts[address].script()
-                return get_script_section(script, name='parameter', cls=None, required=True)
-        return None if address else self.parameter_expr
+                expr = get_script_section(script, name='parameter', cls=None, required=True)
+        elif address:
+            return None
+        else:
+            expr = self.parameter_expr
+        return self.resolve_global_constants(expr)
 
     def get_storage_expr(self, address=None) -> Optional[dict]:
         if self.shell and address:
             script = self.shell.contracts[address].script()
-            return get_script_section(script, name='storage', cls=None, required=True)
-        return None if address else self.storage_expr
+            expr = get_script_section(script, name='storage', cls=None, required=True)
+        elif address:
+            return None
+        else:
+            expr = self.storage_expr
+        return self.resolve_global_constants(expr)
 
     def get_storage_value(self, address=None) -> Optional[dict]:
         if self.shell:
             return self.shell.head.context.contracts[address].storage()
-        return None if address else self.storage_value
+        return None if address else self.resolve_global_constants(self.storage_value)
 
     def get_code_expr(self):
-        return self.code_expr
+        return self.resolve_global_constants(self.code_expr)
 
     def get_views_expr(self) -> List[dict]:
-        return self.views_expr
+        return self.resolve_global_constants(self.views_expr)
 
     def get_view_expr(self, name, address=None) -> Optional[dict]:
         if address:
@@ -214,7 +226,8 @@ class ExecutionContext(AbstractContext):
             views = self.views_expr
 
         try:
-            return next(view for view in views if view['args'][0]['string'] == name)
+            expr = next(view for view in views if view['args'][0]['string'] == name)
+            return self.resolve_global_constants(expr)
         except (StopIteration, KeyError, IndexError):
             return None
 
@@ -408,3 +421,40 @@ class ExecutionContext(AbstractContext):
         if self.sandboxed:
             return MAX_OPERATIONS_TTL
         return DEFAULT_OPERATIONS_TTL
+
+    def register_global_constant(self, expression):
+        """ Register global constant
+        :param expression: Micheline expression
+        """
+        constant_hash = forge_script_expr(forge_micheline(expression))
+        self.global_constants[constant_hash] = expression
+
+    def resolve_global_constants(self, expression):
+        """ Replace global constants with their respectful values or throw an error if the constant is not defined
+        :param expression: Micheline expression
+        """
+        def _resolve_constant(node):
+            try:
+                constant_hash = node['args'][0]['string']
+            except (KeyError, IndexError) as e:
+                raise ValueError('Unexpected constant expression') from e
+            if constant_hash not in self.global_constants:
+                raise KeyError(f'Constant {constant_hash} is not defined')
+            return _resolve(self.global_constants[constant_hash])
+            # TODO: check if global constants are really recursive
+
+        def _resolve(node):
+            if isinstance(node, dict):
+                if node.get('prim') == 'constant':
+                    return _resolve_constant(node)
+                elif node.get('args'):
+                    args = list(map(_resolve, node['args']))
+                    return {k: v if k != 'args' else args for k, v in node.items()}
+                else:
+                    return node
+            elif isinstance(node, list):
+                return list(map(_resolve, node))
+            else:
+                return node
+
+        return _resolve(expression)
