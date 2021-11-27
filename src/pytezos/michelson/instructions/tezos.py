@@ -211,7 +211,8 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
         parameter, amount, destination = cast(Tuple[MichelsonType, MutezType, ContractType], stack.pop3())
         amount.assert_type_equal(MutezType)
         assert isinstance(destination, ContractType), f'expected contract, got {destination.prim}'
-        parameter.assert_type_equal(destination.args[0])
+        param_type = destination.args[0]
+        parameter.assert_type_equal(param_type)
 
         ep_type = get_entrypoint_type(context, destination.get_entrypoint(), address=destination.get_address())
         if ep_type:
@@ -222,7 +223,8 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
             destination=destination.get_address(),
             amount=int(amount),
             entrypoint=destination.get_entrypoint(),
-            parameter=parameter
+            value=parameter.to_micheline_value(),
+            param_type=param_type
         )
         stack.push(transaction)
         stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))  # type: ignore

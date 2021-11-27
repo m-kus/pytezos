@@ -1,4 +1,4 @@
-from typing import Optional, Type
+from typing import Optional, Type, Any
 
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.types.base import MichelsonType
@@ -49,7 +49,7 @@ class OperationType(MichelsonType, prim='operation'):
         return cls(content)
 
     @classmethod
-    def transaction(cls, source: str, destination: str, amount: int, entrypoint: str, parameter: MichelsonType) \
+    def transaction(cls, source: str, destination: str, amount: int, entrypoint: str, value: Any, param_type: Type[MichelsonType]) \
             -> 'OperationType':
         content = {
             'kind': 'transaction',
@@ -58,10 +58,10 @@ class OperationType(MichelsonType, prim='operation'):
             'amount': str(amount),
             'parameters': {
                 'entrypoint': entrypoint,
-                'value': parameter.to_micheline_value()
+                'value': value
             }
         }
-        return cls(content, ty=type(parameter))
+        return cls(content, ty=param_type)
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         kind = self.content['kind']

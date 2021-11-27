@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.1 - [unreleased]
+
+### Fixed
+
+* Results returned from the callback views are now fully-annotated (based on the callback contract type)
+
 ## 3.3.0 - 2021-11-26
 
 ### Added
