@@ -1,0 +1,4 @@
+parameter nat ;
+storage nat ;
+code { CAR ; SELF_ADDRESS; SWAP ; VIEW "add" nat ; ASSERT_SOME ; NIL operation ; PAIR } ;
+view "add" nat nat { UNPAIR ; ADD } ;

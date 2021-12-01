@@ -75,6 +75,9 @@ class AbstractContext:
     def get_code_expr(self):
         raise NotImplementedError
 
+    def get_view_result(self, name, address=None) -> Optional:  # type: ignore
+        raise NotImplementedError
+
     def get_view_expr(self, name, address=None) -> Optional:  # type: ignore
         raise NotImplementedError
 

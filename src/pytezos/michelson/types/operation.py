@@ -1,4 +1,4 @@
-from typing import Optional, Type, Any
+from typing import Any, Optional, Type
 
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.types.base import MichelsonType

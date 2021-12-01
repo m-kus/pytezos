@@ -1,9 +1,9 @@
 from pprint import pformat
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.contract.call import ContractCall, ContractCallResult, skip_nones
+from pytezos.contract.call import ContractCallResult, skip_nones
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.micheline import MichelsonRuntimeError
@@ -233,18 +233,23 @@ class ContractViewCall(ContextMixin):
             raise error
         return storage  # type: ignore
 
-    def onchain_view(self, storage=None, balance=None):
+    def onchain_view(self, storage=None, balance=None, view_results: Optional[Dict[str, Any]] = None):
         """Get return value of an on-chain view.
 
         :param storage: initial storage as Python object, leave None if you want to generate a dummy one
         :param balance: patch BALANCE
+        :param view_results: patch VIEW calls (keys must be string "address%view", values => Python objects)
         :returns: Decoded return value
         """
         ret, stdout, error = Interpreter.run_view(
             name=self.name,
             parameter=self.param_expr,
             storage=self._encode_storage(storage),
-            context=self._spawn_context(balance=balance, script={**self.context.script, 'storage': self._encode_storage(storage)}),
+            context=self._spawn_context(
+                balance=balance,
+                script={**self.context.script, 'storage': self._encode_storage(storage)},  # type: ignore
+                view_results=view_results
+            ),
         )
         if error:
             logger.debug('\n'.join(stdout))

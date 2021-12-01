@@ -15,6 +15,7 @@
   - Multiple `view` sections are correctly parsed/unparsed
   - in REPL `VIEW` instruction works both with self-recursive calls and on-chain contracts (if shell is attached)
   - `ContractInterface` provides a seamless interface to views (works pretty much the same as with off-chain views)
+  - Ability to patch VIEW results when using `interpret()` or `onchain_view()`
 * Partial support for global constants:
   - added new operation kind `register_global_constant`
   - `ExecutionContext` allows to register constants as well

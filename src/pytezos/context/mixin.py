@@ -1,5 +1,5 @@
 from os.path import exists, expanduser
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from pytezos.context.impl import DEFAULT_IPFS_GATEWAY, ExecutionContext  # type: ignore
 from pytezos.crypto.encoding import is_pkh, is_public_key
@@ -125,6 +125,7 @@ class ContextMixin(metaclass=InlineDocstring):
         script: Optional[dict] = None,
         ipfs_gateway: Optional[str] = None,
         balance: Optional[int] = None,
+        view_results: Optional[Dict[str, Any]] = None
     ) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
@@ -168,5 +169,6 @@ class ContextMixin(metaclass=InlineDocstring):
             script=script or self.context.script,
             mode=mode or self.context.mode,
             ipfs_gateway=ipfs_gateway,
-            balance=balance or self.context.balance
+            balance=balance or self.context.balance,
+            view_results=view_results
         )

@@ -1,13 +1,13 @@
 from datetime import datetime
 from itertools import chain
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.logging import logger
 from pytezos.michelson.forge import forge_micheline, forge_script_expr
-from pytezos.michelson.micheline import get_script_section, get_script_sections, MichelineT
+from pytezos.michelson.micheline import MichelineT, get_script_section, get_script_sections
 from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
@@ -20,7 +20,7 @@ class ExecutionContext(AbstractContext):
     def __init__(self, amount=None, chain_id=None, protocol=None, source=None, sender=None, balance=None,
                  block_id=None, now=None, level=None, voting_power=None, total_voting_power=None,
                  key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=None,
-                 global_constants=None):
+                 global_constants=None, view_results=None):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
@@ -60,6 +60,7 @@ class ExecutionContext(AbstractContext):
         self.balance_update = 0
         self.big_maps = {}
         self.tzt_big_maps = {}
+        self.view_results = view_results or {}
         self.global_constants = global_constants or {}
         self.debug = False
         self._sandboxed: Optional[bool] = None
@@ -211,6 +212,10 @@ class ExecutionContext(AbstractContext):
 
     def get_code_expr(self):
         return self.resolve_global_constants(self.code_expr)
+
+    def get_view_result(self, name, address=None) -> Optional[Any]:
+        key = name if address is None else f'{address}%{name}'
+        return self.view_results.get(key)
 
     def get_views_expr(self) -> List[dict]:
         return self.resolve_global_constants(self.views_expr)

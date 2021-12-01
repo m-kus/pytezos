@@ -279,29 +279,34 @@ class ViewInstruction(MichelsonInstruction, prim='VIEW', args_len=2):
 
         return_ty = cast(Type[MichelsonType], cls.args[1])
 
-        try:
-            view_expr = context.get_view_expr(name, address=address)
-            if view_expr is None:
-                raise MichelsonRuntimeError(f'Failed to load view {str(view_address)}%{name}')
-
-            view_ty = ViewSection.match(view_expr)
-            return_ty.assert_type_equal(view_ty.args[2], message=f'view {name} return type')
-        except (MichelsonRuntimeError, AssertionError) as e:
-            stdout.append(f'VIEW: {str(e)}')
-            res = OptionType.none(return_ty)
+        result = context.get_view_result(address=address, name=name)
+        if result is not None:
+            logging.info('Using patched VIEW result')
+            res = OptionType.from_some(return_ty.from_python_object(result))
         else:
-            storage_expr = context.get_storage_value(address)
-            storage_ty = StorageSection.match(context.get_storage_expr())
-            storage_value = storage_ty.from_micheline_value(storage_expr).item
+            try:
+                view_expr = context.get_view_expr(name, address=address)
+                if view_expr is None:
+                    raise MichelsonRuntimeError(f'Failed to load view {str(view_address)}%{name}')
 
-            parameter = PairType.from_comb([input_value, storage_value])
-            view_stack = MichelsonStack([parameter])
-            # FIXME: need to patch context.balance
-            view_code = cast(MichelineSequence, view_ty.args[3])
-            view_code.execute(view_stack, stdout, context)
-            if len(view_stack) != 1:
-                raise MichelsonRuntimeError('Expected single item on the stack, got', view_stack)
-            res = OptionType.from_some(view_stack.pop1())
+                view_ty = ViewSection.match(view_expr)
+                return_ty.assert_type_equal(view_ty.args[2], message=f'view {name} return type')
+            except (MichelsonRuntimeError, AssertionError) as e:
+                stdout.append(f'VIEW: {str(e)}')
+                res = OptionType.none(return_ty)
+            else:
+                storage_expr = context.get_storage_value(address)
+                storage_ty = StorageSection.match(context.get_storage_expr())
+                storage_value = storage_ty.from_micheline_value(storage_expr).item
+
+                parameter = PairType.from_comb([input_value, storage_value])
+                view_stack = MichelsonStack([parameter])
+                # FIXME: need to patch context.balance
+                view_code = cast(MichelineSequence, view_ty.args[3])
+                view_code.execute(view_stack, stdout, context)
+                if len(view_stack) != 1:
+                    raise MichelsonRuntimeError('Expected single item on the stack, got', view_stack)
+                res = OptionType.from_some(view_stack.pop1())
 
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [input_value, view_address], [res]))  # type: ignore

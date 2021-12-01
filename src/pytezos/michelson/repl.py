@@ -106,7 +106,7 @@ class Interpreter:
             sender=sender,
             balance=balance,
             block_id=block_id,
-            script=dict(code=script),
+            script=dict(code=script, storage=storage),
             **kwargs,
         )
         stack = MichelsonStack()
@@ -178,6 +178,7 @@ class Interpreter:
             block_id=context.block_id,
             script=context.script,
             address=context.address,
+            view_results=context.view_results,
         )
         stack = MichelsonStack()
         stdout = []  # type: ignore
