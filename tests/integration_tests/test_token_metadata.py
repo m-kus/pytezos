@@ -3,7 +3,6 @@ from unittest import TestCase, skip
 from pytezos import pytezos
 
 
-@skip
 class TestTokenMetadata(TestCase):
 
     def test_from_storage(self):

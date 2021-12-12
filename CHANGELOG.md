@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.2 - 2021-12-12
+
+### Fixed
+
+* Regression in offline view behavior for storage with bigmaps
+
 ## 3.3.1 - 2021-12-01
 
 ### Added

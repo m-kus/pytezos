@@ -212,10 +212,15 @@ class ContractViewCall(ContextMixin):
     def storage_view(self, storage=None):
         """Get return value of an off-chain view.
 
-        :param storage: initial storage as Python object, leave None if you want to generate a dummy one
+        :param storage: override current contract storage (as Python object)
         :returns: Decoded return value
         """
-        parameters = format_view_params(param_expr=self.param_expr, storage_expr=self._encode_storage(storage))
+        if storage is None:
+            storage_expr = self.context.storage_value
+        else:
+            storage_expr = self._encode_storage(storage)
+
+        parameters = format_view_params(param_expr=self.param_expr, storage_expr=storage_expr)
         script = format_view_script(
             param_ty_expr=self.param_ty_expr,
             storage_ty_expr=self.context.storage_expr,
@@ -241,14 +246,19 @@ class ContractViewCall(ContextMixin):
         :param view_results: patch VIEW calls (keys must be string "address%view", values => Python objects)
         :returns: Decoded return value
         """
+        if storage is None:
+            storage_expr = self.context.storage_value
+        else:
+            storage_expr = self._encode_storage(storage)
+
         ret, stdout, error = Interpreter.run_view(
             name=self.name,
             parameter=self.param_expr,
-            storage=self._encode_storage(storage),
+            storage=storage_expr,
             context=self._spawn_context(
                 balance=balance,
                 script={**self.context.script, 'storage': self._encode_storage(storage)},  # type: ignore
-                view_results=view_results
+                view_results=view_results,
             ),
         )
         if error:

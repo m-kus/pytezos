@@ -26,6 +26,8 @@ nodes = {
     'localhost': ['http://127.0.0.1:8732/'],
     'florencenet': ['https://testnet-tezos.giganode.io'],
     'granadanet': ['https://rpc.tzkt.io/granadanet'],
+    'kaizen': ['https://rpc.tzkt.io/granadanet'],
+    'kaizennet': ['https://rpc.tzkt.io/granadanet'],
     'hangzhounet': ['https://rpc.tzkt.io/hangzhou2net'],
 }
 keys = {
