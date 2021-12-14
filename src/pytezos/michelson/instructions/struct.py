@@ -67,7 +67,7 @@ class GetInstruction(MichelsonInstruction, prim='GET'):
         src.assert_type_in(MapType, BigMapType)
         val = src.get(key, dup=True)
         if val is None:
-            res = OptionType.none(src.args[0])
+            res = OptionType.none(src.args[1])
         else:
             res = OptionType.from_some(val)
         stack.push(res)
