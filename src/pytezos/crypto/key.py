@@ -290,7 +290,7 @@ class Key(metaclass=InlineDocstring):
 
     @classmethod
     def from_faucet(cls, source: Union[str, dict]) -> 'Key':
-        """Import key from a faucet file: https://faucet.tzalpha.net/
+        """Import key from a faucet file: https://teztnets.xyz/
 
         :param source: path to the json file
         :rtype: Key
@@ -307,7 +307,7 @@ class Key(metaclass=InlineDocstring):
             mnemonic=data['mnemonic'],
             passphrase=data.get('password', ''),
             email=data.get('email', ''),
-            activation_code=data['secret']
+            activation_code=data['activation_code']
         )
         if key.public_key_hash() != data['pkh']:
             raise ValueError('Failed to import')

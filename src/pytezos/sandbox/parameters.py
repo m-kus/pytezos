@@ -28,7 +28,7 @@ sandbox_commitment = {
         "split",
         "fall",
     ],
-    "secret": "7375ef222cc038001b6c8fb768246c86e994745b",
+    "activation_code": "7375ef222cc038001b6c8fb768246c86e994745b",
     "amount": "38323962971",
     "pkh": "tz1W86h1XuWy6awbNUTRUgs6nk8q5vqXQwgk",
     "password": "ZuPOpZgMNM",
