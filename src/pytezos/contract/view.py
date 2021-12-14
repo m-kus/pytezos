@@ -153,6 +153,16 @@ class ContractViewCall(ContextMixin):
             logger.info(self.__doc__)
             raise ValueError(f'Unexpected storage object: {pformat(storage)}', *e.args) from e
 
+    def _get_storage(self, storage=None):
+        if storage is None:
+            storage_expr = self.context.get_storage_value(self.address)
+            if storage_expr is None:
+                return self._encode_storage()
+            else:
+                return storage_expr
+        else:
+            return self._encode_storage(storage)
+
     def _prepare_query(
         self,
         parameters=None,
@@ -215,12 +225,7 @@ class ContractViewCall(ContextMixin):
         :param storage: override current contract storage (as Python object)
         :returns: Decoded return value
         """
-        if storage is None:
-            storage_expr = self.context.storage_value
-        else:
-            storage_expr = self._encode_storage(storage)
-
-        parameters = format_view_params(param_expr=self.param_expr, storage_expr=storage_expr)
+        parameters = format_view_params(param_expr=self.param_expr, storage_expr=self._get_storage(storage))
         script = format_view_script(
             param_ty_expr=self.param_ty_expr,
             storage_ty_expr=self.context.storage_expr,
@@ -241,20 +246,15 @@ class ContractViewCall(ContextMixin):
     def onchain_view(self, storage=None, balance=None, view_results: Optional[Dict[str, Any]] = None):
         """Get return value of an on-chain view.
 
-        :param storage: initial storage as Python object, leave None if you want to generate a dummy one
+        :param storage: override current contract storage (as Python object)
         :param balance: patch BALANCE
         :param view_results: patch VIEW calls (keys must be string "address%view", values => Python objects)
         :returns: Decoded return value
         """
-        if storage is None:
-            storage_expr = self.context.storage_value
-        else:
-            storage_expr = self._encode_storage(storage)
-
         ret, stdout, error = Interpreter.run_view(
             name=self.name,
             parameter=self.param_expr,
-            storage=storage_expr,
+            storage=self._get_storage(storage),
             context=self._spawn_context(
                 balance=balance,
                 script={**self.context.script, 'storage': self._encode_storage(storage)},  # type: ignore

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.3 - 2021-12-14
+
+### Fixed
+
+* Stale contract storage passed to ContractViewCall.storage_view
+
 ## 3.3.2 - 2021-12-12
 
 ### Added
