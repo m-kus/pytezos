@@ -25,7 +25,6 @@ executor: Optional[ThreadPoolExecutor] = None
 
 
 class SandboxedNodeContainer(DockerContainer):
-
     def __init__(self, image=DOCKER_IMAGE, port=TEZOS_NODE_PORT):
         super(SandboxedNodeContainer, self).__init__(image, remove=True)
         self.with_bind_ports(TEZOS_NODE_PORT, port)
@@ -44,21 +43,10 @@ class SandboxedNodeContainer(DockerContainer):
         return False
 
     def activate(self, protocol=LATEST, reset=False):
-        return self.client \
-            .using(key='dictator') \
-            .activate_protocol(protocol) \
-            .fill(block_id='genesis' if reset else 'head') \
-            .sign() \
-            .inject()
+        return self.client.using(key='dictator').activate_protocol(protocol).fill(block_id='genesis' if reset else 'head').sign().inject()
 
     def bake(self, key='bootstrap1', min_fee: int = 0):
-        return self.client\
-            .using(key=key)\
-            .bake_block(min_fee)\
-            .fill()\
-            .work()\
-            .sign()\
-            .inject()
+        return self.client.using(key=key).bake_block(min_fee).fill().work().sign().inject()
 
     def get_client(self, key='bootstrap2'):
         return self.client.using(key=key)
@@ -146,13 +134,11 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
         global executor  # pylint: disable=global-statement
         if not executor:
             executor = ThreadPoolExecutor(1)
+        global node_container
+        if not node_container:
+            raise RuntimeError('sandboxed node container is not created')
         cls.exit_event = Event()  # type: ignore
-        cls.baker = executor.submit(
-            cls.autobake,
-            cls.TIME_BETWEEN_BLOCKS,
-            node_container.url,
-            cls.BAKER_KEY,
-            cls.exit_event)
+        cls.baker = executor.submit(cls.autobake, cls.TIME_BETWEEN_BLOCKS, node_container.url, cls.BAKER_KEY, cls.exit_event)
 
     @classmethod
     def tearDownClass(cls) -> None:

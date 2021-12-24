@@ -20,7 +20,7 @@ from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-from pytezos.sandbox.node import SandboxedNodeContainer, DOCKER_IMAGE, TEZOS_NODE_PORT
+from pytezos.sandbox.node import DOCKER_IMAGE, TEZOS_NODE_PORT, SandboxedNodeContainer
 from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Type, Union, cast
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
 from pytezos.michelson.types import OrType
-from pytezos.michelson.types.adt import wrap_parameters, wrap_or
+from pytezos.michelson.types.adt import wrap_or, wrap_parameters
 from pytezos.michelson.types.base import MichelsonType, parse_name
 from pytezos.michelson.types.core import Unit
 
