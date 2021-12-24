@@ -160,7 +160,7 @@ class ContractInterface(ContextMixin):
     @classmethod
     @deprecated(
         deprecated_in='3.0.0',
-        removed_in='3.1.0',
+        removed_in='4.0.0',
         details='use one of `from_file`, `from_michelson`, `from_micheline`, `from_url`',
     )
     def create_from(cls, source):
@@ -197,7 +197,7 @@ class ContractInterface(ContextMixin):
         with open(path, 'w+') as f:
             f.write(self.to_michelson())
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `.storage[path][to][big_map][key]()` instead')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `.storage[path][to][big_map][key]()` instead')
     def big_map_get(self, path):
         """Get BigMap entry as Python object by plain key and block height.
 
@@ -414,22 +414,22 @@ class ContractInterface(ContextMixin):
         return getattr(self, root_name)
 
     @property  # type: ignore
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='access `ContractInterface` directly')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='access `ContractInterface` directly')
     def contract(self) -> 'ContractInterface':
         return self
 
     @property  # type: ignore
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `to_michelson()` instead')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `to_michelson()` instead')
     def text(self) -> str:
         return self.to_michelson()
 
     @property  # type: ignore
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `to_micheline()` instead')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `to_micheline()` instead')
     def code(self):
         return self.to_micheline()
 
     @property  # type: ignore
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `default()` instead')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `default()` instead')
     def call(self) -> ContractEntrypoint:
         return self.parameter
 
@@ -480,6 +480,6 @@ class ContractInterface(ContextMixin):
         )
 
 
-@deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use `ContractInterface` instead')
+@deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `ContractInterface` instead')
 class Contract(ContractInterface):
     pass

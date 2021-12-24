@@ -74,10 +74,9 @@ but if you feel lucky you can try to install natively:
 ### From PyPi
 
 ```shell
-$ pip install wheel setuptools
+$ pip install wheel setuptools pkginfo cryptography
 $ pip install pytezos
 ```
-
 
 ### [Google Colab](https://colab.research.google.com)
 

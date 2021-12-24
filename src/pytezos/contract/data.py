@@ -87,6 +87,6 @@ class ContractData(ContextMixin):
         """
         return type(self.data).dummy(self.context).to_python_object(lazy_diff=True)
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0')
     def default(self):
         return self.dummy()

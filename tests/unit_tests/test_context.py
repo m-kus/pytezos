@@ -1,9 +1,8 @@
-from pytezos.rpc.shell import ShellQuery
 from unittest import TestCase
 from unittest.mock import patch
-from parameterized import parameterized
 
 from pytezos.context.impl import ExecutionContext
+from pytezos.rpc.shell import ShellQuery
 
 
 class TestContext(TestCase):

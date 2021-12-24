@@ -246,7 +246,7 @@ class ContractCall(ContextMixin):
         assert len(results) == 1
         return results[0]
 
-    @deprecated(deprecated_in='3.0.0', removed_in='3.1.0', details='use either `run_code` or `run_operation`')
+    @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use either `run_code` or `run_operation`')
     def result(self, storage=None, source=None, sender=None, gas_limit=None) -> ContractCallResult:
         """Simulate operation and parse the result.
 
@@ -287,6 +287,6 @@ class ContractCall(ContextMixin):
             raise Exception('Multiple internal operations, not sure which one to pick')
         return operations[0]
 
-    @deprecated(deprecated_in='3.0.4', removed_in='3.1.0', details='Use callback_view instead')
+    @deprecated(deprecated_in='3.0.4', removed_in='4.0.0', details='Use callback_view instead')
     def view(self):
         return self.callback_view()

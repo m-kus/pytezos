@@ -1,15 +1,18 @@
 import inspect
 import re
+import sys
 from functools import update_wrapper
 from typing import Optional
+from functools import lru_cache
 
 
+@lru_cache(maxsize=1)
 def is_interactive() -> bool:
     try:
         _ = get_ipython().__class__.__name__  # type: ignore
         return True
     except NameError:
-        return False
+        return any(lib in sys.modules for lib in ['pytest', 'unittest', 'nose'])
 
 
 def get_attr_docstring(class_type, attr_name) -> Optional[str]:
@@ -73,14 +76,18 @@ def inline_doc(method):
         doc.append(re.sub(r' {3,}', '', method.__doc__))
 
     class CustomReprDescriptor:
-        def __get__(self, instance, owner):
+        def __get__(self, obj, objtype=None):
             class MethodWrapper:
                 def __init__(self):
-                    self.class_instance = instance
+                    self.obj = obj
                     self.doc = '\n'.join(doc)
 
                 def __call__(self, *args, **kwargs):
-                    return method(self.class_instance, *args, **kwargs)
+                    if self.obj is None:
+                        # it wasn't the case prior to 3.10: https://bugs.python.org/issue43682
+                        return method(*args, **kwargs)
+                    else:
+                        return method(self.obj, *args, **kwargs)
 
                 def __repr__(self):
                     return self.doc
