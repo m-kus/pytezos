@@ -8,6 +8,7 @@
 * Incorrect wrapping of static methods while injecting jupyter docs (py3.10)
 * Unable to call intermediate entrypoints from the contract interfaceE
 * Sandboxed node wasn't exposed at localhost causing connection issues on MacOS and Windows
+* Big map key of nested or/pair type wasn't handled correctly
 
 ### Changed
 

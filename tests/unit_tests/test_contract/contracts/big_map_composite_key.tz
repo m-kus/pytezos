@@ -1,0 +1,24 @@
+{ parameter address ;
+  storage (big_map (or (address %fa12) (pair %fa2 (address %address) (nat %id))) nat) ;
+  code { PUSH address "KT1LTqpmGJ11EebMVWAzJ7DWd9msgExvHM94" ;
+         SWAP ;
+         DROP ;
+         EMPTY_BIG_MAP (or address (pair address nat)) nat ;
+         PUSH nat 42 ;
+         PUSH nat 0 ;
+         DUP 4 ;
+         PAIR ;
+         RIGHT address ;
+         SWAP ;
+         SOME ;
+         SWAP ;
+         UPDATE ;
+         PUSH nat 7 ;
+         DIG 2 ;
+         LEFT (pair address nat) ;
+         SWAP ;
+         SOME ;
+         SWAP ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }
