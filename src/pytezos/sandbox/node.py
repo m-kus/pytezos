@@ -31,6 +31,11 @@ class SandboxedNodeContainer(DockerContainer):
         self.url = f'http://localhost:{port}'
         self.client = PyTezosClient().using(shell=self.url, key='bootstrap2')
 
+    def start(self):
+        super(SandboxedNodeContainer, self).start()
+        if self.get_wrapped_container() is None:
+            raise RuntimeError('Failed to create a container')
+
     def wait_for_connection(self, max_attempts=MAX_ATTEMPTS, attempt_delay=ATTEMPT_DELAY) -> bool:
         attempts = max_attempts
         while attempts > 0:

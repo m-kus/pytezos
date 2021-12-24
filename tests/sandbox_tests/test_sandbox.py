@@ -6,8 +6,8 @@ from pytezos.sandbox.parameters import sandbox_addresses, LATEST
 class SandboxTestCase(SandboxedNodeTestCase):
 
     def test_1_activate_protocol(self) -> None:
-        block = self.client.shell.block()
-        self.assertIsNotNone(block['header'].get('content'))
+        header = self.client.shell.head.header()
+        self.assertIsNotNone(header.get('content'))
 
     def test_2_bake_empty_block(self) -> None:
         self.bake_block()

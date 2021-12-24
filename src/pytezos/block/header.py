@@ -77,6 +77,7 @@ class BlockHeader(ContextMixin):
     def bake_block(cls, context: ExecutionContext, min_fee: int = 0) -> 'BlockHeader':
         """Create call to bake new block
 
+        :param context: Execution context
         :param min_fee: Minimum fee of transaction to be included in block
         """
         pending_operations = context.shell.mempool.pending_operations()  # type: ignore
