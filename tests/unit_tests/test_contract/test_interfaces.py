@@ -61,3 +61,7 @@ class TestInterfaces(TestCase):
     def test_top_field_annot(self):
         ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'top_field_annot.tz'))
         print(ci.buyTicket)
+
+    def test_or_entry(self):
+        ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'or_entry.tz'))
+        ci.collect(collectRequest=dict(swap_id=0, token_amount=0))

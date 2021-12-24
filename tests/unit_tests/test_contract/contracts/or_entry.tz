@@ -1,0 +1,8 @@
+parameter (or (unit %default)
+			  (or %collect
+				(pair %collectRequest (nat %swap_id) (nat %token_amount))
+				(pair %collectCallback
+				   (nat %swap_id)
+				   (pair (nat %token_amount) (pair %royalties_info (address %issuer) (nat %royalties)))))) ;
+storage unit ;
+code { CDR ; NIL operation ; PAIR }

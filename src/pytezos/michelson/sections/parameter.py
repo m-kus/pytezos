@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Type, Union, cast
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
 from pytezos.michelson.types import OrType
-from pytezos.michelson.types.adt import wrap_parameters
+from pytezos.michelson.types.adt import wrap_parameters, wrap_or
 from pytezos.michelson.types.base import MichelsonType, parse_name
 from pytezos.michelson.types.core import Unit
 
@@ -113,14 +113,20 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             entrypoint = py_obj
             py_obj = {entrypoint: Unit}
         else:
-            assert isinstance(py_obj, dict) and len(py_obj) == 1, \
-                f'expected dict with a single key, got {type(py_obj).__name__} `{py_obj}`'
+            if not isinstance(py_obj, dict) or len(py_obj) != 1:
+                raise TypeError(f'expected dict with a single key, got {type(py_obj).__name__} `{py_obj}`')
             entrypoint = next(iter(py_obj))
+
         if entrypoint == cls.root_name:
             item = cls.args[0].from_python_object(py_obj[entrypoint])
         else:
-            assert issubclass(cls.args[0], OrType), f'expected `{cls.root_name}`, got `{entrypoint}`'
-            item = cls.args[0].from_python_object(py_obj)
+            if not issubclass(cls.args[0], OrType):
+                raise TypeError(f'Unexpected entrypoint `{entrypoint}`: parameter is not of sum type')
+            _, key_to_path, _ = cls.args[0].get_type_layout(infer_names=True, entrypoints=True)
+            if not key_to_path:
+                raise TypeError('sum type has to be named (in the scope of PyTezos)')
+            item = cls.args[0].from_python_object(wrap_or(py_obj[entrypoint], key_to_path[entrypoint]))
+
         return cls(item)
 
     def to_micheline_value(self, mode='readable', lazy_diff=None):
