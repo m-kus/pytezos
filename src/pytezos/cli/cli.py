@@ -20,7 +20,7 @@ from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-from pytezos.sandbox.node import DOCKER_IMAGE
+from pytezos.sandbox.node import SandboxedNodeContainer, DOCKER_IMAGE, TEZOS_NODE_PORT
 from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
@@ -322,7 +322,7 @@ def smartpy_compile(
 @cli.command(help='Run containerized sandbox node')
 @click.option('--image', type=str, help='Docker image to use', default=DOCKER_IMAGE)
 @click.option('--protocol', type=click.Choice(['edo', 'florence', 'hangzhou']), help='Protocol to use', default='hangzhou')
-@click.option('--port', '-p', type=int, help='Port to expose', default=8732)
+@click.option('--port', '-p', type=int, help='Port to expose', default=TEZOS_NODE_PORT)
 @click.option('--interval', '-i', type=float, help='Interval between baked blocks (in seconds)', default=1.0)
 @click.option('--blocks', '-b', type=int, help='Number of blocks to bake before exit')
 @click.pass_context
@@ -340,41 +340,25 @@ def sandbox(
         'hangzhou': HANGZHOU,
     }[protocol]
 
-    container = DockerContainer(image)
-    if port:
-        container.ports[8732] = port
+    with SandboxedNodeContainer(image=image, port=port) as node:
+        if not node.wait_for_connection():
+            raise TimeoutError('Failed to connect to the sandboxed node')
 
-    container.start()
-    atexit.register(container.stop)
+        logger.info('Activating protocol %s...', protocol_hash)
+        node.activate(protocol_hash)
 
-    container_id = container.get_wrapped_container().id
-    host = container.get_docker_client().bridge_ip(container_id)
-    client = pytezos.using(key='bootstrap1', shell=f'http://{host}:8732')
-
-    while True:
-        try:
-            client.shell.node.get("/version/")
-            break
-        except requests.exceptions.ConnectionError:
-            time.sleep(0.1)
-
-    logger.info('Activating protocol %s...', protocol_hash)
-    client.using(key='dictator').activate_protocol(protocol_hash).fill().sign().inject()
-
-    blocks_baked = 0
-    while True:
-        try:
-            logger.info('Baking block %s...', blocks_baked)
-            block_hash = client.bake_block().fill().work().sign().inject()
-            logger.info('Baked block: %s', block_hash)
-            blocks_baked += 1
-
-            if blocks and blocks_baked == blocks:
+        blocks_baked = 0
+        while True:
+            try:
+                logger.info('Baking block %s...', blocks_baked)
+                block_hash = node.bake()
+                logger.info('Baked block: %s', block_hash)
+                blocks_baked += 1
+                if blocks and blocks_baked == blocks:
+                    break
+                time.sleep(interval)
+            except KeyboardInterrupt:
                 break
-
-            time.sleep(interval)
-        except KeyboardInterrupt:
-            break
 
 
 @cli.command(help='Update Ligo compiler (docker pull ligolang/ligo)')

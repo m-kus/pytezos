@@ -26,7 +26,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-attrs = "^20.3.0"
+attrs = "^21.2.0"
 base58 = "^1.0.3"
 bson = "^0.5.10"
 cached-property = "^1.5.2"
@@ -53,7 +53,7 @@ secp256k1 = "0.13.2"
 simplejson = "*"
 strict_rfc3339 = "0.7"
 tabulate = "^0.8.9"
-testcontainers = "^3.2.0"
+testcontainers = "^3.4.2"
 tqdm = "*"
 typing-extensions = "^3.7.4"
 

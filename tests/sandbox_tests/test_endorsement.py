@@ -11,7 +11,7 @@ class TransactionCounterTestCase(SandboxedNodeTestCase):
     def test_endorsement(self):
         self.bake_block()
 
-        client = self.get_client().using(key='bootstrap1')
+        client = self.get_client(key='bootstrap1')
         level = client.shell.head.level()
         endorsement_with_slot = client.endorsement(level).fill().sign().with_slot()
 

@@ -9,13 +9,13 @@ logging.basicConfig(level=logging.DEBUG)
 class TransactionCounterTestCase(SandboxedNodeTestCase):
 
     def test_1_activate_account(self) -> None:
-        client = self.get_client().using(key=sandbox_commitment)
+        client = self.get_client(key=sandbox_commitment)
         client.activate_account().autofill().sign().inject()
         self.bake_block()
         self.assertEqual('100500000000', client.account()['balance'])
 
     def test_2_reveal_pk_and_send_tez(self) -> None:
-        client = self.get_client().using(key=sandbox_commitment)
+        client = self.get_client(key=sandbox_commitment)
         client.reveal().transaction(destination=sandbox_addresses['bootstrap2'], amount=42) \
             .autofill().sign().inject()
         self.bake_block()
