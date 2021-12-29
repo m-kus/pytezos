@@ -23,7 +23,7 @@ update:
 
 install:
 	git submodule update --init  || true
-	poetry install --remove-untracked `if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
+	poetry install `if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
 
 install-kernel:
 	poetry run python -m michelson_kernel install
