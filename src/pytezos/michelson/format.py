@@ -123,5 +123,5 @@ def micheline_to_michelson(data, inline=False, wrap=False) -> str:
         else:
             return res
     except (KeyError, IndexError, TypeError) as e:
-        logger.info(data, compact=True)
+        logger.info(data)
         raise MichelsonFormatterError(e.args)

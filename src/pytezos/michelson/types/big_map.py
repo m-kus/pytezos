@@ -185,8 +185,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         }
         if action == 'alloc':
             key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
-            diff['key_type'] = key_type
-            diff['value_type'] = val_type
+            diff['key_type'] = key_type  # type: ignore
+            diff['value_type'] = val_type  # type: ignore
         elif action == 'copy':
             pass  # TODO:
 

@@ -8,6 +8,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10' ]
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
@@ -17,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.7.x'
+        python-version: ${{ matrix.python-version }}
     - uses: snok/install-poetry@v1.1.1
     - name: Install dependencies
       run: |
