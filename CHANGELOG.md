@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.3.5 - 2022-02-27
+
+### Fixed
+
+* Metadata big map can be located in a nested structure, not necessarily on the top-level (as per TZIP-16)
+
 ## 3.3.4 - 2021-12-23
 
 ### Fixed

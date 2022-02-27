@@ -15,3 +15,8 @@ class TestMetadata(TestCase):
         contract = client.contract("KT1Tg6WFuTU47Z8rPeBhDbgx1DmX1SWCZcZq")
         balance = contract.metadata.getBalance(("tz1WkYQMi1LSvge2ksaWtx5t4eqqLqgEskUM", 0)).storage_view()
         assert int(balance) > 0
+
+    def test_domains(self):
+        td = pytezos.using('mainnet').contract('KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS')
+        res = td.metadata.resolveAddress('tz1PN9FWDGoASBTvgppaQbbPdGhkrnTNmcVz').storage_view()
+        self.assertEqual('tz1PN9FWDGoASBTvgppaQbbPdGhkrnTNmcVz', res['address'])

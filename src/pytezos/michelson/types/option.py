@@ -1,4 +1,4 @@
-from typing import List, Optional, Type
+from typing import List, Optional, Type, Callable
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, parse_micheline_value
@@ -113,3 +113,10 @@ class OptionType(MichelsonType, prim='option', args_len=1):
     def attach_context(self, context: AbstractContext, big_map_copy=False):
         if not self.is_none():
             self.item.attach_context(context, big_map_copy=big_map_copy)  # type: ignore
+
+    def find(self, predicate: Callable[['MichelsonType'], bool]) -> Optional['MichelsonType']:
+        if predicate(self):
+            return self
+        if self.item is not None:
+            return self.item.find(predicate)
+        return None

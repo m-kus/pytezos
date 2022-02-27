@@ -1,6 +1,13 @@
 from copy import copy, deepcopy
-from typing import Dict, Generator, List, Optional, Tuple, Type, Union
-
+from typing import (
+    Callable,
+    Generator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.forge import forge_script_expr
 from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelineSequence, parse_micheline_literal
@@ -191,6 +198,11 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         res = type(self)(items=[], ptr=dst_ptr)
         res.context = self.context
         return res
+
+    def find(self, predicate: Callable[['MichelsonType'], bool]) -> Optional['MichelsonType']:
+        if predicate(self):
+            return self
+        return None
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):
         assert self.context is None, f'context already attached'

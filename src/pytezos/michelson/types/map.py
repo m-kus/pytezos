@@ -1,5 +1,11 @@
-from typing import Generator, List, Optional, Tuple, Type
-
+from typing import (
+    Generator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Callable,
+)
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, MichelineSequence, parse_micheline_value
 from pytezos.michelson.types.base import MichelsonType
@@ -123,6 +129,15 @@ class MapType(MichelsonType, prim='map', args_len=2):
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
         items = [(key, val.aggregate_lazy_diff(lazy_diff, mode=mode)) for key, val in self.items]
         return type(self)(items)
+
+    def find(self, predicate: Callable[['MichelsonType'], bool]) -> Optional['MichelsonType']:
+        if predicate(self):
+            return self
+        for _, item in self:
+            res = item.find(predicate)
+            if res:
+                return res
+        return None
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):
         for _, val in self.items:

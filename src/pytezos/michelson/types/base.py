@@ -1,5 +1,15 @@
 from copy import copy, deepcopy
-from typing import Any, List, Optional, Tuple, Type, Union, cast
+from collections.abc import Iterable
+from typing import (
+    Any,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    cast,
+    Callable,
+)
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
@@ -213,6 +223,17 @@ class MichelsonType(Micheline):
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'MichelsonType':
         assert len(self.args) == 0 or self.prim in ['contract', 'lambda', 'ticket', 'set']
         return copy(self)
+
+    def find(self, predicate: Callable[['MichelsonType'], bool]) -> Optional['MichelsonType']:
+        if predicate(self):
+            return self
+        if isinstance(self, Iterable):
+            for item in self:
+                if isinstance(item, MichelsonType):
+                    res = item.find(predicate)
+                    if res is not None:
+                        return res
+        return None
 
     def forge(self, mode='readable') -> bytes:
         val_expr = self.to_micheline_value(mode=mode)

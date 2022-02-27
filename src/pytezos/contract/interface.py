@@ -27,6 +27,7 @@ from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.sections import ViewSection
 from pytezos.michelson.types.base import generate_pydoc
+from pytezos.michelson.types import BigMapType, BytesType
 from pytezos.operation.group import OperationGroup
 from pytezos.rpc import ShellQuery
 
@@ -402,10 +403,19 @@ class ContractInterface(ContextMixin):
     @cached_property
     def metadata_url(self) -> Optional[str]:
         try:
-            return self.storage['metadata']['']().decode()
+            metadata = self.storage.data.find(lambda x: x.field_name == 'metadata' and isinstance(x, BigMapType))
+            if metadata is not None:
+                metadata_url = metadata['']
+                if isinstance(metadata_url, BytesType):
+                    return metadata_url.value.decode()
+                else:
+                    self._logger.info('Empty string key is not found in metadata big map')
+            else:
+                self._logger.info('Metadata big map not found')
         # FIXME: Dirty
         except (KeyError, AssertionError):
-            return None
+            self._logger.info('Failed to get metadata URI')
+        return None
 
     @property
     def parameter(self) -> ContractEntrypoint:
