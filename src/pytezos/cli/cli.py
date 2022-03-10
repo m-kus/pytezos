@@ -1,4 +1,4 @@
-import atexit
+import logging
 import io
 import sys
 import tarfile
@@ -10,9 +10,9 @@ from typing import List, Optional
 
 import click
 import docker  # type: ignore
-import requests
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
+from pytezos.logging import DEFAULT_LOGGING_CONFIG
 from pytezos import ContractInterface, __version__, pytezos
 from pytezos.cli.github import create_deployment, create_deployment_status
 from pytezos.context.mixin import default_network  # type: ignore
@@ -494,4 +494,6 @@ def ligo_invoke_contract(
 
 
 if __name__ == '__main__':
+    if not logging.getLogger().hasHandlers():
+        logging.config.dictConfig(DEFAULT_LOGGING_CONFIG)
     cli(prog_name='pytezos')

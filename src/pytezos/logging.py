@@ -1,4 +1,3 @@
-import logging
 import logging.config
 
 DEFAULT_LOGGING_CONFIG = {
@@ -22,9 +21,5 @@ DEFAULT_LOGGING_CONFIG = {
         'propagate': False
     }
 }
-
-
-if not logging.getLogger().hasHandlers():
-    logging.config.dictConfig(DEFAULT_LOGGING_CONFIG)
 
 logger = logging.getLogger('pytezos')

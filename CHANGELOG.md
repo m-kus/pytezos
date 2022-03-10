@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.3.6 - 2022-03-10
+
+### Fixed
+
+* Logging configuration is not overwritten by pytezos
+
+### Added
+
+* Installation hints for M1 (credits to @konchunas)
+
 ## 3.3.5 - 2022-02-28
 
 ### Fixed
