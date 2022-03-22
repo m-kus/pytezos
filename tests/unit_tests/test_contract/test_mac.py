@@ -76,7 +76,7 @@ class TestMac(TestCase):
                  token_id=0)]) \
             .interpret(storage=initial_storage_balance,
                        source=pkh)
-        self.assertTrue(len(res.lazy_diff), len(set(map(lambda x: x['id'], res.lazy_diff))))
+        self.assertEqual(len(res.lazy_diff), len(set(map(lambda x: x['id'], res.lazy_diff))))
         self.assertDictEqual(
             {
                 (pkh, 0): 41000,
