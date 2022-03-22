@@ -61,6 +61,6 @@ class ContractCallResult(OperationResult):
         return cls(
             parameters=parameters.to_python_object(),
             storage=extended_storage.to_python_object(lazy_diff=True),
-            lazy_diff=response.get('lazy_diff', []),
+            lazy_diff=response.get('lazy_storage_diff', []),
             operations=response.get('operations', []),
         )

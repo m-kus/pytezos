@@ -21,5 +21,6 @@ class TestRunCode(SandboxedNodeTestCase):
         contract = ContractInterface.from_michelson(code).using(shell=self.client.shell)
         res = contract.using('mainnet').default('hello').run_code()
         self.assertEqual({'hello': 1}, res.storage)
+        self.assertEqual(1, len(res.lazy_diff))
         res1 = contract.default('hello').interpret()
         self.assertEqual({'hello': 1}, res1.storage)

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.1 - 2022-03-22
+
+### Fixed
+
+* Issue with `lazy_storage_diff`
+
 ## 3.4.0 - 2022-03-22
 
 ### Fixed
