@@ -6,9 +6,10 @@ EDO = 'PtEdo2ZkT9oKpimTah6x2embF25oss54njMuPzkJTEi5RqfdZFA'
 FLORENCE = 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i'
 GRANADA = 'PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV'
 HANGZHOU = 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx'
+ITHACA = 'Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A'
 LATEST = HANGZHOU
 
-protocol_version = {EDO: 8, FLORENCE: 9, GRANADA: 10, HANGZHOU: 11}
+protocol_version = {EDO: 8, FLORENCE: 9, GRANADA: 10, HANGZHOU: 11, ITHACA: 12}
 
 sandbox_commitment = {
     "mnemonic": [

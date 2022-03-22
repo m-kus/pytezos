@@ -21,7 +21,7 @@ from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.sandbox.node import DOCKER_IMAGE, TEZOS_NODE_PORT, SandboxedNodeContainer
-from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU
+from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU, ITHACA
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {
@@ -321,7 +321,7 @@ def smartpy_compile(
 
 @cli.command(help='Run containerized sandbox node')
 @click.option('--image', type=str, help='Docker image to use', default=DOCKER_IMAGE)
-@click.option('--protocol', type=click.Choice(['edo', 'florence', 'hangzhou']), help='Protocol to use', default='hangzhou')
+@click.option('--protocol', type=click.Choice(['hangzhou', 'ithaca']), help='Protocol to use', default='ithaca')
 @click.option('--port', '-p', type=int, help='Port to expose', default=TEZOS_NODE_PORT)
 @click.option('--interval', '-i', type=float, help='Interval between baked blocks (in seconds)', default=1.0)
 @click.option('--blocks', '-b', type=int, help='Number of blocks to bake before exit')
@@ -335,9 +335,8 @@ def sandbox(
     blocks: int,
 ):
     protocol_hash = {
-        'edo': EDO,
-        'florence': FLORENCE,
         'hangzhou': HANGZHOU,
+        'ithaca': ITHACA
     }[protocol]
 
     with SandboxedNodeContainer(image=image, port=port) as node:

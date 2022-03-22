@@ -13,7 +13,7 @@ from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
 from pytezos.sandbox.parameters import LATEST
 
-DOCKER_IMAGE = 'bakingbad/sandboxed-node:v11.0-1'
+DOCKER_IMAGE = 'bakingbad/sandboxed-node:v12.0-2'
 MAX_ATTEMPTS = 100
 ATTEMPT_DELAY = 0.1
 TEZOS_NODE_PORT = 8732

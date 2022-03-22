@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.4.0 - 2022-03-22
+
+### Fixed
+
+* `run_code` does not merge lazy storage diffs correctly
+
+### Changed
+
+* Default protocol is Ithaca
+* Sandbox node version is updated to v12
+
 ## 3.3.6 - 2022-03-10
 
 ### Fixed

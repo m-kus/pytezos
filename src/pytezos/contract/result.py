@@ -57,7 +57,7 @@ class ContractCallResult(OperationResult):
         program = MichelsonProgram.load(context)
         parameters = program.parameter.from_parameters(parameters)
         storage = program.storage.from_micheline_value(response['storage'])
-        extended_storage = storage.merge_lazy_diff(response.get('lazy_diff', []))
+        extended_storage = storage.merge_lazy_diff(response.get('lazy_storage_diff', []))
         return cls(
             parameters=parameters.to_python_object(),
             storage=extended_storage.to_python_object(lazy_diff=True),

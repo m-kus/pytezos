@@ -186,7 +186,7 @@ class ContractCall(ContextMixin):
         res = {
             'operations': operations,
             'storage': storage,
-            'lazy_diff': lazy_diff,
+            'lazy_storage_diff': lazy_diff,
         }
         return ContractCallResult.from_run_code(
             res,
