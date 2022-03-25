@@ -163,8 +163,8 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         sequence = cast(MichelineSequence, cls.args[0])
-        assert len(sequence.args) == 3, f'expected 3 sections, got {len(sequence.args)}'
-        assert {arg.prim for arg in sequence.args} == {'parameter', 'storage', 'code'}, f'unexpected sections'
+        assert len(sequence.args) >= 3, f'expected more than 2 sections, got {len(sequence.args)}'
+        assert {arg.prim for arg in sequence.args[:3]} == {'parameter', 'storage', 'code'}, f'unexpected sections'
         storage_type = cast(Type[MichelsonType], next(arg.args[0] for arg in sequence.args if arg.prim == 'storage'))
 
         delegate, amount, initial_storage = cast(Tuple[OptionType, MutezType, MichelsonType], stack.pop3())
