@@ -6,6 +6,7 @@
 
 * time_between_blocks no longer exists, minimum_block_delay used instead
 * sandbox tests -> re-create node container per each case (cannot rollback in Tenderbake)
+* REPL: `CREATE_CONTRACT` is now able to originate contracts with views (by @konchunas)
 
 ### Added
 
