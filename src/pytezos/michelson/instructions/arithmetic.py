@@ -184,22 +184,13 @@ class SubMutezInstruction(MichelsonInstruction, prim='SUB_MUTEZ'):
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
-        if isinstance(a, MutezType) and isinstance(b, MutezType):
-            try:
-                res = OptionType.from_some(MutezType.from_value(int(a) - int(b)))
-            except OverflowError:
-                res = OptionType.none(MutezType)
-        else:
-            res_type, = dispatch_types(type(a), type(b), mapping={  # type: ignore
-                (NatType, NatType): (IntType,),
-                (NatType, IntType): (IntType,),
-                (IntType, NatType): (IntType,),
-                (IntType, IntType): (IntType,),
-                (TimestampType, IntType): (TimestampType,),
-                (TimestampType, TimestampType): (IntType,),
-            })  # type: Union[Type[IntType], Type[NatType], Type[TimestampType]]
-            res = res_type.from_value(int(a) - int(b))
+        a, b = cast(Tuple[MutezType, MutezType], stack.pop2())
+        a.assert_type_equal(MutezType)
+        b.assert_type_equal(MutezType)
+        try:
+            res = OptionType.from_some(MutezType.from_value(int(a) - int(b)))
+        except OverflowError:
+            res = OptionType.none(MutezType)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls(stack_items_added=1)

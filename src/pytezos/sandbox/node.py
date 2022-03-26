@@ -30,7 +30,10 @@ def kill_existing_containers():
     running_containers: List[Container] = docker.client.containers.list(
         filters={'status': 'running', 'ancestor': DOCKER_IMAGE})
     for container in running_containers:
-        container.stop(timeout=1)
+        try:
+            container.stop(timeout=1)
+        except:
+            pass  # Can be stopped in parallel
 
 
 atexit.register(kill_existing_containers)

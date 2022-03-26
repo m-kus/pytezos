@@ -11,6 +11,7 @@
 ### Added
 
 * `SUB_MUTEZ` instruction support in REPL
+* Implementations of `Operation_list_hash`, `Operation_list_list_hash`, and `Block_payload_hash`
 
 ## 3.4.1 - 2022-03-22
 
