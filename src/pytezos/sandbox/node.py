@@ -10,7 +10,7 @@ from pprint import pprint
 import requests.exceptions
 from testcontainers.core.generic import DockerContainer  # type: ignore
 from testcontainers.core.docker_client import DockerClient  # type: ignore
-from testcontainers.core.container import Container
+from testcontainers.core.container import Container  # type: ignore
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
@@ -132,7 +132,7 @@ class SandboxedNodeTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.node_container.stop(force=True, delete_volume=True)
+        cls._get_node_container().stop(force=True, delete_volume=True)
 
     @classmethod
     def _get_node_container(cls) -> SandboxedNodeContainer:

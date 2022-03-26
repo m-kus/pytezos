@@ -11,7 +11,7 @@ def _hash_tuple(left: bytes = b'', right: bytes = b'') -> bytes:
 
 
 def _reduce_operation_hashes(hashes: List[bytes]) -> bytes:
-    a = []
+    a: List[bytes] = []
 
     def step(n: int) -> bytes:
         nonlocal a
