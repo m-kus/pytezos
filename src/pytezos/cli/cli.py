@@ -20,7 +20,7 @@ from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-from pytezos.sandbox.node import DOCKER_IMAGE, TEZOS_NODE_PORT, SandboxedNodeContainer
+from pytezos.sandbox.node import DOCKER_IMAGE, TEZOS_NODE_PORT, SandboxedNodeContainer, get_next_baker_key
 from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU, ITHACA
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
@@ -350,7 +350,7 @@ def sandbox(
         while True:
             try:
                 logger.info('Baking block %s...', blocks_baked)
-                block_hash = node.bake()
+                block_hash = node.bake(key=get_next_baker_key(node.client))
                 logger.info('Baked block: %s', block_hash)
                 blocks_baked += 1
                 if blocks and blocks_baked == blocks:

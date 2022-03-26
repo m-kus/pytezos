@@ -58,6 +58,12 @@ def worker_callback(f):
     })
 
 
+def get_next_baker_key(client: PyTezosClient) -> str:
+    baking_rights = client.shell.head.helpers.baking_rights()
+    delegate = next(br['delegate'] for br in baking_rights if br['round'] == 0)
+    return next(k for k, v in sandbox_addresses.items() if v == delegate)
+
+
 class SandboxedNodeContainer(DockerContainer):
     def __init__(self, image=DOCKER_IMAGE, port=TEZOS_NODE_PORT):
         super(SandboxedNodeContainer, self).__init__(image, remove=True)
@@ -143,19 +149,13 @@ class SandboxedNodeTestCase(unittest.TestCase):
     def get_client(cls, key='bootstrap2') -> PyTezosClient:
         return cls._get_node_container().get_client(key)
 
-    @staticmethod
-    def get_next_baker_key(client: PyTezosClient) -> str:
-        baking_rights = client.shell.head.helpers.baking_rights()
-        delegate = next(br['delegate'] for br in baking_rights if br['round'] == 0)
-        return next(k for k, v in sandbox_addresses.items() if v == delegate)
-
     @classmethod
     def bake_block(cls, min_fee: int = 0) -> OperationGroup:
         """Bake new block.
 
         :param min_fee: minimum fee of operation to be included in block
         """
-        key = cls.get_next_baker_key(cls.get_client())
+        key = get_next_baker_key(cls.get_client())
         return cls._get_node_container().bake(key=key, min_fee=min_fee)
 
     @property
@@ -178,7 +178,7 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
         ptr = 0
         while not exit_event.is_set():
             if ptr % time_between_blocks == 0:
-                key = SandboxedNodeTestCase.get_next_baker_key(client)
+                key = get_next_baker_key(client)
                 client.using(key=key).bake_block().fill().work().sign().inject()
             sleep(1)
             ptr += 1

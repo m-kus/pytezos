@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.4.2 - 2022-03-26
+
+### Fixed
+
+* time_between_blocks no longer exists, minimum_block_delay used instead
+* sandbox tests -> re-create node container per each case (cannot rollback in Tenderbake)
+
+### Added
+
+* `SUB_MUTEZ` instruction support in REPL
+
 ## 3.4.1 - 2022-03-22
 
 ### Fixed
