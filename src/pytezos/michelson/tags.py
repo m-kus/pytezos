@@ -148,6 +148,8 @@ prim_tags = {
     'VIEW': b'\x90',
     'view': b'\x91',
     'constant': b'\x92',
+    # ITHACA
+    'SUB_MUTEZ': b'\x93',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',

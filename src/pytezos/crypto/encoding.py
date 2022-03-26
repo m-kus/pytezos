@@ -46,8 +46,9 @@ base58_encodings = [
     (b"sig",   96,   tb([4, 130, 43]),             64,   "generic signature"),
 
     (b'Net',   15,   tb([87, 82, 0]),              4,    "chain id"),
-    (b'nce',   53,   tb([69, 220, 169]),           32,   u'seed nonce hash'),
-    (b'btz1',  37,   tb([1, 2, 49, 223]),          20,   u'blinded public key hash'),
+    (b'nce',   53,   tb([69, 220, 169]),           32,   'seed nonce hash'),
+    (b'btz1',  37,   tb([1, 2, 49, 223]),          20,   'blinded public key hash'),
+    (b'vh',    52,   tb([1, 106, 242]),            32,   'block_payload_hash'),
 ]
 
 operation_tags = {

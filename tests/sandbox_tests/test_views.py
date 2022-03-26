@@ -15,6 +15,7 @@ code = """
 
 
 class ViewTestCase(SandboxedNodeTestCase):
+
     def originate_contract(self, storage):
         ci = ContractInterface.from_michelson(code).using(
             shell=self.client.shell,
@@ -29,7 +30,6 @@ class ViewTestCase(SandboxedNodeTestCase):
         return contract
 
     def test_check_view_should_be_updated(self):
-
         # originating contract with value 12:
         contract = self.originate_contract(12)
         self.assertEqual(contract.getValue().storage_view(), 12)

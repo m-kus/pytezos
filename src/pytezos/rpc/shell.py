@@ -85,7 +85,7 @@ class ShellQuery(RpcQuery, path=''):
 
         if time_between_blocks is None:
             constants = self.blocks[current_block_hash].context.constants()
-            time_between_blocks = int(constants.get('minimal_block_delay', constants['time_between_blocks'][0]))
+            time_between_blocks = int(constants.get('minimal_block_delay'))
 
         if block_timeout is None:
             block_timeout = MAX_BLOCK_TIMEOUT
@@ -210,7 +210,7 @@ class ShellQuery(RpcQuery, path=''):
         :param delay_sec: Sleep delay
         """
         if time_between_blocks is None:
-            time_between_blocks = int(self.block.context.constants()["time_between_blocks"][0])  # type: ignore
+            time_between_blocks = int(self.block.context.constants()["minimal_block_delay"])  # type: ignore
 
         if time_between_blocks > 0:
             if prev_hash is None:

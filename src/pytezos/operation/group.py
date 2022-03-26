@@ -77,8 +77,6 @@ class OperationGroup(ContextMixin, ContentMixin):
 
     def binary_payload(self) -> bytes:
         """Get binary payload used for injection/hash calculation."""
-        if self.contents[0]['kind'] == 'endorsement_with_slot':
-            return bytes.fromhex(self.forge()) + b'\x00' * 64
         if not self.signature:
             raise ValueError('Not signed')
 
@@ -426,31 +424,3 @@ class OperationGroup(ContextMixin, ContentMixin):
         """
         return OperationResult.from_operation_group(self.preapply())
 
-    def with_slot(self) -> 'OperationGroup':
-        """Wrap endorsement operation
-
-        :rtype: OperationGroup
-        """
-        if self.contents[0]['kind'] != 'endorsement':
-            raise NotImplementedError('Works for endorsement only')
-        if self.branch is None:
-            raise ValueError('Do .fill() first')
-        if self.signature is None:
-            raise ValueError('Do .sign() first')
-
-        level = int(self.contents[0]['level'])
-        delegate = self.key.public_key_hash()
-        rights = self.shell.head.helpers.endorsing_rights(level=level, delegate=delegate)
-        if len(rights) != 1:
-            raise ValueError(f'No endorsing rights for delegate `{delegate}` at level `{level}`')
-
-        slot = rights[0]['slots'][0]
-        endorsement = {'branch': self.branch, 'operations': {'kind': 'endorsement', 'level': level}, 'signature': self.signature}
-
-        return OperationGroup(
-            context=self.context,
-            branch=self.branch,
-            chain_id=self.chain_id,
-            protocol=self.protocol,
-            contents=[ContentMixin().endorsement_with_slot(endorsement=endorsement, slot=slot)],
-        )

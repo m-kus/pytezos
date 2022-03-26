@@ -57,7 +57,8 @@ class MutezType(NatType, prim='mutez'):
     @classmethod
     def from_value(cls, value: int) -> 'MutezType':
         assert value >= 0, f'expected natural number, got {value}'
-        assert value.bit_length() <= 63, f'mutez overflow, got {value.bit_length()} bits, should not exceed 63'
+        if value.bit_length() > 63:
+            raise OverflowError(f'mutez overflow, got {value.bit_length()} bits, should not exceed 63')
         return cls(value)
 
     @classmethod

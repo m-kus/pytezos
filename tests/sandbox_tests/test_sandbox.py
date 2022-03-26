@@ -1,5 +1,5 @@
 from pytezos.sandbox.node import SandboxedNodeTestCase
-from pytezos.sandbox.parameters import sandbox_addresses, LATEST
+from pytezos.sandbox.parameters import sandbox_addresses, sandbox_commitment
 
 
 # NOTE: Node won't be wiped between tests so alphabetical order of method names matters
@@ -13,6 +13,8 @@ class SandboxTestCase(SandboxedNodeTestCase):
         self.bake_block()
 
     def test_3_create_transaction(self) -> None:
+        bootstrap3 = self.client.shell.contracts[sandbox_addresses['bootstrap3']]()
+        print(bootstrap3['balance'])
         opg = self.client.transaction(
             destination=sandbox_addresses['bootstrap3'],
             amount=42,
@@ -22,9 +24,23 @@ class SandboxTestCase(SandboxedNodeTestCase):
     def test_4_bake_block(self) -> None:
         self.bake_block()
         bootstrap3 = self.client.shell.contracts[sandbox_addresses['bootstrap3']]()
-        self.assertEqual('4000000000042', bootstrap3['balance'])
+        self.assertEqual(3_800_000_333_333 + 42, int(bootstrap3['balance']))
+        # 200_000_000_000 frozen deposits + 333333 block rewards
 
-    def test_5_rollback(self) -> None:
-        self.activate(LATEST, reset=True)
-        bootstrap3 = self.client.shell.contracts[sandbox_addresses['bootstrap3']]()
-        self.assertEqual('4000000000000', bootstrap3['balance'])
+    def test_5_activate_account(self) -> None:
+        client = self.get_client(key=sandbox_commitment)
+        client.activate_account().autofill().sign().inject()
+        self.bake_block()
+        self.assertEqual('100500000000', client.account()['balance'])
+
+    def test_6_reveal_pk_and_send_tez(self) -> None:
+        client = self.get_client(key=sandbox_commitment)
+        res = client.reveal().transaction(destination=sandbox_addresses['bootstrap4'], amount=1000) \
+            .autofill().sign().inject()
+        balance_change = sum(int(op.get('amount', 0)) + int(op['fee']) for op in res['contents'])
+        self.bake_block()
+        self.assertEqual(100500000000 - balance_change, int(client.account()['balance']))
+
+    def test_7_register_constant(self):
+        self.client.register_global_constant({'int': '12345'}).autofill().sign().inject()
+        self.bake_block()

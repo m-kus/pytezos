@@ -2,16 +2,21 @@ from pprint import pformat
 from typing import Any, Dict, List, Optional
 
 import bson  # type: ignore
+import itertools
 
 from pytezos.block.forge import bump_fitness, forge_block_header, forge_protocol_data
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.crypto.encoding import base58_encode
+from pytezos.crypto.hash import block_payload_hash
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
 from pytezos.rpc.kind import validation_passes
-from pytezos.sandbox.parameters import sandbox_params
+from pytezos.sandbox.parameters import (
+    sandbox_params,
+    protocol_version,
+)
 
 
 class BlockHeader(ContextMixin):
@@ -90,7 +95,12 @@ class BlockHeader(ContextMixin):
             operations[validation_pass].append(opg)
 
         # NOTE: Real values will be set during fill
-        protocol_data = {"priority": 0, "proof_of_work_nonce": "0000000000000000", "liquidity_baking_escape_vote": False}
+        protocol_data = {
+            "proof_of_work_nonce": "0000000000000000",
+            "liquidity_baking_escape_vote": False,
+            "payload_hash": "vh1g87ZG6scSYxKhspAUzprQVuLAyoa5qMBKcUfjgnQGnFb3dJcG",  # dummy payload (zeroes)
+            "payload_round": 0
+        }
         return BlockHeader(
             context=context,
             operations=operations,
@@ -106,10 +116,9 @@ class BlockHeader(ContextMixin):
             signature=kwargs.get('signature', self.signature),
         )
 
-    def fill(self, block_id='head', timestamp: Optional[int] = None) -> 'BlockHeader':
+    def fill(self, timestamp: Optional[int] = None) -> 'BlockHeader':
         """Fill missing fields essential for preapply
 
-        :param block_id: head or genesis
         :param timestamp: override header timestamp (unix seconds).
             NOTE that the minimal block granularity in Tezos is 1 sec, so you cannot bake faster that once per second.
             You also cannot bake with timestamp in the future, it will end with error.
@@ -117,10 +126,10 @@ class BlockHeader(ContextMixin):
             so that you can continuously increase it by 1 sec.
         :rtype: BlockHeader
         """
-        pred_shell_header = self.shell.blocks[block_id].header.shell()
+        pred_shell_header = self.shell.head.header.shell()
         if timestamp is None:
             timestamp = optimize_timestamp(pred_shell_header['timestamp']) + 1
-        protocol = self.shell.blocks[block_id].protocols()['next_protocol']
+        protocol = self.shell.head.protocols()['next_protocol']
         level = int(pred_shell_header['level']) + 1
         dummy_signature = base58_encode(b'\x00' * 64, b'sig').decode()
 
@@ -131,12 +140,6 @@ class BlockHeader(ContextMixin):
 
         if level % int(sandbox_params['blocks_per_commitment']) == 0:  # type: ignore
             protocol_data['seed_nonce_hash'] = base58_encode(b'\x00' * 32, b'nce').decode()
-
-        if 'priority' in protocol_data:
-            baker = self.key.public_key_hash()
-            baking_rights = self.shell.blocks[block_id].helpers.baking_rights(delegate=baker)
-            # NOTE: Fails if baker has no baking rights
-            protocol_data['priority'] = next(item['priority'] for item in baking_rights if item['delegate'] == baker)
 
         operations = [
             [
@@ -159,7 +162,7 @@ class BlockHeader(ContextMixin):
             'operations': operations,
         }
 
-        res = self.shell.blocks[block_id].helpers.preapply.block.post(
+        res = self.shell.head.helpers.preapply.block.post(
             block=payload,
             sort=True,
             timestamp=timestamp,
@@ -175,6 +178,17 @@ class BlockHeader(ContextMixin):
             ]
             for operation_list in res['operations']
         ]
+
+        if 'payload_hash' in protocol_data:
+            operation_hashes = [
+                [operation['hash'] for operation in operation_list['applied']]
+                for operation_list in res['operations'][1:]  # skip consensus ops
+            ]
+            protocol_data['payload_hash'] = block_payload_hash(
+                predecessor=res['shell_header']['predecessor'],
+                payload_round=protocol_data['payload_round'],
+                operation_hashes=list(itertools.chain(*operation_hashes))
+            )
 
         return self._spawn(
             shell_header=res['shell_header'],
@@ -233,8 +247,13 @@ class BlockHeader(ContextMixin):
         :rtype: BlockHeader
         """
         chain_watermark = bytes.fromhex(self.shell.chains.main.watermark())
-        watermark = b'\x01' + chain_watermark
-        signature = self.key.sign(message=watermark + self.forge())
+        proto = protocol_version.get(self.protocol_data['protocol'], 0)
+        if proto >= 12:  # since Ithaca
+            watermark = b'\x11' + chain_watermark
+        else:
+            watermark = b'\x01' + chain_watermark
+        payload = self.forge()
+        signature = self.key.sign(message=watermark + payload)
         return self._spawn(signature=signature)
 
     def inject(self, force=False) -> str:

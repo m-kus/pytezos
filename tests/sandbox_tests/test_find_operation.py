@@ -14,7 +14,7 @@ class FindOperationTestCase(SandboxedNodeAutoBakeTestCase):
 
     def test_2_sleep(self) -> None:
         level_from = self.client.shell.head.level()
-        self.client.sleep(2)
+        self.client.sleep(2, block_timeout=5)
         level_to = self.client.shell.head.level()
         self.assertEqual(2, level_to - level_from)
 

@@ -1,16 +1,18 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
 
 
-def bump_fitness(fitness: Tuple[str, str]) -> Tuple[str, str]:
+def bump_fitness(fitness: List[str]) -> List[str]:
     if len(fitness) == 0:
-        major = 0
-        minor = 1
+        version = 2
+        level = 1
+        tail = ['', 'ffffffff', '00000000']
     else:
-        major = int.from_bytes(bytes.fromhex(fitness[0]), 'big')
-        minor = int.from_bytes(bytes.fromhex(fitness[1]), 'big') + 1
-    return major.to_bytes(1, 'big').hex(), minor.to_bytes(8, 'big').hex()
+        version = int.from_bytes(bytes.fromhex(fitness[0]), 'big')
+        level = int.from_bytes(bytes.fromhex(fitness[1]), 'big') + 1
+        tail = ['', 'ffffffff', '00000000']  # locked_round, neg_predecessor_round, round
+    return [version.to_bytes(1, 'big').hex(), level.to_bytes(4, 'big').hex(), *tail]
 
 
 def forge_int_fixed(value: int, length: int) -> bytes:
@@ -27,10 +29,6 @@ def forge_fitness(fitness: List[str]) -> bytes:
     return forge_array(b''.join(map(lambda x: forge_array(bytes.fromhex(x)), fitness)))
 
 
-def forge_priority(priority: int) -> bytes:
-    return priority.to_bytes(2, 'big')
-
-
 def forge_content(content: Dict[str, Any]) -> bytes:
     res = b''
     res += forge_command(content['command'])
@@ -45,7 +43,8 @@ def forge_protocol_data(protocol_data: Dict[str, Any]) -> bytes:
     if protocol_data.get('content'):
         res += forge_content(protocol_data['content'])
     else:
-        res += forge_priority(protocol_data['priority'])
+        res += forge_base58(protocol_data['payload_hash'])
+        res += forge_int_fixed(protocol_data['payload_round'], 4)
         res += bytes.fromhex(protocol_data['proof_of_work_nonce'])
         if protocol_data.get('seed_nonce_hash'):
             res += b'\xFF'

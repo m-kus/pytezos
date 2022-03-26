@@ -23,7 +23,8 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
         ci = ContractInterface.from_michelson(code)
         res = self.client.origination(ci.script()).autofill().sign().inject(
             time_between_blocks=self.TIME_BETWEEN_BLOCKS,
-            min_confirmations=1
+            min_confirmations=1,
+            block_timeout=5
         )
         self.assertEqual(1, len(OperationResult.originated_contracts(res)))
 
@@ -33,7 +34,8 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
         opg = self.client.bulk(*txs).autofill()
         opg.sign().inject(
             time_between_blocks=self.TIME_BETWEEN_BLOCKS,
-            min_confirmations=1
+            min_confirmations=1,
+            block_timeout=5
         )
         self.assertEqual(45, int(contract.storage()))
 
@@ -44,17 +46,18 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
         self.client.context.chain_id = self.client.context.get_chain_id()
         self.client.context.protocol = self.client.context.get_protocol()
         txs = [
-            contract.increment(i).send_async(
+            contract.increment(1).send_async(
                 ttl=120,
                 counter=counter + idx,
                 storage_limit=10,
                 gas_limit=50000,
             )
-            for idx, i in enumerate(range(50))
+            for idx, i in enumerate(range(1))
         ]
         self.client.wait(
             *txs,
             time_between_blocks=self.TIME_BETWEEN_BLOCKS,
-            min_confirmations=1
+            min_confirmations=1,
+            block_timeout=5
         )
-        self.assertEqual(1225, int(contract.storage() - value_before))
+        self.assertEqual(1, int(contract.storage() - value_before))
