@@ -85,7 +85,7 @@ class ShellQuery(RpcQuery, path=''):
 
         if time_between_blocks is None:
             constants = self.blocks[current_block_hash].context.constants()
-            time_between_blocks = int(constants.get('minimal_block_delay'))
+            time_between_blocks = int(constants.get('minimal_block_delay', 0))
 
         if block_timeout is None:
             block_timeout = MAX_BLOCK_TIMEOUT
