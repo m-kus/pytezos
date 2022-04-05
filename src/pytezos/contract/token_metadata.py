@@ -5,11 +5,11 @@ from typing import Any, Dict, List, Optional
 
 import requests
 from attr import dataclass
-from cattrs import Converter
 from jsonschema import validate as jsonschema_validate  # type: ignore
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
+from pytezos.contract import converter
 
 with open(join(dirname(__file__), 'token_metadata-schema.json')) as file:
     token_metadata_schema = json.load(file)
@@ -112,7 +112,7 @@ class ContractTokenMetadata(ContextMixin):
             token_metadata_json['decimals'] = int(token_metadata_json['decimals'])
 
         cls.validate_token_metadata_json(token_metadata_json)
-        res = Converter().structure(token_metadata_json, ContractTokenMetadata)
+        res = converter.structure(token_metadata_json, ContractTokenMetadata)
         res.context = context if context else ExecutionContext()
         res.raw = token_metadata_json
         return res
