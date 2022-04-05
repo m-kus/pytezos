@@ -26,8 +26,8 @@ from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.sections import ViewSection
-from pytezos.michelson.types.base import generate_pydoc
 from pytezos.michelson.types import BigMapType, BytesType
+from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.group import OperationGroup
 from pytezos.rpc import ShellQuery
 

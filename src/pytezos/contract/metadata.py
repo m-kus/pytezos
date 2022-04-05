@@ -1,11 +1,12 @@
 import json
 import re
+from contextlib import suppress
 from os.path import dirname, join
 from typing import Any, Dict, List, Optional, Union
 
 import requests  # type: ignore
 from attr import dataclass
-from cattrs_extras.converter import Converter, suppress  # type: ignore
+from cattrs import Converter  # type: ignore
 from jsonschema import validate as jsonschema_validate  # type: ignore
 
 from pytezos.context.impl import ExecutionContext

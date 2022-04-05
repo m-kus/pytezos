@@ -1,5 +1,5 @@
-import logging
 import io
+import logging
 import sys
 import tarfile
 import time
@@ -12,11 +12,10 @@ import click
 import docker  # type: ignore
 from testcontainers.core.generic import DockerContainer  # type: ignore
 
-from pytezos.logging import DEFAULT_LOGGING_CONFIG
 from pytezos import ContractInterface, __version__, pytezos
 from pytezos.cli.github import create_deployment, create_deployment_status
 from pytezos.context.mixin import default_network  # type: ignore
-from pytezos.logging import logger
+from pytezos.logging import DEFAULT_LOGGING_CONFIG, logger
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError

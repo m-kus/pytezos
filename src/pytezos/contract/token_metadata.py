@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 from attr import dataclass
-from cattrs_extras.converter import Converter
+from cattrs import Converter
 from jsonschema import validate as jsonschema_validate  # type: ignore
 
 from pytezos.context.impl import ExecutionContext

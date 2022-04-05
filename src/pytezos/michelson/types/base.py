@@ -1,15 +1,6 @@
-from copy import copy, deepcopy
 from collections.abc import Iterable
-from typing import (
-    Any,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-    cast,
-    Callable,
-)
+from copy import copy, deepcopy
+from typing import Any, Callable, List, Optional, Tuple, Type, Union, cast
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.forge import forge_micheline, unforge_micheline

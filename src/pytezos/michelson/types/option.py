@@ -1,4 +1,4 @@
-from typing import List, Optional, Type, Callable
+from typing import Callable, List, Optional, Type
 
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, parse_micheline_value

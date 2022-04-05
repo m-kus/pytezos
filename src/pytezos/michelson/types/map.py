@@ -1,11 +1,5 @@
-from typing import (
-    Generator,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Callable,
-)
+from typing import Callable, Generator, List, Optional, Tuple, Type
+
 from pytezos.context.abstract import AbstractContext  # type: ignore
 from pytezos.michelson.micheline import Micheline, MichelineSequence, parse_micheline_value
 from pytezos.michelson.types.base import MichelsonType

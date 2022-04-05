@@ -1,23 +1,20 @@
 import atexit
 import logging
 import unittest
-from concurrent.futures import Future, ThreadPoolExecutor, wait, FIRST_EXCEPTION
+from concurrent.futures import FIRST_EXCEPTION, Future, ThreadPoolExecutor, wait
+from pprint import pprint
 from threading import Event
 from time import sleep
-from typing import Optional, List
-from pprint import pprint
+from typing import List, Optional
 
 import requests.exceptions
-from testcontainers.core.generic import DockerContainer  # type: ignore
-from testcontainers.core.docker_client import DockerClient  # type: ignore
 from testcontainers.core.container import Container  # type: ignore
+from testcontainers.core.docker_client import DockerClient  # type: ignore
+from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
-from pytezos.sandbox.parameters import (
-    LATEST,
-    sandbox_addresses,
-)
+from pytezos.sandbox.parameters import LATEST, sandbox_addresses
 
 DOCKER_IMAGE = 'bakingbad/sandboxed-node:v12.0-2'
 MAX_ATTEMPTS = 100
@@ -27,8 +24,7 @@ TEZOS_NODE_PORT = 8732
 
 def kill_existing_containers():
     docker = DockerClient()
-    running_containers: List[Container] = docker.client.containers.list(
-        filters={'status': 'running', 'ancestor': DOCKER_IMAGE})
+    running_containers: List[Container] = docker.client.containers.list(filters={'status': 'running', 'ancestor': DOCKER_IMAGE})
     for container in running_containers:
         try:
             container.stop(timeout=1)
@@ -48,17 +44,9 @@ def worker_callback(f):
     trace = []
     tb = e.__traceback__
     while tb is not None:
-        trace.append({
-            "filename": tb.tb_frame.f_code.co_filename,
-            "name": tb.tb_frame.f_code.co_name,
-            "lineno": tb.tb_lineno
-        })
+        trace.append({"filename": tb.tb_frame.f_code.co_filename, "name": tb.tb_frame.f_code.co_name, "lineno": tb.tb_lineno})
         tb = tb.tb_next
-    pprint({
-        'type': type(e).__name__,
-        'message': str(e),
-        'trace': trace
-    })
+    pprint({'type': type(e).__name__, 'message': str(e), 'trace': trace})
 
 
 def get_next_baker_key(client: PyTezosClient) -> str:
@@ -91,11 +79,7 @@ class SandboxedNodeContainer(DockerContainer):
         return False
 
     def activate(self, protocol=LATEST):
-        return self.client.using(key='dictator') \
-            .activate_protocol(protocol) \
-            .fill() \
-            .sign() \
-            .inject()
+        return self.client.using(key='dictator').activate_protocol(protocol).fill().sign().inject()
 
     def bake(self, key: str, min_fee: int = 0):
         return self.client.using(key=key).bake_block(min_fee).fill().work().sign().inject()

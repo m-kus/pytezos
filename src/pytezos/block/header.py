@@ -1,8 +1,8 @@
+import itertools
 from pprint import pformat
 from typing import Any, Dict, List, Optional
 
 import bson  # type: ignore
-import itertools
 
 from pytezos.block.forge import bump_fitness, forge_block_header, forge_protocol_data
 from pytezos.context.impl import ExecutionContext
@@ -13,10 +13,7 @@ from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
 from pytezos.rpc.kind import validation_passes
-from pytezos.sandbox.parameters import (
-    sandbox_params,
-    protocol_version,
-)
+from pytezos.sandbox.parameters import protocol_version, sandbox_params
 
 
 class BlockHeader(ContextMixin):
@@ -99,7 +96,7 @@ class BlockHeader(ContextMixin):
             "proof_of_work_nonce": "0000000000000000",
             "liquidity_baking_escape_vote": False,
             "payload_hash": "vh1g87ZG6scSYxKhspAUzprQVuLAyoa5qMBKcUfjgnQGnFb3dJcG",  # dummy payload (zeroes)
-            "payload_round": 0
+            "payload_round": 0,
         }
         return BlockHeader(
             context=context,
@@ -187,7 +184,7 @@ class BlockHeader(ContextMixin):
             protocol_data['payload_hash'] = block_payload_hash(
                 predecessor=res['shell_header']['predecessor'],
                 payload_round=protocol_data['payload_round'],
-                operation_hashes=list(itertools.chain(*operation_hashes))
+                operation_hashes=list(itertools.chain(*operation_hashes)),
             )
 
         return self._spawn(

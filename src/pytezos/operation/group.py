@@ -423,4 +423,3 @@ class OperationGroup(ContextMixin, ContentMixin):
         :rtype: List[OperationResult]
         """
         return OperationResult.from_operation_group(self.preapply())
-

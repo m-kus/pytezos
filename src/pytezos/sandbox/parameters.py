@@ -93,15 +93,9 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
             'frozen_deposits_percentage': 5.0,
             'max_operations_time_to_live': 120.0,
             'delay_increment_per_round': '1',
-            'minimal_participation_ratio': {
-                'numerator': 2.0,
-                'denominator': 3.0
-            },
+            'minimal_participation_ratio': {'numerator': 2.0, 'denominator': 3.0},
             'double_baking_punishment': '640000000',
-            'ratio_of_frozen_deposits_slashed_per_double_endorsement': {
-                'numerator': 1.0,
-                'denominator': 2.0
-            }
+            'ratio_of_frozen_deposits_slashed_per_double_endorsement': {'numerator': 1.0, 'denominator': 2.0},
         }
 
     if protocol_version[protocol_hash] >= 10:
@@ -114,10 +108,7 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         }
 
     if protocol_version[protocol_hash] < 10:
-        params = {
-            **params,
-            'test_chain_duration': '1966080'
-        }
+        params = {**params, 'test_chain_duration': '1966080'}
 
     if protocol_version[protocol_hash] < 11:
         params = {

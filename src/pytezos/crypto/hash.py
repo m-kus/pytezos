@@ -1,9 +1,8 @@
-from pyblake2 import blake2b  # type: ignore
-from typing import (
-    List
-)
+from typing import List
 
-from pytezos.crypto.encoding import base58_encode, base58_decode
+from pyblake2 import blake2b  # type: ignore
+
+from pytezos.crypto.encoding import base58_decode, base58_encode
 
 
 def _hash_tuple(left: bytes = b'', right: bytes = b'') -> bytes:
