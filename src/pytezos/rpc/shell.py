@@ -168,14 +168,15 @@ class ShellQuery(RpcQuery, path=''):
                             logger.info('Operation %s has left mempool', opg_hash)
                             pending.remove(opg_hash)
 
-            if len(pending) < len(opg_hashes):
-                included = self.blocks[block_hash].operation_hashes()
-                for i, vp in enumerate(included):
-                    for j, opg_hash in enumerate(vp):
-                        if opg_hash in opg_hashes and opg_hash not in confirmations:
-                            logger.info('Operation %s has been included to block %s', opg_hash, block_hash)
-                            confirmations[opg_hash] = 0  # initialize
-                            operations.append(self.blocks[block_hash].operations[i][j]())
+            included = self.blocks[block_hash].operation_hashes()
+            for i, vp in enumerate(included):
+                for j, opg_hash in enumerate(vp):
+                    if opg_hash in opg_hashes and opg_hash not in confirmations:
+                        logger.info('Operation %s has been included to block %s', opg_hash, block_hash)
+                        if opg_hash in pending:  # can be still in the particular node's mempool (not yet removed)
+                            pending.remove(opg_hash)
+                        confirmations[opg_hash] = 0  # initialize
+                        operations.append(self.blocks[block_hash].operations[i][j]())
 
             for opg_hash in confirmations:
                 confirmations[opg_hash] += 1
