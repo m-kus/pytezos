@@ -136,9 +136,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
             'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, constants)),
-            'storage_limit': lambda x: str(storage_limit)
-            if storage_limit is not None
-            else str(default_storage_limit(x, constants)),
+            'storage_limit': lambda x: str(storage_limit) if storage_limit is not None else str(default_storage_limit(x, constants)),
             'fee': lambda x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)),
         }
 

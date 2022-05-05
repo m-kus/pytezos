@@ -11,11 +11,11 @@ from deprecation import deprecated  # type: ignore
 from pytezos.crypto.encoding import base58_decode
 from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
+from pytezos.rpc.errors import ReorgError
 from pytezos.rpc.kind import validation_passes
 from pytezos.rpc.protocol import BlockQuery, BlocksQuery
 from pytezos.rpc.query import RpcQuery
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
-from pytezos.rpc.errors import ReorgError
 
 MAX_BLOCK_TIMEOUT = 86400
 

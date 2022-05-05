@@ -326,7 +326,7 @@ class ExecutionContext(AbstractContext):
         elif self.shell:
             ts = self.shell.head.header()['timestamp']
             dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
-            first_delay = self.constants['minimal_block_delay']
+            first_delay = self.shell.head.context.constants().get('minimal_block_delay', 0)
             return int((dt - datetime(1970, 1, 1)).total_seconds()) + int(first_delay)
         else:
             return 0
