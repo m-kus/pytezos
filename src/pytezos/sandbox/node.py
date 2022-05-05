@@ -154,19 +154,20 @@ class SandboxedNodeTestCase(unittest.TestCase):
 class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
     exit_event: Optional[Event] = None
     baker: Optional[Future] = None
+    min_fee = 0
 
     TIME_BETWEEN_BLOCKS = 3
     "Time delay between bake attempts, in seconds"
 
     @staticmethod
-    def autobake(time_between_blocks: int, node_url: str, exit_event: Event):
+    def autobake(time_between_blocks: int, node_url: str, exit_event: Event, min_fee=0):
         logging.info("Baker thread started")
         client = PyTezosClient().using(shell=node_url)
         ptr = 0
         while not exit_event.is_set():
             if ptr % time_between_blocks == 0:
                 key = get_next_baker_key(client)
-                client.using(key=key).bake_block().fill().work().sign().inject()
+                client.using(key=key).bake_block(min_fee=min_fee).fill().work().sign().inject()
             sleep(1)
             ptr += 1
         logging.info("Baker thread stopped")
@@ -179,7 +180,12 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
         if cls.node_container is None:
             raise RuntimeError('sandboxed node container is not created')
         cls.exit_event = Event()  # type: ignore
-        cls.baker = cls.executor.submit(cls.autobake, cls.TIME_BETWEEN_BLOCKS, cls.node_container.url, cls.exit_event)
+        cls.baker = cls.executor.submit(
+            cls.autobake,
+            cls.TIME_BETWEEN_BLOCKS,
+            cls.node_container.url,
+            cls.exit_event,
+            cls.min_fee)
         cls.baker.add_done_callback(worker_callback)
 
     @classmethod

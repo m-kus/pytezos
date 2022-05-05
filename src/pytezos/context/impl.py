@@ -71,13 +71,6 @@ class ExecutionContext(AbstractContext):
         raise ValueError("It's not allowed to copy context")
 
     @property
-    def constants(self):
-        if self.shell is None:
-            raise Exception('`shell` is not set')
-        # FIXME: Cached, can be an issue when switching between protocols
-        return self.shell.block.context.constants()
-
-    @property
     def script(self) -> Optional[dict]:
         if self.parameter_expr and self.storage_expr and self.code_expr:
             return dict(code=[self.parameter_expr, self.storage_expr, self.code_expr, *self.views_expr],

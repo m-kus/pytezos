@@ -122,6 +122,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         protocol = self.protocol or self.context.get_protocol()
         branch = self.branch or self.shell.blocks[f'head~{MAX_OPERATIONS_TTL - ttl}'].hash()
         source = self.key.public_key_hash()
+        constants = self.shell.head.context.constants()
 
         if counter is not None:
             self.context.set_counter(counter - 1)  # which is supposedly the current state (head)
@@ -134,10 +135,10 @@ class OperationGroup(ContextMixin, ContentMixin):
             'secret': lambda x: self.key.activation_code,
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
-            'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, self.context.constants)),
+            'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, constants)),
             'storage_limit': lambda x: str(storage_limit)
             if storage_limit is not None
-            else str(default_storage_limit(x, self.context.constants)),
+            else str(default_storage_limit(x, constants)),
             'fee': lambda x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)),
         }
 
@@ -237,6 +238,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
         extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
+        counter_offset = self.context.get_counter_offset()
 
         def fill_content(content: Dict[str, Any]) -> Dict[str, Any]:
             if validation_passes[content['kind']] == 3:
@@ -262,7 +264,7 @@ class OperationGroup(ContextMixin, ContentMixin):
                     gas_limit=str(_gas_limit),
                     storage_limit=str(_storage_limit),
                     fee=str(_fee),
-                    counter=str(current_counter + self.context.get_counter_offset()),
+                    counter=str(current_counter + counter_offset),
                 )
 
             content.pop('metadata')

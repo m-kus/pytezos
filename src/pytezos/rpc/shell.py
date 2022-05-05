@@ -15,6 +15,7 @@ from pytezos.rpc.kind import validation_passes
 from pytezos.rpc.protocol import BlockQuery, BlocksQuery
 from pytezos.rpc.query import RpcQuery
 from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
+from pytezos.rpc.errors import ReorgError
 
 MAX_BLOCK_TIMEOUT = 86400
 
@@ -66,7 +67,6 @@ class ShellQuery(RpcQuery, path=''):
         self,
         current_block_hash: str,
         max_blocks: int = 1,
-        max_priority: int = 2,
         yield_current=False,
         time_between_blocks: Optional[int] = None,
         block_timeout: Optional[int] = None,
@@ -75,7 +75,6 @@ class ShellQuery(RpcQuery, path=''):
 
         :param current_block_hash: hash of the current block (head)
         :param max_blocks: number of blocks to iterate (not including the current one)
-        :param max_priority: wait for blocks with lower priority (increased timeout)
         :param yield_current: yield current block hash at the very beginning
         :param time_between_blocks: override protocol constant
         :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
@@ -96,7 +95,7 @@ class ShellQuery(RpcQuery, path=''):
         for _ in range(max_blocks):
             header = self.blocks[current_block_hash].header()
             if prev_block_hash and prev_block_hash != header['predecessor']:
-                raise StopIteration('Reorg detected, expected predecessor %s instead of %s', prev_block_hash, header['predecessor'])
+                raise ReorgError(header['level'], prev_block_hash, header['predecessor'])
 
             prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
             elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
