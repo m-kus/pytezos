@@ -80,8 +80,6 @@ class ShellQuery(RpcQuery, path=''):
         :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         :return: block hashes
         """
-        prev_block_hash: Optional[str] = None
-
         if time_between_blocks is None:
             constants = self.blocks[current_block_hash].context.constants()
             time_between_blocks = int(constants.get('minimal_block_delay', 0))
@@ -92,12 +90,12 @@ class ShellQuery(RpcQuery, path=''):
         if yield_current:
             yield current_block_hash
 
-        for _ in range(max_blocks):
-            header = self.blocks[current_block_hash].header()
-            if prev_block_hash and prev_block_hash != header['predecessor']:
-                raise ReorgError(header['level'], prev_block_hash, header['predecessor'])
+        current_header = self.blocks[current_block_hash].header()
+        max_level = current_header['level'] + max_blocks
 
-            prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+        while current_header['level'] < max_level:
+            logger.info('Current level: %d (max %d)', current_header['level'], max_level)
+            prev_block_dt = datetime.strptime(current_header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
             elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
             sleep_sec = 1 if elapsed_sec > time_between_blocks else (time_between_blocks - elapsed_sec + 1)
 
@@ -117,8 +115,8 @@ class ShellQuery(RpcQuery, path=''):
             if current_block_hash != next_block_hash:
                 assert next_block_hash
                 yield next_block_hash
-                prev_block_hash = current_block_hash
                 current_block_hash = next_block_hash
+                current_header = self.blocks[current_block_hash].header()
             else:
                 raise TimeoutError('Reached timeout (%d sec) while waiting for the next block', block_timeout)
 
