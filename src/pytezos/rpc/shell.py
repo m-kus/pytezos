@@ -71,7 +71,7 @@ class ShellQuery(RpcQuery, path=''):
         time_between_blocks: Optional[int] = None,
         block_timeout: Optional[int] = None,
     ) -> Generator[str, None, None]:
-        """Iterates over future blocks (waits and yields block hash)
+        """Iterates over future blocks (waits and yields block hash), handles reorgs
 
         :param current_block_hash: hash of the current block (head)
         :param max_blocks: number of blocks to iterate (not including the current one)

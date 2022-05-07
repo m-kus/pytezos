@@ -11,7 +11,7 @@
 ### Changed
 
 * Minimum Python version is now 3.8, Python 3.10 support is added
-* `ReorgError` is now thrown while waiting for operation confirmation instead of `StopIteration` in case of a chain reorg.
+* Blocks observer now handles reorgs and waits for N levels instead of N blocks
 
 ## 3.4.2 - 2022-03-26
 
