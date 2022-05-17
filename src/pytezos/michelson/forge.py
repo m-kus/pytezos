@@ -347,14 +347,11 @@ def unforge_micheline(data: bytes) -> Union[List, Dict]:
         else:
             assert args_len == 0, f'unexpected args len {args_len}'
 
-        if annots:
+        if annots or args_len == 3:
             value, offset = unforge_array(data[ptr:])
             ptr += offset
             if len(value) > 0:
                 expr['annots'] = value.decode().split(' ')
-
-        if args_len == 3:
-            ptr += 4
 
         return expr
 

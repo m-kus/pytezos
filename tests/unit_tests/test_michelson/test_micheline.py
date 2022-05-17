@@ -124,3 +124,15 @@ class TestPacking(TestCase):
     def test_forge_combs(self):
         expr = {'prim': 'Pair', 'args': [{'int': '1'}, {'int': '2'}, {'int': '3'}, {'int': '4'}]}
         self.assertEqual(expr, unforge_micheline(forge_micheline(expr)))
+
+    def test_prim_sequence_three_args(self):
+        packed = "0502000000f003200743036e0a00000016010cd84cb6f78f1e146e5e86b3648327edfd45618e0007430368010000000c63616c6c6261636b2d343034037706550765096500000031046e0000000625766f746572045d0000000a2563616e64696461746504590000000f25657865637574655f766f74696e670000000c25766f74655f706172616d73046e00000007256275636b657400000010256c61756e63685f63616c6c6261636b072f020000000203270200000004034c03200743036a00000521000307430359030a0743035d0a00000015002523250b271e153be6c2668954114be101d04d3d05700005054200030342034d"
+
+        data = bytes.fromhex(packed)
+        result = unforge_micheline(data[1:])
+
+        expected_result = [{'prim': 'DROP'}, {'prim': 'PUSH', 'args': [{'prim': 'address'}, {'bytes': '010cd84cb6f78f1e146e5e86b3648327edfd45618e00'}]}, {'prim': 'PUSH', 'args': [{'prim': 'string'}, {'string': 'callback-404'}]}, {'prim': 'SELF_ADDRESS'}, {'prim': 'CONTRACT', 'args': [{'prim': 'pair', 'args': [{'prim': 'pair', 'args': [{'prim': 'address', 'annots': ['%voter']}, {'prim': 'key_hash', 'annots': ['%candidate']}, {'prim': 'bool', 'annots': ['%execute_voting']}], 'annots': ['%vote_params']}, {'prim': 'address', 'annots': ['%bucket']}]}], 'annots': ['%launch_callback']}, {'prim': 'IF_NONE', 'args': [[{'prim': 'FAILWITH'}], [{'prim': 'SWAP'}, {'prim': 'DROP'}]]}, {'prim': 'PUSH', 'args': [{'prim': 'mutez'}, {'int': '0'}]}, {'prim': 'DUP', 'args': [{'int': '3'}]}, {'prim': 'PUSH', 'args': [{'prim': 'bool'}, {'prim': 'True'}]}, {'prim': 'PUSH', 'args': [{'prim': 'key_hash'}, {'bytes': '002523250b271e153be6c2668954114be101d04d3d'}]}, {'prim': 'DIG', 'args': [{'int': '5'}]}, {'prim': 'PAIR', 'args': [{'int': '3'}]}, {'prim': 'PAIR'}, {'prim': 'TRANSFER_TOKENS'}]
+
+        self.assertListEqual(result, expected_result)
+
+        self.assertListEqual(expected_result, unforge_micheline(forge_micheline(expected_result)))
