@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytezos"
-version = "3.4.2"
+version = "3.5.1"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]
@@ -31,9 +31,9 @@ base58 = "^2.1.1"
 bson = "^0.5.10"
 cached-property = "^1.5.2"
 cattrs = "^22.1.0"
-click = "^8.0.3"
+click = "^8.0.3,<=8.0.4"
 deprecation = "^2.1.0"
-docker = {version = "^5.0.3", platform = "linux"}
+docker = {git = "https://github.com/docker/docker-py.git"}
 fastecdsa = "^2.2.3"
 ipykernel = "^6.6.0"
 jsonschema = "^4.3.2"
@@ -72,7 +72,7 @@ mypy = "^0.930"
 diff-cover = "^6.4.4"
 black = "^21.12b0"
 coverage = "^6.2"
-sphinx-click = "^4.0.3"
+sphinx-click = "^3.0.2"
 types-tabulate = "^0.8.4"
 types-requests = "^2.26.3"
 types-simplejson = "^3.17.2"
