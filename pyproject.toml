@@ -33,7 +33,6 @@ cached-property = "^1.5.2"
 cattrs = "^22.1.0"
 click = "^8.0.3,<=8.0.4"
 deprecation = "^2.1.0"
-docker = {git = "https://github.com/docker/docker-py.git"}
 fastecdsa = "^2.2.3"
 ipykernel = "^6.6.0"
 jsonschema = "^4.3.2"
