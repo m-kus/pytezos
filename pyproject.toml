@@ -16,7 +16,6 @@ classifiers = [
     "Topic :: System :: Shells",
     "Framework :: IPython",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3"
 
 ]
 packages = [
@@ -60,7 +59,7 @@ types-python-dateutil = "^2.8.10"
 
 [tool.poetry.dev-dependencies]
 parameterized = "^0.8.1"
-Sphinx = "^4.3.2"
+Sphinx = "^5.0.0"
 sphinx-rtd-theme = "^1.0.0"
 sphinx-sitemap = "^2.2.0"
 sphinxcontrib-googleanalytics = "^0.1"
@@ -68,16 +67,16 @@ bump2version = "^1.0.1"
 pylint = "^2.12.2"
 pylint-exit = "^1.2.0"
 isort = "^5.10.1"
-mypy = "^0.930"
+mypy = "^0.960"
 diff-cover = "^6.4.4"
-black = "^21.12b0"
+black = "^22.3.0"
 coverage = "^6.2"
-sphinx-click = "^3.0.2"
+sphinx-click = "^4.1.0"
 types-tabulate = "^0.8.4"
 types-requests = "^2.26.3"
 types-simplejson = "^3.17.2"
 pytest-cov = "^3.0.0"
-pytest = "^6.2.5"
+pytest = "^7.1.2"
 
 [tool.poetry.scripts]
 pytezos = 'pytezos.cli.cli:cli'

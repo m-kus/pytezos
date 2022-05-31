@@ -81,10 +81,10 @@ docs:
 	poetry run sh -c "cd docs && rm -rf ./build && $(MAKE) html && cd .."
 
 kernel-docs:
-	python scripts/gen_kernel_docs_py.py
+	poetry run python scripts/gen_kernel_docs_py.py
 
 rpc-docs:
-	python scripts/fetch_docs.py
+	poetry run python scripts/fetch_docs.py
 
 release-patch:
 	bumpversion patch

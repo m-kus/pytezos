@@ -13,7 +13,7 @@ def format_mutez(value: Optional[Union[int, Decimal]]) -> str:
     if value is None:
         value = 0
     elif isinstance(value, Decimal):
-        value = int(value * 10 ** 6)
+        value = int(value * 10**6)
     elif isinstance(value, float):
         raise ValueError('Please use decimal instead of float')
     return str(value)
@@ -25,7 +25,7 @@ def format_tez(value: Optional[Union[int, Decimal]]) -> Decimal:
     :param value: can be None (==0), Decimal (treated as tez), int (treated as mutez)
     :rtype: Decimal
     """
-    tez = Decimal(format_mutez(value)) / 10 ** 6
+    tez = Decimal(format_mutez(value)) / 10**6
     return tez.quantize(Decimal('0.000001'))
 
 

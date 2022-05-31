@@ -1,7 +1,8 @@
 from traceback import format_exception
 from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
 
-from ipykernel.kernelbase import Kernel  # type: ignore
+import traitlets
+from ipykernel.kernelbase import Kernel
 from tabulate import tabulate
 
 from michelson_kernel import __version__
@@ -187,10 +188,12 @@ class MichelsonKernel(Kernel):
         'codemirror_mode': 'michelson',
     }
     banner = 'Michelson (Tezos VM language)'
-    help_links = [
-        'https://michelson.nomadic-labs.com/',
-        'https://tezos.gitlab.io/whitedoc/michelson.html',
-    ]
+    help_links = traitlets.List(
+        [
+            'https://michelson.nomadic-labs.com/',
+            'https://tezos.gitlab.io/whitedoc/michelson.html',
+        ]
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -307,7 +310,16 @@ class MichelsonKernel(Kernel):
         )
         return result
 
-    def do_execute(self, code, silent, store_history=True, user_expressions=None, allow_stdin=False):
+    def do_execute(
+        self,
+        code,
+        silent,
+        store_history=True,
+        user_expressions=None,
+        allow_stdin=False,
+        *,
+        cell_id=None,
+    ):
 
         interpreter_result = self.interpreter.execute(code)
 
@@ -346,7 +358,13 @@ class MichelsonKernel(Kernel):
         res['status'] = 'ok'
         return res
 
-    def do_inspect(self, code, cursor_pos, detail_level=0):
+    def do_inspect(
+        self,
+        code,
+        cursor_pos,
+        detail_level=0,
+        omit_sections=(),
+    ):
         token, _, _ = parse_token(code, cursor_pos)
         docstring = docs.get(token)
         if docstring:

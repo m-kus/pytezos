@@ -102,7 +102,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
         :return: amount in tez
         """
         balance_str = self.account()['balance']
-        return (Decimal(balance_str) / 10 ** 6).quantize(Decimal('0.000001'))
+        return (Decimal(balance_str) / 10**6).quantize(Decimal('0.000001'))
 
     def now(self) -> int:
         """Timestamp of the latest block + block time (UTC)."""
