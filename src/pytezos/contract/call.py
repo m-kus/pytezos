@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional, Union
 
 from deprecation import deprecated  # type: ignore
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
-from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.context.impl import ExecutionContext
+from pytezos.context.mixin import ContextMixin
 from pytezos.contract.result import ContractCallResult
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger

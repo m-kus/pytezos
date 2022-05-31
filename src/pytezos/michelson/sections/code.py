@@ -1,6 +1,6 @@
 from typing import List, Type
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline
 
 

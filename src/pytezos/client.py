@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import List, Optional, Union
 
 from pytezos.block.header import BlockHeader
-from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.context.mixin import ContextMixin
 from pytezos.contract.call import ContractCall
 from pytezos.contract.interface import ContractInterface
 from pytezos.crypto.key import Key
@@ -11,9 +11,7 @@ from pytezos.jupyter import get_class_docstring, is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup
-from pytezos.operation.result import OperationResult
 from pytezos.rpc import ShellQuery
-from pytezos.rpc.node import RpcError
 from pytezos.sandbox.parameters import get_protocol_parameters
 
 

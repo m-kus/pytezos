@@ -1,8 +1,7 @@
 from pprint import pformat
 from typing import Any, Dict, Optional, Union
 
-from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.context.mixin import ExecutionContext
+from pytezos.context.mixin import ContextMixin, ExecutionContext
 from pytezos.contract.call import ContractCall
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger

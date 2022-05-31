@@ -1,6 +1,6 @@
 from typing import List, Tuple, Union, cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BytesType, ListType, MapType, NatType, NeverType, OptionType, SetType, StringType, UnitType

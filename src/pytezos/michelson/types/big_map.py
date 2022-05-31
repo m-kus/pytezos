@@ -1,7 +1,7 @@
 from copy import copy, deepcopy
 from typing import Callable, Generator, List, Optional, Tuple, Type, Union
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.forge import forge_script_expr
 from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelineSequence, parse_micheline_literal
 from pytezos.michelson.types.base import MichelsonType, Undefined

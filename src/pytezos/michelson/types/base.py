@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from copy import copy, deepcopy
 from typing import Any, Callable, List, Optional, Tuple, Type, Union, cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.micheline import Micheline
 

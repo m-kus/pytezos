@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional, Tuple, Type, cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
 from pytezos.michelson.micheline import MichelineLiteral, MichelineSequence, MichelsonRuntimeError
 from pytezos.michelson.sections import ParameterSection, StorageSection, ViewSection

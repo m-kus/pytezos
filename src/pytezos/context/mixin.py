@@ -1,7 +1,7 @@
 from os.path import exists, expanduser
 from typing import Any, Dict, Optional, Union
 
-from pytezos.context.impl import DEFAULT_IPFS_GATEWAY, ExecutionContext  # type: ignore
+from pytezos.context.impl import DEFAULT_IPFS_GATEWAY, ExecutionContext
 from pytezos.crypto.encoding import is_pkh, is_public_key
 from pytezos.crypto.key import Key, is_installed
 from pytezos.jupyter import InlineDocstring

@@ -2,12 +2,12 @@ from datetime import datetime
 from itertools import chain
 from typing import Any, List, Optional, Tuple
 
-from pytezos.context.abstract import AbstractContext, get_originated_address  # type: ignore
+from pytezos.context.abstract import AbstractContext, get_originated_address
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.logging import logger
 from pytezos.michelson.forge import forge_micheline, forge_script_expr
-from pytezos.michelson.micheline import MichelineT, get_script_section, get_script_sections
+from pytezos.michelson.micheline import get_script_section, get_script_sections
 from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery

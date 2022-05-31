@@ -2,7 +2,7 @@ from copy import copy
 from pprint import pformat
 from typing import List, Optional, Tuple, Type, cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType

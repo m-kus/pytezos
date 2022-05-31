@@ -6,8 +6,8 @@ from os.path import dirname, join
 from tempfile import TemporaryDirectory
 
 import click
-from ipykernel.kernelapp import IPKernelApp  # type: ignore
-from jupyter_client.kernelspec import KernelSpecManager  # type: ignore
+from ipykernel.kernelapp import IPKernelApp
+from jupyter_client.kernelspec import KernelSpecManager
 
 from michelson_kernel import __version__
 from michelson_kernel.kernel import MichelsonKernel

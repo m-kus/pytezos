@@ -1,7 +1,7 @@
 from contextlib import suppress
 from typing import Any, Dict, List, Tuple, Union
 
-import base58  # type: ignore
+import base58
 import strict_rfc3339  # type: ignore
 
 from pytezos.crypto.encoding import base58_decode, base58_encode

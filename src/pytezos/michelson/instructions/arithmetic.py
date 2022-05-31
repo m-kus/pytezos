@@ -2,7 +2,7 @@ from typing import Callable, List, Tuple, Type, Union, cast
 
 from py_ecc import optimized_bls12_381 as bls12_381
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import MichelsonInstruction, dispatch_types, format_stdout
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import (BLS12_381_FrType, BLS12_381_G1Type, BLS12_381_G2Type, IntType, MutezType, NatType, OptionType,

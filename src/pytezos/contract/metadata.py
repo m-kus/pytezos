@@ -4,7 +4,7 @@ from contextlib import suppress
 from os.path import dirname, join
 from typing import Any, Dict, List, Optional, Union
 
-import requests  # type: ignore
+import requests
 from attr import dataclass
 from jsonschema import validate as jsonschema_validate  # type: ignore
 

@@ -1,6 +1,6 @@
 from typing import Union
 
-import base58  # type: ignore
+import base58
 
 
 def tb(l):

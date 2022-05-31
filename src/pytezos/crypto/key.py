@@ -6,7 +6,7 @@ from os import environ as env
 from os.path import abspath, expanduser, join
 from typing import List, Optional, Union
 
-from mnemonic import Mnemonic  # type: ignore
+from mnemonic import Mnemonic
 from pyblake2 import blake2b  # type: ignore
 
 from pytezos.crypto.encoding import base58_decode, base58_encode, scrub_input

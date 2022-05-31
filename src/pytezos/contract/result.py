@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
+from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.operation.result import OperationResult
 

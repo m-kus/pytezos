@@ -1,6 +1,6 @@
 from typing import List
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.base import MichelsonInstruction, Wildcard, format_stdout
 from pytezos.michelson.stack import MichelsonStack
 

@@ -1,6 +1,6 @@
 from typing import Any, List, Optional, Type, Union, cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelsonRuntimeError
 from pytezos.michelson.types.base import MichelsonType
 

@@ -10,8 +10,7 @@ import requests
 from cached_property import cached_property  # type: ignore
 from deprecation import deprecated  # type: ignore
 
-from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.context.mixin import ExecutionContext
+from pytezos.context.mixin import ContextMixin, ExecutionContext
 from pytezos.contract.data import ContractData
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.contract.metadata import ContractMetadata
