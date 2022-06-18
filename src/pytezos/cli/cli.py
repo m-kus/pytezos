@@ -320,6 +320,7 @@ def sandbox(
     interval: float,
     blocks: int,
 ):
+    logging.basicConfig(level=logging.DEBUG)
     protocol_hash = {
         'hangzhou': HANGZHOU,
         'ithaca': ITHACA,

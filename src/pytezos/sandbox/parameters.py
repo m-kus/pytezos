@@ -88,6 +88,42 @@ sandbox_params: Dict[str, Any] = {
 
 def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
     params = sandbox_params.copy()
+
+    if protocol_version[protocol_hash] == 13:
+        params['cycles_per_voting_period'] = params.pop('blocks_per_voting_period')
+        params = {
+            **params,
+            'cache_sampler_state_cycles': 8.0,
+            'tx_rollup_enable': True,
+            'tx_rollup_origination_size': 4000.0,
+            'max_operation_data_length': 32768.0,
+            'max_proposals_per_delegate': 20.0,
+            'max_micheline_node_count': 50000.0,
+            'max_micheline_bytes_limit': 50000.0,
+            'max_allowed_global_constants_depth': 10000.0,
+            'cache_layout_size': 3.0,
+            'liquidity_baking_toggle_ema_threshold': 1000000000.0,
+            'cache_script_size': 100000000.0,
+            'cache_stake_distribution_cycles': 8.0,
+            'tx_rollup_hard_size_limit_per_inbox': 500000.0,
+            'tx_rollup_hard_size_limit_per_message': 5000.0,
+            'tx_rollup_max_withdrawals_per_batch': 15.0,
+            'tx_rollup_commitment_bond': '10000000000',
+            'tx_rollup_finality_period': 40000.0,
+            'tx_rollup_withdraw_period': 40000.0,
+            'tx_rollup_max_inboxes_count': 40100.0,
+            'tx_rollup_max_messages_per_inbox': 1010.0,
+            'tx_rollup_max_commitments_count': 80100.0,
+            'tx_rollup_cost_per_byte_ema_factor': 120.0,
+            'tx_rollup_max_ticket_payload_size': 2048.0,
+            'tx_rollup_rejection_max_proof_size': 30000.0,
+            'tx_rollup_sunset_level': 3473409.0,
+            'sc_rollup_enable': False,
+            'sc_rollup_origination_size': 6314.0,
+            'sc_rollup_challenge_window_in_blocks': 20160.0,
+            'sc_rollup_max_available_messages': 1000000.0,
+        }
+
     if protocol_version[protocol_hash] >= 12:
         params = {
             **params,
