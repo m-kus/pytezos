@@ -19,7 +19,7 @@ from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.sandbox.node import DOCKER_IMAGE, TEZOS_NODE_PORT, SandboxedNodeContainer, get_next_baker_key
-from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU, ITHACA
+from pytezos.sandbox.parameters import HANGZHOU, ITHACA, JAKARTA
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {
@@ -259,14 +259,8 @@ def smartpy_test(
         container = run_smartpy_container(
             tag=tag,
             command=f'test /root/smartpy-cli/{script_name} /root/output --protocol {protocol}',
-            files_to_add=[path, ],
-            mounts=[
-                docker.types.Mount(
-                    target='/root/output',
-                    source=output_directory,
-                    type='bind'
-                )
-            ]
+            files_to_add=[path],
+            mounts=[docker.types.Mount(target='/root/output', source=output_directory, type='bind')],
         )
         if container is None:
             raise Exception('Could not create container. Try running update-smartpy.')
@@ -299,14 +293,8 @@ def smartpy_compile(
         container = run_smartpy_container(
             tag=tag,
             command=f'compile /root/smartpy-cli/{script_name} /root/output --protocol {protocol}',
-            files_to_add=[path,],
-            mounts=[
-                docker.types.Mount(
-                    target='/root/output',
-                    source=output_directory,
-                    type='bind'
-                )
-            ]
+            files_to_add=[path],
+            mounts=[docker.types.Mount(target='/root/output', source=output_directory, type='bind')],
         )
         if container is None:
             raise Exception('Could not create container. Try running update-smartpy.')
@@ -319,7 +307,7 @@ def smartpy_compile(
 
 @cli.command(help='Run containerized sandbox node')
 @click.option('--image', type=str, help='Docker image to use', default=DOCKER_IMAGE)
-@click.option('--protocol', type=click.Choice(['hangzhou', 'ithaca']), help='Protocol to use', default='ithaca')
+@click.option('--protocol', type=click.Choice(['hangzhou', 'ithaca', 'jakarta']), help='Protocol to use', default='jakarta')
 @click.option('--port', '-p', type=int, help='Port to expose', default=TEZOS_NODE_PORT)
 @click.option('--interval', '-i', type=float, help='Interval between baked blocks (in seconds)', default=1.0)
 @click.option('--blocks', '-b', type=int, help='Number of blocks to bake before exit')
@@ -334,10 +322,12 @@ def sandbox(
 ):
     protocol_hash = {
         'hangzhou': HANGZHOU,
-        'ithaca': ITHACA
+        'ithaca': ITHACA,
+        'jakarta': JAKARTA,
     }[protocol]
 
-    with SandboxedNodeContainer(image=image, port=port) as node:
+    node = SandboxedNodeContainer(image=image, port=port)
+    with node:
         if not node.wait_for_connection():
             raise TimeoutError('Failed to connect to the sandboxed node')
 
@@ -423,7 +413,7 @@ def ligo_compile_contract(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-contract {contract_name} "{entry_point}"',
-            files_to_add=[path,]
+            files_to_add=[path],
         )
         if not detach:
             for line in container.logs(stream=True):
@@ -452,7 +442,7 @@ def ligo_compile_storage(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-storage {path} "{entry_point}" "{expression}"',
-            files_to_add=[path,],
+            files_to_add=[path],
         )
         if not detach:
             for line in container.logs(stream=True):
@@ -481,7 +471,7 @@ def ligo_invoke_contract(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-parameter {path} "{entry_point}" "{expression}"',
-            files_to_add=[path,],
+            files_to_add=[path],
         )
         if not detach:
             for line in container.logs(stream=True):

@@ -43,6 +43,7 @@ isort:
 black:
 	poetry run black src/michelson_kernel
 	poetry run black src/pytezos/block
+	poetry run black src/pytezos/cli
 	poetry run black src/pytezos/client.py
 	poetry run black src/pytezos/contract
 	poetry run black src/pytezos/michelson/forge.py

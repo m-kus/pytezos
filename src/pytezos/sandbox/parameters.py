@@ -7,9 +7,17 @@ FLORENCE = 'PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i'
 GRANADA = 'PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV'
 HANGZHOU = 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx'
 ITHACA = 'Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A'
-LATEST = ITHACA
+JAKARTA = 'PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY'
+LATEST = JAKARTA
 
-protocol_version = {EDO: 8, FLORENCE: 9, GRANADA: 10, HANGZHOU: 11, ITHACA: 12}
+protocol_version = {
+    EDO: 8,
+    FLORENCE: 9,
+    GRANADA: 10,
+    HANGZHOU: 11,
+    ITHACA: 12,
+    JAKARTA: 13,
+}
 
 sandbox_commitment = {
     "mnemonic": [

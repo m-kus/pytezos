@@ -16,7 +16,7 @@ from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
 from pytezos.sandbox.parameters import LATEST, sandbox_addresses
 
-DOCKER_IMAGE = 'bakingbad/sandboxed-node:v12.0-2'
+DOCKER_IMAGE = 'bakingbad/sandboxed-node:v13.0-1'
 MAX_ATTEMPTS = 100
 ATTEMPT_DELAY = 0.1
 TEZOS_NODE_PORT = 8732
@@ -57,7 +57,7 @@ def get_next_baker_key(client: PyTezosClient) -> str:
 
 class SandboxedNodeContainer(DockerContainer):
     def __init__(self, image=DOCKER_IMAGE, port=TEZOS_NODE_PORT):
-        super(SandboxedNodeContainer, self).__init__(image, remove=True)
+        super(SandboxedNodeContainer, self).__init__(image)
         self.with_bind_ports(TEZOS_NODE_PORT, port)
         self.url = f'http://localhost:{port}'
         self.client = PyTezosClient().using(shell=self.url)
@@ -111,7 +111,6 @@ class SandboxedNodeTestCase(unittest.TestCase):
         cls.node_container.start()
 
         if not cls.node_container.wait_for_connection():
-            cls.node_container.stop()
             logging.error('failed to connect to %s', cls.node_container.url)
             return
 
