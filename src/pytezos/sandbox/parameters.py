@@ -96,12 +96,6 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
             'cache_sampler_state_cycles': 8.0,
             'tx_rollup_enable': True,
             'tx_rollup_origination_size': 4000.0,
-            'max_operation_data_length': 32768.0,
-            'max_proposals_per_delegate': 20.0,
-            'max_micheline_node_count': 50000.0,
-            'max_micheline_bytes_limit': 50000.0,
-            'max_allowed_global_constants_depth': 10000.0,
-            'cache_layout_size': 3.0,
             'liquidity_baking_toggle_ema_threshold': 1000000000.0,
             'cache_script_size': 100000000.0,
             'cache_stake_distribution_cycles': 8.0,
@@ -152,7 +146,10 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         }
 
     if protocol_version[protocol_hash] < 10:
-        params = {**params, 'test_chain_duration': '1966080'}
+        params = {
+            **params,
+            'test_chain_duration': '1966080',
+        }
 
     if protocol_version[protocol_hash] < 11:
         params = {
