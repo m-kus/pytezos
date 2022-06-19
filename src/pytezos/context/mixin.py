@@ -8,7 +8,7 @@ from pytezos.jupyter import InlineDocstring
 from pytezos.rpc import RpcMultiNode, RpcNode, ShellQuery
 from pytezos.rpc.errors import RpcError
 
-default_network = 'ithacanet'
+default_network = 'jakartanet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
 default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 
@@ -29,7 +29,8 @@ nodes = {
     'kaizen': ['https://rpc.tzkt.io/granadanet'],
     'kaizennet': ['https://rpc.tzkt.io/granadanet'],
     'hangzhounet': ['https://rpc.tzkt.io/hangzhou2net'],
-    'ithacanet': ['https://rpc.tzkt.io/ithacanet']
+    'ithacanet': ['https://rpc.tzkt.io/ithacanet'],
+    'jakartanet': ['https://rpc.tzkt.io/jakartanet'],
 }
 keys = {
     'alice': alice_key,

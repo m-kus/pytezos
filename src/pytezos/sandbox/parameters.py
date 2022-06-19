@@ -142,7 +142,6 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
             'minimal_block_delay': '1',
             'liquidity_baking_subsidy': '2500000',
             'liquidity_baking_sunset_level': 2032928.0,
-            'liquidity_baking_escape_ema_threshold': 1000000.0,
         }
 
     if protocol_version[protocol_hash] < 10:
