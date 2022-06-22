@@ -2,6 +2,23 @@
 .PHONY: docs
 .DEFAULT_GOAL: all
 
+LINT_TARGETS ?= \
+	src/pytezos/block \
+	src/pytezos/cli \
+	src/pytezos/client.py \
+	src/pytezos/contract \
+	src/pytezos/michelson/forge.py \
+	src/pytezos/michelson/program.py \
+	src/pytezos/michelson/repl.py \
+	src/pytezos/michelson/stack.py \
+	src/pytezos/michelson/tags.py \
+	src/pytezos/operation \
+	src/pytezos/rpc/helpers.py \
+	src/pytezos/rpc/node.py \
+	src/pytezos/rpc/protocol.py \
+	src/pytezos/rpc/shell.py \
+	src/pytezos/sandbox \
+
 DEV ?= 1
 
 all: install lint test cover
@@ -41,22 +58,7 @@ isort:
 	poetry run isort src
 
 black:
-	poetry run black src/michelson_kernel
-	poetry run black src/pytezos/block
-	poetry run black src/pytezos/cli
-	poetry run black src/pytezos/client.py
-	poetry run black src/pytezos/contract
-	poetry run black src/pytezos/michelson/forge.py
-	poetry run black src/pytezos/michelson/program.py
-	poetry run black src/pytezos/michelson/repl.py
-	poetry run black src/pytezos/michelson/stack.py
-	poetry run black src/pytezos/michelson/tags.py
-	poetry run black src/pytezos/operation
-	poetry run black src/pytezos/rpc/helpers.py
-	poetry run black src/pytezos/rpc/node.py
-	poetry run black src/pytezos/rpc/protocol.py
-	poetry run black src/pytezos/rpc/shell.py
-	poetry run black src/pytezos/sandbox
+	poetry run black ${LINT_TARGETS}
 
 pylint:
 	poetry run pylint src || poetry run pylint-exit $$?
