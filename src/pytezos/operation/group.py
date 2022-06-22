@@ -235,41 +235,44 @@ class OperationGroup(ContextMixin, ContentMixin):
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
-        extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
+        extra_size = (32 + 64) // len(self.contents) + 1  # size of serialized branch and signature
         counter_offset = self.context.get_counter_offset()
+        opg.contents.clear()
 
-        def fill_content(content: Dict[str, Any]) -> Dict[str, Any]:
+        for i, content in enumerate(opg_with_metadata['contents']):
+
             if validation_passes[content['kind']] == 3:
-                _gas_limit, _storage_limit, _fee = gas_limit, storage_limit, fee
-
-                if _gas_limit is None:
-                    _gas_limit = OperationResult.consumed_gas(content)
+                if gas_limit is None:
+                    gas_limit = OperationResult.consumed_gas(content)
                     if content['kind'] in ['origination', 'transaction']:
-                        _gas_limit += gas_reserve
+                        gas_limit += gas_reserve
 
                 if storage_limit is None:
-                    _paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
-                    _burned = OperationResult.burned(content)
-                    _storage_limit = _paid_storage_size_diff + _burned
+                    paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
+                    burned = OperationResult.burned(content)
+                    storage_limit = paid_storage_size_diff + burned
                     if content['kind'] in ['origination', 'transaction']:
-                        _storage_limit += burn_reserve
+                        storage_limit += burn_reserve
 
-                if _fee is None:
-                    _fee = calculate_fee(content, _gas_limit, extra_size)
+                if fee is None:
+                    fee = calculate_fee(content, gas_limit, extra_size)
 
                 current_counter = int(content['counter'])
                 content.update(
-                    gas_limit=str(_gas_limit),
-                    storage_limit=str(_storage_limit),
-                    fee=str(_fee),
                     counter=str(current_counter + counter_offset),
                 )
+                # FIXME: Apply to the first operation only, right?
+                if not i:
+                    content.update(
+                        gas_limit=str(gas_limit),
+                        storage_limit=str(storage_limit),
+                        fee=str(fee),
+                    )
 
             content.pop('metadata')
             logger.debug("autofilled transaction content: %s" % content)
-            return content
+            opg.contents.append(content)
 
-        opg.contents = list(map(fill_content, opg_with_metadata['contents']))
         return opg
 
     def sign(self) -> 'OperationGroup':

@@ -3,8 +3,6 @@ from unittest import TestCase, skip
 
 from pytezos import pytezos
 
-logging.basicConfig(level=logging.INFO)
-
 
 class TestInjection(TestCase):
 

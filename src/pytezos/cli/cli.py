@@ -252,7 +252,6 @@ def smartpy_test(
     protocol: str,
     tag: str,
 ):
-    client = get_docker_client()
     path = get_local_contract_path(script, extension='py')
     if path:
         _, script_name = split(path)
@@ -286,7 +285,6 @@ def smartpy_compile(
     protocol: str,
     tag: str,
 ):
-    client = get_docker_client()
     path = get_local_contract_path(script, extension='py')
     if path:
         _, script_name = split(path)
@@ -320,7 +318,6 @@ def sandbox(
     interval: float,
     blocks: int,
 ):
-    logging.basicConfig(level=logging.DEBUG)
     protocol_hash = {
         'hangzhou': HANGZHOU,
         'ithaca': ITHACA,

@@ -30,4 +30,25 @@ operation_tags = {
     'origination': 109,
     'delegation': 110,
     'register_global_constant': 111,
+    'set_deposits_limit': 112,
+    'tx_rollup_origination': 150,
+    'tx_rollup_submit_batch': 151,
+    'tx_rollup_commit': 152,
+    'tx_rollup_return_bond': 153,
+    'tx_rollup_finalize_commitment': 154,
+    'tx_rollup_remove_commitment': 155,
+    'tx_rollup_rejection': 156,
+    'tx_rollup_dispatch_tickets': 157,
+    'transfer_ticket': 158,
+    'sc_rollup_originate': 200,
+    'sc_rollup_add_messages': 201,
+    'sc_rollup_cement': 202,
+    'sc_rollup_publish': 203,
+}
+# FIXME: No backward compatibility
+operation_tags = {
+    **operation_tags,
+    'double_preendorsement_evidence': 7,
+    'preendorsement': 20,
+    'endorsement': 21,
 }

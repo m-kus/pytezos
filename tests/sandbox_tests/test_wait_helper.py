@@ -1,9 +1,6 @@
-import logging
 
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 class WaitHelpersTestCase(SandboxedNodeTestCase):

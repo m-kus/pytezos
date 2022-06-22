@@ -18,8 +18,8 @@ class SandboxTestCase(SandboxedNodeTestCase):
         opg = self.client.transaction(
             destination=sandbox_addresses['bootstrap3'],
             amount=42,
-        ).fill().sign().inject(min_confirmations=0)
-        self.assertIsNotNone(self.client.shell.mempool.pending_operations[opg['hash']])
+        ).autofill().sign().inject(min_confirmations=0)
+        assert self.client.shell.mempool.pending_operations()['applied'][0]['hash'] == opg['hash']
 
     def test_4_bake_block(self) -> None:
         self.bake_block()

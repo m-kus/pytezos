@@ -159,9 +159,9 @@ class BigMapType(MapType, prim='big_map', args_len=2):
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable') -> 'BigMapType':
         assert self.ptr is not None, f'Big_map ID is not defined'
         if self.context:
-            src_ptr, dst_ptr, action = self.context.get_big_map_diff(self.ptr)
+            _src_ptr, dst_ptr, action = self.context.get_big_map_diff(self.ptr)
         else:
-            src_ptr, dst_ptr, action = self.ptr, self.ptr, 'update'
+            _src_ptr, dst_ptr, action = self.ptr, self.ptr, 'update'
 
         def make_update(key: MichelsonType, val: Optional[MichelsonType]) -> dict:
             update = {
