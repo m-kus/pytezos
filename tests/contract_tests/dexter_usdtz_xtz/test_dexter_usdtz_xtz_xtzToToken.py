@@ -36,8 +36,6 @@ class MainnetOperationTestCaseDEXTER_USDTZ_XTZ(TestCase):
 
     def test_lazy_storage_dexter_usdtz_xtz(self):
         storage = self.program.storage.from_micheline_value(self.operation['storage'])
-
-        # lazy_diff = big_map_diff_to_lazy_diff(self.operation['big_map_diff'])
         lazy_diff = self.operation['big_map_diff']
 
         extended_storage = storage.merge_lazy_diff(lazy_diff)

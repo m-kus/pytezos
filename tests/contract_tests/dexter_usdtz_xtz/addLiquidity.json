@@ -8,7 +8,7 @@
           "prim": "Pair",
           "args": [
             {
-              "string": "tz1dH4oxHPWuhzTfc7nPvus7AWyEbqE6YUyN"
+              "bytes": "000098cfa3a21f7fa33b8938536327d79db21e774464"
             },
             {
               "int": "1"
@@ -19,10 +19,10 @@
           "prim": "Pair",
           "args": [
             {
-              "int": "132820974"
+              "int": "4690214"
             },
             {
-              "string": "2021-01-11T01:20:46.981Z"
+              "int": "1632276418"
             }
           ]
         }
@@ -33,7 +33,7 @@
     "prim": "Pair",
     "args": [
       {
-        "int": "124"
+        "int": "543"
       },
       {
         "prim": "Pair",
@@ -51,7 +51,7 @@
                     "prim": "False"
                   },
                   {
-                    "int": "46823889191"
+                    "int": "1695434246"
                   }
                 ]
               }
@@ -75,10 +75,10 @@
                 "prim": "Pair",
                 "args": [
                   {
-                    "int": "114894803317"
+                    "int": "7722920602"
                   },
                   {
-                    "int": "44107631599"
+                    "int": "1642663564"
                   }
                 ]
               }
@@ -90,21 +90,26 @@
   },
   "big_map_diff": [
     {
-      "action": "update",
-      "big_map": "124",
-      "key_hash": "expruFxJ9k8WeY2XMGVP3b8YD97y7pPu9DSdMxbPFCdGYseUSyFM9V",
-      "key": {
-        "bytes": "0000c17b4bfac12ecab969e8a5521273d367379fbe84"
+      "path": "accounts",
+      "action": "add_key",
+      "content": {
+        "hash": "exprv1rG9MhaSjCZVWGyTsq19EgzMmkQJYjhq4WVL79xu8uTN4Vdsw",
+        "key": {
+          "bytes": "000098cfa3a21f7fa33b8938536327d79db21e774464"
+        },
+        "value": {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "1029655"
+            },
+            []
+          ]
+        }
       },
-      "value": {
-        "prim": "Pair",
-        "args": [
-          {
-            "int": "148495262"
-          },
-          []
-        ]
-      }
+      "big_map": 543,
+      "id": 543,
+      "kind": "big_map"
     }
   ]
 }

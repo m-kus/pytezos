@@ -8,16 +8,16 @@
           "prim": "Pair",
           "args": [
             {
-              "string": "tz1SBF19iLiCc8dNpKe1Ym9juSAKaTPyeypF"
+              "bytes": "000057fc35cf97bccc3f97bb2cca62c37e312eb9c65c"
             },
             {
               "prim": "Pair",
               "args": [
                 {
-                  "string": "tz1SBF19iLiCc8dNpKe1Ym9juSAKaTPyeypF"
+                  "bytes": "000057fc35cf97bccc3f97bb2cca62c37e312eb9c65c"
                 },
                 {
-                  "int": "31625755"
+                  "int": "83317977"
                 }
               ]
             }
@@ -27,16 +27,16 @@
           "prim": "Pair",
           "args": [
             {
-              "int": "30042473"
+              "int": "1"
             },
             {
               "prim": "Pair",
               "args": [
                 {
-                  "int": "76512154"
+                  "int": "1"
                 },
                 {
-                  "string": "2021-01-11T03:29:48.908Z"
+                  "int": "1636675740"
                 }
               ]
             }
@@ -49,7 +49,7 @@
     "prim": "Pair",
     "args": [
       {
-        "int": "124"
+        "int": "543"
       },
       {
         "prim": "Pair",
@@ -67,7 +67,7 @@
                     "prim": "False"
                   },
                   {
-                    "int": "46792263436"
+                    "int": "1593572557"
                   }
                 ]
               }
@@ -91,10 +91,10 @@
                 "prim": "Pair",
                 "args": [
                   {
-                    "int": "113545107796"
+                    "int": "8294236502"
                   },
                   {
-                    "int": "44583451891"
+                    "int": "1369403592"
                   }
                 ]
               }
@@ -106,21 +106,26 @@
   },
   "big_map_diff": [
     {
-      "action": "update",
-      "big_map": "124",
-      "key_hash": "exprtkED1cDh9NCCKzs2bHNoj7Gg8hStV12Dqe8HhQt7rYJn6w9TwH",
-      "key": {
-        "bytes": "000047b7ed172b8a81f44bbf3fdd4e76302bba7e1639"
+      "path": "accounts",
+      "action": "update_key",
+      "content": {
+        "hash": "expru5jB9EydoTk74xcPCahWWsoi3FMqiS3gZgZ8VwZqw84EQUUr6i",
+        "key": {
+          "bytes": "000057fc35cf97bccc3f97bb2cca62c37e312eb9c65c"
+        },
+        "value": {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "0"
+            },
+            []
+          ]
+        }
       },
-      "value": {
-        "prim": "Pair",
-        "args": [
-          {
-            "int": "0"
-          },
-          []
-        ]
-      }
+      "big_map": 543,
+      "id": 543,
+      "kind": "big_map"
     }
   ]
 }

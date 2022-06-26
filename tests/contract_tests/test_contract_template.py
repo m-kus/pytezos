@@ -52,7 +52,7 @@ class MainnetContractTestCaseTemplate(TestCase):
 
     def test_storage_encoding_template(self):
         val = self.program.storage.from_micheline_value(self.script['storage'])
-        val_expr = val.to_micheline_value(mode='legacy_optimized')
+        val_expr = val.to_micheline_value(mode='optimized')
         self.assertEqual(self.script['storage'], val_expr, 'micheline -> value -> micheline')
 
         val_ = self.program.storage.from_python_object(val.to_python_object())
