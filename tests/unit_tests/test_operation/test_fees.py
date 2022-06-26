@@ -28,7 +28,6 @@ class FeesTest(TestCase):
         # Assert
         self.assertEqual(expected_fee, fee)
 
-    @skip('FIXME: proto.013-PtJakart.gas_exhausted.operation on Jakarta')
     def test_default_fee(self) -> None:
         # Arrange
         expected_fee = 412
@@ -39,7 +38,6 @@ class FeesTest(TestCase):
         # Assert
         self.assertEqual(expected_fee, fee)
     
-    @skip('FIXME: proto.013-PtJakart.gas_exhausted.operation on Jakarta')
     def test_default_gas_and_storage_limit(self) -> None:
         # Arrange
         node_gas_limit = 88888
