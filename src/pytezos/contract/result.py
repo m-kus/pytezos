@@ -29,18 +29,18 @@ class ContractCallResult(OperationResult):
         program = MichelsonProgram.load(context)
 
         def decode_result(res: OperationResult) -> 'ContractCallResult':
-            kwargs = {}  # type: ignore
-            if hasattr(res, 'storage') and res.storage is not None:  # type: ignore
-                storage = program.storage.from_micheline_value(res.storage)  # type: ignore
+            kwargs = {}
+            if hasattr(res, 'storage') and res.storage is not None:
+                storage = program.storage.from_micheline_value(res.storage)
                 if hasattr(res, 'lazy_diff'):
-                    kwargs.update(lazy_diff=res.lazy_diff)  # type: ignore
-                    storage = storage.merge_lazy_diff(res.lazy_diff)  # type: ignore
+                    kwargs.update(lazy_diff=res.lazy_diff)
+                    storage = storage.merge_lazy_diff(res.lazy_diff)
                 kwargs.update(storage=storage.to_python_object())
             if hasattr(res, 'parameters'):
-                parameters = program.parameter.from_parameters(res.parameters)  # type: ignore
+                parameters = program.parameter.from_parameters(res.parameters)
                 kwargs.update(parameters=parameters)
             if hasattr(res, 'operations'):
-                kwargs.update(operations=res.operations)  # type: ignore
+                kwargs.update(operations=res.operations)
             return cls(**kwargs)
 
         return list(map(decode_result, results))

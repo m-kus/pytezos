@@ -119,7 +119,7 @@ def preformat_stack_table(items: List[MichelsonInstruction]) -> List[Dict[str, A
     rows = []
     for i, item in enumerate(items):
         prim = format_prim(item)
-        value = item.to_python_object()  # type: ignore
+        value = item.to_python_object()
         if isinstance(value, bytes):
             value = value.hex()
 
@@ -127,7 +127,7 @@ def preformat_stack_table(items: List[MichelsonInstruction]) -> List[Dict[str, A
             {
                 'index': i,
                 'type': prim,
-                'value': value,  # type: ignore
+                'value': value,
             }
         )
     return rows

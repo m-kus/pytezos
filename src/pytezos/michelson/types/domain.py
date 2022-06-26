@@ -22,7 +22,7 @@ from pytezos.michelson.types.base import Undefined
 from pytezos.michelson.types.core import IntType, MichelsonType, NatType, StringType
 
 
-class TimestampType(IntType, prim='timestamp'):  # type: ignore
+class TimestampType(IntType, prim='timestamp'):
     @classmethod
     def from_value(cls, value: int) -> 'TimestampType':
         return cls(value)
@@ -82,7 +82,7 @@ class AddressType(StringType, prim='address'):
     def __repr__(self):
         return f'{self.value[:6]}…{self.value[-3:]}'
 
-    def __lt__(self, other: 'AddressType') -> bool:  # type: ignore
+    def __lt__(self, other: 'AddressType') -> bool:
         if is_pkh(self.value) and is_kt(other.value):
             return True
         elif is_kt(self.value) and is_pkh(other.value):
@@ -131,7 +131,7 @@ class KeyType(StringType, prim='key'):
     def prefix(self) -> str:
         return self.value[:4]
 
-    def __lt__(self, other: 'KeyType') -> bool:  # type: ignore
+    def __lt__(self, other: 'KeyType') -> bool:
         """
         Keys are ordered as follows: edpk < sppk < p2pk
         All keys are in compressed form in Tezos (flag | X) where flag specifies if Y is odd or even
@@ -307,7 +307,7 @@ class ContractType(AddressType, prim='contract', args_len=1):
         return super(ContractType, self).to_python_object()
 
 
-class LambdaType(MichelsonType, prim='lambda', args_len=2):  # type: ignore
+class LambdaType(MichelsonType, prim='lambda', args_len=2):
     def __init__(self, value: Type[Micheline]):
         super(LambdaType, self).__init__()
         self.value = value

@@ -17,14 +17,14 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
                 a.args[0], mapping={(StringType,): (StringType, str, ''), (BytesType,): (BytesType, bytes, b'')}
             )
             res = res_type.from_value(delim.join(map(convert, a)))
-            stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
+            stdout.append(format_stdout(cls.prim, [a], [res]))
         else:
             b = cast(Union[StringType, BytesType], stack.pop1())
             res_type, convert = dispatch_types(
                 type(a), type(b), mapping={(StringType, StringType): (StringType, str), (BytesType, BytesType): (BytesType, bytes)}
             )
             res = res_type.from_value(convert(a) + convert(b))
-            stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
+            stdout.append(format_stdout(cls.prim, [a, b], [res]))
         stack.push(res)
         return cls(stack_items_added=1)
 
@@ -35,7 +35,7 @@ class PackInstruction(MichelsonInstruction, prim='PACK'):
         a = stack.pop1()
         res = BytesType.from_value(a.pack())
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [a], [res]))
         return cls(stack_items_added=1)
 
 
@@ -45,13 +45,13 @@ class UnpackInstruction(MichelsonInstruction, prim='UNPACK', args_len=1):
         a = cast(BytesType, stack.pop1())
         a.assert_type_equal(BytesType)
         try:
-            some = cls.args[0].unpack(bytes(a))  # type: ignore
+            some = cls.args[0].unpack(bytes(a))
             res = OptionType.from_some(some)
         except Exception as e:
             stdout.append(f'{cls.prim}: {e}')
-            res = OptionType.none(cls.args[0])  # type: ignore
+            res = OptionType.none(cls.args[0])
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [a], [res]))
         return cls(stack_items_added=1)
 
 
@@ -62,7 +62,7 @@ class SizeInstruction(MichelsonInstruction, prim='SIZE'):
         src.assert_type_in(StringType, BytesType, ListType, SetType, MapType)
         res = NatType.from_value(len(src))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [src], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [src], [res]))
         return cls(stack_items_added=1)
 
 
@@ -79,7 +79,7 @@ class SliceInstruction(MichelsonInstruction, prim='SLICE'):
         else:
             res = OptionType.none(type(s))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [offset, length, s], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [offset, length, s], [res]))
         return cls(stack_items_added=1)
 
 
@@ -88,7 +88,7 @@ class UnitInstruction(MichelsonInstruction, prim='UNIT'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = UnitType()
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [], [res]))
         return cls(stack_items_added=1)
 
 
@@ -97,5 +97,5 @@ class NeverInstruction(MichelsonInstruction, prim='NEVER'):
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         never = cast(NeverType, stack.pop1())
         never.assert_type_equal(NeverType)
-        stdout.append(format_stdout(cls.prim, [never], []))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [never], []))
         return cls()

@@ -178,7 +178,7 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
             cls.executor = ThreadPoolExecutor(1)
         if cls.node_container is None:
             raise RuntimeError('sandboxed node container is not created')
-        cls.exit_event = Event()  # type: ignore
+        cls.exit_event = Event()
         cls.baker = cls.executor.submit(cls.autobake, cls.TIME_BETWEEN_BLOCKS, cls.node_container.url, cls.exit_event, cls.min_fee)
         cls.baker.add_done_callback(worker_callback)
 

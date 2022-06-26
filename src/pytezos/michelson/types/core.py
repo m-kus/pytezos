@@ -39,7 +39,7 @@ class StringType(MichelsonType, prim='string'):
     def __lt__(self, other: 'StringType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other):  # type: ignore
+    def __eq__(self, other):
         if not isinstance(other, StringType):
             return False
         return self.value == other.value
@@ -99,7 +99,7 @@ class IntType(MichelsonType, prim='int'):
     def __lt__(self, other: 'IntType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other):  # type: ignore
+    def __eq__(self, other):
         if not isinstance(other, IntType):
             return False
         return self.value == other.value
@@ -166,7 +166,7 @@ class BytesType(MichelsonType, prim='bytes'):
     def __lt__(self, other: 'BytesType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other):  # type: ignore
+    def __eq__(self, other):
         if not isinstance(other, BytesType):
             return False
         return self.value == other.value
@@ -233,7 +233,7 @@ class BoolType(MichelsonType, prim='bool'):
     def __lt__(self, other: 'BoolType'):  # type: ignore
         return self.value < other.value
 
-    def __eq__(self, other):  # type: ignore
+    def __eq__(self, other):
         if not isinstance(other, BoolType):
             return False
         return self.value == other.value

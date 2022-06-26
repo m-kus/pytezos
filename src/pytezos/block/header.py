@@ -61,7 +61,7 @@ class BlockHeader(ContextMixin):
         :param parameters: protocol parameters
         :param context: execution context
         """
-        prev_fitness = context.shell.head.header()['fitness']  # type: ignore
+        prev_fitness = context.shell.head.header()['fitness']
         protocol_data = {
             "content": {
                 "command": "activate",
@@ -82,7 +82,7 @@ class BlockHeader(ContextMixin):
         :param context: Execution context
         :param min_fee: Minimum fee of transaction to be included in block
         """
-        pending_operations = context.shell.mempool.pending_operations()  # type: ignore
+        pending_operations = context.shell.mempool.pending_operations()
         operations: List[List[Dict[str, Any]]] = [[], [], [], []]
 
         for opg in pending_operations['applied']:
@@ -139,7 +139,7 @@ class BlockHeader(ContextMixin):
             **self.protocol_data,
         }
 
-        if level % int(sandbox_params['blocks_per_commitment']) == 0:  # type: ignore
+        if level % int(sandbox_params['blocks_per_commitment']) == 0:
             protocol_data['seed_nonce_hash'] = base58_encode(b'\x00' * 32, b'nce').decode()
 
         operations = [

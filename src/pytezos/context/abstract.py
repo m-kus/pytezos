@@ -75,7 +75,7 @@ class AbstractContext:
     def get_view_expr(self, name, address=None) -> Optional:  # type: ignore
         raise NotImplementedError
 
-    def get_views_expr(self) -> List:  # type: ignore
+    def get_views_expr(self) -> List:
         raise NotImplementedError
 
     def get_input_expr(self):

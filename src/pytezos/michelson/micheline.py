@@ -152,7 +152,7 @@ class Micheline(metaclass=ErrorTrace):
 
     @classmethod
     def __init_subclass__(cls, prim: Optional[str] = None, args_len: Optional[int] = 0, **kwargs):
-        super().__init_subclass__(**kwargs)  # type: ignore
+        super().__init_subclass__(**kwargs)
         if prim is not None:
             assert (prim, args_len) not in cls.classes, f'duplicate key {prim} ({args_len} args)'
             cls.classes[(prim, args_len)] = cls
@@ -288,7 +288,7 @@ class MichelineLiteral(Micheline):
     @classmethod
     def get_bytes(cls) -> bytes:
         if not isinstance(cls.literal, bytes):
-            raise TypeError(f'Expected bytes, got {cls.literal}')  # type: ignore
+            raise TypeError(f'Expected bytes, got {cls.literal}')
         return cls.literal
 
 

@@ -23,9 +23,9 @@ def format_stdout(prim: str, inputs: list, outputs: list, arg=None):
 
 def dispatch_types(*args: Type[Micheline], mapping: Dict[Tuple[Type[Micheline], ...], Tuple[Any, ...]]):
     key = tuple(arg.prim for arg in args)
-    mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}  # type: ignore
-    assert key in mapping, f'unexpected types `{" * ".join(key)}`'  # type: ignore
-    return mapping[key]  # type: ignore
+    mapping = {tuple(arg.prim for arg in k): v for k, v in mapping.items()}
+    assert key in mapping, f'unexpected types `{" * ".join(key)}`'
+    return mapping[key]
 
 
 class MichelsonInstruction(Micheline):

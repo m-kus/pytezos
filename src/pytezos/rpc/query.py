@@ -51,7 +51,7 @@ class RpcQuery(metaclass=InlineDocstring):
 
     @classmethod
     def __init_subclass__(cls, path: str = '', **kwargs):
-        super().__init_subclass__(**kwargs)  # type: ignore
+        super().__init_subclass__(**kwargs)
         if isinstance(path, list):
             for sub_path in path:
                 cls.__extensions__[sub_path] = cls

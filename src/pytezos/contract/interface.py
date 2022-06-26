@@ -67,9 +67,9 @@ class ContractInterface(ContextMixin):
                 name=view_name,
                 parameter=view_ty.args[1].as_micheline_expr(),
                 return_type=view_ty.args[2].as_micheline_expr(),
-                code=view_ty.args[3].as_micheline_expr(),  # type: ignore
+                code=view_ty.args[3].as_micheline_expr(),
             )
-            view_attr.__doc__ = view_ty.generate_pydoc()  # type: ignore
+            view_attr.__doc__ = view_ty.generate_pydoc()
             assert not hasattr(self, view_name), f'View name collision {view_name}'
             setattr(self, view_name, view_attr)
 
@@ -340,7 +340,7 @@ class ContractInterface(ContextMixin):
 
         :rtype: ContractTokenMetadataProxy
         """
-        return ContractTokenMetadataProxy(self._get_token_metadata)  # type: ignore
+        return ContractTokenMetadataProxy(self._get_token_metadata)
 
     @lru_cache(maxsize=None)
     def _get_token_metadata(self, token_id: int) -> Optional[ContractTokenMetadata]:
@@ -422,22 +422,22 @@ class ContractInterface(ContextMixin):
         assert root_name in self.entrypoints, 'root entrypoint is undefined'
         return getattr(self, root_name)
 
-    @property  # type: ignore
+    @property
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='access `ContractInterface` directly')
     def contract(self) -> 'ContractInterface':
         return self
 
-    @property  # type: ignore
+    @property
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `to_michelson()` instead')
     def text(self) -> str:
         return self.to_michelson()
 
-    @property  # type: ignore
+    @property
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `to_micheline()` instead')
     def code(self):
         return self.to_micheline()
 
-    @property  # type: ignore
+    @property
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `default()` instead')
     def call(self) -> ContractEntrypoint:
         return self.parameter

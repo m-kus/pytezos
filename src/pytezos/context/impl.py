@@ -198,7 +198,7 @@ class ExecutionContext(AbstractContext):
                 return None  # dummy callback
             else:
                 script = self.shell.contracts[address].script()
-                expr = get_script_section(script, name='parameter', cls=None, required=True)  # type: ignore
+                expr = get_script_section(script, name='parameter', cls=None, required=True)
         elif address:
             return None
         else:
@@ -208,7 +208,7 @@ class ExecutionContext(AbstractContext):
     def get_storage_expr(self, address=None) -> Optional[dict]:
         if self.shell and address:
             script = self.shell.contracts[address].script()
-            expr = get_script_section(script, name='storage', cls=None, required=True)  # type: ignore
+            expr = get_script_section(script, name='storage', cls=None, required=True)
         elif address:
             return None
         else:

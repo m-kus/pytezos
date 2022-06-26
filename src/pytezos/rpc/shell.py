@@ -34,7 +34,7 @@ class ShellQuery(RpcQuery, path=''):
         """Shortcut for `blocks.head`"""
         return self.blocks.head
 
-    @property  # type: ignore
+    @property
     @lru_cache(maxsize=None)
     def block(self) -> BlockQuery:
         """Cached head block, useful if you just want to explore things."""
@@ -207,7 +207,7 @@ class ShellQuery(RpcQuery, path=''):
         :param delay_sec: Sleep delay
         """
         if time_between_blocks is None:
-            time_between_blocks = int(self.block.context.constants()["minimal_block_delay"])  # type: ignore
+            time_between_blocks = int(self.block.context.constants()["minimal_block_delay"])
 
         if time_between_blocks > 0:
             if prev_hash is None:

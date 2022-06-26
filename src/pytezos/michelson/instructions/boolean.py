@@ -20,14 +20,14 @@ def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add
 class OrInstruction(MichelsonInstruction, prim='OR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])  # type: ignore
+        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] | x[1])
         return cls(stack_items_added=1)
 
 
 class XorInstruction(MichelsonInstruction, prim='XOR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])  # type: ignore
+        execute_boolean_add(cls.prim, stack, stdout, lambda x: x[0] ^ x[1])
         return cls(stack_items_added=1)
 
 
@@ -47,7 +47,7 @@ class AndInstruction(MichelsonInstruction, prim='AND'):
         )
         res = res_type.from_value(convert(a) & convert(b))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))
         return cls(stack_items_added=1)
 
 
@@ -65,5 +65,5 @@ class NotInstruction(MichelsonInstruction, prim='NOT'):
         )
         res = res_type.from_value(convert(a))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
+        stdout.append(format_stdout(cls.prim, [a], [res]))
         return cls(stack_items_added=1)

@@ -26,7 +26,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         else:
             return self.item < other.item
 
-    def __eq__(self, other) -> bool:  # type: ignore
+    def __eq__(self, other) -> bool:
         if not isinstance(other, OptionType):
             return False
         return self.item == other.item  # type: ignore

@@ -241,7 +241,7 @@ class ContractViewCall(ContextMixin):
         if error:
             logger.debug('\n'.join(stdout))
             raise error
-        return storage  # type: ignore
+        return storage
 
     def onchain_view(self, storage=None, balance=None, view_results: Optional[Dict[str, Any]] = None):
         """Get return value of an on-chain view.
@@ -257,11 +257,11 @@ class ContractViewCall(ContextMixin):
             storage=self._get_storage(storage),
             context=self._spawn_context(
                 balance=balance,
-                script={**self.context.script, 'storage': self._encode_storage(storage)},  # type: ignore
+                script={**self.context.script, 'storage': self._encode_storage(storage)},
                 view_results=view_results,
             ),
         )
         if error:
             logger.debug('\n'.join(stdout))
             raise error
-        return ret  # type: ignore
+        return ret
