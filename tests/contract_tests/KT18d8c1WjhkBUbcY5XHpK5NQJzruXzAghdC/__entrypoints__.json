@@ -1,0 +1,37 @@
+{
+  "entrypoints": {
+    "afterTransfer": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address"
+                },
+                {
+                  "prim": "nat"
+                }
+              ]
+            },
+            {
+              "prim": "address"
+            },
+            {
+              "prim": "nat"
+            }
+          ]
+        },
+        {
+          "prim": "address"
+        }
+      ]
+    },
+    "addToken_": {
+      "prim": "address"
+    }
+  }
+}

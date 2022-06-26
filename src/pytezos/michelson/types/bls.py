@@ -42,10 +42,7 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'IntType':
-        value = parse_micheline_literal(val_expr, {
-            'int': int,
-            'bytes': lambda x: cls.bytes_to_int(bytes.fromhex(x))
-        })
+        value = parse_micheline_literal(val_expr, {'int': int, 'bytes': lambda x: cls.bytes_to_int(bytes.fromhex(x))})
         return cls.from_value(value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
@@ -60,7 +57,6 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
 
 
 class BLS12_381_G1Type(BytesType, prim='bls12_381_g1'):
-
     @classmethod
     def from_value(cls, value: bytes):
         assert len(value) == 96, f'expected 98 bytes, got {len(value)}'
@@ -88,7 +84,6 @@ class BLS12_381_G1Type(BytesType, prim='bls12_381_g1'):
 
 
 class BLS12_381_G2Type(BytesType, prim='bls12_381_g2'):
-
     @classmethod
     def from_value(cls, value: bytes):
         assert len(value) == 192, f'expected 98 bytes, got {len(value)}'
@@ -102,8 +97,7 @@ class BLS12_381_G2Type(BytesType, prim='bls12_381_g2'):
             x, y = bls12_381.normalize(point)
             x_re, x_im = x.coeffs
             y_re, y_im = y.coeffs
-        value = x_im.to_bytes(48, 'big') + x_re.to_bytes(48, 'big') \
-            + y_im.to_bytes(48, 'big') + y_re.to_bytes(48, 'big')
+        value = x_im.to_bytes(48, 'big') + x_re.to_bytes(48, 'big') + y_im.to_bytes(48, 'big') + y_re.to_bytes(48, 'big')
         return cls(value)
 
     def to_point(self) -> G2Uncompressed:

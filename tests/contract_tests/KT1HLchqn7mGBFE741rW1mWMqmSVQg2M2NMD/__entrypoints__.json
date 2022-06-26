@@ -1,0 +1,120 @@
+{
+  "entrypoints": {
+    "getReservesCallback": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%token1_pool"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token2_pool"
+          ]
+        }
+      ]
+    },
+    "execute": {
+      "prim": "map",
+      "args": [
+        {
+          "prim": "int"
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%address"
+                      ]
+                    },
+                    {
+                      "prim": "int",
+                      "annots": [
+                        "%fee"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "bool",
+                  "annots": [
+                    "%invert"
+                  ]
+                },
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "address"
+                    }
+                  ],
+                  "annots": [
+                    "%token1Address"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%token1ID"
+                  ]
+                },
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "address"
+                    }
+                  ],
+                  "annots": [
+                    "%token2Address"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token2ID"
+              ]
+            },
+            {
+              "prim": "int",
+              "annots": [
+                "%type"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

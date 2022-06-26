@@ -61,7 +61,7 @@ def default_gas_limit(
         'transaction': (
             # FIXME: proto.013-PtJakart.gas_exhausted.operation on Jakarta
             # if content.get('destination', '').startswith('KT') else DEFAULT_TRANSACTION_GAS_LIMIT
-            constants['hard_gas_limit_per_operation']  
+            constants['hard_gas_limit_per_operation']
         ),
         'register_global_constant': constants['hard_gas_limit_per_operation'],
     }

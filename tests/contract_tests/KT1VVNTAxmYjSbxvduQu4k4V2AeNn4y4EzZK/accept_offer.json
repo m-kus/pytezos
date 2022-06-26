@@ -1,0 +1,37 @@
+{
+  "parameters": {
+    "creator": "tz1RrnzDWAt2baFPPi3qtQLwzEct3dtHg6RV",
+    "royalty": "100",
+    "offer_id": "314"
+  },
+  "storage": {
+    "offers": 60022,
+    "counter": "495",
+    "metadata": 60021,
+    "trading_fee": "25",
+    "administrator": "tz1SotrT1MEeC8bNeGzgBLUb3ryfASsFsdun",
+    "trading_fee_collector": "tz1ijy2Z7sSmmxPqsZ6iGRn1ZHrCtpwR7XNm"
+  },
+  "big_map_diff": [
+    {
+      "bigmap": 60022,
+      "path": "offers",
+      "action": "remove_key",
+      "content": {
+        "hash": "exprtm8JAL1QrRnyetpEAqfJ16c5wrehob9XnFwWDaGwS3i24Xyj5Q",
+        "key": "314",
+        "value": {
+          "issuer": "tz1NsyLnJBrkBmdhokVx85AxHXdeNnLbcby9",
+          "creator": "tz1RrnzDWAt2baFPPi3qtQLwzEct3dtHg6RV",
+          "royalty": "100",
+          "nft_contract": "KT1EpGgjQs73QfFJs9z7m1Mxm5MTnpC2tqse",
+          "nft_token_id": "49592",
+          "offer_amount": "2000000",
+          "offered_token_id": "0",
+          "offered_token_contract": "KT1VVNTAxmYjSbxvduQu4k4V2AeNn4y4EzZK",
+          "offered_token_standard": ""
+        }
+      }
+    }
+  ]
+}

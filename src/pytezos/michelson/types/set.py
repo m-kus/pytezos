@@ -7,7 +7,6 @@ from pytezos.michelson.types.base import MichelsonType
 
 
 class SetType(MichelsonType, prim='set', args_len=1):
-
     def __init__(self, items: List[MichelsonType]):
         super(SetType, self).__init__()
         self.items = items
@@ -77,16 +76,12 @@ class SetType(MichelsonType, prim='set', args_len=1):
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         assert not comparable, f'{self.prim} is not comparable'
-        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack,
-                                                     lazy_diff=lazy_diff,
-                                                     comparable=True), self))
+        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=True), self))
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
-        arg_doc = cls.args[0].generate_pydoc(definitions,
-                                             inferred_name=f'{name}_item' if name else None,
-                                             comparable=True)
+        arg_doc = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_item' if name else None, comparable=True)
         return f'{{ {arg_doc}, … }}'
 
     def contains(self, item: MichelsonType) -> bool:

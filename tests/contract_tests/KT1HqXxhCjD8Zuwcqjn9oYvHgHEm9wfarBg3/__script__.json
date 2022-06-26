@@ -1,0 +1,2178 @@
+{
+  "code": [
+    {
+      "prim": "storage",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%administrator"
+                          ]
+                        },
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%artist"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%collaborator"
+                          ]
+                        },
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "string"
+                            },
+                            {
+                              "prim": "bytes"
+                            }
+                          ],
+                          "annots": [
+                            "%metadata"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%next_id"
+                          ]
+                        },
+                        {
+                          "prim": "bool",
+                          "annots": [
+                            "%paused"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "address",
+                                      "annots": [
+                                        "%owner"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "timestamp",
+                                          "annots": [
+                                            "%timestamp"
+                                          ]
+                                        },
+                                        {
+                                          "prim": "list",
+                                          "args": [
+                                            {
+                                              "prim": "pair",
+                                              "args": [
+                                                {
+                                                  "prim": "nat",
+                                                  "annots": [
+                                                    "%amount"
+                                                  ]
+                                                },
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "address",
+                                                      "annots": [
+                                                        "%fa2"
+                                                      ]
+                                                    },
+                                                    {
+                                                      "prim": "nat",
+                                                      "annots": [
+                                                        "%token_id"
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "annots": [
+                                            "%tokens_accepted"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "list",
+                                      "args": [
+                                        {
+                                          "prim": "pair",
+                                          "args": [
+                                            {
+                                              "prim": "nat",
+                                              "annots": [
+                                                "%amount"
+                                              ]
+                                            },
+                                            {
+                                              "prim": "pair",
+                                              "args": [
+                                                {
+                                                  "prim": "address",
+                                                  "annots": [
+                                                    "%fa2"
+                                                  ]
+                                                },
+                                                {
+                                                  "prim": "nat",
+                                                  "annots": [
+                                                    "%token_id"
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "annots": [
+                                        "%tokens_offered"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "mutez",
+                                          "annots": [
+                                            "%xtz_ask"
+                                          ]
+                                        },
+                                        {
+                                          "prim": "mutez",
+                                          "annots": [
+                                            "%xtz_bid"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%trades"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%trading_fee"
+                              ]
+                            },
+                            {
+                              "prim": "map",
+                              "args": [
+                                {
+                                  "prim": "address"
+                                },
+                                {
+                                  "prim": "bool"
+                                }
+                              ],
+                              "annots": [
+                                "%whitelist"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "big_map",
+              "args": [
+                {
+                  "prim": "nat"
+                },
+                {
+                  "prim": "lambda",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "or",
+                          "args": [
+                            {
+                              "prim": "or",
+                              "args": [
+                                {
+                                  "prim": "or",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "bool"
+                                        },
+                                        {
+                                          "prim": "address"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "or",
+                                  "args": [
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "pair",
+                                          "args": [
+                                            {
+                                              "prim": "list",
+                                              "args": [
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "nat"
+                                                    },
+                                                    {
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "address"
+                                                        },
+                                                        {
+                                                          "prim": "nat"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "prim": "list",
+                                              "args": [
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "nat"
+                                                    },
+                                                    {
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "address"
+                                                        },
+                                                        {
+                                                          "prim": "nat"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "prim": "pair",
+                                          "args": [
+                                            {
+                                              "prim": "mutez"
+                                            },
+                                            {
+                                              "prim": "mutez"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "prim": "address"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "or",
+                              "args": [
+                                {
+                                  "prim": "or",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    },
+                                    {
+                                      "prim": "bool"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "or",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "nat"
+                                        },
+                                        {
+                                          "prim": "mutez"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "address"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "string"
+                                        },
+                                        {
+                                          "prim": "bytes"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    },
+                                    {
+                                      "prim": "bool"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "nat"
+                                        },
+                                        {
+                                          "prim": "pair",
+                                          "args": [
+                                            {
+                                              "prim": "pair",
+                                              "args": [
+                                                {
+                                                  "prim": "address"
+                                                },
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "timestamp"
+                                                    },
+                                                    {
+                                                      "prim": "list",
+                                                      "args": [
+                                                        {
+                                                          "prim": "pair",
+                                                          "args": [
+                                                            {
+                                                              "prim": "nat"
+                                                            },
+                                                            {
+                                                              "prim": "pair",
+                                                              "args": [
+                                                                {
+                                                                  "prim": "address"
+                                                                },
+                                                                {
+                                                                  "prim": "nat"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "prim": "pair",
+                                              "args": [
+                                                {
+                                                  "prim": "list",
+                                                  "args": [
+                                                    {
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "nat"
+                                                        },
+                                                        {
+                                                          "prim": "pair",
+                                                          "args": [
+                                                            {
+                                                              "prim": "address"
+                                                            },
+                                                            {
+                                                              "prim": "nat"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "mutez"
+                                                    },
+                                                    {
+                                                      "prim": "mutez"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "nat"
+                                        },
+                                        {
+                                          "prim": "map",
+                                          "args": [
+                                            {
+                                              "prim": "address"
+                                            },
+                                            {
+                                              "prim": "bool"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "list",
+                          "args": [
+                            {
+                              "prim": "operation"
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "address"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "string"
+                                        },
+                                        {
+                                          "prim": "bytes"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    },
+                                    {
+                                      "prim": "bool"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "big_map",
+                                      "args": [
+                                        {
+                                          "prim": "nat"
+                                        },
+                                        {
+                                          "prim": "pair",
+                                          "args": [
+                                            {
+                                              "prim": "pair",
+                                              "args": [
+                                                {
+                                                  "prim": "address"
+                                                },
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "timestamp"
+                                                    },
+                                                    {
+                                                      "prim": "list",
+                                                      "args": [
+                                                        {
+                                                          "prim": "pair",
+                                                          "args": [
+                                                            {
+                                                              "prim": "nat"
+                                                            },
+                                                            {
+                                                              "prim": "pair",
+                                                              "args": [
+                                                                {
+                                                                  "prim": "address"
+                                                                },
+                                                                {
+                                                                  "prim": "nat"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "prim": "pair",
+                                              "args": [
+                                                {
+                                                  "prim": "list",
+                                                  "args": [
+                                                    {
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "nat"
+                                                        },
+                                                        {
+                                                          "prim": "pair",
+                                                          "args": [
+                                                            {
+                                                              "prim": "address"
+                                                            },
+                                                            {
+                                                              "prim": "nat"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "prim": "pair",
+                                                  "args": [
+                                                    {
+                                                      "prim": "mutez"
+                                                    },
+                                                    {
+                                                      "prim": "mutez"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "nat"
+                                        },
+                                        {
+                                          "prim": "map",
+                                          "args": [
+                                            {
+                                              "prim": "address"
+                                            },
+                                            {
+                                              "prim": "bool"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "parameter",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%cancel_trade"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "bool",
+                          "annots": [
+                            "%enabled"
+                          ]
+                        },
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%fa2"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%mod_whitelist"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "list",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "nat",
+                                      "annots": [
+                                        "%amount"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "address",
+                                          "annots": [
+                                            "%fa2"
+                                          ]
+                                        },
+                                        {
+                                          "prim": "nat",
+                                          "annots": [
+                                            "%token_id"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%tokens_accepted"
+                              ]
+                            },
+                            {
+                              "prim": "list",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "nat",
+                                      "annots": [
+                                        "%amount"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "pair",
+                                      "args": [
+                                        {
+                                          "prim": "address",
+                                          "annots": [
+                                            "%fa2"
+                                          ]
+                                        },
+                                        {
+                                          "prim": "nat",
+                                          "annots": [
+                                            "%token_id"
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%tokens_offered"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "mutez",
+                              "annots": [
+                                "%xtz_ask"
+                              ]
+                            },
+                            {
+                              "prim": "mutez",
+                              "annots": [
+                                "%xtz_bid"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%offer_trade"
+                      ]
+                    },
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%set_administrator"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%set_fees"
+                      ]
+                    },
+                    {
+                      "prim": "bool",
+                      "annots": [
+                        "%set_pause"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%take_trade"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%trade_id"
+                          ]
+                        },
+                        {
+                          "prim": "mutez",
+                          "annots": [
+                            "%xtz_ask"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%update_ask"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "code",
+      "args": [
+        [
+          {
+            "prim": "CAST",
+            "args": [
+              {
+                "prim": "pair",
+                "args": [
+                  {
+                    "prim": "or",
+                    "args": [
+                      {
+                        "prim": "or",
+                        "args": [
+                          {
+                            "prim": "or",
+                            "args": [
+                              {
+                                "prim": "nat"
+                              },
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "bool"
+                                  },
+                                  {
+                                    "prim": "address"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "prim": "or",
+                            "args": [
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "pair",
+                                    "args": [
+                                      {
+                                        "prim": "list",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "address"
+                                                  },
+                                                  {
+                                                    "prim": "nat"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "prim": "list",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "address"
+                                                  },
+                                                  {
+                                                    "prim": "nat"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "prim": "pair",
+                                    "args": [
+                                      {
+                                        "prim": "mutez"
+                                      },
+                                      {
+                                        "prim": "mutez"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "prim": "address"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "or",
+                        "args": [
+                          {
+                            "prim": "or",
+                            "args": [
+                              {
+                                "prim": "nat"
+                              },
+                              {
+                                "prim": "bool"
+                              }
+                            ]
+                          },
+                          {
+                            "prim": "or",
+                            "args": [
+                              {
+                                "prim": "nat"
+                              },
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "nat"
+                                  },
+                                  {
+                                    "prim": "mutez"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "pair",
+                    "args": [
+                      {
+                        "prim": "pair",
+                        "args": [
+                          {
+                            "prim": "pair",
+                            "args": [
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "address"
+                                  },
+                                  {
+                                    "prim": "address"
+                                  }
+                                ]
+                              },
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "address"
+                                  },
+                                  {
+                                    "prim": "big_map",
+                                    "args": [
+                                      {
+                                        "prim": "string"
+                                      },
+                                      {
+                                        "prim": "bytes"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "prim": "pair",
+                            "args": [
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "nat"
+                                  },
+                                  {
+                                    "prim": "bool"
+                                  }
+                                ]
+                              },
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "big_map",
+                                    "args": [
+                                      {
+                                        "prim": "nat"
+                                      },
+                                      {
+                                        "prim": "pair",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "address"
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "timestamp"
+                                                  },
+                                                  {
+                                                    "prim": "list",
+                                                    "args": [
+                                                      {
+                                                        "prim": "pair",
+                                                        "args": [
+                                                          {
+                                                            "prim": "nat"
+                                                          },
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "address"
+                                                              },
+                                                              {
+                                                                "prim": "nat"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "list",
+                                                "args": [
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "nat"
+                                                      },
+                                                      {
+                                                        "prim": "pair",
+                                                        "args": [
+                                                          {
+                                                            "prim": "address"
+                                                          },
+                                                          {
+                                                            "prim": "nat"
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "mutez"
+                                                  },
+                                                  {
+                                                    "prim": "mutez"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "prim": "pair",
+                                    "args": [
+                                      {
+                                        "prim": "nat"
+                                      },
+                                      {
+                                        "prim": "map",
+                                        "args": [
+                                          {
+                                            "prim": "address"
+                                          },
+                                          {
+                                            "prim": "bool"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "big_map",
+                        "args": [
+                          {
+                            "prim": "nat"
+                          },
+                          {
+                            "prim": "lambda",
+                            "args": [
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "or",
+                                    "args": [
+                                      {
+                                        "prim": "or",
+                                        "args": [
+                                          {
+                                            "prim": "or",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "bool"
+                                                  },
+                                                  {
+                                                    "prim": "address"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "or",
+                                            "args": [
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "list",
+                                                        "args": [
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "nat"
+                                                              },
+                                                              {
+                                                                "prim": "pair",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "address"
+                                                                  },
+                                                                  {
+                                                                    "prim": "nat"
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "prim": "list",
+                                                        "args": [
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "nat"
+                                                              },
+                                                              {
+                                                                "prim": "pair",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "address"
+                                                                  },
+                                                                  {
+                                                                    "prim": "nat"
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "mutez"
+                                                      },
+                                                      {
+                                                        "prim": "mutez"
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "prim": "address"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "prim": "or",
+                                        "args": [
+                                          {
+                                            "prim": "or",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "bool"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "or",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "nat"
+                                                  },
+                                                  {
+                                                    "prim": "mutez"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "prim": "pair",
+                                    "args": [
+                                      {
+                                        "prim": "pair",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "address"
+                                              },
+                                              {
+                                                "prim": "address"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "address"
+                                              },
+                                              {
+                                                "prim": "big_map",
+                                                "args": [
+                                                  {
+                                                    "prim": "string"
+                                                  },
+                                                  {
+                                                    "prim": "bytes"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "prim": "pair",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "bool"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "big_map",
+                                                "args": [
+                                                  {
+                                                    "prim": "nat"
+                                                  },
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "pair",
+                                                        "args": [
+                                                          {
+                                                            "prim": "address"
+                                                          },
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "timestamp"
+                                                              },
+                                                              {
+                                                                "prim": "list",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "pair",
+                                                                    "args": [
+                                                                      {
+                                                                        "prim": "nat"
+                                                                      },
+                                                                      {
+                                                                        "prim": "pair",
+                                                                        "args": [
+                                                                          {
+                                                                            "prim": "address"
+                                                                          },
+                                                                          {
+                                                                            "prim": "nat"
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "prim": "pair",
+                                                        "args": [
+                                                          {
+                                                            "prim": "list",
+                                                            "args": [
+                                                              {
+                                                                "prim": "pair",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "nat"
+                                                                  },
+                                                                  {
+                                                                    "prim": "pair",
+                                                                    "args": [
+                                                                      {
+                                                                        "prim": "address"
+                                                                      },
+                                                                      {
+                                                                        "prim": "nat"
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "mutez"
+                                                              },
+                                                              {
+                                                                "prim": "mutez"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "nat"
+                                                  },
+                                                  {
+                                                    "prim": "map",
+                                                    "args": [
+                                                      {
+                                                        "prim": "address"
+                                                      },
+                                                      {
+                                                        "prim": "bool"
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "list",
+                                    "args": [
+                                      {
+                                        "prim": "operation"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "prim": "pair",
+                                    "args": [
+                                      {
+                                        "prim": "pair",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "address"
+                                              },
+                                              {
+                                                "prim": "address"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "address"
+                                              },
+                                              {
+                                                "prim": "big_map",
+                                                "args": [
+                                                  {
+                                                    "prim": "string"
+                                                  },
+                                                  {
+                                                    "prim": "bytes"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "prim": "pair",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "nat"
+                                              },
+                                              {
+                                                "prim": "bool"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "big_map",
+                                                "args": [
+                                                  {
+                                                    "prim": "nat"
+                                                  },
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "pair",
+                                                        "args": [
+                                                          {
+                                                            "prim": "address"
+                                                          },
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "timestamp"
+                                                              },
+                                                              {
+                                                                "prim": "list",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "pair",
+                                                                    "args": [
+                                                                      {
+                                                                        "prim": "nat"
+                                                                      },
+                                                                      {
+                                                                        "prim": "pair",
+                                                                        "args": [
+                                                                          {
+                                                                            "prim": "address"
+                                                                          },
+                                                                          {
+                                                                            "prim": "nat"
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "prim": "pair",
+                                                        "args": [
+                                                          {
+                                                            "prim": "list",
+                                                            "args": [
+                                                              {
+                                                                "prim": "pair",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "nat"
+                                                                  },
+                                                                  {
+                                                                    "prim": "pair",
+                                                                    "args": [
+                                                                      {
+                                                                        "prim": "address"
+                                                                      },
+                                                                      {
+                                                                        "prim": "nat"
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "mutez"
+                                                              },
+                                                              {
+                                                                "prim": "mutez"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "nat"
+                                                  },
+                                                  {
+                                                    "prim": "map",
+                                                    "args": [
+                                                      {
+                                                        "prim": "address"
+                                                      },
+                                                      {
+                                                        "prim": "bool"
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "prim": "UNPAIR",
+            "args": [
+              {
+                "int": "3"
+              }
+            ]
+          },
+          {
+            "prim": "DUP"
+          },
+          {
+            "prim": "IF_LEFT",
+            "args": [
+              [
+                {
+                  "prim": "IF_LEFT",
+                  "args": [
+                    [
+                      {
+                        "prim": "IF_LEFT",
+                        "args": [
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "0"
+                                }
+                              ]
+                            }
+                          ],
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "1"
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "prim": "IF_LEFT",
+                        "args": [
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "2"
+                                }
+                              ]
+                            }
+                          ],
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "3"
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ],
+              [
+                {
+                  "prim": "IF_LEFT",
+                  "args": [
+                    [
+                      {
+                        "prim": "IF_LEFT",
+                        "args": [
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "4"
+                                }
+                              ]
+                            }
+                          ],
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "5"
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "prim": "IF_LEFT",
+                        "args": [
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "6"
+                                }
+                              ]
+                            }
+                          ],
+                          [
+                            {
+                              "prim": "DROP"
+                            },
+                            {
+                              "prim": "PUSH",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                },
+                                {
+                                  "int": "7"
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          },
+          {
+            "prim": "DUP",
+            "args": [
+              {
+                "int": "4"
+              }
+            ]
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "GET"
+          },
+          {
+            "prim": "IF_NONE",
+            "args": [
+              [
+                {
+                  "prim": "PUSH",
+                  "args": [
+                    {
+                      "prim": "int"
+                    },
+                    {
+                      "int": "-1"
+                    }
+                  ]
+                },
+                {
+                  "prim": "FAILWITH"
+                }
+              ],
+              []
+            ]
+          },
+          {
+            "prim": "DUG",
+            "args": [
+              {
+                "int": "2"
+              }
+            ]
+          },
+          {
+            "prim": "PAIR"
+          },
+          {
+            "prim": "EXEC"
+          },
+          {
+            "prim": "UNPAIR"
+          },
+          {
+            "prim": "NIL",
+            "args": [
+              {
+                "prim": "operation"
+              }
+            ]
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "ITER",
+            "args": [
+              [
+                {
+                  "prim": "CONS"
+                }
+              ]
+            ]
+          },
+          {
+            "prim": "DUG",
+            "args": [
+              {
+                "int": "2"
+              }
+            ]
+          },
+          {
+            "prim": "PAIR"
+          },
+          {
+            "prim": "SWAP"
+          },
+          {
+            "prim": "PAIR"
+          }
+        ]
+      ]
+    }
+  ],
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "bytes": "0000a1747fc66faa10c46006ccfc373f688d78e635a5"
+                },
+                {
+                  "bytes": "00004ff8aa78d2afb120087faeb40fc895319f0c3f0d"
+                }
+              ]
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "bytes": "0000a1747fc66faa10c46006ccfc373f688d78e635a5"
+                },
+                {
+                  "int": "21128"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "2219"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "int": "21129"
+        },
+        {
+          "int": "100"
+        },
+        [
+          {
+            "prim": "Elt",
+            "args": [
+              {
+                "bytes": "01ff1efaa0256342a528bfead7a6e103afd8abf62500"
+              },
+              {
+                "prim": "True"
+              }
+            ]
+          }
+        ]
+      ],
+      {
+        "int": "21130"
+      }
+    ]
+  }
+}

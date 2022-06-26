@@ -18,9 +18,7 @@ alice_key_hash = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
 dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'  # for tezos-node in sandboxed mode
 
 nodes = {
-    'mainnet': ['https://mainnet-tezos.giganode.io/',
-                'https://api.tez.ie/',
-                'https://tezos-prod.cryptonomic-infra.tech/'],
+    'mainnet': ['https://mainnet-tezos.giganode.io/', 'https://api.tez.ie/', 'https://tezos-prod.cryptonomic-infra.tech/'],
     'sandbox': ['http://127.0.0.1:8732/'],
     'sandboxnet': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
@@ -45,17 +43,12 @@ keys = {
 
 
 class KeyHash(Key):
-
     def __init__(self, public_key_hash):
         super(KeyHash, self).__init__(b'\x00' * 32)
         self._pkh = public_key_hash
 
     def __repr__(self):
-        res = [
-            super(Key, self).__repr__(),
-            f'\nPublic key hash',
-            self.public_key_hash()
-        ]
+        res = [super(Key, self).__repr__(), f'\nPublic key hash', self.public_key_hash()]
         return '\n'.join(res)
 
     def public_key_hash(self):
@@ -75,15 +68,15 @@ class KeyHash(Key):
 
 
 class ContextMixin(metaclass=InlineDocstring):
-    """ Mixin for blockchain interaction, stores node connection and key object.
-    """
+    """Mixin for blockchain interaction, stores node connection and key object."""
 
     def __init__(self, context: Optional[ExecutionContext] = None):
         super(ContextMixin, self).__init__()
         if context is None:
             context = ExecutionContext(
                 shell=ShellQuery(RpcNode(nodes[default_network][0])),
-                key=Key.from_encoded_key(default_key) if is_installed() else KeyHash(default_key_hash))
+                key=Key.from_encoded_key(default_key) if is_installed() else KeyHash(default_key_hash),
+            )
         self.context = context
 
     @property
@@ -105,10 +98,7 @@ class ContextMixin(metaclass=InlineDocstring):
         return self.context.block_id
 
     def __repr__(self):
-        res = [
-            super(ContextMixin, self).__repr__(),
-            '\nProperties'
-        ]
+        res = [super(ContextMixin, self).__repr__(), '\nProperties']
         if self.context.key is not None:
             res.append(f'.key\t\t{self.key.public_key_hash()}')
         if self.context.shell is not None:
@@ -129,7 +119,7 @@ class ContextMixin(metaclass=InlineDocstring):
         script: Optional[dict] = None,
         ipfs_gateway: Optional[str] = None,
         balance: Optional[int] = None,
-        view_results: Optional[Dict[str, Any]] = None
+        view_results: Optional[Dict[str, Any]] = None,
     ) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
@@ -174,5 +164,5 @@ class ContextMixin(metaclass=InlineDocstring):
             mode=mode or self.context.mode,
             ipfs_gateway=ipfs_gateway,
             balance=balance or self.context.balance,
-            view_results=view_results
+            view_results=view_results,
         )

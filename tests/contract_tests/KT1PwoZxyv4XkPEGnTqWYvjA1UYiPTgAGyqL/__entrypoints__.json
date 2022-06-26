@@ -1,0 +1,1703 @@
+{
+  "entrypoints": {
+    "swap_tokens_for_exact": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amountInMax"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amountOut"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenIn"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenOut"
+          ]
+        }
+      ]
+    },
+    "swap_exact_for_tokens": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amountIn"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amountOutMin"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenIn"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenOut"
+          ]
+        }
+      ]
+    },
+    "reserves_callback": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%price_ts_last"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%reserve0"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%reserve1"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%total_liquidity"
+          ]
+        }
+      ]
+    },
+    "remove_liquidity_route": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amount0Min"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount1Min"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%liquidity"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa2_address"
+                  ]
+                },
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%token0"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%token1"
+          ]
+        }
+      ]
+    },
+    "main_entry": {
+      "prim": "or",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amount0Desired"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount0Min"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount1Desired"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount1Min"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%token0"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%token1"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%add_liquidity_route"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amountIn"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amountOutMin"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%tokenIn"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%tokenOut"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%fin_exact_for_tokens"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amountInMax"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amountOut"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%tokenIn"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%tokenOut"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%fin_tokens_for_exact"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amount0Desired"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount0Min"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount1Desired"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount1Min"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%token0"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%token1"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%finalize_add_liquidity"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amount0Min"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount1Min"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%liquidity"
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%fa2_address"
+                                  ]
+                                },
+                                {
+                                  "prim": "option",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%token_id"
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%token0"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%token1"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%finalize_remove_liquidity"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amount0Min"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amount1Min"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%liquidity"
+                              ]
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%fa2_address"
+                                  ]
+                                },
+                                {
+                                  "prim": "option",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%token_id"
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%token0"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%token1"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%remove_liquidity_route"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%price_ts_last"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%reserve0"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%reserve1"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%total_liquidity"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%reserves_callback"
+                      ]
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%_to"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%amountIn"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%amountOutMin"
+                              ]
+                            },
+                            {
+                              "prim": "timestamp",
+                              "annots": [
+                                "%deadline"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%tokenIn"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%fa2_address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%token_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%tokenOut"
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%swap_exact_for_tokens"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%_to"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%amountInMax"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amountOut"
+                  ]
+                },
+                {
+                  "prim": "timestamp",
+                  "annots": [
+                    "%deadline"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa2_address"
+                  ]
+                },
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%tokenIn"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa2_address"
+                  ]
+                },
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%tokenOut"
+              ]
+            }
+          ],
+          "annots": [
+            "%swap_tokens_for_exact"
+          ]
+        }
+      ]
+    },
+    "initialize_code": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bytes",
+              "annots": [
+                "%assets"
+              ]
+            },
+            {
+              "prim": "bytes",
+              "annots": [
+                "%finalize"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%start"
+          ]
+        }
+      ]
+    },
+    "finalize_remove_liquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amount0Min"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount1Min"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%liquidity"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa2_address"
+                  ]
+                },
+                {
+                  "prim": "option",
+                  "args": [
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%token0"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%token1"
+          ]
+        }
+      ]
+    },
+    "finalize_add_liquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amount0Desired"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount0Min"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount1Desired"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount1Min"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%token0"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%token1"
+          ]
+        }
+      ]
+    },
+    "fin_tokens_for_exact": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amountInMax"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amountOut"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenIn"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenOut"
+          ]
+        }
+      ]
+    },
+    "fin_exact_for_tokens": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amountIn"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amountOutMin"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenIn"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%tokenOut"
+          ]
+        }
+      ]
+    },
+    "add_liquidity_route": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%_to"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%amount0Desired"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount0Min"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount1Desired"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount1Min"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%deadline"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%token0"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%fa2_address"
+              ]
+            },
+            {
+              "prim": "option",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%token1"
+          ]
+        }
+      ]
+    }
+  }
+}

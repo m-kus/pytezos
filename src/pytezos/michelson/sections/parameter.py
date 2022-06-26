@@ -30,10 +30,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         return cls
 
     @classmethod
-    def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['ParameterSection']:
+    def create_type(cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs) -> Type['ParameterSection']:
         root_name = parse_name(annots, prefix='%')  # type: ignore
         root_type = cast(Type[MichelsonType], args[0])
         if issubclass(root_type, OrType):
@@ -70,8 +67,10 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
     def from_parameters(cls, parameters: Dict[str, Any]) -> 'ParameterSection':
         if len(parameters) == 0:
             parameters = {'entrypoint': 'default', 'value': {'prim': 'Unit'}}
-        assert isinstance(parameters, dict) and parameters.keys() == {'entrypoint', 'value'}, \
-            f'expected {{entrypoint, value}}, got {parameters}'
+        assert isinstance(parameters, dict) and parameters.keys() == {
+            'entrypoint',
+            'value',
+        }, f'expected {{entrypoint, value}}, got {parameters}'
         entrypoint = parameters['entrypoint']
         if entrypoint == cls.root_name:
             res = cls.from_micheline_value(parameters['value'])
@@ -91,8 +90,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             flat_values = self.item.get_flat_values(entrypoints=True)
             assert isinstance(flat_values, dict) and len(flat_values) == 1, f'expected named type'
             entrypoint, item = next(iter(flat_values.items()))
-        return {'entrypoint': entrypoint,
-                'value': item.to_micheline_value(mode=mode, lazy_diff=None)}
+        return {'entrypoint': entrypoint, 'value': item.to_micheline_value(mode=mode, lazy_diff=None)}
 
     @classmethod
     def generate_pydoc(cls) -> str:

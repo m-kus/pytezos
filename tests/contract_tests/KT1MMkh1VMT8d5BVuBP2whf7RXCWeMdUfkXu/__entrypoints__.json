@@ -1,0 +1,93 @@
+{
+  "entrypoints": {
+    "claim": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bytes",
+              "annots": [
+                "%label"
+              ]
+            },
+            {
+              "prim": "bytes",
+              "annots": [
+                "%tld"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%owner"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%timestamp"
+              ]
+            }
+          ],
+          "annots": [
+            "%payload"
+          ]
+        },
+        {
+          "prim": "signature",
+          "annots": [
+            "%signature"
+          ]
+        }
+      ]
+    },
+    "admin_update": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%set_child_record"
+          ]
+        },
+        {
+          "prim": "set",
+          "args": [
+            {
+              "prim": "key"
+            }
+          ],
+          "annots": [
+            "%sign_keys"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%admin"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%max_timestamp_age"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%claim_price"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%treasury"
+          ]
+        }
+      ]
+    }
+  }
+}

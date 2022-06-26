@@ -2,22 +2,10 @@
 .PHONY: docs
 .DEFAULT_GOAL: all
 
+
 LINT_TARGETS ?= \
-	src/pytezos/block \
-	src/pytezos/cli \
-	src/pytezos/client.py \
-	src/pytezos/contract \
-	src/pytezos/michelson/forge.py \
-	src/pytezos/michelson/program.py \
-	src/pytezos/michelson/repl.py \
-	src/pytezos/michelson/stack.py \
-	src/pytezos/michelson/tags.py \
-	src/pytezos/operation \
-	src/pytezos/rpc/helpers.py \
-	src/pytezos/rpc/node.py \
-	src/pytezos/rpc/protocol.py \
-	src/pytezos/rpc/shell.py \
-	src/pytezos/sandbox \
+	src \
+	scripts \
 
 DEV ?= 1
 
@@ -55,16 +43,16 @@ debug:
 	pip install . --force --no-deps
 
 isort:
-	poetry run isort src
+	poetry run isort ${LINT_TARGETS}
 
 black:
 	poetry run black ${LINT_TARGETS}
 
 pylint:
-	poetry run pylint src || poetry run pylint-exit $$?
+	poetry run pylint ${LINT_TARGETS} || poetry run pylint-exit $$?
 
 mypy:
-	poetry run mypy src
+	poetry run mypy ${LINT_TARGETS}
 
 lint: isort black pylint mypy
 

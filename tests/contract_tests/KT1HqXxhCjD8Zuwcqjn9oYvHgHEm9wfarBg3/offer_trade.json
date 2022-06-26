@@ -1,0 +1,65 @@
+{
+  "parameters": {
+    "xtz_ask": "2500000",
+    "xtz_bid": "0",
+    "tokens_offered": [
+      {
+        "fa2": "KT1Xqiz99Q5mLebyERrPjAhVodysyebkhYFb",
+        "amount": "1",
+        "token_id": "1067"
+      }
+    ],
+    "tokens_accepted": [
+      {
+        "fa2": "KT1Xqiz99Q5mLebyERrPjAhVodysyebkhYFb",
+        "amount": "1",
+        "token_id": "2060"
+      }
+    ]
+  },
+  "storage": {
+    "artist": "tz1SvsxtDXL7JXRft9y6gPrM5GNDipsx8Atn",
+    "paused": false,
+    "trades": 21129,
+    "big_map": 21130,
+    "next_id": "2219",
+    "metadata": 21128,
+    "whitelist": {
+      "KT1Xqiz99Q5mLebyERrPjAhVodysyebkhYFb": true
+    },
+    "trading_fee": "100",
+    "collaborator": "tz1aMj3WEJ4w9AHFibdemtLq4ReJe5XA9WSw",
+    "administrator": "tz1aMj3WEJ4w9AHFibdemtLq4ReJe5XA9WSw"
+  },
+  "big_map_diff": [
+    {
+      "bigmap": 21129,
+      "path": "trades",
+      "action": "add_key",
+      "content": {
+        "hash": "expruY2Ky7wWstAM5qbH9ARnMqpNZ23828LRh7XSQsBXGyE2tDTYM1",
+        "key": "2218",
+        "value": {
+          "owner": "tz2DSCUTLXUu3AKXgjKJNTkSakV6XKxGA8u4",
+          "xtz_ask": "2500000",
+          "xtz_bid": "0",
+          "timestamp": "2022-06-16T18:31:29Z",
+          "tokens_offered": [
+            {
+              "fa2": "KT1Xqiz99Q5mLebyERrPjAhVodysyebkhYFb",
+              "amount": "1",
+              "token_id": "1067"
+            }
+          ],
+          "tokens_accepted": [
+            {
+              "fa2": "KT1Xqiz99Q5mLebyERrPjAhVodysyebkhYFb",
+              "amount": "1",
+              "token_id": "2060"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

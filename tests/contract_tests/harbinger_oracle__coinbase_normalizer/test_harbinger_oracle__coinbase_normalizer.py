@@ -31,7 +31,7 @@ class MainnetContractTestCaseHARBINGER_ORACLE__COINBASE_NORMALIZER(TestCase):
     def test_parameter_type_harbinger_oracle__coinbase_normalizer(self):
         type_expr = self.program.parameter.as_micheline_expr()
         self.assertEqual(
-            get_script_section(self.script, name='parameter', required=True),
+            get_script_section(self.script, name='parameter'),
             type_expr,
             'micheline -> type -> micheline')
 
@@ -46,7 +46,7 @@ class MainnetContractTestCaseHARBINGER_ORACLE__COINBASE_NORMALIZER(TestCase):
     def test_storage_type_harbinger_oracle__coinbase_normalizer(self):
         type_expr = self.program.storage.as_micheline_expr()
         self.assertEqual(
-            get_script_section(self.script, name='storage', required=True),
+            get_script_section(self.script, name='storage'),
             type_expr,
             'micheline -> type -> micheline')
 

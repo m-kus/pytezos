@@ -7,7 +7,7 @@ line_size = 100
 
 
 def format_timestamp(timestamp: int) -> str:
-    """ Format unix timestamp.
+    """Format unix timestamp.
 
     :param timestamp: Unix timestamp (seconds)
     """
@@ -20,19 +20,51 @@ class MichelsonFormatterError(ValueError):
 
 
 def is_framed(node):
-    if node['prim'] in {'Pair', 'Left', 'Right', 'Some', 'pair', 'or', 'option', 'map', 'big_map', 'list', 'set',
-                        'contract', 'lambda', 'ticket', 'sapling_state', 'sapling_transaction'}:
+    if node['prim'] in {
+        'Pair',
+        'Left',
+        'Right',
+        'Some',
+        'pair',
+        'or',
+        'option',
+        'map',
+        'big_map',
+        'list',
+        'set',
+        'contract',
+        'lambda',
+        'ticket',
+        'sapling_state',
+        'sapling_transaction',
+    }:
         return True
-    elif node['prim'] in {'key', 'unit', 'signature', 'operation', 'int', 'nat', 'string', 'bytes', 'mutez', 'bool',
-                          'key_hash', 'timestamp', 'address', 'bls12_381_g1', 'bls12_381_g2', 'bls12_381_fr',
-                          'chain_id', 'never'}:
+    elif node['prim'] in {
+        'key',
+        'unit',
+        'signature',
+        'operation',
+        'int',
+        'nat',
+        'string',
+        'bytes',
+        'mutez',
+        'bool',
+        'key_hash',
+        'timestamp',
+        'address',
+        'bls12_381_g1',
+        'bls12_381_g2',
+        'bls12_381_fr',
+        'chain_id',
+        'never',
+    }:
         return 'annots' in node
     return False
 
 
 def is_complex(node):
-    return node['prim'] == 'LAMBDA' \
-           or node['prim'].startswith('IF')
+    return node['prim'] == 'LAMBDA' or node['prim'].startswith('IF')
 
 
 def is_inline(node):
@@ -40,9 +72,7 @@ def is_inline(node):
 
 
 def is_script(node):
-    return all(map(
-        lambda x: isinstance(x, dict) and x.get('prim') in ['parameter', 'storage', 'code'],
-        node))
+    return all(map(lambda x: isinstance(x, dict) and x.get('prim') in ['parameter', 'storage', 'code'], node))
 
 
 def format_node(node, indent='', inline=False, is_root=False, wrapped=False):
@@ -110,7 +140,7 @@ def format_node(node, indent='', inline=False, is_root=False, wrapped=False):
 
 
 def micheline_to_michelson(data, inline=False, wrap=False) -> str:
-    """ Converts micheline expression into formatted Michelson source.
+    """Converts micheline expression into formatted Michelson source.
 
     :param data: Micheline expression
     :param inline: produce single line, used for tezos-client arguments (False by default)

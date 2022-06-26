@@ -50,7 +50,7 @@ def operation_list_list_hash(operations_hashes: List[List[str]]) -> str:
 
 
 def block_payload_hash(predecessor: str, payload_round: int, operation_hashes: List[str]) -> str:
-    """ Calculate payload hash
+    """Calculate payload hash
     For each level, Tenderbake proceeds in rounds. Each round represents an attempt by the validators to agree on the
     content of the block for the current level, that is, on the sequence of non-consensus operations the block contains.
     We call this sequence the block’s payload.
@@ -63,7 +63,7 @@ def block_payload_hash(predecessor: str, payload_round: int, operation_hashes: L
     payload = [
         base58_decode(predecessor.encode()),
         payload_round.to_bytes(4, 'big'),
-        _reduce_operation_hashes([base58_decode(x.encode()) for x in operation_hashes])
+        _reduce_operation_hashes([base58_decode(x.encode()) for x in operation_hashes]),
     ]
     res = blake2b(b''.join(payload), digest_size=32).digest()
     return base58_encode(res, b'vh').decode()

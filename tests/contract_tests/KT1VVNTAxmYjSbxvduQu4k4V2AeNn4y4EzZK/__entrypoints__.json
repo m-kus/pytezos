@@ -1,0 +1,110 @@
+{
+  "entrypoints": {
+    "withdraw_offer": {
+      "prim": "nat"
+    },
+    "set_trading_fee_collector": {
+      "prim": "address"
+    },
+    "set_trading_fee": {
+      "prim": "nat"
+    },
+    "set_contract_metadata_uri": {
+      "prim": "bytes"
+    },
+    "set_administrator": {
+      "prim": "address"
+    },
+    "make_offer": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%creator"
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%nft_contract"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%nft_token_id"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%offer_amount"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%offered_token_contract"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%offered_token_id"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "string",
+          "annots": [
+            "%offered_token_standard"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%royalty"
+          ]
+        }
+      ]
+    },
+    "accept_offer": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%creator"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%offer_id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%royalty"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "parameters": {
+    "payload": {
+      "tld": "78797a",
+      "label": "646170706574697a6572",
+      "owner": "tz1Lxmk7eZiomcdJ6JPaeiLDkg4GJehVpSFV",
+      "timestamp": "2022-06-07T15:19:00Z"
+    },
+    "signature": "spsig17JUku4vjvycSjcVTN22ZPQ63q8rxXRn55WzNmaaBzjwVVhEAy78RNsDG9nTuEFf4hVkeNZMz5LhX8Z5787NWuxZYM4QWn"
+  },
+  "storage": {
+    "admin": "tz1PnpYYdcgoVq1RYgj6qSdbzwSJRXXcfU3F",
+    "treasury": "KT1W56o8dK5En5hM46VsD1zKtgpqWPhs3bLh",
+    "sign_keys": [
+      "sppk7cZc6vG1CacPffxq7pCJQLTASkNrWT6TYWdJxTszhPmtSji5CC8"
+    ],
+    "claim_price": "1000000",
+    "set_child_record": "KT1QHLk1EMUA8BPH3FvRUeUmbTspmAhb7kpd%set_child_record",
+    "max_timestamp_age": "300"
+  },
+  "big_map_diff": null
+}

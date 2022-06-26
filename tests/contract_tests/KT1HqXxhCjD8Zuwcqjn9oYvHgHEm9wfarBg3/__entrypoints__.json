@@ -1,0 +1,137 @@
+{
+  "entrypoints": {
+    "update_ask": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%trade_id"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%xtz_ask"
+          ]
+        }
+      ]
+    },
+    "take_trade": {
+      "prim": "nat"
+    },
+    "set_pause": {
+      "prim": "bool"
+    },
+    "set_fees": {
+      "prim": "nat"
+    },
+    "set_administrator": {
+      "prim": "address"
+    },
+    "offer_trade": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%amount"
+                      ]
+                    },
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%fa2"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%token_id"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%tokens_accepted"
+              ]
+            },
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%amount"
+                      ]
+                    },
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%fa2"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%token_id"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%tokens_offered"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%xtz_ask"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%xtz_bid"
+          ]
+        }
+      ]
+    },
+    "mod_whitelist": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bool",
+          "annots": [
+            "%enabled"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%fa2"
+          ]
+        }
+      ]
+    },
+    "cancel_trade": {
+      "prim": "nat"
+    }
+  }
+}

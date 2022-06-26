@@ -1,0 +1,39 @@
+{
+  "entrypoints": {
+    "selectWinner": {
+      "prim": "nat"
+    },
+    "save_hashed_salt": {
+      "prim": "bytes"
+    },
+    "save_data": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%salt"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%time"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%volume"
+          ]
+        }
+      ]
+    },
+    "pause": {
+      "prim": "unit"
+    },
+    "buyTicket": {
+      "prim": "nat"
+    }
+  }
+}

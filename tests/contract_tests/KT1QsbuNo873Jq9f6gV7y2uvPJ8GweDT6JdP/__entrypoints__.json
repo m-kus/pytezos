@@ -1,0 +1,21 @@
+{
+  "entrypoints": {
+    "xtzToToken": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address"
+        },
+        {
+          "prim": "nat"
+        },
+        {
+          "prim": "timestamp"
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

@@ -6,7 +6,6 @@ from pytezos.michelson.types.base import MichelsonType
 
 
 class ListType(MichelsonType, prim='list', args_len=1):
-
     def __init__(self, items: List[MichelsonType]):
         super(ListType, self).__init__()
         self.items = items

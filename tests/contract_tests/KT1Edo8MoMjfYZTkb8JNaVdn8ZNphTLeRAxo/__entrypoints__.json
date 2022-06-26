@@ -1,0 +1,47 @@
+{
+  "entrypoints": {
+    "set_admin": {
+      "prim": "address"
+    },
+    "send": {
+      "prim": "mutez"
+    },
+    "pause": {
+      "prim": "bool"
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "confirm_admin": {
+      "prim": "unit"
+    },
+    "admin": {
+      "prim": "or",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "unit",
+              "annots": [
+                "%confirm_admin"
+              ]
+            },
+            {
+              "prim": "bool",
+              "annots": [
+                "%pause"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%set_admin"
+          ]
+        }
+      ]
+    }
+  }
+}

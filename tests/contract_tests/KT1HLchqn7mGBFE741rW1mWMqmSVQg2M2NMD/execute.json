@@ -1,0 +1,76 @@
+{
+  "parameters": {
+    "0": {
+      "fee": "30",
+      "type": "1",
+      "invert": false,
+      "address": "KT1DuYujxrmgepwSDHtADthhKBje9BosUs1w",
+      "token1ID": null,
+      "token2ID": null,
+      "token1Address": null,
+      "token2Address": null
+    },
+    "1": {
+      "fee": "35",
+      "type": "2",
+      "invert": true,
+      "address": "KT1HUnqM6xFJa51PM2xHfLs7s6ARvXungtyq",
+      "token1ID": "0",
+      "token2ID": "20",
+      "token1Address": "KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b",
+      "token2Address": "KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ"
+    },
+    "2": {
+      "fee": "30",
+      "type": "0",
+      "invert": true,
+      "address": "KT1X1LgNkQShpF9nRLYw3Dgdy4qp38MX617z",
+      "token1ID": null,
+      "token2ID": null,
+      "token1Address": null,
+      "token2Address": null
+    }
+  },
+  "storage": {
+    "x0": "0",
+    "x1": "0",
+    "x2": "0",
+    "y0": "0",
+    "y1": "0",
+    "y2": "0",
+    "DEXs": {
+      "0": {
+        "fee": "30",
+        "type": "1",
+        "invert": false,
+        "address": "KT1DuYujxrmgepwSDHtADthhKBje9BosUs1w",
+        "token1ID": null,
+        "token2ID": null,
+        "token1Address": null,
+        "token2Address": null
+      },
+      "1": {
+        "fee": "35",
+        "type": "2",
+        "invert": true,
+        "address": "KT1HUnqM6xFJa51PM2xHfLs7s6ARvXungtyq",
+        "token1ID": "0",
+        "token2ID": "20",
+        "token1Address": "KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b",
+        "token2Address": "KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ"
+      },
+      "2": {
+        "fee": "30",
+        "type": "0",
+        "invert": true,
+        "address": "KT1X1LgNkQShpF9nRLYw3Dgdy4qp38MX617z",
+        "token1ID": null,
+        "token2ID": null,
+        "token1Address": null,
+        "token2Address": null
+      }
+    },
+    "state": "0"
+  },
+  "big_map_diff": null
+}

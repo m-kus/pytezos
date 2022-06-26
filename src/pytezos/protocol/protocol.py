@@ -74,10 +74,7 @@ def files_to_proto(files: List[Tuple[str, str]]) -> dict:
         else:
             components[name] = {'name': name, key: data}
 
-    proto = {
-        'expected_env_version': 0,  # TODO: this is V1
-        'components': list(components.values())
-    }
+    proto = {'expected_env_version': 0, 'components': list(components.values())}  # TODO: this is V1
     return proto
 
 
@@ -132,16 +129,11 @@ def proto_to_bytes(proto: dict) -> bytes:
 
 
 class Protocol(metaclass=InlineDocstring):
-
     def __init__(self, proto):
         self._proto = proto
 
     def __repr__(self):
-        res = [
-            super(Protocol, self).__repr__(),
-            '\nHelpers',
-            get_class_docstring(self.__class__)
-        ]
+        res = [super(Protocol, self).__repr__(), '\nHelpers', get_class_docstring(self.__class__)]
         return '\n'.join(res)
 
     def __iter__(self):
@@ -149,7 +141,7 @@ class Protocol(metaclass=InlineDocstring):
 
     @classmethod
     def from_uri(cls, uri):
-        """ Loads protocol implementation from various sources and converts it to the RPC-like format.
+        """Loads protocol implementation from various sources and converts it to the RPC-like format.
 
         :param uri: link/path to a tar archive or path to a folder with extracted contents
         :returns: Protocol instance
@@ -166,18 +158,15 @@ class Protocol(metaclass=InlineDocstring):
         return Protocol(files_to_proto(files))
 
     def index(self) -> dict:
-        """ Generates TEZOS_PROTOCOL file.
+        """Generates TEZOS_PROTOCOL file.
 
         :returns: dict with protocol hash and modules
         """
-        data = {
-            'hash': self.hash(),
-            'modules': list(map(lambda x: x['name'], self._proto.get('components', [])))
-        }
+        data = {'hash': self.hash(), 'modules': list(map(lambda x: x['name'], self._proto.get('components', [])))}
         return data
 
     def export_tar(self, output_path=None):
-        """ Creates a tarball and dumps to a file or returns bytes.
+        """Creates a tarball and dumps to a file or returns bytes.
 
         :param output_path: Path to the tarball [optional]. You can add .bz2 or .gz extension to make it compressed
         :returns: bytes if path is None or nothing
@@ -187,7 +176,7 @@ class Protocol(metaclass=InlineDocstring):
         return files_to_tar(files, output_path)
 
     def export_html(self, output_path=None):
-        """ Generates github-like side-by-side diff viewe, powered by diff2html.js
+        """Generates github-like side-by-side diff viewe, powered by diff2html.js
 
         :param output_path: will write to this file if specified
         :returns: html string if path is not specified
@@ -196,7 +185,7 @@ class Protocol(metaclass=InlineDocstring):
         return generate_unidiff_html(diffs, output_path=output_path)
 
     def diff(self, proto, context_size=3):
-        """ Calculates file diff between two protocol versions.
+        """Calculates file diff between two protocol versions.
 
         :param proto: an instance of Protocol
         :param context_size: number of context lines before and after the change
@@ -207,18 +196,13 @@ class Protocol(metaclass=InlineDocstring):
         theirs = proto_to_files(proto())
 
         for filename, their_text in theirs:
-            patch = make_patch(
-                a=yours.get(filename, ''),
-                b=their_text,
-                filename=filename,
-                context_size=context_size
-            )
+            patch = make_patch(a=yours.get(filename, ''), b=their_text, filename=filename, context_size=context_size)
             files.append((filename, patch))
 
         return Protocol(files_to_proto(files))
 
     def patch(self, patch):
-        """ Applies unified diff and returns full-fledged protocol.
+        """Applies unified diff and returns full-fledged protocol.
 
         :param patch: an instance of Protocol containing diff of files
         :returns: Protocol instance

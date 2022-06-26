@@ -12,7 +12,6 @@ from pytezos.michelson.tags import prim_tags
 
 
 class MichelsonParserError(ValueError):
-
     def __init__(self, token: LexToken, message=None):
         message = message or f'failed to parse expression {token}'
         super(MichelsonParserError, self).__init__(message)
@@ -29,8 +28,7 @@ class Sequence(list):
 
 
 class SimpleMichelsonLexer(Lexer):
-    tokens = ('INT', 'BYTE', 'STR', 'ANNOT', 'PRIM',
-              'LEFT_CURLY', 'RIGHT_CURLY', 'LEFT_PAREN', 'RIGHT_PAREN', 'SEMI')
+    tokens = ('INT', 'BYTE', 'STR', 'ANNOT', 'PRIM', 'LEFT_CURLY', 'RIGHT_CURLY', 'LEFT_PAREN', 'RIGHT_PAREN', 'SEMI')
 
     t_INT = r'-?[0-9]+'
     t_BYTE = r'0x[A-Fa-f0-9]*'
@@ -59,13 +57,13 @@ class SimpleMichelsonLexer(Lexer):
 
 
 class MichelsonParser(object):
-    """ Customizable Michelson parser
-    """
+    """Customizable Michelson parser"""
+
     tokens = SimpleMichelsonLexer.tokens
 
     def p_instr(self, p):
         '''instr : expr
-                 | empty
+        | empty
         '''
         p[0] = p[1]
 
@@ -102,25 +100,17 @@ class MichelsonParser(object):
         '''expr : PRIM annots args'''
         prim = p[1]
         if prim in prim_tags or prim in self.extra_primitives:
-            expr = make_expr(
-                prim=prim, 
-                annots=p[2] or [], 
-                args=p[3] or []
-            )
+            expr = make_expr(prim=prim, annots=p[2] or [], args=p[3] or [])
         else:
             try:
-                expr = expand_macro(
-                    prim=prim,
-                    annots=p[2] or [],
-                    args=p[3] or []
-                )
+                expr = expand_macro(prim=prim, annots=p[2] or [], args=p[3] or [])
             except AssertionError as e:
                 raise MichelsonParserError(p.slice[1], str(e)) from e
         p[0] = Sequence(expr) if isinstance(expr, list) else expr
 
     def p_annots(self, p):
         '''annots : annot
-                  | empty
+        | empty
         '''
         if p[1] is not None:
             p[0] = [p[1]]
@@ -139,7 +129,7 @@ class MichelsonParser(object):
 
     def p_args(self, p):
         '''args : arg
-                | empty
+        | empty
         '''
         p[0] = list()
         if p[1] is not None:
@@ -189,7 +179,7 @@ class MichelsonParser(object):
         raise MichelsonParserError(p)
 
     def __init__(self, debug=False, write_tables=False, extra_primitives: Optional[List[str]] = None):
-        """ Initialize Michelson parser
+        """Initialize Michelson parser
 
         :param debug: Verbose output
         :param write_tables: Store PLY output
@@ -204,7 +194,7 @@ class MichelsonParser(object):
         self.extra_primitives = extra_primitives or []
 
     def parse(self, code):
-        """ Parse Michelson source.
+        """Parse Michelson source.
 
         :param code: Michelson source
         :returns: Micheline expression
@@ -215,7 +205,7 @@ class MichelsonParser(object):
 
 
 def michelson_to_micheline(data, parser=None):
-    """ Converts Michelson source text into a Micheline expression.
+    """Converts Michelson source text into a Micheline expression.
 
     :param data: Michelson string
     :param parser: custom Michelson parser (optional)

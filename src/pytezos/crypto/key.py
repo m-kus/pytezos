@@ -75,8 +75,9 @@ def validate_mnemonic(mnemonic: str, language: str = DEFAULT_LANGUAGE) -> None:
     m = Mnemonic(language)
     mnemonic_words = m.normalize_string(mnemonic).split(' ')
     if len(mnemonic_words) not in VALID_MNEMONIC_LENGTHS:
-        raise ValueError('Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, '
-                         'but it is not (%d).' % len(mnemonic_words))
+        raise ValueError(
+            'Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, ' 'but it is not (%d).' % len(mnemonic_words)
+        )
 
     idx = map(lambda x: bin(m.wordlist.index(x))[2:].zfill(11), mnemonic_words)
     b = ''.join(idx)
@@ -200,11 +201,7 @@ class Key(metaclass=InlineDocstring):
             passphrase = get_passphrase(passphrase)
 
             salt, encrypted_sk = encoded_key[:8], encoded_key[8:]
-            encryption_key = hashlib.pbkdf2_hmac(hash_name="sha512",
-                                                 password=passphrase,
-                                                 salt=salt,
-                                                 iterations=32768,
-                                                 dklen=32)
+            encryption_key = hashlib.pbkdf2_hmac(hash_name="sha512", password=passphrase, salt=salt, iterations=32768, dklen=32)
             encoded_key = pysodium.crypto_secretbox_open(
                 c=encrypted_sk,
                 nonce=b'\000' * 24,
@@ -256,7 +253,7 @@ class Key(metaclass=InlineDocstring):
         validate: bool = True,
         curve: bytes = b'ed',
         activation_code: Optional[str] = None,
-        language: str = DEFAULT_LANGUAGE
+        language: str = DEFAULT_LANGUAGE,
     ) -> 'Key':
         """Creates a key object from a bip39 mnemonic.
 
@@ -307,7 +304,7 @@ class Key(metaclass=InlineDocstring):
             mnemonic=data['mnemonic'],
             passphrase=data.get('password', ''),
             email=data.get('email', ''),
-            activation_code=data['activation_code']
+            activation_code=data['activation_code'],
         )
         if key.public_key_hash() != data['pkh']:
             raise ValueError('Failed to import')

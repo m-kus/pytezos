@@ -77,6 +77,8 @@ types-requests = "^2.26.3"
 types-simplejson = "^3.17.2"
 pytest-cov = "^3.0.0"
 pytest = "^7.1.2"
+types-PyYAML = "^6.0.9"
+types-setuptools = "^57.4.17"
 
 [tool.poetry.scripts]
 pytezos = 'pytezos.cli.cli:cli'

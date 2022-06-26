@@ -9,6 +9,7 @@ class ViewSection(Micheline, prim='view', args_len=4):
     """
     Syntax: view {name} {arg_type} {ret_type} {code}
     """
+
     args: List[Type[MichelsonType]]  # type: ignore
     name: str
 
@@ -30,10 +31,7 @@ class ViewSection(Micheline, prim='view', args_len=4):
         return cls
 
     @classmethod
-    def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['ViewSection']:
+    def create_type(cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs) -> Type['ViewSection']:
         view_name = cast(Type[MichelineLiteral], args[0])
         if not issubclass(view_name, MichelineLiteral):
             raise MichelsonRuntimeError('view', 'Expected view name as first argument', view_name)

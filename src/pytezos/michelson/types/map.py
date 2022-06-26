@@ -10,7 +10,6 @@ class EltLiteral(Micheline, prim='Elt', args_len=2):
 
 
 class MapType(MichelsonType, prim='map', args_len=2):
-
     def __init__(self, items: List[Tuple[MichelsonType, MichelsonType]]):
         super(MapType, self).__init__()
         self.items = items
@@ -55,11 +54,8 @@ class MapType(MichelsonType, prim='map', args_len=2):
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
-        key = cls.args[0].generate_pydoc(definitions,
-                                         inferred_name=f'{name}_key' if name else None,
-                                         comparable=True)
-        val = cls.args[1].generate_pydoc(definitions,
-                                         inferred_name=f'{name}_value' if name else None)
+        key = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_key' if name else None, comparable=True)
+        val = cls.args[1].generate_pydoc(definitions, inferred_name=f'{name}_value' if name else None)
         return f'{{ {key}: {val}, … }}'
 
     @classmethod
@@ -71,9 +67,9 @@ class MapType(MichelsonType, prim='map', args_len=2):
         assert isinstance(val_expr, list), f'expected list, got {type(val_expr).__name__}'
 
         def parse_elt(elt_expr) -> Tuple[MichelsonType, MichelsonType]:
-            return parse_micheline_value(elt_expr, {
-                ('Elt', 2): lambda x: tuple(cls.args[i].from_micheline_value(arg) for i, arg in enumerate(x))
-            })
+            return parse_micheline_value(
+                elt_expr, {('Elt', 2): lambda x: tuple(cls.args[i].from_micheline_value(arg) for i, arg in enumerate(x))}
+            )
 
         items = list(map(parse_elt, val_expr))
         cls.check_constraints(items)
@@ -86,10 +82,7 @@ class MapType(MichelsonType, prim='map', args_len=2):
     @classmethod
     def parse_python_object(cls, py_obj) -> List[Tuple[MichelsonType, MichelsonType]]:
         assert isinstance(py_obj, dict), f'expected dict, got {type(py_obj).__name__}'
-        items = [
-            (cls.args[0].from_python_object(k), cls.args[1].from_python_object(v))
-            for k, v in py_obj.items()
-        ]
+        items = [(cls.args[0].from_python_object(k), cls.args[1].from_python_object(v)) for k, v in py_obj.items()]
         return list(sorted(items, key=lambda x: x[0]))
 
     @classmethod
@@ -97,22 +90,15 @@ class MapType(MichelsonType, prim='map', args_len=2):
         return cls(cls.parse_python_object(py_obj))
 
     def to_literal(self) -> Type[Micheline]:
-        return MichelineSequence.create_type(args=[
-            EltLiteral.create_type(args=[k.to_literal(), v.to_literal()])
-            for k, v in self.items
-        ])
+        return MichelineSequence.create_type(args=[EltLiteral.create_type(args=[k.to_literal(), v.to_literal()]) for k, v in self.items])
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
-        return [
-            {'prim': 'Elt', 'args': [x.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for x in elt]}
-            for elt in self
-        ]
+        return [{'prim': 'Elt', 'args': [x.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for x in elt]} for elt in self]
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> dict:
         assert not comparable, f'{self.prim} is not comparable'
         return {
-            k.to_python_object(try_unpack=try_unpack, comparable=True):
-                v.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+            k.to_python_object(try_unpack=try_unpack, comparable=True): v.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
             for k, v in self.items
         }
 

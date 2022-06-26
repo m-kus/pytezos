@@ -1,0 +1,44 @@
+{
+  "code": [
+    {
+      "prim": "parameter",
+      "args": [
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    {
+      "prim": "storage",
+      "args": [
+        {
+          "prim": "unit"
+        }
+      ]
+    },
+    {
+      "prim": "code",
+      "args": [
+        [
+          {
+            "prim": "PUSH",
+            "args": [
+              {
+                "prim": "string"
+              },
+              {
+                "string": "{\"label\":\"ERX Cap Table Snapshot (16 Mar 2022 17:00:00.000000 +00:00)\",\"uri\":\"https://erx.blob.core.windows.net/cdn/archives/exchange/ERX_CapTable_20220317_0000.csv\",\"checksum\":\"3d2c69d43fd6b87d0e20a18b08086f43\"}"
+              }
+            ]
+          },
+          {
+            "prim": "FAILWITH"
+          }
+        ]
+      ]
+    }
+  ],
+  "storage": {
+    "prim": "Unit"
+  }
+}

@@ -1,17 +1,13 @@
-import yaml
-import requests
 from os.path import dirname, join
 from pprint import pprint
+
+import requests
+import yaml
 
 target_path = join(dirname(dirname(__file__)), 'src', 'michelson_kernel', 'docs.py')
 meta_url = 'https://gitlab.com/tezos/michelson-reference/-/raw/master/michelson_reference/michelson-meta.yaml'
 sema_url = 'https://gitlab.com/tezos/michelson-reference/-/raw/master/michelson_reference/michelson.json'
-extra = {
-    'RENAME': '',
-    'CAST': '',
-    'TOP': '',
-    'EXPAND': ''
-}
+extra = {'RENAME': '', 'CAST': '', 'TOP': '', 'EXPAND': ''}
 
 
 def format_entry(title, concl, descr):
@@ -39,7 +35,8 @@ def generate():
             docs[primitive] = format_entry(
                 title=sema[section].get(primitive, {}).get(args_key, ''),
                 concl=sema[section].get(primitive, {}).get('ty', ''),
-                descr=body.get('documentation_short'))
+                descr=body.get('documentation_short'),
+            )
 
     with open(target_path, 'w+') as f:
         f.write('docs = ')

@@ -7,25 +7,22 @@ from pytezos.michelson.types import BytesType, ListType, MapType, NatType, Never
 
 
 class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = cast(Union[StringType, BytesType, ListType], stack.pop1())
         a.assert_type_in(StringType, BytesType, ListType)
         if isinstance(a, ListType):
             a.assert_type_in(ListType)
-            res_type, convert, delim = dispatch_types(a.args[0], mapping={
-                (StringType,): (StringType, str, ''),
-                (BytesType,): (BytesType, bytes, b'')
-            })
+            res_type, convert, delim = dispatch_types(
+                a.args[0], mapping={(StringType,): (StringType, str, ''), (BytesType,): (BytesType, bytes, b'')}
+            )
             res = res_type.from_value(delim.join(map(convert, a)))
             stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
         else:
             b = cast(Union[StringType, BytesType], stack.pop1())
-            res_type, convert = dispatch_types(type(a), type(b), mapping={
-                (StringType, StringType): (StringType, str),
-                (BytesType, BytesType): (BytesType, bytes)
-            })
+            res_type, convert = dispatch_types(
+                type(a), type(b), mapping={(StringType, StringType): (StringType, str), (BytesType, BytesType): (BytesType, bytes)}
+            )
             res = res_type.from_value(convert(a) + convert(b))
             stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         stack.push(res)
@@ -33,7 +30,6 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
 
 
 class PackInstruction(MichelsonInstruction, prim='PACK'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = stack.pop1()
@@ -44,7 +40,6 @@ class PackInstruction(MichelsonInstruction, prim='PACK'):
 
 
 class UnpackInstruction(MichelsonInstruction, prim='UNPACK', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = cast(BytesType, stack.pop1())
@@ -61,7 +56,6 @@ class UnpackInstruction(MichelsonInstruction, prim='UNPACK', args_len=1):
 
 
 class SizeInstruction(MichelsonInstruction, prim='SIZE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         src = cast(Union[StringType, BytesType, ListType, SetType, MapType], stack.pop1())
@@ -73,7 +67,6 @@ class SizeInstruction(MichelsonInstruction, prim='SIZE'):
 
 
 class SliceInstruction(MichelsonInstruction, prim='SLICE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         offset, length, s = cast(Tuple[NatType, NatType, Union[StringType, BytesType]], stack.pop3())
@@ -91,7 +84,6 @@ class SliceInstruction(MichelsonInstruction, prim='SLICE'):
 
 
 class UnitInstruction(MichelsonInstruction, prim='UNIT'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = UnitType()
@@ -101,7 +93,6 @@ class UnitInstruction(MichelsonInstruction, prim='UNIT'):
 
 
 class NeverInstruction(MichelsonInstruction, prim='NEVER'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         never = cast(NeverType, stack.pop1())
