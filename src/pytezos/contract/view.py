@@ -257,7 +257,7 @@ class ContractViewCall(ContextMixin):
             storage=self._get_storage(storage),
             context=self._spawn_context(
                 balance=balance,
-                script={**self.context.script, 'storage': self._encode_storage(storage)},
+                script={**self.context.script, 'storage': self._encode_storage(storage)},  # type: ignore
                 view_results=view_results,
             ),
         )

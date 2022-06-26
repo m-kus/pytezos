@@ -61,7 +61,7 @@ class BlockHeader(ContextMixin):
         :param parameters: protocol parameters
         :param context: execution context
         """
-        prev_fitness = context.shell.head.header()['fitness']
+        prev_fitness = context.shell.head.header()['fitness']  # type: ignore
         protocol_data = {
             "content": {
                 "command": "activate",
@@ -82,7 +82,7 @@ class BlockHeader(ContextMixin):
         :param context: Execution context
         :param min_fee: Minimum fee of transaction to be included in block
         """
-        pending_operations = context.shell.mempool.pending_operations()
+        pending_operations = context.shell.mempool.pending_operations()  # type: ignore
         operations: List[List[Dict[str, Any]]] = [[], [], [], []]
 
         for opg in pending_operations['applied']:

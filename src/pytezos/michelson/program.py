@@ -68,10 +68,10 @@ class MichelsonProgram:
             MichelsonProgram.__name__,
             (MichelsonProgram,),
             dict(
-                parameter=get_script_section(sequence, cls=ParameterSection, required=True),
-                storage=get_script_section(sequence, cls=StorageSection, required=True),
-                code=get_script_section(sequence, cls=CodeSection, required=True),
-                views=get_script_sections(sequence, cls=ViewSection),
+                parameter=get_script_section(sequence, cls=ParameterSection, required=True),  # type: ignore
+                storage=get_script_section(sequence, cls=StorageSection, required=True),  # type: ignore
+                code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+                views=get_script_sections(sequence, cls=ViewSection),  # type: ignore
             ),
         )
         return cast(Type['MichelsonProgram'], cls)
@@ -140,8 +140,8 @@ class MichelsonProgram:
             ),
             message='list of operations + resulting storage',
         )
-        operations = [op.content for op in res.items[0]]
-        lazy_diff = []
+        operations = [op.content for op in res.items[0]]  # type: ignore
+        lazy_diff = []  # type: ignore
         storage = res.items[1].aggregate_lazy_diff(lazy_diff).to_micheline_value(mode=output_mode)
         stdout.append(format_stdout(f'END %{self.name}', [res], []))
         return operations, storage, lazy_diff, res
@@ -188,10 +188,10 @@ class TztMichelsonProgram:
             TztMichelsonProgram.__name__,
             (TztMichelsonProgram,),
             dict(
-                input=get_script_section(sequence, cls=InputSection, required=True),
-                output=get_script_section(sequence, cls=OutputSection, required=True),
-                code=get_script_section(sequence, cls=CodeSection, required=True),
-                big_maps=get_script_section(sequence, cls=BigMapsSection, required=False),
+                input=get_script_section(sequence, cls=InputSection, required=True),  # type: ignore
+                output=get_script_section(sequence, cls=OutputSection, required=True),  # type: ignore
+                code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+                big_maps=get_script_section(sequence, cls=BigMapsSection, required=False),  # type: ignore
             ),
         )
         return cast(Type['TztMichelsonProgram'], cls)
@@ -219,22 +219,22 @@ class TztMichelsonProgram:
     def fill_context(self, script, context: ExecutionContext) -> None:
         sender = context.get_sender_expr()
         if sender:
-            context.sender = SenderSection.match(sender).args[0].get_string()
+            context.sender = SenderSection.match(sender).args[0].get_string()  # type: ignore
         amount = context.get_amount_expr()
         if amount:
-            context.amount = AmountSection.match(amount).args[0].get_int()
+            context.amount = AmountSection.match(amount).args[0].get_int()  # type: ignore
         balance = context.get_balance_expr()
         if balance:
-            context.balance = BalanceSection.match(balance).args[0].get_int()
+            context.balance = BalanceSection.match(balance).args[0].get_int()  # type: ignore
         _self = context.get_self_expr()
         if _self:
-            context.address = SelfSection.match(_self).args[0].get_string()
+            context.address = SelfSection.match(_self).args[0].get_string()  # type: ignore
         now = context.get_now_expr()
         if now:
-            context.now = NowSection.match(now).args[0].get_int()
+            context.now = NowSection.match(now).args[0].get_int()  # type: ignore
         source = context.get_source_expr()
         if source:
-            context.source = SourceSection.match(source).args[0].get_string()
+            context.source = SourceSection.match(source).args[0].get_string()  # type: ignore
         chain_id = context.get_chain_id_expr()
         if chain_id:
             # FIXME: Move to some common place
@@ -250,7 +250,7 @@ class TztMichelsonProgram:
                     raise Exception('Only `Big_map` instructions can be used in `big_maps` section')
                 item.add(stack, stdout, context)
 
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:  # pylint: disable=no-self-use
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
         """Prepare stack for contract execution"""
 
         for item in self.input.args[0].args[::-1]:

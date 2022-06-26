@@ -82,7 +82,7 @@ class AddressType(StringType, prim='address'):
     def __repr__(self):
         return f'{self.value[:6]}…{self.value[-3:]}'
 
-    def __lt__(self, other: 'AddressType') -> bool:
+    def __lt__(self, other: 'AddressType') -> bool:  # type: ignore
         if is_pkh(self.value) and is_kt(other.value):
             return True
         elif is_kt(self.value) and is_pkh(other.value):
@@ -131,7 +131,7 @@ class KeyType(StringType, prim='key'):
     def prefix(self) -> str:
         return self.value[:4]
 
-    def __lt__(self, other: 'KeyType') -> bool:
+    def __lt__(self, other: 'KeyType') -> bool:  # type: ignore
         """
         Keys are ordered as follows: edpk < sppk < p2pk
         All keys are in compressed form in Tezos (flag | X) where flag specifies if Y is odd or even

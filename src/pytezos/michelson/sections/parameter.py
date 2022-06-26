@@ -9,7 +9,7 @@ from pytezos.michelson.types.core import Unit
 
 
 class ParameterSection(Micheline, prim='parameter', args_len=1):
-    args: List[Type[MichelsonType]]
+    args: List[Type[MichelsonType]]  # type: ignore
     root_name: str
 
     def __init__(self, item: MichelsonType):
@@ -31,7 +31,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
 
     @classmethod
     def create_type(cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs) -> Type['ParameterSection']:
-        root_name = parse_name(annots, prefix='%')
+        root_name = parse_name(annots, prefix='%')  # type: ignore
         root_type = cast(Type[MichelsonType], args[0])
         if issubclass(root_type, OrType):
             if not root_name:
@@ -79,8 +79,8 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             root_type = cls.args[0]
             assert issubclass(root_type, OrType), f'expected `{cls.root_name}`, got `{entrypoint}`'
             _, key_to_path, _ = root_type.get_type_layout(entrypoints=True)
-            assert entrypoint in key_to_path, f'unexpected entrypoint `{entrypoint}`'
-            val_expr = wrap_parameters(parameters['value'], key_to_path[entrypoint])
+            assert entrypoint in key_to_path, f'unexpected entrypoint `{entrypoint}`'  # type: ignore
+            val_expr = wrap_parameters(parameters['value'], key_to_path[entrypoint])  # type: ignore
             item = root_type.from_micheline_value(val_expr)
             return cls(item)
 
@@ -94,7 +94,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
 
     @classmethod
     def generate_pydoc(cls) -> str:
-        definitions = []
+        definitions = []  # type: ignore
         res = cls.args[0].generate_pydoc(definitions, cls.prim)
         if res != f'${cls.prim}':
             definitions.insert(0, (cls.prim, res))
@@ -145,7 +145,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         self.item.attach_context(context, big_map_copy=True)
 
     def aggregate_lazy_diff(self, mode='readable') -> List[dict]:
-        lazy_diff = []
+        lazy_diff = []  # type: ignore
         self.item.aggregate_lazy_diff(lazy_diff, mode=mode)
         return lazy_diff
 

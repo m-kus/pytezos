@@ -25,7 +25,7 @@ class AbsInstruction(MichelsonInstruction, prim='ABS'):
         a.assert_type_equal(IntType)
         res = NatType.from_value(abs(int(a)))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))
+        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -65,11 +65,11 @@ class AddInstruction(MichelsonInstruction, prim='ADD'):
             res_type,
         )
         if issubclass(res_type, IntType):
-            res = res_type.from_value(int(a) + int(b))
+            res = res_type.from_value(int(a) + int(b))  # type: ignore
         else:
-            res = res_type.from_point(bls12_381.add(a.to_point(), b.to_point()))
+            res = res_type.from_point(bls12_381.add(a.to_point(), b.to_point()))  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -77,7 +77,7 @@ class EdivInstruction(MichelsonInstruction, prim='EDIV'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
-        q_type, r_type = dispatch_types(
+        q_type, r_type = dispatch_types(  # type: ignore
             type(a),
             type(b),
             mapping={
@@ -99,7 +99,7 @@ class EdivInstruction(MichelsonInstruction, prim='EDIV'):
             items = [q_type.from_value(q), r_type.from_value(r)]
             res = OptionType.from_some(PairType.from_comb(items))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -117,14 +117,14 @@ def execute_shift(prim: str, stack: MichelsonStack, stdout: List[str], shift: Ca
 class LslInstruction(MichelsonInstruction, prim='LSL'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_shift(cls.prim, stack, stdout, lambda x: x[0] << x[1])
+        execute_shift(cls.prim, stack, stdout, lambda x: x[0] << x[1])  # type: ignore
         return cls(stack_items_added=1)
 
 
 class LsrInstruction(MichelsonInstruction, prim='LSR'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_shift(cls.prim, stack, stdout, lambda x: x[0] >> x[1])
+        execute_shift(cls.prim, stack, stdout, lambda x: x[0] >> x[1])  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -164,11 +164,11 @@ class MulInstruction(MichelsonInstruction, prim='MUL'):
             res_type,
         )
         if issubclass(res_type, IntType):
-            res = res_type.from_value(int(a) * int(b))
+            res = res_type.from_value(int(a) * int(b))  # type: ignore
         else:
-            res = res_type.from_point(bls12_381.multiply(a.to_point(), int(b)))
+            res = res_type.from_point(bls12_381.multiply(a.to_point(), int(b)))  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -187,11 +187,11 @@ class NegInstruction(MichelsonInstruction, prim='NEG'):
             },
         )
         if issubclass(res_type, IntType):
-            res = IntType.from_value(-int(a))
+            res = IntType.from_value(-int(a))  # type: ignore
         else:
-            res = res_type.from_point(bls12_381.neg(a.to_point()))
+            res = res_type.from_point(bls12_381.neg(a.to_point()))  # type: ignore
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))
+        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -199,7 +199,7 @@ class SubInstruction(MichelsonInstruction, prim='SUB'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a, b = cast(Tuple[Union[IntType, NatType, MutezType, TimestampType], ...], stack.pop2())
-        (res_type,) = dispatch_types(
+        (res_type,) = dispatch_types(  # type: ignore
             type(a),
             type(b),
             mapping={
@@ -214,7 +214,7 @@ class SubInstruction(MichelsonInstruction, prim='SUB'):
         )  # type: Union[Type[IntType], Type[NatType], Type[TimestampType], Type[MutezType]]
         res = res_type.from_value(int(a) - int(b))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -229,7 +229,7 @@ class SubMutezInstruction(MichelsonInstruction, prim='SUB_MUTEZ'):
         except OverflowError:
             res = OptionType.none(MutezType)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a, b], [res]))
+        stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -254,5 +254,5 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
         else:
             res = OptionType.none(NatType)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [a], [res]))
+        stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
         return cls(stack_items_added=1)

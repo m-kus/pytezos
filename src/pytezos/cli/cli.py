@@ -144,7 +144,7 @@ def activate(_ctx, path: str, network: str) -> None:
 def deploy(
     _ctx,
     path: str,
-    storage: Optional[str],  # pylint: disable=redefined-outer-name
+    storage: Optional[str],
     network: str,
     key: Optional[str],
     github_repo_slug: Optional[str],

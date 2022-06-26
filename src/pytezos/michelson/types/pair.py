@@ -39,10 +39,10 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
     def init(cls, items: List[MichelsonType]) -> 'PairType':
         if len(items) > 2:
             right_cls = cast(Type['PairType'], cls.args[1])
-            items = items[0], right_cls.init(items[1:])
+            items = items[0], right_cls.init(items[1:])  # type: ignore
         else:
-            items = tuple(items)
-        return cls(items)
+            items = tuple(items)  # type: ignore
+        return cls(items)  # type: ignore
 
     @staticmethod
     def from_comb(items: List[MichelsonType]) -> 'PairType':
@@ -62,7 +62,7 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
     def iter_type_args(cls, entrypoints=False, path='') -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
         for i, arg in enumerate(cls.args):
             if issubclass(arg, PairType) and not (arg.field_name or arg.type_name):
-                yield from arg.iter_type_args(path=path + str(i))
+                yield from arg.iter_type_args(path=path + str(i))  # type: ignore
             else:
                 yield path + str(i), arg
 

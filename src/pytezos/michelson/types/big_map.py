@@ -45,7 +45,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
     def __len__(self):
         return len(self.items) + len(self.removed_keys)
 
-    def __iter__(self) -> Generator[Tuple[MichelsonType, Optional[MichelsonType]], None, None]:
+    def __iter__(self) -> Generator[Tuple[MichelsonType, Optional[MichelsonType]], None, None]:  # type: ignore
         yield from iter(self.items)
         for key in self.removed_keys:
             yield key, None
@@ -60,14 +60,14 @@ class BigMapType(MapType, prim='big_map', args_len=2):
     def __deepcopy__(self, memodict={}):
         return self.duplicate()
 
-    def __getitem__(self, key_obj) -> Optional[MichelsonType]:
+    def __getitem__(self, key_obj) -> Optional[MichelsonType]:  # type: ignore
         key = self.args[0].from_python_object(key_obj)
         return self.get(key, dup=False)
 
     @staticmethod
     def empty(key_type: Type[MichelsonType], val_type: Type[MichelsonType]) -> 'BigMapType':
         cls = BigMapType.create_type(args=[key_type, val_type])
-        return cls(items=[])
+        return cls(items=[])  # type: ignore
 
     @staticmethod
     def from_items(items: List[Tuple[MichelsonType, MichelsonType]]):
@@ -166,8 +166,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         diff = {'action': action, 'updates': [make_update(key, val) for key, val in self]}
         if action == 'alloc':
             key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
-            diff['key_type'] = key_type
-            diff['value_type'] = val_type
+            diff['key_type'] = key_type  # type: ignore
+            diff['value_type'] = val_type  # type: ignore
         elif action == 'copy':
             pass  # TODO:
 
@@ -188,8 +188,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             self.ptr = context.get_tmp_big_map_id()
         else:
             self.ptr = context.register_big_map(self.ptr, copy=big_map_copy)
-        if context.tzt:
-            context.tzt_big_maps[self.ptr] = self
+        if context.tzt:  # type: ignore
+            context.tzt_big_maps[self.ptr] = self  # type: ignore
 
     def get(self, key: MichelsonType, dup=True) -> Optional[MichelsonType]:
         self.args[0].assert_type_equal(type(key))
@@ -197,13 +197,13 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         if val is Undefined:
             assert self.context, f'context is not attached'
             key_hash = forge_script_expr(key.pack(legacy=True))
-            val_expr = self.context.get_big_map_value(self.ptr, key_hash)
+            val_expr = self.context.get_big_map_value(self.ptr, key_hash)  # type: ignore
             if val_expr is None:
                 return None
             else:
                 return self.args[1].from_micheline_value(val_expr)
         else:
-            return val
+            return val  # type: ignore
 
     def update(self, key: MichelsonType, val: Optional[MichelsonType]) -> Tuple[Optional[MichelsonType], MichelsonType]:
         removed_keys = set(self.removed_keys)
@@ -220,8 +220,8 @@ class BigMapType(MapType, prim='big_map', args_len=2):
                 if key in removed_keys:
                     removed_keys.remove(key)
             else:  # do nothing
-                items = self.items
-        res = type(self)(items=items, ptr=self.ptr, removed_keys=list(removed_keys))
+                items = self.items  # type: ignore
+        res = type(self)(items=items, ptr=self.ptr, removed_keys=list(removed_keys))  # type: ignore
         res.context = self.context
         return prev_val, res
 

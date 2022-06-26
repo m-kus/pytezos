@@ -110,7 +110,7 @@ class Interpreter:
             **kwargs,
         )
         stack = MichelsonStack()
-        stdout = []
+        stdout = []  # type: ignore
         try:
             program = MichelsonProgram.load(context, with_code=True)
             res = program.instantiate(
@@ -149,7 +149,7 @@ class Interpreter:
             address=context.address,
         )
         stack = MichelsonStack()
-        stdout = []
+        stdout = []  # type: ignore
         try:
             program = MichelsonProgram.load(ctx, with_code=True)
             res = program.instantiate(entrypoint=entrypoint, parameter=parameter, storage=storage)
@@ -181,7 +181,7 @@ class Interpreter:
             view_results=context.view_results,
         )
         stack = MichelsonStack()
-        stdout = []
+        stdout = []  # type: ignore
         try:
             program = MichelsonProgram.load(ctx, with_code=True)
             res = program.instantiate_view(name=name, parameter=parameter, storage=storage)

@@ -61,7 +61,7 @@ class ContractCall(ContextMixin):
             destination=self.address, amount=self.amount, parameters=self.parameters, **kwargs
         )
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `as_transaction()` instead')
     def operation_group(self) -> OperationGroup:
         return self.as_transaction().fill()

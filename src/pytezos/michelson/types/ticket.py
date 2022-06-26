@@ -26,7 +26,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
     @staticmethod
     def create(ticketer: str, item: MichelsonType, amount: int) -> 'TicketType':
         cls = TicketType.create_type(args=[item.get_anon_type()])
-        return cls(ticketer, item, amount)
+        return cls(ticketer, item, amount)  # type: ignore
 
     @classmethod
     def from_comb(cls, comb: PairType) -> 'TicketType':

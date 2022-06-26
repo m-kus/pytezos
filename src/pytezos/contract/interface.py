@@ -67,7 +67,7 @@ class ContractInterface(ContextMixin):
                 name=view_name,
                 parameter=view_ty.args[1].as_micheline_expr(),
                 return_type=view_ty.args[2].as_micheline_expr(),
-                code=view_ty.args[3].as_micheline_expr(),
+                code=view_ty.args[3].as_micheline_expr(),  # type: ignore
             )
             view_attr.__doc__ = view_ty.generate_pydoc()
             assert not hasattr(self, view_name), f'View name collision {view_name}'
@@ -422,22 +422,22 @@ class ContractInterface(ContextMixin):
         assert root_name in self.entrypoints, 'root entrypoint is undefined'
         return getattr(self, root_name)
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='access `ContractInterface` directly')
     def contract(self) -> 'ContractInterface':
         return self
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `to_michelson()` instead')
     def text(self) -> str:
         return self.to_michelson()
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `to_micheline()` instead')
     def code(self):
         return self.to_micheline()
 
-    @property
+    @property  # type: ignore
     @deprecated(deprecated_in='3.0.0', removed_in='4.0.0', details='use `default()` instead')
     def call(self) -> ContractEntrypoint:
         return self.parameter

@@ -16,11 +16,11 @@ class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
         assert isinstance(right, TicketType), f'expected ticket on the right, got {right.prim}'
         res = TicketType.join(left, right)
         if res is None:
-            res = OptionType.none(type(left))
+            res = OptionType.none(type(left))  # type: ignore
         else:
-            res = OptionType.from_some(res)
-        stack.push(res)
-        stdout.append(format_stdout(cls.prim, [pair], [res]))
+            res = OptionType.from_some(res)  # type: ignore
+        stack.push(res)  # type: ignore
+        stdout.append(format_stdout(cls.prim, [pair], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -32,7 +32,7 @@ class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
         res = ticket.to_comb()
         stack.push(ticket)
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [ticket], [res, ticket]))
+        stdout.append(format_stdout(cls.prim, [ticket], [res, ticket]))  # type: ignore
         return cls(stack_items_added=2)
 
 
@@ -42,16 +42,16 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
         ticket, amounts = cast(Tuple[TicketType, PairType], stack.pop2())
         ticket.assert_type_in(TicketType)
         amounts.assert_type_in(PairType)
-        a, b = tuple(amounts)  # type: NatType, NatType
+        a, b = tuple(amounts)  # type: NatType, NatType  # type: ignore
         a.assert_type_equal(NatType)
         b.assert_type_equal(NatType)
         res = ticket.split(int(a), int(b))
         if res is None:
-            res = OptionType.none(PairType.create_type(args=[type(ticket), type(ticket)]))
+            res = OptionType.none(PairType.create_type(args=[type(ticket), type(ticket)]))  # type: ignore
         else:
-            res = OptionType.from_some(PairType.from_comb(list(res)))
-        stack.push(res)
-        stdout.append(format_stdout(cls.prim, [ticket, amounts], [res]))
+            res = OptionType.from_some(PairType.from_comb(list(res)))  # type: ignore
+        stack.push(res)  # type: ignore
+        stdout.append(format_stdout(cls.prim, [ticket, amounts], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
 
@@ -63,5 +63,5 @@ class TicketInstruction(MichelsonInstruction, prim='TICKET'):
         address = context.get_self_address()
         res = TicketType.create(address, item, int(amount))
         stack.push(res)
-        stdout.append(format_stdout(cls.prim, [item, amount], [res]))
+        stdout.append(format_stdout(cls.prim, [item, amount], [res]))  # type: ignore
         return cls(stack_items_added=1)
