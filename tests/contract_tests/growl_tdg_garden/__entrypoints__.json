@@ -1,0 +1,235 @@
+{
+  "entrypoints": {
+    "update_token_metadata": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_id"
+              ]
+            },
+            {
+              "prim": "map",
+              "args": [
+                {
+                  "prim": "string"
+                },
+                {
+                  "prim": "bytes"
+                }
+              ],
+              "annots": [
+                "%token_info"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "update_mint_time": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%due_time"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%start_time"
+          ]
+        }
+      ]
+    },
+    "update_metadata": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%k"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%v"
+          ]
+        }
+      ]
+    },
+    "update_admin": {
+      "prim": "address"
+    },
+    "tdtm_fa2_callback": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%request"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%balance"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tdg_fa2_callback": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%request"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%balance"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "set_pause": {
+      "prim": "bool"
+    },
+    "reveal_token_metadata": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%serial_id"
+              ]
+            },
+            {
+              "prim": "map",
+              "args": [
+                {
+                  "prim": "string"
+                },
+                {
+                  "prim": "bytes"
+                }
+              ],
+              "annots": [
+                "%token_info"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "pick_intial_id": {
+      "prim": "unit"
+    },
+    "oracle_callback": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "timestamp"
+        },
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "mint": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%tdg_token_id"
+          ]
+        },
+        {
+          "prim": "list",
+          "args": [
+            {
+              "prim": "nat"
+            }
+          ],
+          "annots": [
+            "%tdtm_token_list"
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "admin_mint": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%mint_amount"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%minter"
+          ]
+        }
+      ]
+    }
+  }
+}

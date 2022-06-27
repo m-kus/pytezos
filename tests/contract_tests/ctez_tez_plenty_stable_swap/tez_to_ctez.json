@@ -1,0 +1,130 @@
+{
+  "parameters": {
+    "entrypoint": "tez_to_ctez",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "23261727"
+        },
+        {
+          "string": "tz1RoA34HzfB3RHmA5KAAQXHFKQyA5fN1BGx"
+        }
+      ]
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "True"
+              },
+              {
+                "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "01c71a724e60088d398e7724739faa7488dfab46b100"
+              },
+              {
+                "int": "0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "20010205943"
+          },
+          {
+            "bytes": "0157006fcca7770ededb7fc644a1a354f7ebbdae1800"
+          }
+        ]
+      },
+      {
+        "int": "1000"
+      },
+      {
+        "bytes": "013463d7aff77ae4d127b2740650998919b2b5535700"
+      },
+      {
+        "int": "41363624975"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Some",
+              "args": [
+                {
+                  "int": "23261727"
+                }
+              ]
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Some",
+              "args": [
+                {
+                  "bytes": "0000438aa0ed99c9939b86ae8611d1a3da40a270475a"
+                }
+              ]
+            },
+            {
+              "prim": "None"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "False"
+        },
+        {
+          "int": "21375962530"
+        }
+      ]
+    },
+    {
+      "prim": "Some",
+      "args": [
+        {
+          "int": "25000000"
+        }
+      ]
+    },
+    {
+      "prim": "None"
+    },
+    {
+      "int": "0"
+    }
+  ],
+  "lazy_storage_diff": []
+}

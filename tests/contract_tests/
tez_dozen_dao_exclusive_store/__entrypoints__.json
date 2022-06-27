@@ -1,0 +1,337 @@
+{
+  "entrypoints": {
+    "update_whitelist": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%add_address"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%remove_address"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "update_operators": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%add_address"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%remove_address"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "update_metadata": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%k"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%v"
+          ]
+        }
+      ]
+    },
+    "update_english_auction_info": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%akaDAO_increment"
+              ]
+            },
+            {
+              "prim": "timestamp",
+              "annots": [
+                "%due_time"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%extension_time"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%start_akaDAO"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%start_time"
+          ]
+        }
+      ]
+    },
+    "update_dutch_auction_info": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%drop_akaDAO"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%drop_time"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%due_time"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%start_akaDAO"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%start_time"
+          ]
+        }
+      ]
+    },
+    "update_admin": {
+      "prim": "address"
+    },
+    "td_fa2_callback": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%request"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%balance"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "make_english_auction": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%token_fa2"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "make_dutch_auction": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_amount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%token_fa2"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "collect_dutch_auction": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%auction_id"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bool",
+              "annots": [
+                "%is_tdtm"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%td_token"
+          ]
+        }
+      ]
+    },
+    "close_english_auction": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "close_dutch_auction": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "cancel_english_auction": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "cancel_dutch_auction": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "bid_english_auction": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%auction_id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%bid_value"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bool",
+              "annots": [
+                "%is_tdtm"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ],
+          "annots": [
+            "%td_token"
+          ]
+        }
+      ]
+    }
+  }
+}

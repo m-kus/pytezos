@@ -1,0 +1,186 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "unit"
+    },
+    "updateVotingContract": {
+      "prim": "address"
+    },
+    "updateStakingOptionRate": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%rate"
+          ]
+        }
+      ]
+    },
+    "updateStakingOptionMin": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%min"
+          ]
+        }
+      ]
+    },
+    "updateStakingOptionMax": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%max"
+          ]
+        }
+      ]
+    },
+    "updateStakingOptionDuration": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%id"
+          ]
+        },
+        {
+          "prim": "int",
+          "annots": [
+            "%duration"
+          ]
+        }
+      ]
+    },
+    "updateStakingFlexRate": {
+      "prim": "nat"
+    },
+    "updateReserve": {
+      "prim": "address"
+    },
+    "updatePauseLock": {
+      "prim": "unit"
+    },
+    "updatePauseFlex": {
+      "prim": "unit"
+    },
+    "updateMetadata": {
+      "prim": "bytes"
+    },
+    "updateMaxValuesNb": {
+      "prim": "nat"
+    },
+    "updateContract": {
+      "prim": "address"
+    },
+    "updateAdmin": {
+      "prim": "address"
+    },
+    "unstakeLock": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%index"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%pack"
+          ]
+        }
+      ]
+    },
+    "unstakeFlex": {
+      "prim": "nat"
+    },
+    "stakeLock": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%amount"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%pack"
+          ]
+        }
+      ]
+    },
+    "stakeFlex": {
+      "prim": "nat"
+    },
+    "deleteStakingOption": {
+      "prim": "nat"
+    },
+    "createStakingOption": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%rate"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%max"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%min"
+          ]
+        },
+        {
+          "prim": "int",
+          "annots": [
+            "%duration"
+          ]
+        }
+      ]
+    },
+    "claimRewardFlex": {
+      "prim": "unit"
+    },
+    "add_reserve_fund": {
+      "prim": "nat"
+    }
+  }
+}

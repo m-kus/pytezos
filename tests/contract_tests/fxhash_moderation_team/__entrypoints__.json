@@ -1,0 +1,918 @@
+{
+  "entrypoints": {
+    "withdraw": {
+      "prim": "option",
+      "args": [
+        {
+          "prim": "mutez"
+        }
+      ]
+    },
+    "update_shares": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%address"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%pct"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "update_moderators": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%address"
+              ]
+            },
+            {
+              "prim": "set",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%authorizations"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "update_lambda": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "lambda",
+              "args": [
+                {
+                  "prim": "bytes"
+                },
+                {
+                  "prim": "list",
+                  "args": [
+                    {
+                      "prim": "operation"
+                    }
+                  ]
+                }
+              ],
+              "annots": [
+                "%code"
+              ]
+            },
+            {
+              "prim": "bool",
+              "annots": [
+                "%enabled"
+              ]
+            },
+            {
+              "prim": "string",
+              "annots": [
+                "%name"
+              ]
+            }
+          ],
+          "annots": [
+            "%lambda_details"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%lambda_id"
+          ]
+        }
+      ]
+    },
+    "update_ep": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "lambda",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "or",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "lambda",
+                              "args": [
+                                {
+                                  "prim": "bytes"
+                                },
+                                {
+                                  "prim": "list",
+                                  "args": [
+                                    {
+                                      "prim": "operation"
+                                    }
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%code"
+                              ]
+                            },
+                            {
+                              "prim": "bool",
+                              "annots": [
+                                "%enabled"
+                              ]
+                            },
+                            {
+                              "prim": "string",
+                              "annots": [
+                                "%name"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%add_lambda"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "lambda",
+                                  "args": [
+                                    {
+                                      "prim": "bytes"
+                                    },
+                                    {
+                                      "prim": "list",
+                                      "args": [
+                                        {
+                                          "prim": "operation"
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%code"
+                                  ]
+                                },
+                                {
+                                  "prim": "bool",
+                                  "annots": [
+                                    "%enabled"
+                                  ]
+                                },
+                                {
+                                  "prim": "string",
+                                  "annots": [
+                                    "%name"
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%lambda_details"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%lambda_id"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%update_lambda"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "or",
+                      "args": [
+                        {
+                          "prim": "list",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "address",
+                                  "annots": [
+                                    "%address"
+                                  ]
+                                },
+                                {
+                                  "prim": "set",
+                                  "args": [
+                                    {
+                                      "prim": "nat"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%authorizations"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%update_moderators"
+                          ]
+                        },
+                        {
+                          "prim": "or",
+                          "args": [
+                            {
+                              "prim": "list",
+                              "args": [
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "address",
+                                      "annots": [
+                                        "%address"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "nat",
+                                      "annots": [
+                                        "%pct"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%update_shares"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "mutez"
+                                }
+                              ],
+                              "annots": [
+                                "%withdraw"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%admin"
+                          ]
+                        },
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "bytes"
+                            },
+                            {
+                              "prim": "bytes"
+                            }
+                          ],
+                          "annots": [
+                            "%extended_storage"
+                          ]
+                        },
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "lambda",
+                                  "args": [
+                                    {
+                                      "prim": "bytes"
+                                    },
+                                    {
+                                      "prim": "list",
+                                      "args": [
+                                        {
+                                          "prim": "operation"
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%code"
+                                  ]
+                                },
+                                {
+                                  "prim": "bool",
+                                  "annots": [
+                                    "%enabled"
+                                  ]
+                                },
+                                {
+                                  "prim": "string",
+                                  "annots": [
+                                    "%name"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%lambdas_exec"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%lambdas_exec_count"
+                      ]
+                    },
+                    {
+                      "prim": "bool",
+                      "annots": [
+                        "%locked_eps"
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "string"
+                        },
+                        {
+                          "prim": "bytes"
+                        }
+                      ],
+                      "annots": [
+                        "%metadata"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "address"
+                        },
+                        {
+                          "prim": "set",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%moderators"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%moderators_count"
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "nat"
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "map",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "bool"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%approvals"
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "nat",
+                                      "annots": [
+                                        "%call_id"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "bytes",
+                                      "annots": [
+                                        "%call_params"
+                                      ]
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%call_settings"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "bool",
+                              "annots": [
+                                "%executed"
+                              ]
+                            },
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%initiator"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%proposals"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%proposals_count"
+                  ]
+                },
+                {
+                  "prim": "map",
+                  "args": [
+                    {
+                      "prim": "address"
+                    },
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%shares"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%shares_total"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "list",
+                  "args": [
+                    {
+                      "prim": "operation"
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%admin"
+                          ]
+                        },
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "bytes"
+                            },
+                            {
+                              "prim": "bytes"
+                            }
+                          ],
+                          "annots": [
+                            "%extended_storage"
+                          ]
+                        },
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            },
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "lambda",
+                                  "args": [
+                                    {
+                                      "prim": "bytes"
+                                    },
+                                    {
+                                      "prim": "list",
+                                      "args": [
+                                        {
+                                          "prim": "operation"
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%code"
+                                  ]
+                                },
+                                {
+                                  "prim": "bool",
+                                  "annots": [
+                                    "%enabled"
+                                  ]
+                                },
+                                {
+                                  "prim": "string",
+                                  "annots": [
+                                    "%name"
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%lambdas_exec"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%lambdas_exec_count"
+                      ]
+                    },
+                    {
+                      "prim": "bool",
+                      "annots": [
+                        "%locked_eps"
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "string"
+                        },
+                        {
+                          "prim": "bytes"
+                        }
+                      ],
+                      "annots": [
+                        "%metadata"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "address"
+                        },
+                        {
+                          "prim": "set",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%moderators"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%moderators_count"
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "nat"
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "map",
+                                  "args": [
+                                    {
+                                      "prim": "address"
+                                    },
+                                    {
+                                      "prim": "bool"
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%approvals"
+                                  ]
+                                },
+                                {
+                                  "prim": "pair",
+                                  "args": [
+                                    {
+                                      "prim": "nat",
+                                      "annots": [
+                                        "%call_id"
+                                      ]
+                                    },
+                                    {
+                                      "prim": "bytes",
+                                      "annots": [
+                                        "%call_params"
+                                      ]
+                                    }
+                                  ],
+                                  "annots": [
+                                    "%call_settings"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "prim": "bool",
+                              "annots": [
+                                "%executed"
+                              ]
+                            },
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%initiator"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "annots": [
+                        "%proposals"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%proposals_count"
+                  ]
+                },
+                {
+                  "prim": "map",
+                  "args": [
+                    {
+                      "prim": "address"
+                    },
+                    {
+                      "prim": "nat"
+                    }
+                  ],
+                  "annots": [
+                    "%shares"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%shares_total"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%code"
+          ]
+        },
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "unit",
+                  "annots": [
+                    "%add_lambda"
+                  ]
+                },
+                {
+                  "prim": "unit",
+                  "annots": [
+                    "%update_lambda"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "unit",
+                  "annots": [
+                    "%update_moderators"
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "unit",
+                      "annots": [
+                        "%update_shares"
+                      ]
+                    },
+                    {
+                      "prim": "unit",
+                      "annots": [
+                        "%withdraw"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%ep_name"
+          ]
+        }
+      ]
+    },
+    "set_metadata": {
+      "prim": "big_map",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "bytes"
+        }
+      ]
+    },
+    "set_administrator": {
+      "prim": "address"
+    },
+    "proposal_vote": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bool",
+          "annots": [
+            "%approval"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%proposal_id"
+          ]
+        }
+      ]
+    },
+    "proposal_make": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%call_id"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%call_params"
+          ]
+        }
+      ]
+    },
+    "proposal_execute": {
+      "prim": "nat"
+    },
+    "lock_eps": {
+      "prim": "unit"
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "add_lambda": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "lambda",
+          "args": [
+            {
+              "prim": "bytes"
+            },
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "operation"
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%code"
+          ]
+        },
+        {
+          "prim": "bool",
+          "annots": [
+            "%enabled"
+          ]
+        },
+        {
+          "prim": "string",
+          "annots": [
+            "%name"
+          ]
+        }
+      ]
+    }
+  }
+}

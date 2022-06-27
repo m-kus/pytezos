@@ -1,0 +1,552 @@
+{
+  "entrypoints": {
+    "verify": {
+      "prim": "address"
+    },
+    "update_ep": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "lambda",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "or",
+                      "args": [
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%reason"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%ban"
+                          ]
+                        },
+                        {
+                          "prim": "pair",
+                          "args": [
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%address"
+                              ]
+                            },
+                            {
+                              "prim": "option",
+                              "args": [
+                                {
+                                  "prim": "nat"
+                                }
+                              ],
+                              "annots": [
+                                "%reason"
+                              ]
+                            },
+                            {
+                              "prim": "nat",
+                              "annots": [
+                                "%state"
+                              ]
+                            }
+                          ],
+                          "annots": [
+                            "%moderate"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "or",
+                      "args": [
+                        {
+                          "prim": "string",
+                          "annots": [
+                            "%reason_add"
+                          ]
+                        },
+                        {
+                          "prim": "or",
+                          "args": [
+                            {
+                              "prim": "pair",
+                              "args": [
+                                {
+                                  "prim": "string",
+                                  "annots": [
+                                    "%reason"
+                                  ]
+                                },
+                                {
+                                  "prim": "nat",
+                                  "annots": [
+                                    "%reason_id"
+                                  ]
+                                }
+                              ],
+                              "annots": [
+                                "%reason_update"
+                              ]
+                            },
+                            {
+                              "prim": "address",
+                              "annots": [
+                                "%verify"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "string"
+                            },
+                            {
+                              "prim": "address"
+                            }
+                          ],
+                          "annots": [
+                            "%addresses"
+                          ]
+                        },
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%admin"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "bytes"
+                        },
+                        {
+                          "prim": "bytes"
+                        }
+                      ],
+                      "annots": [
+                        "%extended_storage"
+                      ]
+                    },
+                    {
+                      "prim": "bool",
+                      "annots": [
+                        "%locked_eps"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "string"
+                        },
+                        {
+                          "prim": "bytes"
+                        }
+                      ],
+                      "annots": [
+                        "%metadata"
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "nat"
+                        },
+                        {
+                          "prim": "string"
+                        }
+                      ],
+                      "annots": [
+                        "%reasons"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%reasons_count"
+                  ]
+                },
+                {
+                  "prim": "big_map",
+                  "args": [
+                    {
+                      "prim": "address"
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "option",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            }
+                          ],
+                          "annots": [
+                            "%reason"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%state"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    "%users"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "list",
+                  "args": [
+                    {
+                      "prim": "operation"
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "big_map",
+                          "args": [
+                            {
+                              "prim": "string"
+                            },
+                            {
+                              "prim": "address"
+                            }
+                          ],
+                          "annots": [
+                            "%addresses"
+                          ]
+                        },
+                        {
+                          "prim": "address",
+                          "annots": [
+                            "%admin"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "bytes"
+                        },
+                        {
+                          "prim": "bytes"
+                        }
+                      ],
+                      "annots": [
+                        "%extended_storage"
+                      ]
+                    },
+                    {
+                      "prim": "bool",
+                      "annots": [
+                        "%locked_eps"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "string"
+                        },
+                        {
+                          "prim": "bytes"
+                        }
+                      ],
+                      "annots": [
+                        "%metadata"
+                      ]
+                    },
+                    {
+                      "prim": "big_map",
+                      "args": [
+                        {
+                          "prim": "nat"
+                        },
+                        {
+                          "prim": "string"
+                        }
+                      ],
+                      "annots": [
+                        "%reasons"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%reasons_count"
+                  ]
+                },
+                {
+                  "prim": "big_map",
+                  "args": [
+                    {
+                      "prim": "address"
+                    },
+                    {
+                      "prim": "pair",
+                      "args": [
+                        {
+                          "prim": "option",
+                          "args": [
+                            {
+                              "prim": "nat"
+                            }
+                          ],
+                          "annots": [
+                            "%reason"
+                          ]
+                        },
+                        {
+                          "prim": "nat",
+                          "annots": [
+                            "%state"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    "%users"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%code"
+          ]
+        },
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "unit",
+                  "annots": [
+                    "%ban"
+                  ]
+                },
+                {
+                  "prim": "unit",
+                  "annots": [
+                    "%moderate"
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "unit",
+                  "annots": [
+                    "%reason_add"
+                  ]
+                },
+                {
+                  "prim": "or",
+                  "args": [
+                    {
+                      "prim": "unit",
+                      "annots": [
+                        "%reason_update"
+                      ]
+                    },
+                    {
+                      "prim": "unit",
+                      "annots": [
+                        "%verify"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%ep_name"
+          ]
+        }
+      ]
+    },
+    "set_metadata": {
+      "prim": "big_map",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "bytes"
+        }
+      ]
+    },
+    "set_administrator": {
+      "prim": "address"
+    },
+    "set_addresses": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%address"
+              ]
+            },
+            {
+              "prim": "string",
+              "annots": [
+                "%address_id"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "reason_update": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%reason"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%reason_id"
+          ]
+        }
+      ]
+    },
+    "reason_add": {
+      "prim": "string"
+    },
+    "moderate": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%address"
+          ]
+        },
+        {
+          "prim": "option",
+          "args": [
+            {
+              "prim": "nat"
+            }
+          ],
+          "annots": [
+            "%reason"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%state"
+          ]
+        }
+      ]
+    },
+    "lock_eps": {
+      "prim": "unit"
+    },
+    "ban": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%address"
+          ]
+        },
+        {
+          "prim": "option",
+          "args": [
+            {
+              "prim": "nat"
+            }
+          ],
+          "annots": [
+            "%reason"
+          ]
+        }
+      ]
+    }
+  }
+}

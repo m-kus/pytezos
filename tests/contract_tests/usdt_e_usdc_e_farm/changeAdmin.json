@@ -1,0 +1,134 @@
+{
+  "parameters": {
+    "entrypoint": "changeAdmin",
+    "value": {
+      "string": "KT1GpTEq4p2XZ8w9p5xM7Wayyw5VR7tb3UaW"
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "015a5788144ca8c9e2581821ae6aa3b5918aa41a3000"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "198863"
+              },
+              {
+                "int": "8192"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1000000000000000000000000000000000000"
+          },
+          {
+            "prim": "False"
+          }
+        ]
+      },
+      {
+        "int": "2475225"
+      },
+      {
+        "prim": "False"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "2475296"
+            },
+            {
+              "int": "26000000000000000000000"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "100000000000000000"
+            },
+            {
+              "bytes": "0155fdb2c7edb043dbed4e188580aa5e5c1dba593200"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "0127e198ad58aa0b6a3a6b721dfdcdb3526730b41d00"
+        },
+        {
+          "int": "0"
+        }
+      ]
+    },
+    {
+      "int": "54158000000000000"
+    },
+    [
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "1"
+          },
+          {
+            "int": "25"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "2"
+          },
+          {
+            "int": "25"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "3"
+          },
+          {
+            "int": "25"
+          }
+        ]
+      }
+    ]
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "198863",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

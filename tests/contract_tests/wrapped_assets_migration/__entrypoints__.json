@@ -1,0 +1,55 @@
+{
+  "entrypoints": {
+    "swapTokens": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%amount"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%tokenId"
+          ]
+        }
+      ]
+    },
+    "setAddress": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%newTokenAddress"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%oldTokenAddress"
+          ]
+        }
+      ]
+    },
+    "addMapping": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%newTokenId"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%oldTokenId"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -5,8 +5,8 @@ from unittest import TestCase
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 from pytezos.michelson.program import MichelsonProgram
 
-folder = 'dexter_usdtz_xtz'
-entrypoint = 'removeLiquidity'
+folder = 'typed_minter'
+entrypoint = 'mint_TYPED'
 
 
 class MainnetOperationTestCaseTemplate(TestCase):
@@ -34,9 +34,9 @@ class MainnetOperationTestCaseTemplate(TestCase):
 
     def test_lazy_storage_template(self):
         storage = self.program.storage.from_micheline_value(self.operation['storage'])
-        lazy_diff = self.operation['big_map_diff']
+        lazy_storage_diff = self.operation['lazy_storage_diff']
 
-        extended_storage = storage.merge_lazy_diff(lazy_diff)
+        extended_storage = storage.merge_lazy_diff(lazy_storage_diff)
         py_obj = extended_storage.to_python_object(try_unpack=True, lazy_diff=True)
         # pprint(py_obj)
 

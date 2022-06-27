@@ -1,0 +1,118 @@
+{
+  "parameters": {
+    "entrypoint": "add_liquidity",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "tz1NbDzUQCcV2kp3wxdVHVSZEDeq2h97mweW"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "1400000"
+            },
+            {
+              "int": "1400000"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+              },
+              {
+                "int": "1000"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0127e198ad58aa0b6a3a6b721dfdcdb3526730b41d00"
+              },
+              {
+                "int": "2800000"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "False"
+          },
+          {
+            "prim": "False"
+          }
+        ]
+      },
+      {
+        "bytes": "01de89cf6f8f5ec570fa9c5da1d4b796e76312064300"
+      },
+      {
+        "prim": "True"
+      },
+      {
+        "int": "0"
+      }
+    ],
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "3"
+          },
+          {
+            "int": "1400000"
+          }
+        ]
+      },
+      {
+        "int": "1"
+      },
+      {
+        "bytes": "01de89cf6f8f5ec570fa9c5da1d4b796e76312064300"
+      },
+      {
+        "prim": "True"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "0"
+        },
+        {
+          "int": "2"
+        }
+      ]
+    },
+    {
+      "int": "1400000"
+    },
+    {
+      "int": "1"
+    },
+    {
+      "prim": "None"
+    }
+  ],
+  "lazy_storage_diff": []
+}

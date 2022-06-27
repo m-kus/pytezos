@@ -1,0 +1,90 @@
+{
+  "parameters": {
+    "entrypoint": "mint_TYPED",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "9999"
+        },
+        {
+          "bytes": "697066733a2f2f516d65374148676276756244655547453437664b6f516f6a4b4d4d42624634327a44447763616333556675656d51"
+        }
+      ]
+    }
+  },
+  "storage": [
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "0000a6ae57c142a11701e837bef4c88a7bf3e68c46c9"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "196861"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "0168526319b4de50b7dd503e4724e3956ae3d8612b00"
+        },
+        {
+          "int": "1"
+        }
+      ]
+    },
+    {
+      "int": "100"
+    },
+    {
+      "int": "196862"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "196862",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "exprtZBwZUeYYYfUs9B9Rg2ywHezVHnCCnmF9WsDQVrs582dSK63dC",
+            "key": {
+              "int": "0"
+            },
+            "value": {
+              "prim": "Pair",
+              "args": [
+                {
+                  "bytes": "00002c6260d8260bc22c9d7f243cc24c6cba7ebbfa2a"
+                },
+                {
+                  "int": "100"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "196861",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+{
+  "parameters": {
+    "entrypoint": "unstakeFlex",
+    "value": {
+      "int": "2641800000"
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0162973eb7780358871be6b69e18e066e868fb2c3500"
+              },
+              {
+                "int": "172788"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000182ca950c9dc7c11cc17d18b28d6c95c90fac1c5"
+              },
+              {
+                "int": "0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "172789"
+          },
+          {
+            "int": "0"
+          }
+        ]
+      },
+      {
+        "prim": "False"
+      },
+      {
+        "prim": "True"
+      },
+      {
+        "int": "172790"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "bytes": "013e199f0675acf62ffb3d8900bea1eed0e085f88d00"
+            },
+            {
+              "int": "166666697601"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "1"
+            },
+            {
+              "int": "172791"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        [
+          {
+            "prim": "Elt",
+            "args": [
+              {
+                "int": "0"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1000000000000000"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "22"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        {
+          "int": "2399"
+        }
+      ]
+    },
+    {
+      "int": "172792"
+    },
+    {
+      "int": "172793"
+    },
+    {
+      "prim": "None"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "172793",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172792",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "exprtZBwZUeYYYfUs9B9Rg2ywHezVHnCCnmF9WsDQVrs582dSK63dC",
+            "key": {
+              "int": "0"
+            },
+            "value": [
+              {
+                "prim": "Elt",
+                "args": [
+                  {
+                    "bytes": "0000ef90fd1cd6c55b1c1e918251f854e8b1cb939564"
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "22"
+                          },
+                          {
+                            "int": "3317"
+                          }
+                        ]
+                      },
+                      {
+                        "prim": "Pair",
+                        "args": [
+                          {
+                            "int": "1652714324"
+                          },
+                          {
+                            "int": "0"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172791",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "expruYAQ12yvxjmMsSYr31HGhauEHzthNqAbHpa6fzEqFsJExD4wgU",
+            "key": {
+              "int": "1652714324"
+            },
+            "value": {
+              "int": "-2641800000"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172790",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172789",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172788",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

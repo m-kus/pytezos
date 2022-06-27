@@ -1,0 +1,127 @@
+{
+  "entrypoints": {
+    "unstake": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%Amount"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%MapKey"
+          ]
+        }
+      ]
+    },
+    "stake": {
+      "prim": "nat"
+    },
+    "changeUnstakeFee": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%blocksPerCycle"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%cycles"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%defaultFee"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%fee"
+          ]
+        }
+      ]
+    },
+    "changeState": {
+      "prim": "unit"
+    },
+    "changeAdmin": {
+      "prim": "address"
+    },
+    "WithdrawFee": {
+      "prim": "unit"
+    },
+    "RecoverExcessToken": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%address"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%id"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%token"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%type"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%value"
+          ]
+        }
+      ]
+    },
+    "GetReward": {
+      "prim": "unit"
+    },
+    "AddReward": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%blocks"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%reward"
+          ]
+        }
+      ]
+    }
+  }
+}

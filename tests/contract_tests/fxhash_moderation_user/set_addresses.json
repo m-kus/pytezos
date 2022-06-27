@@ -1,0 +1,132 @@
+{
+  "parameters": {
+    "entrypoint": "set_addresses",
+    "value": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "string": "KT1FvGQcPxzuJkJsdWFQiGkueSNT5mqpFDrf"
+          },
+          {
+            "string": "moderation_team"
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "149804"
+                },
+                {
+                  "bytes": "0000db88fc895c577ac6d6109167dcef060810d2c2f0"
+                }
+              ]
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "149805"
+                },
+                {
+                  "prim": "False"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "149806"
+            },
+            {
+              "int": "149807"
+            }
+          ]
+        },
+        {
+          "int": "0"
+        },
+        {
+          "int": "149808"
+        }
+      ],
+      {
+        "int": "149809"
+      }
+    ]
+  },
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "149809",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149808",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149807",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149806",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149805",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149804",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "expruimNuvRzMZY7jAg3KyMZ4u8gfnHTjaf5QtGRMWQBupDM7uqcAZ",
+            "key": {
+              "string": "moderation_team"
+            },
+            "value": {
+              "bytes": "015078dc283ce5f533d8a1ad5a4ba13d648892726f00"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

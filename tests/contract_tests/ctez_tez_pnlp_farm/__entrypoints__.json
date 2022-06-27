@@ -1,0 +1,19 @@
+{
+  "entrypoints": {
+    "unstake": {
+      "prim": "nat"
+    },
+    "stake": {
+      "prim": "nat"
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "GetReward": {
+      "prim": "unit"
+    },
+    "ChangeState": {
+      "prim": "unit"
+    }
+  }
+}

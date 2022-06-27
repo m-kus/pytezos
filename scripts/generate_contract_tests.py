@@ -45,6 +45,8 @@ if __name__ == '__main__':
     for case_dir in glob(join(base_dir, '*')):
         if isdir(case_dir):
             folder = basename(case_dir)
+            if folder == '__pycache__':
+                continue
             write_init_file(folder)
             generate_contract_test_case(folder)
             for file in glob(join(case_dir, '*.json')):

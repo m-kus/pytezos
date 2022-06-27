@@ -9,7 +9,7 @@ from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.types.base import MichelsonType
 
-folder = 'dexter_usdtz_xtz'
+folder = 'typed_minter'
 
 
 class MainnetContractTestCaseTemplate(TestCase):

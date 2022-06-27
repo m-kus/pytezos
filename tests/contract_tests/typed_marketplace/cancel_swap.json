@@ -1,0 +1,85 @@
+{
+  "parameters": {
+    "entrypoint": "cancel_swap",
+    "value": {
+      "int": "1"
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "196866"
+          },
+          {
+            "prim": "False"
+          }
+        ]
+      },
+      {
+        "int": "3"
+      },
+      {
+        "int": "50"
+      },
+      {
+        "bytes": "0000a6ae57c142a11701e837bef4c88a7bf3e68c46c9"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "0000a6ae57c142a11701e837bef4c88a7bf3e68c46c9"
+        },
+        {
+          "int": "196867"
+        }
+      ]
+    },
+    {
+      "int": "100"
+    },
+    {
+      "int": "196868"
+    },
+    {
+      "prim": "False"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "196868",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "expru2dKqDfZG8hu4wNGkiyunvq2hdSKuVYtcKta7BWP6Q18oNxKjS",
+            "key": {
+              "int": "1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "196867",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "196866",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "entrypoints": {
+    "update_sales_info": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "int",
+              "annots": [
+                "%duration_minutes"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%n_drop_minutes"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%n_drop_tez"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%start_price"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%start_time"
+          ]
+        }
+      ]
+    },
+    "update_metadata": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%k"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%v"
+          ]
+        }
+      ]
+    },
+    "update_blacklist": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%add_address"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%remove_address"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "update_admin": {
+      "prim": "address"
+    },
+    "make_auction": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "int",
+              "annots": [
+                "%duration_minutes"
+              ]
+            },
+            {
+              "prim": "list",
+              "args": [
+                {
+                  "prim": "nat"
+                }
+              ],
+              "annots": [
+                "%list_of_token"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%n_drop_minutes"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%n_drop_tez"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%start_price"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%start_time"
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "collect_auction": {
+      "prim": "unit"
+    },
+    "close_auction": {
+      "prim": "unit"
+    },
+    "admin_withdraw": {
+      "prim": "mutez"
+    }
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "parameters": {
+    "entrypoint": "updateReserve",
+    "value": {
+      "string": "KT1EF89rHUm71YoFqUTnc4DjiPUas9HyGWb1"
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0162973eb7780358871be6b69e18e066e868fb2c3500"
+              },
+              {
+                "int": "172788"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "00008f7af27b3691c5ceb638e27c2a166de66e219f62"
+              },
+              {
+                "int": "0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "172789"
+          },
+          {
+            "int": "0"
+          }
+        ]
+      },
+      {
+        "prim": "False"
+      },
+      {
+        "prim": "True"
+      },
+      {
+        "int": "172790"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "bytes": "013e199f0675acf62ffb3d8900bea1eed0e085f88d00"
+            },
+            {
+              "int": "0"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "0"
+            },
+            {
+              "int": "172791"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        [
+          {
+            "prim": "Elt",
+            "args": [
+              {
+                "int": "0"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "1000000000000000"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "int": "22"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        {
+          "int": "0"
+        }
+      ]
+    },
+    {
+      "int": "172792"
+    },
+    {
+      "int": "172793"
+    },
+    {
+      "prim": "None"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "172793",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172792",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172791",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172790",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172789",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "172788",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

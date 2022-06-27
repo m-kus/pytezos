@@ -1,0 +1,115 @@
+{
+  "entrypoints": {
+    "update_voucher_token": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%token_fa2"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token_id"
+          ]
+        }
+      ]
+    },
+    "update_raffle_info": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%end_time"
+          ]
+        },
+        {
+          "prim": "bool",
+          "annots": [
+            "%pause"
+          ]
+        },
+        {
+          "prim": "timestamp",
+          "annots": [
+            "%start_time"
+          ]
+        }
+      ]
+    },
+    "update_metadata": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": [
+            "%k"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%v"
+          ]
+        }
+      ]
+    },
+    "update_admin": {
+      "prim": "address"
+    },
+    "raffle": {
+      "prim": "nat"
+    },
+    "pick_assign_prize": {
+      "prim": "unit"
+    },
+    "oracle_callback": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "timestamp"
+        },
+        {
+          "prim": "nat"
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "add_prize": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%initial_entropy"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%token_fa2"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%token_id"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,8 +1,6 @@
 """Fetch contract data for tests from BCD and TzKT APIs"""
 import json
 import logging
-import sys
-from contextlib import suppress
 from os import makedirs
 from os.path import dirname, exists, join
 from typing import Any, Dict, List, Optional, Tuple
@@ -12,10 +10,11 @@ import requests
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
 from pytezos.logging import logger
 
+
 TZKT_API = 'https://api.tzkt.io/v1'
-# RPC_API = 'https://rpc.tzkt.io/mainnet'
 RPC_API = 'https://mainnet-tezos.giganode.io'
 
 
@@ -39,12 +38,7 @@ def get_raw_entrypoints(address: str) -> Dict[str, Any]:
     return _get(url).json()
 
 
-def get_raw_storage(address: str) -> Dict[str, Any]:
-    url = f'{RPC_API}/chains/main/blocks/head/context/contracts/{address}/storage'
-    return _get(url).json()
-
-
-def get_raw_parameter(level: int, hash_: str, counter: str, entrypoint: str) -> Dict[str, Any]:
+def get_raw_operation(level: int, hash_: str, counter: str, entrypoint: str) -> Dict[str, Any]:
     url = f'{RPC_API}/chains/main/blocks/{level}/operations/3'
     block = _get(url).json()
     for item in block:
@@ -52,11 +46,19 @@ def get_raw_parameter(level: int, hash_: str, counter: str, entrypoint: str) -> 
             continue
         for op in item['contents']:
             if counter == op['counter'] and op['parameters']['entrypoint'] == entrypoint:
-                return op['parameters']
+                return {
+                    'parameters': op['parameters'],
+                    'storage': op['metadata']['operation_result']['storage'],
+                    'lazy_storage_diff': op['metadata']['operation_result'].get('lazy_storage_diff', [])
+                }
 
             for int_op in op['metadata'].get('internal_operation_results', ()):
                 if 'parameters' in int_op and int_op['parameters']['entrypoint'] == entrypoint:
-                    return int_op['parameters']
+                    return {
+                        'parameters': int_op['parameters'],
+                        'storage': int_op['result']['storage'],
+                        'lazy_storage_diff': int_op['result'].get('lazy_storage_diff', [])
+                    }
     else:
         raise Exception(level, hash_, counter, entrypoint)
 
@@ -64,7 +66,8 @@ def get_raw_parameter(level: int, hash_: str, counter: str, entrypoint: str) -> 
 def get_contract_list(offset: int, limit: int) -> List[List[str]]:
     params: Dict[str, Any] = {
         'kind': 'smart_contract',
-        'select.values': 'address,alias',
+        'lastActivity.gt': 2200000,
+        'select.values': 'address,alias,typeHash',
         'sort.desc': 'id',
         'offset': offset,
         'limit': limit,
@@ -98,27 +101,30 @@ def get_contract_call(address: str, entrypoint: str) -> Optional[Dict[str, Any]]
     except IndexError:
         return None
 
-    op['parameter'] = get_raw_parameter(op['level'], op['hash'], str(op['counter']), entrypoint)
-    op['storage'] = get_raw_storage(address)
-    op['diffs'] = op['diffs'] or []
-
-    # NOTE: TzKT doesn't set these fields
-    for diff in op['diffs']:
-        diff['kind'] = 'big_map'
-        diff['id'] = diff['bigmap']
-
-    return op
+    return get_raw_operation(op['level'], op['hash'], str(op['counter']), entrypoint)
 
 
 def normalize_alias(alias: Optional[str]) -> str:
     if not alias:
         return ''
-    return alias.replace(' ', '_').replace('/', '_').replace(':', '_').lower()
+    return alias.replace(' ', '_').replace('/', '_').replace(':', '_').replace('.', '_').replace('-', '_').lower()
 
 
-def fetch_contract_samples(offset: int, limit: int, contracts: Optional[Tuple[Tuple[str, str], ...]] = None) -> None:
-    for address, alias in contracts or get_contract_list(offset, limit):
-        name = normalize_alias(alias) or address
+def fetch_contract_samples(limit: int) -> None:
+    contracts = get_contract_list(0, 10000)
+    code_hashes = set()
+
+    for address, alias, code_hash in contracts:
+        if not alias:
+            continue
+
+        if code_hash in code_hashes:
+            continue
+        else:
+            code_hashes.add(code_hash)
+
+        name = normalize_alias(alias)
+        logger.info('Processing contract %s', name)
 
         path = join(dirname(dirname(__file__)), 'tests', 'contract_tests', name)
         if exists(path):
@@ -134,11 +140,6 @@ def fetch_contract_samples(offset: int, limit: int, contracts: Optional[Tuple[Tu
             if not operation:
                 continue
 
-            operation = {
-                'parameters': operation['parameter'],
-                'storage': operation['storage'],
-                'big_map_diff': operation['diffs'],
-            }
             entrypoint_data.append((path, entrypoint, operation))
 
         if not entrypoint_data:
@@ -155,12 +156,10 @@ def fetch_contract_samples(offset: int, limit: int, contracts: Optional[Tuple[Tu
         for _path, _entrypoint, _operation in entrypoint_data:
             write_test_data(_path, _entrypoint, _operation)
 
-        logger.info('Done')
+        if len(code_hashes) >= limit:
+            return
 
 
 if __name__ == '__main__':
-    args = sys.argv[1:]
-    contracts = ((args[0], args[1]),) if len(args) == 2 else None
-    offset, limit = 40000, 10
-    logger.info('Fetching contract samples; offset=%s, limit=%s', offset, limit)
-    fetch_contract_samples(offset, limit, contracts)
+    fetch_contract_samples(25)
+    logger.info('Done')

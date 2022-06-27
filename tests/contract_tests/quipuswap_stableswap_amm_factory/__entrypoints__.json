@@ -1,0 +1,351 @@
+{
+  "entrypoints": {
+    "use_factory": {
+      "prim": "or",
+      "args": [
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "unit",
+              "annots": [
+                "%claim_rewards"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%set_burn_rate"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "or",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%set_price"
+              ]
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "bool",
+                  "annots": [
+                    "%add"
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%candidate"
+                  ]
+                }
+              ],
+              "annots": [
+                "%set_whitelist"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "use_dev": {
+      "prim": "or",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%set_dev_address"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%set_dev_fee"
+          ]
+        }
+      ]
+    },
+    "start_dex": {
+      "prim": "map",
+      "args": [
+        {
+          "prim": "nat"
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa12"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%token_address"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%token_id"
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    "%fa2"
+                  ]
+                }
+              ],
+              "annots": [
+                "%token"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%value"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "set_whitelist": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bool",
+          "annots": [
+            "%add"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%candidate"
+          ]
+        }
+      ]
+    },
+    "set_token_function": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%func"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%index"
+          ]
+        }
+      ]
+    },
+    "set_price": {
+      "prim": "nat"
+    },
+    "set_init_function": {
+      "prim": "bytes"
+    },
+    "set_dex_function": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%func"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%index"
+          ]
+        }
+      ]
+    },
+    "set_dev_function": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%func"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%index"
+          ]
+        }
+      ]
+    },
+    "set_dev_fee": {
+      "prim": "nat"
+    },
+    "set_dev_address": {
+      "prim": "address"
+    },
+    "set_burn_rate": {
+      "prim": "nat"
+    },
+    "set_admin_function": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "bytes",
+          "annots": [
+            "%func"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%index"
+          ]
+        }
+      ]
+    },
+    "claim_rewards": {
+      "prim": "unit"
+    },
+    "add_pool": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%a_constant"
+          ]
+        },
+        {
+          "prim": "set",
+          "args": [
+            {
+              "prim": "or",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%fa12"
+                  ]
+                },
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%token_address"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%token_id"
+                      ]
+                    }
+                  ],
+                  "annots": [
+                    "%fa2"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%input_tokens"
+          ]
+        },
+        {
+          "prim": "map",
+          "args": [
+            {
+              "prim": "nat"
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%rate_f"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%precision_multiplier_f"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%tokens_info"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%default_referral"
+          ]
+        },
+        {
+          "prim": "set",
+          "args": [
+            {
+              "prim": "address"
+            }
+          ],
+          "annots": [
+            "%managers"
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%lp_f"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%stakers_f"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%ref_f"
+              ]
+            }
+          ],
+          "annots": [
+            "%fees"
+          ]
+        }
+      ]
+    }
+  }
+}

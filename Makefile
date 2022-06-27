@@ -97,15 +97,9 @@ update-tzips:      ## Update TZIP-16 schema and tests
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/examples/example-005.json -O tests/unit_tests/test_contract/metadata/example-005.json
 
 update-contracts:  ## Update contract tests
-	rm -r tests/contract_tests/dexter_usdtz_xtz || true
-	rm -r tests/contract_tests/KT1* || true
-
-	poetry run python scripts/fetch_contract_data.py KT1Tr2eG3eVmPRbymrbU2UppUmKjFPXomGG9 dexter_usdtz_xtz
-	poetry run python scripts/fetch_contract_data.py KT1SWHFFrgtRJF7LecghRCA9sPWqUyURHUUW ""
-	# poetry run python scripts/fetch_contract_data.py
-
+	poetry run python scripts/fetch_contract_data.py
 	poetry run python scripts/generate_contract_tests.py
-	poetry run pytest -v tests/contract_tests
+	# poetry run pytest -v tests/contract_tests
 
 kernel-docs:       ## Build docs for Michelson IPython kernel
 	poetry run python scripts/generate_kernel_docs.py

@@ -1,0 +1,112 @@
+{
+  "parameters": {
+    "entrypoint": "ChangeBakerAddress",
+    "value": {
+      "prim": "Some",
+      "args": [
+        {
+          "string": "tz1abmz7jiCV2GH2u81LRrGgAFFgvQgiDiaf"
+        }
+      ]
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "False"
+              },
+              {
+                "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "01c71a724e60088d398e7724739faa7488dfab46b100"
+              },
+              {
+                "int": "0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "20010205943"
+          },
+          {
+            "bytes": "0157006fcca7770ededb7fc644a1a354f7ebbdae1800"
+          }
+        ]
+      },
+      {
+        "int": "1000"
+      },
+      {
+        "bytes": "013463d7aff77ae4d127b2740650998919b2b5535700"
+      },
+      {
+        "int": "41363624975"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "None"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "None"
+            },
+            {
+              "prim": "None"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "False"
+        },
+        {
+          "int": "21375962530"
+        }
+      ]
+    },
+    {
+      "prim": "None"
+    },
+    {
+      "prim": "None"
+    },
+    {
+      "int": "0"
+    }
+  ],
+  "lazy_storage_diff": []
+}
