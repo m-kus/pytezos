@@ -1,9 +1,8 @@
 import json
 from os import listdir
-from os.path import dirname, join
-from unittest import TestCase
-
+from os.path import join, dirname
 from pytezos.contract.token_metadata import ContractTokenMetadata
+from unittest import TestCase
 
 
 class TokenMetadataTest(TestCase):

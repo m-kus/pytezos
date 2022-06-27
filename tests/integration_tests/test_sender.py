@@ -16,6 +16,7 @@ sender = 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'
 
 
 class SenderContractTest(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.ci = ContractInterface.from_michelson(code).using('mainnet')

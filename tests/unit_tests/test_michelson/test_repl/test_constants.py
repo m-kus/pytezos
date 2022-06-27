@@ -12,6 +12,7 @@ code { DROP;
 
 
 class GlobalConstantsTestCase(TestCase):
+
     def test_resolve_code(self):
         context = ExecutionContext()
         context.register_global_constant({'prim': 'int'})

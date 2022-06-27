@@ -1,5 +1,4 @@
 from unittest import TestCase
-
 from pytezos import ContractInterface
 
 bob = "tz1iBobBobBobBobBobBobBobBobBodTWLCX"
@@ -42,6 +41,7 @@ code = """
 
 
 class LambdaExecTestCase(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.maxDiff = None

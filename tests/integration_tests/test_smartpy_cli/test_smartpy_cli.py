@@ -1,7 +1,7 @@
 import json
+import pytest
 from unittest import TestCase, skip
 
-import pytest
 from click.testing import CliRunner
 
 from pytezos.cli.cli import cli
@@ -47,7 +47,10 @@ class TestSmartPyCLIContainer(TestCase):
         result = self.runner.invoke(cli, ['update-smartpy'])
         self.assertEqual(result.exit_code, 0)
         self.assertTrue('Pulling from bakingbad/smartpy-cli' in self._caplog.records[1].message)
-        self.assertEqual(self._caplog.records[-1].message, 'Pulled SmartPy CLI image successfully!')
+        self.assertEqual(
+            self._caplog.records[-1].message,
+            'Pulled SmartPy CLI image successfully!'
+        )
 
     def test_run_smartpy(self):
         result = self.runner.invoke(cli, ['update-smartpy'])
@@ -57,17 +60,15 @@ class TestSmartPyCLIContainer(TestCase):
         output_dir.mkdir()
         script_file = self._tmp_path / "smartpy-test-script.py"
         script_file.write_text(TEST_SCRIPT_CONTENT)
-        print(script_file, output_dir)
-        result = self.runner.invoke(
-            cli,
-            [
-                'smartpy-compile',
-                '--script',
-                str(script_file),
-                '--output-directory',
-                str(output_dir),
-            ],
-        )
+        print(script_file,
+              output_dir)
+        result = self.runner.invoke(cli, [
+            'smartpy-compile',
+            '--script',
+            str(script_file),
+            '--output-directory',
+            str(output_dir),
+        ])
 
         self.assertEqual(result.exit_code, 0)
 

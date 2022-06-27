@@ -4,6 +4,7 @@ from pytezos import pytezos
 
 
 class TestTokenMetadata(TestCase):
+
     def test_from_storage(self):
         contract = pytezos.using('mainnet').contract('KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton')
         token_metadata = contract.token_metadata[24552]

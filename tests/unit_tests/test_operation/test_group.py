@@ -1,8 +1,7 @@
 from contextlib import suppress
+from pytezos.client import PyTezosClient
 from unittest import TestCase
 from unittest.mock import patch
-
-from pytezos.client import PyTezosClient
 
 
 class TestOperationGroup(TestCase):

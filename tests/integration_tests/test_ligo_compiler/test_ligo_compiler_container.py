@@ -1,6 +1,6 @@
+import pytest
 from unittest import TestCase, skip
 
-import pytest
 from click.testing import CliRunner
 
 from pytezos.cli.cli import cli
@@ -58,6 +58,13 @@ class TestLigoCompiler(TestCase):
         result = self.runner.invoke(cli, ['update-ligo'])
         self.assertEqual(result.exit_code, 0)
 
-        result = self.runner.invoke(cli, ['ligo-compile-contract', f'--path={str(self._tmp_path / "contract.ligo")}', '--entry-point=main'])
+        result = self.runner.invoke(
+            cli,
+            [
+                'ligo-compile-contract',
+                f'--path={str(self._tmp_path / "contract.ligo")}',
+                '--entry-point=main'
+            ]
+        )
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, TEST_CONTRACT_COMPILATION_RESULT)

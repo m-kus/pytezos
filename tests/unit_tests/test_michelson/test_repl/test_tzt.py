@@ -1,10 +1,12 @@
 import logging
+from os.path import dirname
+from os.path import join
 from os import listdir
-from os.path import dirname, join
 from unittest.case import TestCase
 
 from pytezos.logging import logger
-from pytezos.michelson.parse import MichelsonParser, michelson_to_micheline
+from pytezos.michelson.parse import MichelsonParser
+from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.repl import Interpreter
 
 
