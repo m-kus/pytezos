@@ -148,8 +148,9 @@ def forge_address(value: str, tz_only=False) -> bytes:
     :param value: base58 encoded address or key_hash
     :param tz_only: True indicates that it's a key_hash (will be encoded in a more compact form)
     """
-    prefix = value[:3]
-    address = base58.b58decode_check(value)[3:]
+    prefix_len = 4 if value.startswith('txr1') else 3
+    prefix = value[:prefix_len]
+    address = base58.b58decode_check(value)[prefix_len:]
 
     if prefix == 'tz1':
         res = b'\x00\x00' + address
@@ -159,6 +160,8 @@ def forge_address(value: str, tz_only=False) -> bytes:
         res = b'\x00\x02' + address
     elif prefix == 'KT1':
         res = b'\x01' + address + b'\x00'
+    elif prefix == 'txr1':
+        res = b'\x02' + address + b'\x00'
     else:
         raise ValueError(f'Can\'t forge address: unknown prefix `{prefix}`')
 
@@ -183,6 +186,8 @@ def unforge_address(data: bytes) -> str:
 
     if data.startswith(b'\x01') and data.endswith(b'\x00'):
         return base58_encode(data[1:-1], b'KT1').decode()
+    elif data.startswith(b'\x02') and data.endswith(b'\x00'):
+        return base58_encode(data[1:-1], b'txr1').decode()
     else:
         return base58_encode(data[1:], tz_prefixes[b'\x00' + data[:1]]).decode()
 

@@ -150,6 +150,8 @@ prim_tags = {
     'constant': b'\x92',
     # ITHACA
     'SUB_MUTEZ': b'\x93',
+    # JAKARTA
+    'tx_rollup_l2_address': b'\x94',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',

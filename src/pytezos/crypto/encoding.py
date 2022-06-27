@@ -21,6 +21,8 @@ base58_encodings = [
     (b"tz2",   36,   tb([6, 161, 161]),            20,   "secp256k1 public key hash"),
     (b"tz3",   36,   tb([6, 161, 164]),            20,   "p256 public key hash"),
     (b"KT1",   36,   tb([2, 90, 121]),             20,   "originated address"),
+    # FIXME: replace with tb()
+    (b"txr1",  37,   b'\x01\x80x\x1f',             20,   "tx_rollup_l2_address"),
 
     (b"id",    30,   tb([153, 103]),               16,   "cryptobox public key hash"),
 
@@ -118,7 +120,6 @@ def base58_encode(v: bytes, prefix: bytes) -> bytes:
         )
     except StopIteration as e:
         raise ValueError('Invalid encoding, prefix or length mismatch.') from e
-
     return base58.b58encode_check(encoding[2] + v)
 
 
@@ -141,6 +142,15 @@ def validate_pkh(v: Union[str, bytes]):
     return _validate(v, prefixes=[b'tz1', b'tz2', b'tz3'])
 
 
+def validate_l2_pkh(v: Union[str, bytes]):
+    """ Ensure parameter is a L2 public key hash (starts with b'txr1')
+
+    :param v: string or bytes
+    :raises ValueError: if parameter is not a public key hash
+    """
+    return _validate(v, prefixes=[b'txr1'])
+
+
 def validate_sig(v: Union[str, bytes]):
     """ Ensure parameter is a signature (starts with b'edsig', b'spsig', b'p2sig', b'sig')
 
@@ -155,6 +165,16 @@ def is_pkh(v: Union[str, bytes]) -> bool:
     """
     try:
         validate_pkh(v)
+    except (ValueError, TypeError):
+        return False
+    return True
+
+
+def is_l2_pkh(v: Union[str, bytes]) -> bool:
+    """ Check if value is an L2 public key hash.
+    """
+    try:
+        validate_l2_pkh(v)
     except (ValueError, TypeError):
         return False
     return True
@@ -227,3 +247,11 @@ def is_address(v: Union[str, bytes]) -> bool:
         v = v.decode()
     address = v.split('%')[0]
     return is_kt(address) or is_pkh(address)
+
+def is_l2_address(v: Union[str, bytes]) -> bool:
+    """ Check if value is a txr1 address
+    """
+    if isinstance(v, bytes):
+        v = v.decode()
+    address = v.split('%')[0]
+    return is_l2_pkh(address)

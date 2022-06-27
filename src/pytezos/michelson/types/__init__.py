@@ -3,7 +3,7 @@ from pytezos.michelson.types.big_map import BigMapType
 from pytezos.michelson.types.bls import BLS12_381_FrType, BLS12_381_G1Type, BLS12_381_G2Type
 from pytezos.michelson.types.chest import ChestKeyType, ChestType
 from pytezos.michelson.types.core import BoolType, BytesType, IntType, NatType, NeverType, StringType, UnitType
-from pytezos.michelson.types.domain import (AddressType, ChainIdType, ContractType, KeyHashType, KeyType, LambdaType, MutezType,
+from pytezos.michelson.types.domain import (AddressType, L2AddressType, ChainIdType, ContractType, KeyHashType, KeyType, LambdaType, MutezType,
                                             SignatureType, TimestampType)
 from pytezos.michelson.types.list import ListType
 from pytezos.michelson.types.map import MapType

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from parameterized import parameterized
 
-from pytezos.crypto.encoding import scrub_input, base58_encode, base58_decode, is_pkh, is_sig, is_bh
+from pytezos.crypto.encoding import is_l2_pkh, scrub_input, base58_encode, base58_decode, is_pkh, is_sig, is_bh
 
 
 class TestEncoding(TestCase):
@@ -16,6 +16,7 @@ class TestEncoding(TestCase):
         (b'tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', b'tz1'),
         (b'tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', b'tz2'),
         (b'tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', b'tz3'),
+        (b'txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', b'txr1'),
         (b'edpku976gpuAD2bXyx1XGraeKuCo1gUZ3LAJcHM12W1ecxZwoiu22R', b'edpk'),
         (b'sppk7aMNM3xh14haqEyaxNjSt7hXanCDyoWtRcxF8wbtya859ak6yZT', b'sppk'),
         (b'p2pk679D18uQNkdjpRxuBXL5CqcDKTKzsiXVtc9oCUT6xb82zQmgUks', b'p2pk'),
@@ -49,12 +50,26 @@ class TestEncoding(TestCase):
         ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', True),
         ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', True),
         ('tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', True),
+        ('txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', False),
         ('KT1ExvG3EjTrvDcAU7EqLNb77agPa5u6KvnY', False),
         ('qwerty', False),
         ('tz1eKkWU5hGtfLUiq', False)
     ])
     def test_is_pkh(self, value, expected):
         self.assertEqual(expected, is_pkh(value))
+
+    @parameterized.expand([
+        ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', False),
+        ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', False),
+        ('tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', False),
+        ('txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', True),
+        ('KT1ExvG3EjTrvDcAU7EqLNb77agPa5u6KvnY', False),
+        ('qwerty', False),
+        ('tz1eKkWU5hGtfLUiq', False)
+    ])
+    def test_is_l2_pkh(self, value, expected):
+        self.assertEqual(expected, is_l2_pkh(value))
+
 
     @parameterized.expand([
         ('edsigtzLBGCyadERX1QsYHKpwnxSxEYQeGLnJGsSkHEsyY8vB5GcNdnvzUZDdFevJK7YZQ2ujwVjvQZn62ahCEcy74AwtbA8HuN', True),
