@@ -1,27 +1,67 @@
 """Fetch contract data for tests from BCD and TzKT APIs"""
+from contextlib import suppress
 import json
 import logging
-from contextlib import suppress
 from os import makedirs
 from os.path import dirname, exists, join
-from typing import Any, Dict, List, Optional
+import sys
+from typing import Any, Dict, List, Optional, Tuple
 
 import requests
-from requests import JSONDecodeError
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 from pytezos.logging import logger
 
 TZKT_API = 'https://api.tzkt.io/v1'
-RPC_API = 'https://rpc.tzkt.io'
+# RPC_API = 'https://rpc.tzkt.io/mainnet'
+RPC_API = 'https://mainnet-tezos.giganode.io'
 
-NETWORK = 'mainnet'
+
+def _get(url: str, params: Optional[Dict[str, Any]] = None):
+    logger.info(f'GET {url}?{"&".join(f"{k}={v}" for k, v in (params or {}).items())}')
+    return requests.get(url, params=params)
 
 
 def write_test_data(path: str, name: str, data: Dict[str, Any]) -> None:
     with open(join(path, f'{name}.json'), 'w+') as f:
         f.write(json.dumps(data, indent=2))
+
+
+def get_raw_script(address: str) -> Dict[str, Any]:
+    url = f'{RPC_API}/chains/main/blocks/head/context/contracts/{address}/script'
+    return _get(url).json()
+
+
+def get_raw_entrypoints(address: str) -> Dict[str, Any]:
+    url = f'{RPC_API}/chains/main/blocks/head/context/contracts/{address}/entrypoints'
+    return _get(url).json()
+
+
+def get_raw_storage(address: str) -> Dict[str, Any]:
+    url = f'{RPC_API}/chains/main/blocks/head/context/contracts/{address}/storage'
+    return _get(url).json()
+
+
+def get_raw_parameter(level: int, hash_: str, counter: str, entrypoint: str) -> Dict[str, Any]:
+    url = f'{RPC_API}/chains/main/blocks/{level}/operations/3'
+    block = _get(url).json()
+    for item in block:
+        if item['hash'] != hash_:
+            continue
+        for op in item['contents']:
+            if counter == op['counter'] and op['parameters']['entrypoint'] == entrypoint:
+                return op['parameters']
+
+            for int_op in op['metadata'].get('internal_operation_results', ()):
+                if 'parameters' in int_op and int_op['parameters']['entrypoint'] == entrypoint:
+                    return int_op['parameters']
+    else:
+        raise Exception(level, hash_, counter, entrypoint)
+                
+
+    
 
 
 def get_contract_list(offset: int, limit: int) -> List[List[str]]:
@@ -32,14 +72,14 @@ def get_contract_list(offset: int, limit: int) -> List[List[str]]:
         'offset': offset,
         'limit': limit,
     }
-    return requests.get(
+    return _get(
         f'{TZKT_API}/contracts',
         params=params,
     ).json()
 
 
 def get_contract_entrypoints(address: str) -> List[str]:
-    result = requests.get(
+    result = _get(
         f'{TZKT_API}/contracts/{address}/entrypoints',
         params={'select': 'entrypoints'},
     ).json()
@@ -49,25 +89,28 @@ def get_contract_entrypoints(address: str) -> List[str]:
 def get_contract_call(address: str, entrypoint: str) -> Optional[Dict[str, Any]]:
     url = f'{TZKT_API}/operations/transactions'
     params: Dict[str, Any] = {
-        'select': 'storage,parameter,diffs,hash,level,counter,target',
+        'select': 'level,hash,counter,diffs',
         'target': address,
         'entrypoint': entrypoint,
         'micheline': 2,
         'limit': 1,
     }
-    with suppress(IndexError, JSONDecodeError):
-        return requests.get(url, params=params).json()[0]
-    return None
 
+    try:
+        op = _get(url, params=params).json()[0]
+    except IndexError:
+        return None
 
-def get_raw_script(address: str) -> Dict[str, Any]:
-    url = f'{RPC_API}/{NETWORK}/chains/main/blocks/head/context/contracts/{address}/script'
-    return requests.get(url).json()
+    op['parameter'] = get_raw_parameter(op['level'], op['hash'], str(op['counter']), entrypoint)
+    op['storage'] = get_raw_storage(address)
+    op['diffs'] = op['diffs'] or []
 
+    # NOTE: TzKT doesn't set these fields
+    for diff in op['diffs']:
+        diff['kind'] = 'big_map'
+        diff['id'] = diff['bigmap']
 
-def get_raw_entrypoints(address: str) -> Dict[str, Any]:
-    url = f'{RPC_API}/{NETWORK}/chains/main/blocks/head/context/contracts/{address}/entrypoints'
-    return requests.get(url).json()
+    return op
 
 
 def normalize_alias(alias: Optional[str]) -> str:
@@ -76,9 +119,8 @@ def normalize_alias(alias: Optional[str]) -> str:
     return alias.replace(' ', '_').replace('/', '_').replace(':', '_').lower()
 
 
-def fetch_contract_samples(offset: int, limit: int) -> None:
-    # [['KT1Tr2eG3eVmPRbymrbU2UppUmKjFPXomGG9', 'dexter_usdtz_xtz']]
-    for address, alias in get_contract_list(offset, limit):
+def fetch_contract_samples(offset: int, limit: int, contracts: Optional[Tuple[Tuple[str, str], ...]] = None) -> None:
+    for address, alias in contracts or get_contract_list(offset, limit):
         name = normalize_alias(alias) or address
 
         path = join(dirname(dirname(__file__)), 'tests', 'contract_tests', name)
@@ -94,12 +136,6 @@ def fetch_contract_samples(offset: int, limit: int) -> None:
             operation = get_contract_call(address, entrypoint)
             if not operation:
                 continue
-
-            operation['diffs'] = operation['diffs'] or []
-            # NOTE: TzKT doesn't set this fields
-            for diff in operation['diffs']:
-                diff['kind'] = 'big_map'
-                diff['id'] = diff['bigmap']
 
             operation = {
                 'parameters': operation['parameter'],
@@ -126,6 +162,8 @@ def fetch_contract_samples(offset: int, limit: int) -> None:
 
 
 if __name__ == '__main__':
-    offset, limit = 20000, 300
+    args = sys.argv[1:]
+    contracts = ((args[0], args[1]),) if len(args) == 2 else None
+    offset, limit = 40000, 10
     logger.info('Fetching contract samples; offset=%s, limit=%s', offset, limit)
-    fetch_contract_samples(offset, limit)
+    fetch_contract_samples(offset, limit, contracts)
