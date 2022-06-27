@@ -1,6 +1,7 @@
 from unittest import TestCase
 from os.path import dirname, join
 from parameterized import parameterized
+from pytezos import MichelsonRuntimeError
 
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.parse import michelson_to_micheline
@@ -12,6 +13,7 @@ KEY_HASH = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 BALANCE = 4000000000000
 VOTING_POWER = 500
 TOTAL_VOTING_POWER = 2500
+MIN_BLOCK_TIME = 60000
 
 # The verifying key, proof, and inputs are generated from
 # ZoKrates, modified to use BLS12-381.
@@ -946,6 +948,13 @@ class OpcodesTestCase(TestCase):
             'Unit',
             '(Some "KT1Mjjcb6tmSsLm7Cb3DSQszePjfchPM4Uxm")',
         ),
+        # Test create_contract_rootname_alt
+        (
+            'create_contract_rootname_alt.tz',
+            'None',
+            'Unit',
+            '(Some "KT1Mjjcb6tmSsLm7Cb3DSQszePjfchPM4Uxm")',
+        ),
         # Test multiplication - success case (no overflow)
         # Failure case is tested in m̀ul_overflow.tz
         ('mul.tz', 'Unit', 'Unit', 'Unit'),
@@ -1013,7 +1022,7 @@ class OpcodesTestCase(TestCase):
             'min_block_time.tz',
             '0',
             'Unit',
-            '1',
+            f'{MIN_BLOCK_TIME}',
         ),
         # Test KECCAK
         (
@@ -1088,12 +1097,28 @@ class OpcodesTestCase(TestCase):
             balance=BALANCE,
             chain_id=CHAIN_ID,
             total_voting_power=TOTAL_VOTING_POWER,
-            voting_power={KEY_HASH: VOTING_POWER}
+            voting_power={KEY_HASH: VOTING_POWER},
+            min_block_time=MIN_BLOCK_TIME,
         )
         if error:
             print('\n'.join(stdout))
             raise error
         self.assertEqual(michelson_to_micheline(result), storage)
+
+    def test_parameter_annots(self):
+        filename = 'create_contract_rootname.tz'
+        storage = 'None'
+        parameter = 'Unit'
+
+        with open(join(dirname(__file__), 'opcodes', filename)) as f:
+            script = f.read()
+
+        _, storage, lazy_diff, stdout, error = Interpreter.run_code(
+            parameter=michelson_to_micheline(parameter),
+            storage=michelson_to_micheline(storage),
+            script=michelson_to_micheline(script),
+        )
+        self.assertIsInstance(error, MichelsonRuntimeError)
 
     @parameterized.expand([
         # Test building Fr element from nat.
