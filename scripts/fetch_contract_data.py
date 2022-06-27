@@ -107,7 +107,7 @@ def get_contract_call(address: str, entrypoint: str) -> Optional[Dict[str, Any]]
 def normalize_alias(alias: Optional[str]) -> str:
     if not alias:
         return ''
-    return alias.replace(' ', '_').replace('/', '_').replace(':', '_').replace('.', '_').replace('-', '_').lower()
+    return alias.lstrip().replace(' ', '_').replace('/', '_').replace(':', '_').replace('.', '_').replace('-', '_').lower()
 
 
 def fetch_contract_samples(limit: int) -> None:
