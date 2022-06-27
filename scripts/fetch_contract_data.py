@@ -1,24 +1,23 @@
 """Fetch contract data for tests from BCD and TzKT APIs"""
+from contextlib import suppress
 import json
-from datetime import datetime
 import logging
 from os import makedirs
 from os.path import dirname, exists, join
-import re
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, List, Optional
 
 import requests
+from requests import JSONDecodeError
 
-from pytezos.michelson.format import micheline_to_michelson
-logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 from pytezos.logging import logger
 
-BCD_API = 'https://api.better-call.dev'
 TZKT_API = 'https://api.tzkt.io/v1'
 RPC_API = 'https://rpc.tzkt.io'
 
 NETWORK = 'mainnet'
-SINCE = int(datetime(2020, 6, 1, 0, 0).timestamp())
 
 
 def write_test_data(path: str, name: str, data: Dict[str, Any]) -> None:
@@ -26,123 +25,108 @@ def write_test_data(path: str, name: str, data: Dict[str, Any]) -> None:
         f.write(json.dumps(data, indent=2))
 
 
-def fetch_bcd_search_results(offset: int = 0) -> Dict[str, Any]:
+def get_contract_list(offset: int, limit: int) -> List[List[str]]:
     params: Dict[str, Any] = {
-        'q': 'KT1',
-        'i': 'contract',
-        'n': NETWORK,
-        'g': 1,
-        's': SINCE,
-        'o': offset,
+        'kind': 'smart_contract',
+        'select.values': 'address,alias',
+        'sort.desc': 'id',
+        'offset': offset,
+        'limit': limit,
     }
     return requests.get(
-        f'{BCD_API}/v1/search',
+        f'{TZKT_API}/contracts',
         params=params,
     ).json()
 
 
-def iter_bcd_contracts(max_count: int = 100) -> Iterator[Dict[str, Any]]:
-    offset = 0
-    while offset < max_count:
-        res = fetch_bcd_search_results(offset)
-        if len(res['items']) == 0:
-            break
-        for item in res['items']:
-            yield item['body']
-            offset += 1
+def get_contract_entrypoints(address: str) -> List[str]:
+    result = requests.get(
+        f'{TZKT_API}/contracts/{address}/entrypoints',
+        params={'select': 'entrypoints'},
+    ).json()
+    return [c['name'] for c in result]
 
 
-def fetch_script(address: str) -> Dict[str, Any]:
-    return requests.get(f'{RPC_API}/{NETWORK}/chains/main/blocks/head/context/contracts/{address}/script').json()
-
-
-def fetch_entrypoints(address: str) -> Dict[str, Any]:
-    return requests.get(f'{RPC_API}/{NETWORK}/chains/main/blocks/head/context/contracts/{address}/entrypoints').json()
-
-
-def fetch_operation_result(
-    hash_: str,
-    counter: int,
-    address: str,
-):
+def get_contract_call(address: str, entrypoint: str) -> Optional[Dict[str, Any]]:
+    url = f'{TZKT_API}/operations/transactions'
     params: Dict[str, Any] = {
-        'select': 'storage,parameters,parameter,diffs,hash,level,counter,target',
+        'select': 'storage,parameter,diffs,hash,level,counter,target',
+        'target': address,
+        'entrypoint': entrypoint,
         'micheline': 2,
+        'limit': 1,
     }
-    operations = requests.get(
-        f'{TZKT_API}/operations/transactions/{hash_}',
-        params=params,
-    ).json()
-    for op in operations:
-        if not op.get('parameters'):
-            continue
-        expected = (hash_, counter, address)
-        result = (op['hash'], op['counter'], op['target']['address'])
-        if expected == result:
-            break
-    else:
-        return None
-
-    diffs = op.get('diffs') or []
-
-    # FIXME: Lazy diff imitation
-    for item in diffs:
-        item['big_map'] = item.pop('bigmap')
-        item['id'] = item['big_map']
-        item['kind'] = 'big_map'
-
-    parameters = json.loads(op['parameters'])
-    storage = json.loads(op['storage'])
-    return {
-        'parameters': parameters,
-        'storage': storage,
-        'big_map_diff': diffs,
-    }
+    with suppress(IndexError, JSONDecodeError):
+        return requests.get(url, params=params).json()[0]
+    return None
 
 
-def fetch_bcd_operation(address, entrypoint):
-    res = requests.get(
-        f'{BCD_API}/v1/contract/{NETWORK}/{address}/operations',
-        params={
-            'status': 'applied',
-            'entrypoints': entrypoint,
-            'size': 1,
-        },
-    ).json()
-    return next((op for op in res['operations'] if op['destination'] == address and op['entrypoint'] == entrypoint), None)
+def get_raw_script(address: str) -> Dict[str, Any]:
+    url = f'{RPC_API}/{NETWORK}/chains/main/blocks/head/context/contracts/{address}/script'
+    return requests.get(url).json()
 
 
-def normalize_alias(alias):
+def get_raw_entrypoints(address: str) -> Dict[str, Any]:
+    url = f'{RPC_API}/{NETWORK}/chains/main/blocks/head/context/contracts/{address}/entrypoints'
+    return requests.get(url).json()
+
+
+def normalize_alias(alias: Optional[str]) -> str:
+    if not alias:
+        return ''
     return alias.replace(' ', '_').replace('/', '_').replace(':', '_').lower()
 
 
-def fetch_contract_samples(max_count: int):
-    contracts = iter_bcd_contracts(max_count=max_count)
-    for contract in contracts:
-        name = normalize_alias(contract.get('alias', '')) or contract['address']
+def fetch_contract_samples(offset: int, limit: int) -> None:
+    # [['KT1Tr2eG3eVmPRbymrbU2UppUmKjFPXomGG9', 'dexter_usdtz_xtz']]
+    for address, alias in get_contract_list(offset, limit):
+        name = normalize_alias(alias) or address
 
-        logging.info('Creating a test for contract %s', name)
         path = join(dirname(dirname(__file__)), 'tests', 'contract_tests', name)
         if exists(path):
+            logger.info('Skipping contract `%s`', name)
             continue
 
+        logger.info('Fetching contract `%s`', name)
+        entrypoints = get_contract_entrypoints(address)
+        entrypoint_data = []
+        for entrypoint in entrypoints:
+            logger.info('Fetching %s:%s operation', name, entrypoint)
+            operation = get_contract_call(address, entrypoint)
+            if not operation:
+                continue
+
+            operation['diffs'] = operation['diffs'] or []
+            # NOTE: TzKT doesn't set this fields
+            for diff in operation['diffs']:
+                diff['kind'] = 'big_map'
+                diff['id'] = diff['bigmap']
+
+            operation = {
+                'parameters': operation['parameter'],
+                'storage': operation['storage'],
+                'big_map_diff': operation['diffs'],
+            }
+            entrypoint_data.append((path, entrypoint, operation))
+
+        if not entrypoint_data:
+            logger.info('No operations found for `%s`, skipping', name)
+
         makedirs(path)
-        script = fetch_script(contract['address'])
-        write_test_data(path, '__script__', script)
-        entrypoints = fetch_entrypoints(contract['address'])
-        write_test_data(path, '__entrypoints__', entrypoints)
-        for entrypoint in contract['entrypoints']:
-            operation = fetch_bcd_operation(contract['address'], entrypoint)
-            if operation:
-                result = fetch_operation_result(
-                    hash_=operation['hash'],
-                    counter=operation['counter'],
-                    address=contract['address'],
-                )
-                if result:
-                    write_test_data(path, entrypoint, result)
-        logger.info(name)
+
+        raw_script = get_raw_script(address)
+        write_test_data(path, '__script__', raw_script)
+
+        raw_entrypoints = get_raw_entrypoints(address)
+        write_test_data(path, '__entrypoints__', raw_entrypoints)
+
+        for _path, _entrypoint, _operation in entrypoint_data:
+            write_test_data(_path, _entrypoint, _operation)
+
+        logger.info('Done')
 
 
 if __name__ == '__main__':
-    fetch_contract_samples(1000)
+    offset, limit = 20000, 300
+    logger.info('Fetching contract samples; offset=%s, limit=%s', offset, limit)
+    fetch_contract_samples(offset, limit)

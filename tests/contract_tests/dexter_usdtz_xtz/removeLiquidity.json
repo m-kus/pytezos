@@ -8,16 +8,16 @@
           "prim": "Pair",
           "args": [
             {
-              "bytes": "000057fc35cf97bccc3f97bb2cca62c37e312eb9c65c"
+              "bytes": "00001d93c82061ef77a557743d802e2ea3b2bbbb5ab3"
             },
             {
               "prim": "Pair",
               "args": [
                 {
-                  "bytes": "000057fc35cf97bccc3f97bb2cca62c37e312eb9c65c"
+                  "bytes": "00001d93c82061ef77a557743d802e2ea3b2bbbb5ab3"
                 },
                 {
-                  "int": "83317977"
+                  "int": "1168068144"
                 }
               ]
             }
@@ -27,16 +27,16 @@
           "prim": "Pair",
           "args": [
             {
-              "int": "1"
+              "int": "1116302206"
             },
             {
               "prim": "Pair",
               "args": [
                 {
-                  "int": "1"
+                  "int": "4432036759"
                 },
                 {
-                  "int": "1636675740"
+                  "int": "1614770991"
                 }
               ]
             }
@@ -67,7 +67,7 @@
                     "prim": "False"
                   },
                   {
-                    "int": "1593572557"
+                    "int": "30216740645"
                   }
                 ]
               }
@@ -91,10 +91,10 @@
                 "prim": "Pair",
                 "args": [
                   {
-                    "int": "8294236502"
+                    "int": "114997297066"
                   },
                   {
-                    "int": "1369403592"
+                    "int": "28964501747"
                   }
                 ]
               }
@@ -106,12 +106,13 @@
   },
   "big_map_diff": [
     {
+      "bigmap": 543,
       "path": "accounts",
       "action": "update_key",
       "content": {
-        "hash": "expru5jB9EydoTk74xcPCahWWsoi3FMqiS3gZgZ8VwZqw84EQUUr6i",
+        "hash": "expruVbWxFizSnffmXQDWqzeXAXagrqpMSiVyipCmzY58g74j5MHF6",
         "key": {
-          "bytes": "000057fc35cf97bccc3f97bb2cca62c37e312eb9c65c"
+          "bytes": "00001d93c82061ef77a557743d802e2ea3b2bbbb5ab3"
         },
         "value": {
           "prim": "Pair",
@@ -123,9 +124,8 @@
           ]
         }
       },
-      "big_map": 543,
-      "id": 543,
-      "kind": "big_map"
+      "kind": "big_map",
+      "id": 543
     }
   ]
 }

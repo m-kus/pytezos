@@ -92,3 +92,6 @@ release-major:
 	git push --tags
 	git push
 
+update-contract-tests:
+	poetry run python scripts/fetch_contract_data.py
+	poetry run python scripts/generatecontract_tests.py

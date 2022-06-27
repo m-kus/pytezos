@@ -3,7 +3,6 @@ from os.path import dirname, join
 import json
 
 from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.types.big_map import big_map_diff_to_lazy_diff
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
 
 folder = 'dexter_usdtz_xtz'

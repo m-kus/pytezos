@@ -8,28 +8,6 @@ from pytezos.michelson.types.base import MichelsonType, Undefined
 from pytezos.michelson.types.map import EltLiteral, MapType
 
 
-def big_map_diff_to_lazy_diff(big_map_diff: List[dict]):
-    lazy_diff = dict()
-    for diff in big_map_diff:
-        if diff['action'] in ['copy', 'remove']:
-            continue
-        ptr = diff['big_map']
-        if ptr not in lazy_diff:
-            lazy_diff[ptr] = {'kind': 'big_map', 'id': ptr, 'diff': {'action': 'update', 'updates': []}}
-        if diff['action'] == 'alloc':
-            lazy_diff[ptr]['diff']['action'] = diff['action']
-            lazy_diff[ptr]['diff']['key_type'] = diff['key_type']
-            lazy_diff[ptr]['diff']['value_type'] = diff['value_type']
-        elif diff['action'] == 'update':
-            item = {'key': diff['key'], 'key_hash': diff['key_hash']}
-            if diff.get('value'):
-                item['value'] = diff['value']
-            lazy_diff[ptr]['diff']['updates'].append(item)
-        else:
-            raise NotImplementedError(diff['action'])
-    return list(lazy_diff.values())
-
-
 class BigMapType(MapType, prim='big_map', args_len=2):
     def __init__(
         self,
