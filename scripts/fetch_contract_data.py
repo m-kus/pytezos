@@ -1,10 +1,10 @@
 """Fetch contract data for tests from BCD and TzKT APIs"""
-from contextlib import suppress
 import json
 import logging
+import sys
+from contextlib import suppress
 from os import makedirs
 from os.path import dirname, exists, join
-import sys
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests
@@ -59,9 +59,6 @@ def get_raw_parameter(level: int, hash_: str, counter: str, entrypoint: str) -> 
                     return int_op['parameters']
     else:
         raise Exception(level, hash_, counter, entrypoint)
-                
-
-    
 
 
 def get_contract_list(offset: int, limit: int) -> List[List[str]]:
