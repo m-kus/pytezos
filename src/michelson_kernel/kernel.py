@@ -127,7 +127,7 @@ def preformat_stack_table(items: List[MichelsonInstruction]) -> List[Dict[str, A
             {
                 'index': i,
                 'type': prim,
-                'value': value,
+                'value': value,  # type: ignore
             }
         )
     return rows
