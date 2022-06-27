@@ -6,7 +6,7 @@ DEFAULT_CONSTANTS = dict(
     hard_gas_limit_per_operation=1040000,
     hard_storage_limit_per_operation=60000,
 )
-DEFAULT_TRANSACTION_GAS_LIMIT = 1427
+DEFAULT_TRANSACTION_GAS_LIMIT = 1450
 DEFAULT_TRANSACTION_STORAGE_LIMIT = 257
 MINIMAL_FEES = 100
 MINIMAL_MUTEZ_PER_BYTE = 1
@@ -59,9 +59,7 @@ def default_gas_limit(
         'delegation': 1000,
         'origination': constants['hard_gas_limit_per_operation'],
         'transaction': (
-            # FIXME: proto.013-PtJakart.gas_exhausted.operation on Jakarta
-            # constants['hard_gas_limit_per_operation'] if content.get('destination', '').startswith('KT') else DEFAULT_TRANSACTION_GAS_LIMIT
-            constants['hard_gas_limit_per_operation']
+            constants['hard_gas_limit_per_operation'] if content.get('destination', '').startswith('KT') else DEFAULT_TRANSACTION_GAS_LIMIT
         ),
         'register_global_constant': constants['hard_gas_limit_per_operation'],
     }

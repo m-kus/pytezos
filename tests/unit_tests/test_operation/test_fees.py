@@ -30,7 +30,7 @@ class FeesTest(TestCase):
 
     def test_default_fee(self) -> None:
         # Arrange
-        expected_fee = 412
+        expected_fee = 415
 
         # Act
         fee = default_fee(self.content)

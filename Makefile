@@ -36,7 +36,7 @@ docs:              ## Build docs
 ##
 
 isort:             ## Format with isort
-	poetry run isort src tests scripts
+	# poetry run isort src tests scripts
 
 black:             ## Format with black
 	# poetry run black src tests scripts --exclude ".*/docs.py"
