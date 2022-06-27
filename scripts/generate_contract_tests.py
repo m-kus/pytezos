@@ -1,5 +1,5 @@
+from os.path import join, dirname, isdir, basename, splitext, exists
 from glob import glob
-from os.path import basename, dirname, exists, isdir, join, splitext
 
 base_dir = join(dirname(dirname(__file__)), 'tests', 'contract_tests')
 
@@ -16,19 +16,21 @@ operation_test_case_template = read_template('test_operation_template')
 def generate_contract_test_case(folder):
     cid = folder[3:9].lower() if folder.startswith('KT1') else folder
     with open(join(base_dir, folder, f'test_{cid}.py'), 'w+') as f:
-        res = contract_test_case_template.replace('{folder}', '').replace('_template', f'_{cid}').replace('Template', cid.upper())
+        res = contract_test_case_template \
+            .replace('{folder}', '') \
+            .replace('_template', f'_{cid}') \
+            .replace('Template', cid.upper())
         f.write(res)
 
 
 def generate_operation_test_case(folder, entrypoint):
     cid = folder[3:9].lower() if folder.startswith('KT1') else folder
     with open(join(base_dir, folder, f'test_{cid}_{entrypoint}.py'), 'w+') as f:
-        res = (
-            operation_test_case_template.replace('{folder}', '')
-            .replace('{entrypoint}', entrypoint)
-            .replace('_template', f'_{cid}')
+        res = operation_test_case_template \
+            .replace('{folder}', '') \
+            .replace('{entrypoint}', entrypoint) \
+            .replace('_template', f'_{cid}') \
             .replace('Template', cid.upper())
-        )
         f.write(res)
 
 
