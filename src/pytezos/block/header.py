@@ -96,11 +96,9 @@ class BlockHeader(ContextMixin):
             "proof_of_work_nonce": "0000000000000000",
             "payload_hash": "vh1g87ZG6scSYxKhspAUzprQVuLAyoa5qMBKcUfjgnQGnFb3dJcG",  # dummy payload (zeroes)
             "payload_round": 0,
+            "liquidity_baking_toggle_vote": "off"
+
         }
-        if protocol_version.get(context.protocol, 0) >= 13:
-            protocol_data["liquidity_baking_escape_vote"] = False
-        else:
-            protocol_data["liquidity_baking_toggle_vote"] = "off"
 
         return BlockHeader(
             context=context,
