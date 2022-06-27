@@ -3,9 +3,9 @@
 ##
 ##    🚧 PyTezos developer tools
 ##
-## DEV=1                Whether to install dev dependencies
+##  DEV=1               Whether to install dev dependencies
 DEV=1
-## TAG=latest           Tag for the `image` command
+##  TAG=latest          Tag for the `image` command
 TAG=latest
 
 ##
@@ -26,9 +26,12 @@ lint:              ## Lint with all tools
 test:              ## Run test suite
 	poetry run sh -c "pytest --cov-report=term-missing --cov=pytezos --cov=michelson_kernel --cov-report=xml -n auto -s -v tests/contract_tests tests/integration_tests tests/unit_tests && pytest -v tests/sandbox_tests"
 
-docs: 			   ## Build docs
+docs:              ## Build docs
 	make kernel-docs rpc-docs
-	cd docs && rm -r build && poetry run make html && cd ..
+	cd docs
+	rm -r build || true
+	poetry run make html
+	cd ..
 
 ##
 
@@ -99,7 +102,7 @@ update-contracts:  ## Update contract tests
 	poetry run python scripts/generate_contract_tests.py
 
 kernel-docs:       ## Build docs for Michelson IPython kernel
-	poetry run python scripts/gen_kernel_docs.py
+	poetry run python scripts/generate_kernel_docs.py
 
 rpc-docs:          ## Build docs for Tezos node RPC
 	poetry run python scripts/fetch_rpc_docs.py
