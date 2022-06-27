@@ -59,7 +59,9 @@ def default_gas_limit(
         'delegation': 1000,
         'origination': constants['hard_gas_limit_per_operation'],
         'transaction': (
-            constants['hard_gas_limit_per_operation'] if content.get('destination', '').startswith('KT') else DEFAULT_TRANSACTION_GAS_LIMIT
+            # FIXME: proto.013-PtJakart.gas_exhausted.operation on Jakarta
+            # constants['hard_gas_limit_per_operation'] if content.get('destination', '').startswith('KT') else DEFAULT_TRANSACTION_GAS_LIMIT
+            constants['hard_gas_limit_per_operation']
         ),
         'register_global_constant': constants['hard_gas_limit_per_operation'],
     }
