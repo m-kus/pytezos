@@ -224,3 +224,6 @@ class AbstractContext:
 
     def get_operations_ttl(self) -> int:
         raise NotImplementedError
+
+    def get_min_block_time(self) -> int:
+        raise NotImplementedError

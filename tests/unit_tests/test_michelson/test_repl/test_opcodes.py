@@ -1008,6 +1008,13 @@ class OpcodesTestCase(TestCase):
             f'"{PUBLIC_KEY}"',
             '(Pair 500 2500)',
         ),
+        # Test MIN_BLOCK_TIME
+        (
+            'min_block_time.tz',
+            '0',
+            'Unit',
+            '1',
+        ),
         # Test KECCAK
         (
             'keccak.tz',

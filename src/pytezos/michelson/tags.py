@@ -151,7 +151,9 @@ prim_tags = {
     # ITHACA
     'SUB_MUTEZ': b'\x93',
     # JAKARTA
+    # FIXME: Check tags are valid
     'tx_rollup_l2_address': b'\x94',
+    'MIN_BLOCK_TIME': b'\x95',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',

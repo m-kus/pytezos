@@ -27,6 +27,6 @@ from pytezos.michelson.instructions.struct import (ConsInstruction, EmptyBigMapI
 from pytezos.michelson.instructions.tezos import (AddressInstruction, AmountInstruction, BalanceInstruction, ChainIdInstruction,
                                                   ContractInstruction, CreateContractInstruction, ImplicitAccountInstruction,
                                                   NowInstruction, SelfAddressInstruction, SelfInstruction, SenderInstruction,
-                                                  SetDelegateInstruction, SourceInstruction, TransferTokensInstruction)
+                                                  SetDelegateInstruction, SourceInstruction, TransferTokensInstruction, VotingPowerInstruction, TotalVotingPowerInstruction, MinBlockTimeInstruction)
 from pytezos.michelson.instructions.ticket import JoinTicketsInstruction, ReadTicketInstruction, SplitTicketInstruction, TicketInstruction
 from pytezos.michelson.instructions.tzt import BigMapInstruction, StackEltInstruction

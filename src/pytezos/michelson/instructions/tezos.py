@@ -318,3 +318,13 @@ class OpenChestInstruction(MichelsonInstruction, prim='OPEN_CHEST'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         raise NotImplementedError
+
+
+class MinBlockTimeInstruction(MichelsonInstruction, prim='MIN_BLOCK_TIME'):
+
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        res = NatType.from_value(context.get_min_block_time())
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
+        return cls(stack_items_added=1)
