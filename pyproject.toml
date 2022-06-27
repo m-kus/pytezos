@@ -82,6 +82,7 @@ types-requests = "^2.26.3"
 types-setuptools = "^57.4.17"
 types-simplejson = "^3.17.2"
 types-tabulate = "^0.8.4"
+parameterized = "^0.8.1"
 PyYAML = "^6.0"
 
 [tool.poetry.scripts]
