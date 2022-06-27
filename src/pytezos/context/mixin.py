@@ -1,24 +1,31 @@
 from os.path import exists, expanduser
 from typing import Any, Dict, Optional, Union
 
-from pytezos.context.impl import DEFAULT_IPFS_GATEWAY, ExecutionContext
+from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import is_pkh, is_public_key
 from pytezos.crypto.key import Key, is_installed
 from pytezos.jupyter import InlineDocstring
 from pytezos.rpc import RpcMultiNode, RpcNode, ShellQuery
 from pytezos.rpc.errors import RpcError
 
+# NOTE: Built-in key for PyTezos client, please, use responsibly.
 default_network = 'jakartanet'
-default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
-default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
+default_key = 'edskSBRJRoNMFca9WccBrFha1mborT9FcjLKC8Txz4BGdsofMQsop6k2SudSD3JpNNhUPyeLzdiDKXx9nqGoqu8shCTJ4aHwK3'
+default_key_hash = 'tz1NsNzkNeCLhknuZzQQtMLRrA7Q6AidQm1n'
 
-alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'  # for flextesa sandbox
+# NOTE: For flextesa sandbox
+alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
 alice_key_hash = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
 
-dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'  # for tezos-node in sandboxed mode
+# NOTE: For tezos-node in sandboxed mode
+dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'
 
 nodes = {
-    'mainnet': ['https://mainnet-tezos.giganode.io/', 'https://api.tez.ie/', 'https://tezos-prod.cryptonomic-infra.tech/'],
+    'mainnet': [
+        'https://mainnet-tezos.giganode.io/',
+        'https://api.tez.ie/',
+        'https://tezos-prod.cryptonomic-infra.tech/',
+    ],
     'sandbox': ['http://127.0.0.1:8732/'],
     'sandboxnet': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
