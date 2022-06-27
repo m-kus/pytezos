@@ -24,7 +24,7 @@ def get_attr_docstring(class_type, attr_name) -> Optional[str]:
     return None
 
 
-def default_attr_filter(x) -> bool:
+def default_attr_filter(x) -> bool:  # pylint: disable=unused-argument
     return True
 
 

@@ -3,18 +3,8 @@ from typing import Type, cast
 
 from pytezos.context.abstract import AbstractContext, get_originated_address
 from pytezos.crypto.encoding import base58_decode, is_address, is_chain_id, is_kt, is_pkh, is_public_key, is_sig
-from pytezos.michelson.forge import (
-    forge_address,
-    forge_base58,
-    forge_contract,
-    forge_public_key,
-    optimize_timestamp,
-    unforge_address,
-    unforge_chain_id,
-    unforge_contract,
-    unforge_public_key,
-    unforge_signature,
-)
+from pytezos.michelson.forge import (forge_address, forge_base58, forge_contract, forge_public_key, optimize_timestamp, unforge_address,
+                                     unforge_chain_id, unforge_contract, unforge_public_key, unforge_signature)
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
 from pytezos.michelson.micheline import Micheline, parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
@@ -22,14 +12,18 @@ from pytezos.michelson.types.base import Undefined
 from pytezos.michelson.types.core import IntType, MichelsonType, NatType, StringType
 
 
-class TimestampType(IntType, prim='timestamp'):
+class TimestampType(IntType, prim='timestamp'):  # type: ignore
+
     @classmethod
     def from_value(cls, value: int) -> 'TimestampType':
         return cls(value)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'TimestampType':
-        value = parse_micheline_literal(val_expr, {'int': int, 'string': optimize_timestamp})
+        value = parse_micheline_literal(val_expr, {
+            'int': int,
+            'string': optimize_timestamp
+        })
         return cls.from_value(value)
 
     @classmethod
@@ -55,8 +49,9 @@ class TimestampType(IntType, prim='timestamp'):
 
 
 class MutezType(NatType, prim='mutez'):
+
     def __repr__(self):
-        return str(Decimal(self.value) / 10**6)
+        return str(Decimal(self.value) / 10 ** 6)
 
     @classmethod
     def from_value(cls, value: int) -> 'MutezType':
@@ -70,15 +65,16 @@ class MutezType(NatType, prim='mutez'):
         if isinstance(py_obj, int):
             value = py_obj
         elif isinstance(py_obj, Decimal):
-            value = int(py_obj * (10**6))
+            value = int(py_obj * (10 ** 6))
         elif isinstance(py_obj, str):
-            value = int(Decimal(py_obj) * (10**6))
+            value = int(Decimal(py_obj) * (10 ** 6))
         else:
             assert False, f'unexpected value type {py_obj}'
         return cls.from_value(value)
 
 
 class AddressType(StringType, prim='address'):
+
     def __repr__(self):
         return f'{self.value[:6]}…{self.value[-3:]}'
 
@@ -103,7 +99,10 @@ class AddressType(StringType, prim='address'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'AddressType':
-        value = parse_micheline_literal(val_expr, {'bytes': lambda x: unforge_contract(bytes.fromhex(x)), 'string': lambda x: x})
+        value = parse_micheline_literal(val_expr, {
+            'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
+            'string': lambda x: x
+        })
         return cls.from_value(value)
 
     @classmethod
@@ -123,6 +122,7 @@ class AddressType(StringType, prim='address'):
 
 
 class KeyType(StringType, prim='key'):
+
     @property
     def raw(self) -> bytes:
         return base58_decode(self.value.encode())
@@ -138,7 +138,11 @@ class KeyType(StringType, prim='key'):
         https://crypto.stackexchange.com/questions/70754/ec-key-compression
         For secp256r1 (aka p256) we need to cut the first byte (for unknown reason)
         """
-        curves = {'edpk': (0, 0), 'sppk': (1, 0), 'p2pk': (2, 1)}
+        curves = {
+            'edpk': (0, 0),
+            'sppk': (1, 0),
+            'p2pk': (2, 1)
+        }
         res = curves[self.prefix][0] - curves[other.prefix][0]
         if res < 0:
             return True
@@ -159,7 +163,10 @@ class KeyType(StringType, prim='key'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'KeyType':
-        value = parse_micheline_literal(val_expr, {'bytes': lambda x: unforge_public_key(bytes.fromhex(x)), 'string': lambda x: x})
+        value = parse_micheline_literal(val_expr, {
+            'bytes': lambda x: unforge_public_key(bytes.fromhex(x)),
+            'string': lambda x: x
+        })
         return cls.from_value(value)
 
     @classmethod
@@ -179,6 +186,7 @@ class KeyType(StringType, prim='key'):
 
 
 class KeyHashType(StringType, prim='key_hash'):
+
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'KeyHashType':
         return cls.from_value(context.get_dummy_key_hash())
@@ -190,7 +198,10 @@ class KeyHashType(StringType, prim='key_hash'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'KeyHashType':
-        value = parse_micheline_literal(val_expr, {'bytes': lambda x: unforge_address(bytes.fromhex(x)), 'string': lambda x: x})
+        value = parse_micheline_literal(val_expr, {
+            'bytes': lambda x: unforge_address(bytes.fromhex(x)),
+            'string': lambda x: x
+        })
         return cls.from_value(value)
 
     @classmethod
@@ -210,6 +221,7 @@ class KeyHashType(StringType, prim='key_hash'):
 
 
 class SignatureType(StringType, prim='signature'):
+
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'SignatureType':
         return cls.from_value(context.get_dummy_signature())
@@ -221,7 +233,10 @@ class SignatureType(StringType, prim='signature'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'SignatureType':
-        value = parse_micheline_literal(val_expr, {'bytes': lambda x: unforge_signature(bytes.fromhex(x)), 'string': lambda x: x})
+        value = parse_micheline_literal(val_expr, {
+            'bytes': lambda x: unforge_signature(bytes.fromhex(x)),
+            'string': lambda x: x
+        })
         return cls.from_value(value)
 
     @classmethod
@@ -241,6 +256,7 @@ class SignatureType(StringType, prim='signature'):
 
 
 class ChainIdType(StringType, prim='chain_id'):
+
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'ChainIdType':
         return cls.from_value(context.get_dummy_chain_id())
@@ -252,7 +268,10 @@ class ChainIdType(StringType, prim='chain_id'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'ChainIdType':
-        value = parse_micheline_literal(val_expr, {'bytes': lambda x: unforge_chain_id(bytes.fromhex(x)), 'string': lambda x: x})
+        value = parse_micheline_literal(val_expr, {
+            'bytes': lambda x: unforge_chain_id(bytes.fromhex(x)),
+            'string': lambda x: x
+        })
         return cls.from_value(value)
 
     @classmethod
@@ -272,6 +291,7 @@ class ChainIdType(StringType, prim='chain_id'):
 
 
 class ContractType(AddressType, prim='contract', args_len=1):
+
     def __repr__(self):
         address, entrypoint = self.get_address(), self.get_entrypoint()
         return f'{address[:6]}…{address[-3:]}%{entrypoint}'
@@ -307,7 +327,8 @@ class ContractType(AddressType, prim='contract', args_len=1):
         return super(ContractType, self).to_python_object()
 
 
-class LambdaType(MichelsonType, prim='lambda', args_len=2):
+class LambdaType(MichelsonType, prim='lambda', args_len=2):  # type: ignore
+
     def __init__(self, value: Type[Micheline]):
         super(LambdaType, self).__init__()
         self.value = value

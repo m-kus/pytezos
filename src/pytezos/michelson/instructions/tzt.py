@@ -1,3 +1,4 @@
+
 from typing import List, Type, cast
 
 from pytezos.context.abstract import AbstractContext
@@ -10,6 +11,7 @@ from pytezos.michelson.types.big_map import BigMapType
 
 
 class StackEltInstruction(MichelsonInstruction, prim='Stack_elt', args_len=2):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         raise RuntimeError('`Stack_elt` primitive is used only in TZT tests and cannot be executed directly')
@@ -60,6 +62,7 @@ class StackEltInstruction(MichelsonInstruction, prim='Stack_elt', args_len=2):
 
 
 class BigMapInstruction(MichelsonInstruction, prim='Big_map', args_len=4):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         raise RuntimeError('`Big_map` primitive is used only in TZT tests and cannot be executed directly')

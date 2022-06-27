@@ -11,14 +11,18 @@ class PairLiteral(Micheline, prim='Pair', args_len=None):
 
 
 class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
+
     def __init__(self, items: Tuple[MichelsonType, ...]):
         super(PairType, self).__init__()
         self.items = items
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # type: ignore
         if not isinstance(other, PairType):
             return False
-        return all(item == other.items[i] for i, item in enumerate(self.items))
+        return all(
+            item == other.items[i]
+            for i, item in enumerate(self.items)
+        )
 
     def __lt__(self, other: 'PairType'):  # type: ignore
         for i, item in enumerate(self.items):
@@ -50,7 +54,10 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         return cls.init(items)
 
     @classmethod
-    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['PairType']:
+    def create_type(cls,
+                    args: List[Type['Micheline']],
+                    annots: Optional[list] = None,
+                    **kwargs) -> Type['PairType']:
         if len(args) > 2:  # comb
             args = [args[0], PairType.create_type(args=args[1:])]
         else:
@@ -71,10 +78,16 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
         flat_args = cls.get_flat_args(force_tuple=comparable)
         if isinstance(flat_args, dict):
-            fields = [(name, arg.generate_pydoc(definitions, inferred_name=name)) for name, arg in flat_args.items()]
+            fields = [
+                (name, arg.generate_pydoc(definitions, inferred_name=name))
+                for name, arg in flat_args.items()
+            ]
             doc = '{\n' + ',\n'.join(f'\t  "{name}": {arg_doc}' for name, arg_doc in fields) + '\n\t}'
         else:
-            items = [arg.generate_pydoc(definitions, inferred_name=f'{arg.prim}_{i}') for i, arg in enumerate(flat_args)]
+            items = [
+                arg.generate_pydoc(definitions, inferred_name=f'{arg.prim}_{i}')
+                for i, arg in enumerate(flat_args)
+            ]
             if all(arg.prim in ['pair', 'or'] or not arg.args for arg in flat_args):
                 return f'( {", ".join(items)} )'
             else:
@@ -185,8 +198,14 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> Union[dict, tuple]:
         flat_values = self.get_flat_values(force_tuple=comparable)
         if isinstance(flat_values, dict):
-            return {name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff) for name, arg in flat_values.items()}
-        return tuple(arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable) for arg in flat_values)
+            return {
+                name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+                for name, arg in flat_values.items()
+            }
+        return tuple(
+            arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable)
+            for arg in flat_values
+        )
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'PairType':
         items = tuple(item.merge_lazy_diff(lazy_diff) for item in self)

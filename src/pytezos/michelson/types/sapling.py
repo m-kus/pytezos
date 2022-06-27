@@ -11,6 +11,7 @@ class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len
 
 
 class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
+
     def __init__(self, ptr: Optional[int] = None):
         super(SaplingStateType, self).__init__()
         self.ptr = ptr

@@ -15,7 +15,11 @@ DEFAULT_LOGGING_CONFIG = {
             'stream': 'ext://sys.stdout',
         }
     },
-    'root': {'handlers': ['default'], 'level': 'INFO', 'propagate': False},
+    'root': {
+        'handlers': ['default'],
+        'level': 'INFO',
+        'propagate': False
+    }
 }
 
 logger = logging.getLogger('pytezos')

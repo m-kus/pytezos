@@ -250,7 +250,7 @@ class TztMichelsonProgram:
                     raise Exception('Only `Big_map` instructions can be used in `big_maps` section')
                 item.add(stack, stdout, context)
 
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:  # pylint: disable=no-self-use
         """Prepare stack for contract execution"""
 
         for item in self.input.args[0].args[::-1]:

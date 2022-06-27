@@ -11,6 +11,7 @@ from pytezos.michelson.types.pair import PairType
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):
+
     def __init__(self, ticketer: str, item: MichelsonType, amount: int):
         super(TicketType, self).__init__()
         self.ticketer = ticketer

@@ -3,9 +3,9 @@ from typing import Dict, Generator, List, Optional, Tuple, Type, Union
 from pytezos.michelson.types.base import MichelsonType, Undefined
 
 
-def get_type_layout(
-    flat_args: List[Tuple[str, Type[MichelsonType]]], infer_names: bool = False, entrypoints: bool = False
-) -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
+def get_type_layout(flat_args: List[Tuple[str, Type[MichelsonType]]],
+                    infer_names: bool = False, entrypoints: bool = False) \
+        -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
     reserved = set()
     path_to_key = {}
     for i, (bin_path, arg) in enumerate(flat_args):
@@ -29,6 +29,7 @@ def get_type_layout(
 
 
 class Nested:
+
     def __init__(self, *args):
         self.args = args
 
@@ -51,7 +52,11 @@ def wrap_pair(obj: dict, path='') -> Nested:
     if all(not x.startswith(path) for x in obj):
         raise KeyError(path)
 
-    items = [obj[subpath] if subpath in obj else wrap_pair(obj, subpath) for subpath in [path + '0', path + '1']]
+    items = [
+        obj[subpath] if subpath in obj else wrap_pair(obj, subpath)
+        for subpath
+        in [path + '0', path + '1']
+    ]
     return Nested(*items)
 
 
@@ -67,14 +72,14 @@ def wrap_parameters(expr, path):
 
 
 class ADTMixin:
+
     @classmethod
     def iter_type_args(cls, entrypoints: bool = False, path='') -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
         raise NotImplementedError
 
     @classmethod
-    def get_flat_args(
-        cls, infer_names: bool = False, force_tuple: bool = False, entrypoints: bool = False
-    ) -> Union[Dict[str, Type[MichelsonType]], List[Type[MichelsonType]]]:
+    def get_flat_args(cls, infer_names: bool = False, force_tuple: bool = False, entrypoints: bool = False) \
+            -> Union[Dict[str, Type[MichelsonType]], List[Type[MichelsonType]]]:
         flat_args = list(cls.iter_type_args(entrypoints=entrypoints))
         if force_tuple is False:
             path_to_key, _, _ = get_type_layout(flat_args, infer_names=infer_names, entrypoints=entrypoints)
@@ -83,18 +88,16 @@ class ADTMixin:
         return [arg for _, arg in flat_args]
 
     @classmethod
-    def get_type_layout(
-        cls, infer_names: bool = False, entrypoints: bool = False
-    ) -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
+    def get_type_layout(cls, infer_names: bool = False, entrypoints: bool = False) \
+            -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
         flat_args = list(cls.iter_type_args(entrypoints=entrypoints))
         return get_type_layout(flat_args, infer_names=infer_names, entrypoints=entrypoints)
 
     def iter_values(self, path='') -> Generator[Tuple[str, MichelsonType], None, None]:
         raise NotImplementedError
 
-    def get_flat_values(
-        self, infer_names: bool = False, force_tuple: bool = False, entrypoints: bool = False
-    ) -> Union[Dict[str, MichelsonType], List[MichelsonType]]:
+    def get_flat_values(self, infer_names: bool = False, force_tuple: bool = False, entrypoints: bool = False) \
+            -> Union[Dict[str, MichelsonType], List[MichelsonType]]:
         path_to_key, _, _ = self.get_type_layout(infer_names=infer_names, entrypoints=entrypoints)
         flat_values = list(self.iter_values())
         if force_tuple is False and isinstance(path_to_key, dict):

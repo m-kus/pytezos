@@ -6,6 +6,7 @@ from pytezos.michelson.micheline import Micheline
 
 # FIXME: CodeSection copypaste
 class InputSection(Micheline, prim='input', args_len=1):
+
     @staticmethod
     def match(input_expr) -> Type['InputSection']:
         cls = Micheline.match(input_expr)
@@ -21,6 +22,7 @@ class InputSection(Micheline, prim='input', args_len=1):
 
 # FIXME: CodeSection copypaste
 class OutputSection(Micheline, prim='output', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['OutputSection']:
         cls = Micheline.match(output_expr)
@@ -36,6 +38,7 @@ class OutputSection(Micheline, prim='output', args_len=1):
 
 # FIXME: CodeSection copypaste
 class SenderSection(Micheline, prim='sender', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['SenderSection']:
         cls = Micheline.match(output_expr)
@@ -48,9 +51,9 @@ class SenderSection(Micheline, prim='sender', args_len=1):
         context.set_sender_expr(cls.as_micheline_expr())
         stdout.append('sender: updated')
 
-
 # FIXME: CodeSection copypaste
 class BalanceSection(Micheline, prim='balance', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['BalanceSection']:
         cls = Micheline.match(output_expr)
@@ -63,9 +66,9 @@ class BalanceSection(Micheline, prim='balance', args_len=1):
         context.set_balance_expr(cls.as_micheline_expr())
         stdout.append('balance: updated')
 
-
 # FIXME: CodeSection copypaste
 class AmountSection(Micheline, prim='amount', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['AmountSection']:
         cls = Micheline.match(output_expr)
@@ -81,6 +84,7 @@ class AmountSection(Micheline, prim='amount', args_len=1):
 
 # FIXME: CodeSection copypaste
 class SelfSection(Micheline, prim='self', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['SelfSection']:
         cls = Micheline.match(output_expr)
@@ -96,6 +100,7 @@ class SelfSection(Micheline, prim='self', args_len=1):
 
 # FIXME: CodeSection copypaste
 class NowSection(Micheline, prim='now', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['NowSection']:
         cls = Micheline.match(output_expr)
@@ -111,6 +116,7 @@ class NowSection(Micheline, prim='now', args_len=1):
 
 # FIXME: CodeSection copypaste
 class SourceSection(Micheline, prim='source', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['SourceSection']:
         cls = Micheline.match(output_expr)
@@ -126,6 +132,7 @@ class SourceSection(Micheline, prim='source', args_len=1):
 
 # FIXME: CodeSection copypaste
 class ChainIdSection(Micheline, prim='chain_id', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['ChainIdSection']:
         cls = Micheline.match(output_expr)
@@ -141,6 +148,7 @@ class ChainIdSection(Micheline, prim='chain_id', args_len=1):
 
 # FIXME: CodeSection copypaste
 class BigMapsSection(Micheline, prim='big_maps', args_len=1):
+
     @staticmethod
     def match(output_expr) -> Type['BigMapsSection']:
         cls = Micheline.match(output_expr)

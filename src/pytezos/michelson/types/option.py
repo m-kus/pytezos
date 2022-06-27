@@ -14,6 +14,7 @@ class SomeLiteral(Micheline, prim='Some', args_len=1):
 
 
 class OptionType(MichelsonType, prim='option', args_len=1):
+
     def __init__(self, item: Optional[MichelsonType]):
         super(OptionType, self).__init__()
         self.item = item
@@ -26,7 +27,7 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         else:
             return self.item < other.item
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other) -> bool:  # type: ignore
         if not isinstance(other, OptionType):
             return False
         return self.item == other.item  # type: ignore
@@ -59,7 +60,10 @@ class OptionType(MichelsonType, prim='option', args_len=1):
 
     @classmethod
     def from_micheline_value(cls, val_expr):
-        item = parse_micheline_value(val_expr, {('Some', 1): lambda x: cls.args[0].from_micheline_value(x[0]), ('None', 0): lambda x: None})
+        item = parse_micheline_value(val_expr, {
+            ('Some', 1): lambda x: cls.args[0].from_micheline_value(x[0]),
+            ('None', 0): lambda x: None
+        })
         return cls(item)
 
     @classmethod
@@ -94,7 +98,9 @@ class OptionType(MichelsonType, prim='option', args_len=1):
         if self.is_none():
             return None
         else:
-            return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable)
+            return self.item.to_python_object(try_unpack=try_unpack,
+                                              lazy_diff=lazy_diff,
+                                              comparable=comparable)
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         item = None if self.is_none() else self.item.merge_lazy_diff(lazy_diff)  # type: ignore

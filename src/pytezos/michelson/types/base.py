@@ -13,8 +13,8 @@ type_mappings = {
     'timestamp': 'int  /* Unix time in seconds */ ||\n\tstring  /* Formatted datetime `%Y-%m-%dT%H:%M:%SZ` */',
     'mutez': 'int  /* Amount in `utz` (10^-6) */ ||\n\tDecimal  /* Amount in `tz` */',
     'contract': 'str  /* Base58 encoded `KT` address with optional entrypoint */'
-    ' ||\n\tNone  /* when you need to avoid type checking */'
-    ' ||\n\tUndefined  /* `from pytezos import Undefined` for resolving None ambiguity  */',
+                ' ||\n\tNone  /* when you need to avoid type checking */'
+                ' ||\n\tUndefined  /* `from pytezos import Undefined` for resolving None ambiguity  */',
     'address': 'str  /* Base58 encoded `tz` or `KT` address */',
     'key': 'str  /* Base58 encoded public key */',
     'key_hash': 'str  /* Base58 encoded public key hash */',
@@ -22,11 +22,12 @@ type_mappings = {
     'lambda': 'str  /* Michelson source code */',
     'chain_id': 'str  /* Base58 encoded chain ID */',
     'ticket': '/* no literal form, tickets can only be created by another contract */',
-    'operation': '/* no literal form, operations can only be spawned by another contract or lambda */',
+    'operation': '/* no literal form, operations can only be spawned by another contract or lambda */'
 }
 
 
 class undefined:
+
     def __repr__(self):
         return '_'
 
@@ -72,7 +73,10 @@ class MichelsonType(Micheline):
         return cast(Type['MichelsonType'], Micheline.match(expr))
 
     @classmethod
-    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['MichelsonType']:
+    def create_type(cls,
+                    args: List[Type['Micheline']],
+                    annots: Optional[list] = None,
+                    **kwargs) -> Type['MichelsonType']:
         type_args = [arg for arg in args if issubclass(arg, MichelsonType)]
         if cls.prim in ['list', 'set', 'map', 'big_map', 'option', 'contract', 'lambda']:
             for arg in type_args:
@@ -81,16 +85,10 @@ class MichelsonType(Micheline):
             assert type_args[0].is_comparable(), f'{cls.prim} key type has to be comparable (not {type_args[0].prim})'
         if cls.prim == 'big_map':
             assert type_args[0].is_big_map_friendly(), f'impossible big_map value type'
-        res = type(
-            cls.__name__,
-            (cls,),
-            dict(
-                field_name=parse_name(annots, '%'),  # type: ignore
-                type_name=parse_name(annots, ':'),  # type: ignore
-                args=args,
-                **kwargs,
-            ),
-        )
+        res = type(cls.__name__, (cls,), dict(field_name=parse_name(annots, '%'),  # type: ignore
+                                              type_name=parse_name(annots, ':'),  # type: ignore
+                                              args=args,
+                                              **kwargs))
         return cast(Type['MichelsonType'], res)
 
     @classmethod
@@ -110,13 +108,9 @@ class MichelsonType(Micheline):
 
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False) -> str:
-        assert len(cls.args) == 0 or cls.prim in [
-            'contract',
-            'lambda',
-            'ticket',
-            'sapling_state',
-            'sapling_transaction',
-        ], 'defined for simple types only'
+        assert len(cls.args) == 0 \
+            or cls.prim in ['contract', 'lambda', 'ticket', 'sapling_state', 'sapling_transaction'], \
+            'defined for simple types only'
         if cls.prim in type_mappings:
             if all(x != cls.prim for x, _ in definitions):
                 definitions.append((cls.prim, type_mappings[cls.prim]))
@@ -124,21 +118,8 @@ class MichelsonType(Micheline):
 
     @classmethod
     def is_comparable(cls):
-        if cls.prim in [
-            'bls12_381_fr',
-            'bls12_381_g1',
-            'bls12_381_g2',
-            'sapling_state',
-            'sapling_transaction',
-            'big_map',
-            'contract',
-            'lambda',
-            'list',
-            'map',
-            'set',
-            'operation',
-            'ticket',
-        ]:
+        if cls.prim in ['bls12_381_fr', 'bls12_381_g1', 'bls12_381_g2', 'sapling_state', 'sapling_transaction',
+                        'big_map', 'contract', 'lambda', 'list', 'map', 'set', 'operation', 'ticket']:
             return False
         return all(map(lambda x: x.is_comparable(), cls.args))
 

@@ -69,7 +69,7 @@ class ContractInterface(ContextMixin):
                 return_type=view_ty.args[2].as_micheline_expr(),
                 code=view_ty.args[3].as_micheline_expr(),  # type: ignore
             )
-            view_attr.__doc__ = view_ty.generate_pydoc()
+            view_attr.__doc__ = view_ty.generate_pydoc()  # type: ignore
             assert not hasattr(self, view_name), f'View name collision {view_name}'
             setattr(self, view_name, view_attr)
 
@@ -340,7 +340,7 @@ class ContractInterface(ContextMixin):
 
         :rtype: ContractTokenMetadataProxy
         """
-        return ContractTokenMetadataProxy(self._get_token_metadata)
+        return ContractTokenMetadataProxy(self._get_token_metadata)  # type: ignore
 
     @lru_cache(maxsize=None)
     def _get_token_metadata(self, token_id: int) -> Optional[ContractTokenMetadata]:

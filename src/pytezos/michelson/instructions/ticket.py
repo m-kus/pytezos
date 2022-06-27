@@ -7,6 +7,7 @@ from pytezos.michelson.types import MichelsonType, NatType, OptionType, PairType
 
 
 class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         pair = cast(PairType, stack.pop1())
@@ -25,6 +26,7 @@ class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
 
 
 class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         ticket = cast(TicketType, stack.pop1())
@@ -37,6 +39,7 @@ class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
 
 
 class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         ticket, amounts = cast(Tuple[TicketType, PairType], stack.pop2())
@@ -56,6 +59,7 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
 
 
 class TicketInstruction(MichelsonInstruction, prim='TICKET'):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         item, amount = cast(Tuple[MichelsonType, NatType], stack.pop2())

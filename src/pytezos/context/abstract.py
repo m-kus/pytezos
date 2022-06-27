@@ -14,12 +14,17 @@ def get_originated_address(index: int, opg_hash=None):
 
 
 class KeyHash(Key):
+
     def __init__(self, public_key_hash):
         super(KeyHash, self).__init__(0)
         self._pkh = public_key_hash
 
     def __repr__(self):
-        res = [super(Key, self).__repr__(), f'\nPublic key hash', self.public_key_hash()]
+        res = [
+            super(Key, self).__repr__(),
+            f'\nPublic key hash',
+            self.public_key_hash()
+        ]
         return '\n'.join(res)
 
     def public_key_hash(self):
@@ -39,6 +44,7 @@ class KeyHash(Key):
 
 
 class AbstractContext:
+
     def reset(self):
         raise NotImplementedError
 
@@ -75,7 +81,7 @@ class AbstractContext:
     def get_view_expr(self, name, address=None) -> Optional:  # type: ignore
         raise NotImplementedError
 
-    def get_views_expr(self) -> List:
+    def get_views_expr(self) -> List:  # type: ignore
         raise NotImplementedError
 
     def get_input_expr(self):

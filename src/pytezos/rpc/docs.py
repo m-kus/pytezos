@@ -8,7 +8,6 @@ rpc_docs = {
       "injection",
       "monitor",
       "network",
-      "private",
       "protocols",
       "stats",
       "version",
@@ -33,7 +32,6 @@ rpc_docs = {
       "checkpoint",
       "invalid_blocks",
       "is_bootstrapped",
-      "levels",
       "mempool"
     ]
   },
@@ -51,7 +49,7 @@ rpc_docs = {
         },
         {
           "name": "min_date",
-          "descr": "When `min_date` is provided, blocks with a timestamp before `min_date` are filtered out. However, if the `length` parameter is also provided, then up to that number of predecessors will be returned regardless of their date."
+          "descr": "When `min_date` is provided, blocks with a timestamp before `min_date` are filtered out"
         }
       ],
       "ret": "Array"
@@ -70,7 +68,7 @@ rpc_docs = {
   },
   "/chains/{}/checkpoint": {
     "GET": {
-      "descr": "DEPRECATED: use `../levels/{checkpoint, savepoint, caboose, history_mode}` instead. The current checkpoint for this chain.",
+      "descr": "The current checkpoint for this chain.",
       "args": [],
       "ret": "Object"
     }
@@ -105,34 +103,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/levels": {
-    "props": [
-      "caboose",
-      "checkpoint",
-      "savepoint"
-    ]
-  },
-  "/chains/{}/levels/caboose": {
-    "GET": {
-      "descr": "The current caboose for this chain.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/levels/checkpoint": {
-    "GET": {
-      "descr": "The current checkpoint for this chain.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/levels/savepoint": {
-    "GET": {
-      "descr": "The current savepoint for this chain.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
   "/config": {
     "GET": {
       "descr": "Return the runtime node configuration (this takes into account the command-line arguments and the on-disk configuration file)",
@@ -140,24 +110,8 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "history_mode",
-      "logging",
       "network"
     ]
-  },
-  "/config/history_mode": {
-    "GET": {
-      "descr": "Returns the history mode of the node's underlying storage.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/config/logging": {
-    "PUT": {
-      "descr": "Replace the logging configuration of the node.",
-      "args": [],
-      "ret": "Object"
-    }
   },
   "/config/network": {
     "props": [
@@ -169,14 +123,14 @@ rpc_docs = {
     "GET": {
       "descr": "List of protocols which replace other protocols",
       "args": [],
-      "ret": "Array"
+      "ret": "Object"
     }
   },
   "/config/network/user_activated_upgrades": {
     "GET": {
       "descr": "List of protocols to switch to at given levels",
       "args": [],
-      "ret": "Array"
+      "ret": "Object"
     }
   },
   "/errors": {
@@ -372,36 +326,15 @@ rpc_docs = {
     }
   },
   "/network/greylist": {
-    "DELETE": {
-      "descr": "Clear all greylists tables. This will unban all addresses and peers automatically greylisted by the system.",
-      "args": [],
-      "ret": "Object"
-    },
     "props": [
-      "clear",
-      "ips",
-      "peers"
+      "clear"
     ]
   },
   "/network/greylist/clear": {
     "GET": {
-      "descr": "DEPRECATED: Clear all greylists tables. This will unban all addresses and peers automatically greylisted by the system. Use DELETE `/network/greylist` instead",
+      "descr": "Clear all greylists tables.",
       "args": [],
       "ret": "Object"
-    }
-  },
-  "/network/greylist/ips": {
-    "GET": {
-      "descr": "Returns an object that contains a list of IP and the field \"not_reliable_since\".\n           If the field \"not_reliable_since\" is None then the list contains the currently greylisted IP addresses.\n           If the field \"not_reliable_since\" Contains a date, this means that the greylist has been overflowed and it is no more possible to obtain the exact list of greylisted IPs. Since the greylist of IP addresses has been design to work whatever his size, there is no security issue related to this overflow.\n          Reinitialize the ACL structure by calling \"delete /network/greylist\" to get back this list reliable.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/network/greylist/peers": {
-    "GET": {
-      "descr": "List of the last greylisted peers.",
-      "args": [],
-      "ret": "Array"
     }
   },
   "/network/log": {
@@ -433,11 +366,6 @@ rpc_docs = {
       "args": [],
       "ret": "Object"
     },
-    "PATCH": {
-      "descr": "Change the permissions of a given peer. With `{acl: ban}`: blacklist the given peer and remove it from the whitelist if present. With `{acl: open}`: removes the peer from the blacklist and whitelist. With `{acl: trust}`: trust the given peer permanently and remove it from the blacklist if present. The peer cannot be blocked (but its host IP still can).",
-      "args": [],
-      "ret": "Object"
-    },
     "props": [
       "ban",
       "banned",
@@ -449,7 +377,7 @@ rpc_docs = {
   },
   "/network/peers/{}/ban": {
     "GET": {
-      "descr": "DEPRECATED: Blacklist the given peer and remove it from the whitelist if present. Use PATCH `network/peers/<peer_id>` instead.",
+      "descr": "Blacklist the given peer and remove it from the whitelist if present.",
       "args": [],
       "ret": "Object"
     }
@@ -475,21 +403,21 @@ rpc_docs = {
   },
   "/network/peers/{}/trust": {
     "GET": {
-      "descr": "DEPRECATED: Whitelist a given peer permanently and remove it from the blacklist if present. The peer cannot be blocked (but its host IP still can). Use PATCH `network/peers/<peer_id>` instead.",
+      "descr": "Whitelist a given peer permanently and remove it from the blacklist if present. The peer cannot be blocked (but its host IP still can).",
       "args": [],
       "ret": "Object"
     }
   },
   "/network/peers/{}/unban": {
     "GET": {
-      "descr": "DEPRECATED: Remove the given peer from the blacklist. Use PATCH `network/peers/<peer_id>` instead.",
+      "descr": "Remove the given peer from the blacklist.",
       "args": [],
       "ret": "Object"
     }
   },
   "/network/peers/{}/untrust": {
     "GET": {
-      "descr": "DEPRECATED: Remove a given peer from the whitelist. Use PATCH `network/peers/<peer_id>` instead.",
+      "descr": "Remove a given peer from the whitelist.",
       "args": [],
       "ret": "Object"
     }
@@ -526,11 +454,6 @@ rpc_docs = {
       ],
       "ret": "Object"
     },
-    "PATCH": {
-      "descr": "Change the connectivity state of a given `IP:addr`. With `{acl : ban}`: blacklist the given address and remove it from the whitelist if present. With `{acl: open}`: removes an address from the blacklist and whitelist. With `{acl: trust}`: trust a given address permanently and remove it from the blacklist if present. With `{peer_id: <id>}` set the peerId of the point. Connections from this address can still be closed on authentication if the peer is greylisted. ",
-      "args": [],
-      "ret": "Object"
-    },
     "props": [
       "ban",
       "banned",
@@ -542,14 +465,14 @@ rpc_docs = {
   },
   "/network/points/{}/ban": {
     "GET": {
-      "descr": "DEPRECATED: Blacklist the given address and remove it from the whitelist if present. Use PATCH `/network/point/<point_id>` instead.",
+      "descr": "Blacklist the given address and remove it from the whitelist if present.",
       "args": [],
       "ret": "Object"
     }
   },
   "/network/points/{}/banned": {
     "GET": {
-      "descr": "Check if a given address is blacklisted or greylisted. Port component is unused.",
+      "descr": "Check is a given address is blacklisted or greylisted.",
       "args": [],
       "ret": "Boolean"
     }
@@ -568,21 +491,21 @@ rpc_docs = {
   },
   "/network/points/{}/trust": {
     "GET": {
-      "descr": "DEPRECATED: Trust a given address permanently and remove it from the blacklist if present. Connections from this address can still be closed on authentication if the peer is greylisted. Use PATCH`/network/point/<point_id>` instead.",
+      "descr": "Trust a given address permanently and remove it from the blacklist if present. Connections from this address can still be closed on authentication if the peer is greylisted.",
       "args": [],
       "ret": "Object"
     }
   },
   "/network/points/{}/unban": {
     "GET": {
-      "descr": "DEPRECATED: Remove an address from the blacklist. Use PATCH `/network/point/<point_id>` instead.",
+      "descr": "Remove an address from the blacklist.",
       "args": [],
       "ret": "Object"
     }
   },
   "/network/points/{}/untrust": {
     "GET": {
-      "descr": "DEPRECATED: Remove an address from the whitelist. Use PATCH `/network/point/<point_id>` instead.",
+      "descr": "Remove an address from the whitelist.",
       "args": [],
       "ret": "Object"
     }
@@ -615,32 +538,6 @@ rpc_docs = {
       "ret": "Array"
     }
   },
-  "/private": {
-    "props": [
-      "injection"
-    ]
-  },
-  "/private/injection": {
-    "props": [
-      "operation"
-    ]
-  },
-  "/private/injection/operation": {
-    "POST": {
-      "descr": "Inject an operation in node and broadcast it. Returns the ID of the operation. The `signedOperationContents` should be constructed using a contextual RPCs from the latest block and signed by the client. By default, the RPC will wait for the operation to be (pre-)validated before answering. See RPCs under /blocks/prevalidation for more details on the prevalidation context. If ?async is true, the function returns immediately. Otherwise, the operation will be validated before the result is returned. An optional ?chain parameter can be used to specify whether to inject on the test chain or the main chain.",
-      "args": [
-        {
-          "name": "async",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "chain",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
   "/protocols": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
@@ -666,7 +563,7 @@ rpc_docs = {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [],
-      "ret": "Integer"
+      "ret": "Object"
     }
   },
   "/stats": {
@@ -777,35 +674,20 @@ rpc_docs = {
   },
   "/chains/{}/mempool": {
     "props": [
-      "ban_operation",
       "filter",
       "monitor_operations",
       "pending_operations",
-      "request_operations",
-      "unban_all_operations",
-      "unban_operation"
+      "request_operations"
     ]
-  },
-  "/chains/{}/mempool/ban_operation": {
-    "POST": {
-      "descr": "Remove an operation from the mempool if present, reverting its effect if it was applied. Add it to the set of banned operations to prevent it from being fetched/processed/injected in the future. Note: If the baker has already received the operation, then it's necessary to restart it to flush the operation from it.",
-      "args": [],
-      "ret": "Object"
-    }
   },
   "/chains/{}/mempool/filter": {
     "GET": {
-      "descr": "Get the configuration of the mempool filter. The minimal_fees are in mutez. Each field minimal_nanotez_per_xxx is a rational number given as a numerator and a denominator, e.g. \"minimal_nanotez_per_gas_unit\": [ \"100\", \"1\" ].",
-      "args": [
-        {
-          "name": "include_default",
-          "descr": "Show fields equal to their default value (set by default)"
-        }
-      ],
+      "descr": "Get the configuration of the mempool filter.",
+      "args": [],
       "ret": "Object"
     },
     "POST": {
-      "descr": "Set the configuration of the mempool filter. **If any of the fields is absent from the input JSON, then it is set to the default value for this field (i.e. its value in the default configuration), even if it previously had a different value.** If the input JSON does not describe a valid configuration, then the configuration is left unchanged. Also return the new configuration (which may differ from the input if it had omitted fields or was invalid). You may call [./tezos-client rpc get '/chains/main/mempool/filter?include_default=true'] to see an example of JSON describing a valid configuration.",
+      "descr": "Set the configuration of the mempool filter.",
       "args": [],
       "ret": "Object"
     }
@@ -823,10 +705,6 @@ rpc_docs = {
           "descr": "Include refused operations"
         },
         {
-          "name": "outdated",
-          "descr": "Include outdated operations"
-        },
-        {
           "name": "branch_refused",
           "descr": "Include branch refused operations"
         },
@@ -841,57 +719,13 @@ rpc_docs = {
   "/chains/{}/mempool/pending_operations": {
     "GET": {
       "descr": "List the prevalidated operations.",
-      "args": [
-        {
-          "name": "version",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "applied",
-          "descr": "Include applied operations (true by default)"
-        },
-        {
-          "name": "refused",
-          "descr": "Include refused operations (true by default)"
-        },
-        {
-          "name": "outdated",
-          "descr": "Include outdated operations (true by default)"
-        },
-        {
-          "name": "branch_refused",
-          "descr": "Include branch refused operations (true by default)"
-        },
-        {
-          "name": "branch_delayed",
-          "descr": "Include branch delayed operations (true by default)"
-        }
-      ],
+      "args": [],
       "ret": "Object"
     }
   },
   "/chains/{}/mempool/request_operations": {
     "POST": {
-      "descr": "Request the operations of our peers or a specific peer if specified via a query parameter.",
-      "args": [
-        {
-          "name": "peer_id",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/mempool/unban_all_operations": {
-    "POST": {
-      "descr": "Clear the set of banned operations.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/mempool/unban_operation": {
-    "POST": {
-      "descr": "Remove an operation from the set of banned operations (nothing happens if it was not banned).",
+      "descr": "Request the operations of your peers.",
       "args": [],
       "ret": "Object"
     }
@@ -899,46 +733,38 @@ rpc_docs = {
   "/chains/{}/blocks/{}": {
     "GET": {
       "descr": "All the information about a block. The associated metadata may not be present depending on the history mode and block's distance from the head.",
-      "args": [
-        {
-          "name": "force_metadata",
-          "descr": "Forces to recompute the operations metadata if it was considered as too large."
-        }
-      ],
+      "args": [],
       "ret": "Object"
     },
     "props": [
       "context",
+      "endorsing_power",
       "hash",
       "header",
       "helpers",
       "live_blocks",
       "metadata",
       "metadata_hash",
+      "minimal_valid_time",
       "operation_hashes",
       "operation_metadata_hashes",
       "operations",
       "operations_metadata_hash",
       "protocols",
+      "required_endorsements",
       "votes"
     ]
   },
   "/chains/{}/blocks/{}/context": {
     "props": [
       "big_maps",
-      "cache",
       "constants",
       "contracts",
       "delegates",
-      "liquidity_baking",
-      "merkle_tree",
       "nonces",
       "raw",
       "sapling",
-      "sc_rollup",
-      "seed",
-      "selected_snapshot",
-      "tx_rollup"
+      "seed"
     ]
   },
   "/chains/{}/blocks/{}/context/big_maps": {
@@ -948,20 +774,6 @@ rpc_docs = {
     }
   },
   "/chains/{}/blocks/{}/context/big_maps/{}": {
-    "GET": {
-      "descr": "Get the (optionally paginated) list of values in a big map. Order of values is unspecified, but is guaranteed to be consistent.",
-      "args": [
-        {
-          "name": "offset",
-          "descr": "Skip the first [offset] values. Useful in combination with [length] for pagination."
-        },
-        {
-          "name": "length",
-          "descr": "Only retrieve [length] values. Useful in combination with [offset] for pagination."
-        }
-      ],
-      "ret": "Array"
-    },
     "item": {
       "name": "script_expr",
       "descr": "script_expr (Base58Check-encoded)"
@@ -972,57 +784,6 @@ rpc_docs = {
       "descr": "Access the value associated with a key in a big map.",
       "args": [],
       "ret": "Object"
-    },
-    "props": [
-      "normalized"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/big_maps/{}/{}/normalized": {
-    "POST": {
-      "descr": "Access the value associated with a key in a big map, normalize the output using the requested unparsing mode.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/cache": {
-    "props": [
-      "contracts"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/cache/contracts": {
-    "props": [
-      "all",
-      "rank",
-      "size",
-      "size_limit"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/cache/contracts/all": {
-    "GET": {
-      "descr": "Return the list of cached contracts",
-      "args": [],
-      "ret": "Array"
-    }
-  },
-  "/chains/{}/blocks/{}/context/cache/contracts/rank": {
-    "POST": {
-      "descr": "Return the number of cached contracts older than the provided contract",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/cache/contracts/size": {
-    "GET": {
-      "descr": "Return the size of the contract cache",
-      "args": [],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/cache/contracts/size_limit": {
-    "GET": {
-      "descr": "Return the size limit of the contract cache",
-      "args": [],
-      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/constants": {
@@ -1056,22 +817,15 @@ rpc_docs = {
   "/chains/{}/blocks/{}/context/contracts/{}": {
     "GET": {
       "descr": "Access the complete status of a contract.",
-      "args": [
-        {
-          "name": "normalize_types",
-          "descr": "Whether types should be normalized (annotations removed, combs flattened) or kept as they appeared in the original script."
-        }
-      ],
+      "args": [],
       "ret": "Object"
     },
     "props": [
       "balance",
-      "balance_and_frozen_bonds",
       "big_map_get",
       "counter",
       "delegate",
       "entrypoints",
-      "frozen_bonds",
       "manager_key",
       "script",
       "single_sapling_get_diff",
@@ -1080,14 +834,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/context/contracts/{}/balance": {
     "GET": {
-      "descr": "Access the spendable balance of a contract, excluding frozen bonds.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/contracts/{}/balance_and_frozen_bonds": {
-    "GET": {
-      "descr": "Access the sum of the spendable balance and frozen bonds of a contract. This sum is part of the contract's stake, and it is exactly the contract's stake if the contract is not a delegate.",
+      "descr": "Access the balance of a contract.",
       "args": [],
       "ret": "Object"
     }
@@ -1103,7 +850,7 @@ rpc_docs = {
     "GET": {
       "descr": "Access the counter of a contract, if any.",
       "args": [],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/contracts/{}/delegate": {
@@ -1116,34 +863,17 @@ rpc_docs = {
   "/chains/{}/blocks/{}/context/contracts/{}/entrypoints": {
     "GET": {
       "descr": "Return the list of entrypoints of the contract",
-      "args": [
-        {
-          "name": "normalize_types",
-          "descr": "Whether types should be normalized (annotations removed, combs flattened) or kept as they appeared in the original script."
-        }
-      ],
+      "args": [],
       "ret": "Object"
     },
     "item": {
-      "name": "entrypoint",
-      "descr": "A Michelson entrypoint (string of length < 32)"
+      "name": "string",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
     }
   },
   "/chains/{}/blocks/{}/context/contracts/{}/entrypoints/{}": {
     "GET": {
       "descr": "Return the type of the given entrypoint of the contract",
-      "args": [
-        {
-          "name": "normalize_types",
-          "descr": "Whether types should be normalized (annotations removed, combs flattened) or kept as they appeared in the original script."
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/contracts/{}/frozen_bonds": {
-    "GET": {
-      "descr": "Access the frozen bonds of a contract.",
       "args": [],
       "ret": "Object"
     }
@@ -1158,16 +888,6 @@ rpc_docs = {
   "/chains/{}/blocks/{}/context/contracts/{}/script": {
     "GET": {
       "descr": "Access the code and data of the contract.",
-      "args": [],
-      "ret": "Object"
-    },
-    "props": [
-      "normalized"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/contracts/{}/script/normalized": {
-    "POST": {
-      "descr": "Access the script of the contract and normalize it using the requested unparsing mode.",
       "args": [],
       "ret": "Object"
     }
@@ -1193,21 +913,11 @@ rpc_docs = {
       "descr": "Access the data of the contract.",
       "args": [],
       "ret": "Object"
-    },
-    "props": [
-      "normalized"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/contracts/{}/storage/normalized": {
-    "POST": {
-      "descr": "Access the data of the contract and normalize it using the requested unparsing mode.",
-      "args": [],
-      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/delegates": {
     "GET": {
-      "descr": "Lists all registered delegates. The arguments `active`, `inactive`, `with_minimal_stake`, and `without_minimal_stake` allow to enumerate only the delegates that are active, inactive, have at least a minimal stake to participate in consensus and in governance, or do not have such a minimal stake, respectively.",
+      "descr": "Lists all registered delegates.",
       "args": [
         {
           "name": "active",
@@ -1215,14 +925,6 @@ rpc_docs = {
         },
         {
           "name": "inactive",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "with_minimal_stake",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "without_minimal_stake",
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
@@ -1240,22 +942,20 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "current_frozen_deposits",
+      "balance",
       "deactivated",
       "delegated_balance",
       "delegated_contracts",
-      "frozen_deposits",
-      "frozen_deposits_limit",
-      "full_balance",
+      "frozen_balance",
+      "frozen_balance_by_cycle",
       "grace_period",
-      "participation",
       "staking_balance",
       "voting_power"
     ]
   },
-  "/chains/{}/blocks/{}/context/delegates/{}/current_frozen_deposits": {
+  "/chains/{}/blocks/{}/context/delegates/{}/balance": {
     "GET": {
-      "descr": "Returns the current amount of the frozen deposits (in mutez).",
+      "descr": "Returns the full balance of a given delegate, including the frozen balances.",
       "args": [],
       "ret": "Object"
     }
@@ -1269,7 +969,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/context/delegates/{}/delegated_balance": {
     "GET": {
-      "descr": "Returns the sum (in mutez) of all balances of all the contracts that delegate to a given delegate. This excludes the delegate's own balance and its frozen deposits.",
+      "descr": "Returns the balances of all the contracts that delegate to a given delegate. This excludes the delegate's own balance and its frozen balances.",
       "args": [],
       "ret": "Object"
     }
@@ -1281,77 +981,39 @@ rpc_docs = {
       "ret": "Array"
     }
   },
-  "/chains/{}/blocks/{}/context/delegates/{}/frozen_deposits": {
+  "/chains/{}/blocks/{}/context/delegates/{}/frozen_balance": {
     "GET": {
-      "descr": "Returns the initial amount (that is, at the beginning of a cycle) of the frozen deposits (in mutez). This amount is the same as the current amount of the frozen deposits, unless the delegate has been punished.",
+      "descr": "Returns the total frozen balances of a given delegate, this includes the frozen deposits, rewards and fees.",
       "args": [],
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/delegates/{}/frozen_deposits_limit": {
+  "/chains/{}/blocks/{}/context/delegates/{}/frozen_balance_by_cycle": {
     "GET": {
-      "descr": "Returns the frozen deposits limit for the given delegate or none if no limit is set.",
+      "descr": "Returns the frozen balances of a given delegate, indexed by the cycle by which it will be unfrozen",
       "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/delegates/{}/full_balance": {
-    "GET": {
-      "descr": "Returns the full balance (in mutez) of a given delegate, including the frozen deposits and the frozen bonds. It does not include its delegated balance.",
-      "args": [],
-      "ret": "Object"
+      "ret": "Array"
     }
   },
   "/chains/{}/blocks/{}/context/delegates/{}/grace_period": {
     "GET": {
-      "descr": "Returns the cycle by the end of which the delegate might be deactivated if she fails to execute any delegate action. A deactivated delegate might be reactivated (without loosing any stake) by simply re-registering as a delegate. For deactivated delegates, this value contains the cycle at which they were deactivated.",
+      "descr": "Returns the cycle by the end of which the delegate might be deactivated if she fails to execute any delegate action. A deactivated delegate might be reactivated (without loosing any rolls) by simply re-registering as a delegate. For deactivated delegates, this value contains the cycle by which they were deactivated.",
       "args": [],
       "ret": "Integer"
     }
   },
-  "/chains/{}/blocks/{}/context/delegates/{}/participation": {
-    "GET": {
-      "descr": "Returns cycle and level participation information. In particular this indicates, in the field 'expected_cycle_activity', the number of slots the delegate is expected to have in the cycle based on its active stake. The field 'minimal_cycle_activity' indicates the minimal endorsing slots in the cycle required to get endorsing rewards. It is computed based on 'expected_cycle_activity. The fields 'missed_slots' and 'missed_levels' indicate the number of missed endorsing slots and missed levels (for endorsing) in the cycle so far. 'missed_slots' indicates the number of missed endorsing slots in the cycle so far. The field 'remaining_allowed_missed_slots' indicates the remaining amount of endorsing slots that can be missed in the cycle before forfeiting the rewards. Finally, 'expected_endorsing_rewards' indicates the endorsing rewards that will be distributed at the end of the cycle if activity at that point will be greater than the minimal required; if the activity is already known to be below the required minimum, then the rewards are zero.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
   "/chains/{}/blocks/{}/context/delegates/{}/staking_balance": {
     "GET": {
-      "descr": "Returns the total amount of tokens (in mutez) delegated to a given delegate. This includes the balances of all the contracts that delegate to it, but also the balance of the delegate itself, its frozen deposits, and its frozen bonds.",
+      "descr": "Returns the total amount of tokens delegated to a given delegate. This includes the balances of all the contracts that delegate to it, but also the balance of the delegate itself and its frozen fees and deposits. The rewards do not count in the delegated balance until they are unfrozen.",
       "args": [],
       "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/delegates/{}/voting_power": {
     "GET": {
-      "descr": "The voting power in the vote listings for a given delegate.",
+      "descr": "The number of rolls in the vote listings for a given delegate",
       "args": [],
-      "ret": "String"
-    }
-  },
-  "/chains/{}/blocks/{}/context/liquidity_baking": {
-    "props": [
-      "cpmm_address"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/liquidity_baking/cpmm_address": {
-    "GET": {
-      "descr": "Liquidity baking CPMM address",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/merkle_tree": {
-    "GET": {
-      "descr": "Returns the merkle tree of a piece of context.",
-      "args": [
-        {
-          "name": "holey",
-          "descr": "Send only hashes, omit data of key"
-        }
-      ],
-      "ret": "Object"
+      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/nonces": {
@@ -1412,45 +1074,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/sc_rollup": {
-    "GET": {
-      "descr": "List of all originated smart contract rollups",
-      "args": [],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "Sc_rollup_hash",
-      "descr": "Sc_rollup_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}": {
-    "props": [
-      "inbox",
-      "initial_level",
-      "kind"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/inbox": {
-    "GET": {
-      "descr": "Inbox for a smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/initial_level": {
-    "GET": {
-      "descr": "Initial level for a smart-contract rollup",
-      "args": [],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/kind": {
-    "GET": {
-      "descr": "Kind of smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
   "/chains/{}/blocks/{}/context/seed": {
     "POST": {
       "descr": "Seed of the cycle to which the block belongs.",
@@ -1458,76 +1081,11 @@ rpc_docs = {
       "ret": "String"
     }
   },
-  "/chains/{}/blocks/{}/context/selected_snapshot": {
-    "GET": {
-      "descr": "Returns the index of the selected snapshot for the current cycle or for the specific `cycle` passed as argument, if any.",
-      "args": [
-        {
-          "name": "cycle",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup": {
-    "item": {
-      "name": "tx_rollup_id",
-      "descr": "A tx rollup identifier encoded in b58check."
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}": {
-    "props": [
-      "commitment",
-      "inbox",
-      "pending_bonded_commitments",
-      "state"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/commitment": {
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/commitment/{}": {
-    "GET": {
-      "descr": "Return the commitment for a level, if any",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/inbox": {
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/inbox/{}": {
-    "GET": {
-      "descr": "Get the inbox of a transaction rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/pending_bonded_commitments": {
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/pending_bonded_commitments/{}": {
-    "GET": {
-      "descr": "Get the number of pending bonded commitments for a pkh on a rollup",
+  "/chains/{}/blocks/{}/endorsing_power": {
+    "POST": {
+      "descr": "Get the endorsing power of an endorsement, that is, the number of slots that the endorser has",
       "args": [],
       "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/state": {
-    "GET": {
-      "descr": "Access the state of a rollup.",
-      "args": [],
-      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/hash": {
@@ -1591,14 +1149,12 @@ rpc_docs = {
       "levels_in_current_cycle",
       "parse",
       "preapply",
-      "round",
-      "scripts",
-      "validators"
+      "scripts"
     ]
   },
   "/chains/{}/blocks/{}/helpers/baking_rights": {
     "GET": {
-      "descr": "Retrieves the list of delegates allowed to bake a block.\nBy default, it gives the best baking opportunities (in terms of rounds) for bakers that have at least one opportunity below the 64th round for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the baking rights have to be returned.\nParameter `delegate` can be used to restrict the results to the given delegates. If parameter `all` is set, all the baking opportunities for each baker at each level are returned, instead of just the first one.\nReturns the list of baking opportunities up to round 64. Also returns the minimal timestamps that correspond to these opportunities. The timestamps are omitted for levels in the past, and are only estimates for levels higher that the next block's, based on the hypothesis that all predecessor blocks were baked at the first round.",
+      "descr": "Retrieves the list of delegates allowed to bake a block.\nBy default, it gives the best baking priorities for bakers that have at least one opportunity below the 64th priority for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the baking rights have to be returned. When asked for (a) whole cycle(s), baking opportunities are given by default up to the priority 8.\nParameter `delegate` can be used to restrict the results to the given delegates. If parameter `all` is set, all the baking opportunities for each baker at each level are returned, instead of just the first one.\nReturns the list of baking slots. Also returns the minimal timestamps that correspond to these slots. The timestamps are omitted for levels in the past, and are only estimates for levels later that the next block, based on the hypothesis that all predecessor blocks were baked at the first priority.",
       "args": [
         {
           "name": "level",
@@ -1613,7 +1169,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         },
         {
-          "name": "max_round",
+          "name": "max_priority",
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         },
         {
@@ -1639,7 +1195,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers/current_level": {
     "GET": {
-      "descr": "Returns the level of the interrogated block, or the one of a block located `offset` blocks after it in the chain. For instance, the next block if `offset` is 1. The offset cannot be negative.",
+      "descr": "Returns the level of the interrogated block, or the one of a block located `offset` blocks after in the chain (or before when negative). For instance, the next block if `offset` is 1.",
       "args": [
         {
           "name": "offset",
@@ -1651,7 +1207,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers/endorsing_rights": {
     "GET": {
-      "descr": "Retrieves the delegates allowed to endorse a block.\nBy default, it gives the endorsing power for delegates that have at least one endorsing slot for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the endorsing rights have to be returned. Parameter `delegate` can be used to restrict the results to the given delegates.\nReturns the smallest endorsing slots and the endorsing power. Also returns the minimal timestamp that corresponds to endorsing at the given level. The timestamps are omitted for levels in the past, and are only estimates for levels higher that the next block's, based on the hypothesis that all predecessor blocks were baked at the first round.",
+      "descr": "Retrieves the delegates allowed to endorse a block.\nBy default, it gives the endorsement slots for delegates that have at least one in the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the endorsement rights have to be returned. Parameter `delegate` can be used to restrict the results to the given delegates.\nReturns the list of endorsement slots. Also returns the minimal timestamps that correspond to these slots. The timestamps are omitted for levels in the past, and are only estimates for levels later that the next block, based on the hypothesis that all predecessor blocks were baked at the first priority.",
       "args": [
         {
           "name": "level",
@@ -1672,8 +1228,7 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/forge": {
     "props": [
       "operations",
-      "protocol_data",
-      "tx_rollup"
+      "protocol_data"
     ]
   },
   "/chains/{}/blocks/{}/helpers/forge/operations": {
@@ -1686,60 +1241,6 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/forge/protocol_data": {
     "POST": {
       "descr": "Forge the protocol-specific part of a block header",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup": {
-    "props": [
-      "commitment",
-      "inbox"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment": {
-    "props": [
-      "merkle_tree_hash",
-      "merkle_tree_path"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment/merkle_tree_hash": {
-    "POST": {
-      "descr": "Compute the merkle tree hash of a commitment",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment/merkle_tree_path": {
-    "POST": {
-      "descr": "Compute a path of a message result hash in the commitment merkle tree",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox": {
-    "props": [
-      "merkle_tree_hash",
-      "merkle_tree_path",
-      "message_hash"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox/merkle_tree_hash": {
-    "POST": {
-      "descr": "Compute the merkle tree hash of an inbox",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox/merkle_tree_path": {
-    "POST": {
-      "descr": "Compute a path of an inbox message in a merkle tree",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox/message_hash": {
-    "POST": {
-      "descr": "Compute the hash of a message",
       "args": [],
       "ret": "Object"
     }
@@ -1812,26 +1313,13 @@ rpc_docs = {
       "ret": "Array"
     }
   },
-  "/chains/{}/blocks/{}/helpers/round": {
-    "GET": {
-      "descr": "Returns the round of the interrogated block, or the one of a block located `offset` blocks after in the chain (or before when negative). For instance, the next block if `offset` is 1.",
-      "args": [],
-      "ret": "Integer"
-    }
-  },
   "/chains/{}/blocks/{}/helpers/scripts": {
     "props": [
       "entrypoint",
       "entrypoints",
-      "normalize_data",
-      "normalize_script",
-      "normalize_type",
       "pack_data",
       "run_code",
       "run_operation",
-      "run_view",
-      "script_size",
-      "simulate_operation",
       "trace_code",
       "typecheck_code",
       "typecheck_data"
@@ -1847,27 +1335,6 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/scripts/entrypoints": {
     "POST": {
       "descr": "Return the list of entrypoints of the given script",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/scripts/normalize_data": {
-    "POST": {
-      "descr": "Normalizes some data expression using the requested unparsing mode",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/scripts/normalize_script": {
-    "POST": {
-      "descr": "Normalizes a Michelson script using the requested unparsing mode",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/scripts/normalize_type": {
-    "POST": {
-      "descr": "Normalizes some Michelson type by expanding `pair a b c` as `pair a (pair b c)",
       "args": [],
       "ret": "Object"
     }
@@ -1893,32 +1360,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/helpers/scripts/run_view": {
-    "POST": {
-      "descr": "Simulate a call to a view following the TZIP-4 standard. See https://gitlab.com/tzip/tzip/-/blob/master/proposals/tzip-4/tzip-4.md#view-entrypoints.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/scripts/script_size": {
-    "POST": {
-      "descr": "Compute the size of a script in the current context",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/scripts/simulate_operation": {
-    "POST": {
-      "descr": "Simulate an operation",
-      "args": [
-        {
-          "name": "successor_level",
-          "descr": "If true, the simulation is done on the successor level of the current context."
-        }
-      ],
-      "ret": "Object"
-    }
-  },
   "/chains/{}/blocks/{}/helpers/scripts/trace_code": {
     "POST": {
       "descr": "Run a piece of code in the current context, keeping a trace",
@@ -1940,22 +1381,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/helpers/validators": {
-    "GET": {
-      "descr": "Retrieves the level, the endorsement slots and the public key hash of each delegate allowed to endorse a block.\nBy default, it provides this information for the next level.\nParameter `level` can be used to specify the (valid) level(s) in the past or future at which the endorsement rights have to be returned. Parameter `delegate` can be used to restrict the results to the given delegates.\n",
-      "args": [
-        {
-          "name": "level",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "delegate",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    }
-  },
   "/chains/{}/blocks/{}/live_blocks": {
     "GET": {
       "descr": "List the ancestors of the given block which, if referred to as the branch in an operation header, are recent enough for that operation to be included in the current block.",
@@ -1974,6 +1399,22 @@ rpc_docs = {
     "GET": {
       "descr": "Hash of the metadata associated to the block. This is only set on blocks starting from environment V1.",
       "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/minimal_valid_time": {
+    "GET": {
+      "descr": "Minimal valid time for a block given a priority and an endorsing power.",
+      "args": [
+        {
+          "name": "priority",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "endorsing_power",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
       "ret": "Object"
     }
   },
@@ -2038,12 +1479,7 @@ rpc_docs = {
   "/chains/{}/blocks/{}/operations": {
     "GET": {
       "descr": "All the operations included in the block.",
-      "args": [
-        {
-          "name": "force_metadata",
-          "descr": "Forces to recompute the operations metadata if it was considered as too large."
-        }
-      ],
+      "args": [],
       "ret": "Array"
     },
     "item": {
@@ -2054,12 +1490,7 @@ rpc_docs = {
   "/chains/{}/blocks/{}/operations/{}": {
     "GET": {
       "descr": "All the operations included in `n-th` validation pass of the block.",
-      "args": [
-        {
-          "name": "force_metadata",
-          "descr": "Forces to recompute the operations metadata if it was considered as too large."
-        }
-      ],
+      "args": [],
       "ret": "Array"
     },
     "item": {
@@ -2070,12 +1501,7 @@ rpc_docs = {
   "/chains/{}/blocks/{}/operations/{}/{}": {
     "GET": {
       "descr": "The `m-th` operation in the `n-th` validation pass of the block.",
-      "args": [
-        {
-          "name": "force_metadata",
-          "descr": "Forces to recompute the operations metadata if it was considered as too large."
-        }
-      ],
+      "args": [],
       "ret": "Object"
     }
   },
@@ -2093,11 +1519,24 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/required_endorsements": {
+    "GET": {
+      "descr": "Minimum number of endorsements for a block to be valid, given a delay of the block's timestamp with respect to the minimum time to bake at the block's priority",
+      "args": [
+        {
+          "name": "block_delay",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
   "/chains/{}/blocks/{}/votes": {
     "props": [
       "ballot_list",
       "ballots",
       "current_period",
+      "current_period_kind",
       "current_proposal",
       "current_quorum",
       "listings",
@@ -2127,6 +1566,13 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/votes/current_period_kind": {
+    "GET": {
+      "descr": "Current period kind. This RPC is DEPRECATED: use `..<block_id>/votes/current_period` RPC instead.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/votes/current_proposal": {
     "GET": {
       "descr": "Current proposal under evaluation.",
@@ -2143,7 +1589,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/votes/listings": {
     "GET": {
-      "descr": "List of delegates with their voting power.",
+      "descr": "List of delegates with their voting weight, in number of rolls.",
       "args": [],
       "ret": "Array"
     }
@@ -2157,16 +1603,16 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/votes/successor_period": {
     "GET": {
-      "descr": "Returns the voting period (index, kind, starting position) and related information (position, remaining) of the next block.Useful to craft operations that will be valid in the next block.",
+      "descr": "Returns the voting period (index, kind, starting position) and related information (position, remaining) of the next block.",
       "args": [],
       "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/votes/total_voting_power": {
     "GET": {
-      "descr": "Total voting power in the voting listings.",
+      "descr": "Total number of rolls for the delegates in the voting listings.",
       "args": [],
-      "ret": "String"
+      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json": {
@@ -2181,49 +1627,21 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "active_delegate_with_one_roll",
+      "active_delegates_with_rolls",
       "big_maps",
-      "block_round",
+      "block_priority",
       "commitments",
       "contracts",
       "cycle",
       "delegates",
-      "endorsement_branch",
-      "first_level_of_Tenderbake",
-      "first_level_of_protocol",
-      "global_constant",
-      "grand_parent_branch",
-      "last_snapshot",
-      "liquidity_baking_cpmm_address",
-      "liquidity_baking_escape_ema",
-      "pending_migration_balance_updates",
-      "pending_migration_operation_results",
+      "delegates_with_frozen_balance",
       "ramp_up",
+      "rolls",
       "sapling",
-      "sc_rollup",
-      "staking_balance",
-      "ticket_balance",
-      "tx_rollup",
       "votes"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "current",
-      "snapshot"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/current": {
+  "/chains/{}/blocks/{}/context/raw/json/active_delegates_with_rolls": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2239,7 +1657,7 @@ rpc_docs = {
       "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/current/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/active_delegates_with_rolls/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2248,51 +1666,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/snapshot": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "int",
-      "descr": "\u00af\\_(\u30c4)_/\u00af"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/snapshot/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/snapshot/{}/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
+      "ret": "Boolean"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/big_maps": {
@@ -2394,7 +1768,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/big_maps/index/{}/value_type": {
@@ -2421,7 +1795,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/block_round": {
+  "/chains/{}/blocks/{}/context/raw/json/block_priority": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2486,7 +1860,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/contracts/index": {
@@ -2518,20 +1892,18 @@ rpc_docs = {
     },
     "props": [
       "balance",
-      "bond_id_index",
+      "change",
       "code",
       "counter",
       "delegate",
       "delegate_desactivation",
       "delegated",
-      "frozen_deposits",
-      "frozen_deposits_limit",
+      "frozen_balance",
       "inactive_delegate",
       "manager",
-      "missed_endorsements",
       "paid_bytes",
+      "roll_list",
       "storage",
-      "total_frozen_bonds",
       "used_bytes"
     ]
   },
@@ -2547,38 +1919,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/bond_id_index": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "bond_id",
-      "descr": "A bond identifier."
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/bond_id_index/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "frozen_bonds"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/bond_id_index/{}/frozen_bonds": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/change": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2611,7 +1952,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/delegate": {
@@ -2666,7 +2007,40 @@ rpc_docs = {
       "ret": "Boolean"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_deposits": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "deposits",
+      "fees",
+      "rewards"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}/deposits": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2678,7 +2052,19 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_deposits_limit": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}/fees": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_balance/{}/rewards": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2714,18 +2100,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/missed_endorsements": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
   "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/paid_bytes": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
@@ -2735,10 +2109,10 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/storage": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/roll_list": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2747,10 +2121,10 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
+      "ret": "Integer"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/total_frozen_bonds": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/storage": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2771,7 +2145,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/cycle": {
@@ -2802,15 +2176,13 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "delegate_sampler_state",
+      "last_roll",
       "nonces",
       "random_seed",
-      "selected_stake_distribution",
-      "slashed_deposits",
-      "total_active_stake"
+      "roll_snapshot"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/delegate_sampler_state": {
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/last_roll": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2819,7 +2191,23 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
+      "ret": "Array"
+    },
+    "item": {
+      "name": "int",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/last_roll/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/cycle/{}/nonces": {
@@ -2862,7 +2250,7 @@ rpc_docs = {
       "ret": "String"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/selected_stake_distribution": {
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/roll_snapshot": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2871,63 +2259,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Array"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/slashed_deposits": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/slashed_deposits/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/slashed_deposits/{}/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/total_active_stake": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
+      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/delegates": {
@@ -2958,43 +2290,7 @@ rpc_docs = {
       "ret": "Boolean"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/endorsement_branch": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/first_level_of_Tenderbake": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/first_level_of_protocol": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/global_constant": {
+  "/chains/{}/blocks/{}/context/raw/json/delegates_with_frozen_balance": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3006,71 +2302,11 @@ rpc_docs = {
       "ret": "Array"
     },
     "item": {
-      "name": "script_expr",
-      "descr": "script_expr (Base58Check-encoded)"
+      "name": "block_cycle",
+      "descr": "A cycle integer"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/global_constant/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/grand_parent_branch": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/last_snapshot": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/liquidity_baking_cpmm_address": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/liquidity_baking_escape_ema": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/pending_migration_balance_updates": {
+  "/chains/{}/blocks/{}/context/raw/json/delegates_with_frozen_balance/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3080,9 +2316,13 @@ rpc_docs = {
         }
       ],
       "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/pending_migration_operation_results": {
+  "/chains/{}/blocks/{}/context/raw/json/delegates_with_frozen_balance/{}/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3091,7 +2331,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Array"
+      "ret": "Boolean"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/ramp_up": {
@@ -3106,8 +2346,37 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
+      "deposits",
       "rewards"
     ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up/deposits": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/ramp_up/deposits/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
   },
   "/chains/{}/blocks/{}/context/raw/json/ramp_up/rewards": {
     "GET": {
@@ -3126,6 +2395,195 @@ rpc_docs = {
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/ramp_up/rewards/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "index",
+      "limbo",
+      "next",
+      "owner"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/index": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "roll",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/index/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "successor"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/index/{}/successor": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/limbo": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/next": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "current",
+      "snapshot"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/current": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "roll",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/current/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_cycle",
+      "descr": "A cycle integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "int",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "roll",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/rolls/owner/snapshot/{}/{}/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3247,7 +2705,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/commitments_size": {
@@ -3259,7 +2717,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/memo_size": {
@@ -3327,7 +2785,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/nullifiers_size": {
@@ -3339,7 +2797,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/roots": {
@@ -3367,7 +2825,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/sapling/index/{}/roots_level": {
@@ -3403,7 +2861,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/sapling/next": {
@@ -3416,559 +2874,6 @@ rpc_docs = {
         }
       ],
       "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "index"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "sc_rollup_address",
-      "descr": "A smart contract rollup address."
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "boot_sector",
-      "commitment_added",
-      "commitment_stake_count",
-      "commitments",
-      "inbox",
-      "initial_level",
-      "kind",
-      "last_cemented_commitment",
-      "staker_count",
-      "stakers"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/boot_sector": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_added": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_added/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_stake_count": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_stake_count/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitments": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitments/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/inbox": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/initial_level": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/kind": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/last_cemented_commitment": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/staker_count": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/stakers": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/stakers/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "current",
-      "snapshot"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/current": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/current/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/snapshot": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "int",
-      "descr": "\u00af\\_(\u30c4)_/\u00af"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/snapshot/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/snapshot/{}/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/ticket_balance": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "paid_bytes",
-      "table",
-      "used_bytes"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/ticket_balance/paid_bytes": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "String"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/ticket_balance/table": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "script_expr",
-      "descr": "script_expr (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/ticket_balance/table/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "String"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/ticket_balance/used_bytes": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "String"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "tx_rollup_id",
-      "descr": "A tx rollup identifier encoded in b58check."
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "bond",
-      "state",
-      "tx_level"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/bond": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/bond/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "commitment"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/bond/{}/commitment": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/state": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "commitment",
-      "inbox",
-      "withdrawals"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}/commitment": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}/inbox": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}/withdrawals": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "String"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/votes": {
@@ -3985,14 +2890,14 @@ rpc_docs = {
     "props": [
       "ballots",
       "current_period",
+      "current_period_kind",
       "current_proposal",
       "listings",
       "listings_size",
       "participation_ema",
       "pred_period_kind",
       "proposals",
-      "proposals_count",
-      "voting_power_in_listings"
+      "proposals_count"
     ]
   },
   "/chains/{}/blocks/{}/context/raw/json/votes/ballots": {
@@ -4024,6 +2929,18 @@ rpc_docs = {
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/votes/current_period": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/votes/current_period_kind": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4072,7 +2989,7 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/votes/listings_size": {
@@ -4181,18 +3098,6 @@ rpc_docs = {
         }
       ],
       "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/votes/voting_power_in_listings": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "String"
     }
   }
 }

@@ -5,6 +5,7 @@ from pytezos.michelson.micheline import Micheline
 
 
 class CodeSection(Micheline, prim='code', args_len=1):
+
     @staticmethod
     def match(code_expr) -> Type['CodeSection']:
         cls = Micheline.match(code_expr)

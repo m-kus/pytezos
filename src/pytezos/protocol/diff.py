@@ -15,7 +15,13 @@ def make_patch(a, b, filename, context_size=0):
     Get unified string diff between two strings. Trims top two lines.
     Returns empty string if strings are identical.
     """
-    diffs = difflib.unified_diff(a=a.splitlines(True), b=b.splitlines(True), fromfile=filename, tofile=filename, n=context_size)
+    diffs = difflib.unified_diff(
+        a=a.splitlines(True),
+        b=b.splitlines(True),
+        fromfile=filename,
+        tofile=filename,
+        n=context_size
+    )
     diffs = map(lambda x: x if x[-1] == '\n' else x + '\n' + _no_eol + '\n', diffs)
     return ''.join(diffs)
 
@@ -59,7 +65,7 @@ def apply_patch(source, patch, revert=False):
             if len(line) > 0:
                 if line[0] == sign or line[0] == ' ':
                     target += line[1:]
-                sl += line[0] != sign
+                sl += (line[0] != sign)
 
     target += ''.join(source[sl:])
     return target

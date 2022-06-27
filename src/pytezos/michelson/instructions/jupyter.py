@@ -82,10 +82,11 @@ class DropAllInstruction(MichelsonInstruction, prim='DROP_ALL'):
 
 
 class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
+
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         # FIXME: MichelsonProgram copypaste
-        parameter_literal, storage_literal = cls.args
+        parameter_literal, storage_literal = cls.args  # type: ignore
 
         parameter_type_expr = context.get_parameter_expr()
         storage_type_expr = context.get_storage_expr()
@@ -109,6 +110,7 @@ class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
 
 
 class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
+
     def __init__(self, lazy_diff: List[Dict[str, str]], result, stack_items_added: int = 0) -> None:
         super().__init__(stack_items_added)
         self.lazy_diff = lazy_diff
@@ -124,7 +126,10 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
             raise Exception(f'Stack is not empty: {stack}')
         res.assert_type_equal(
             PairType.create_type(
-                args=[ListType.create_type(args=[OperationType]), StorageSection.match(context.get_storage_expr()).args[0]],
+                args=[
+                    ListType.create_type(args=[OperationType]),
+                    StorageSection.match(context.get_storage_expr()).args[0]
+                ],
             ),
             message='list of operations + resulting storage',
         )
@@ -139,6 +144,7 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
 
 
 class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
+
     def __init__(self, lazy_diff: List[Dict[str, str]], result, stack_items_added: int = 0) -> None:
         super().__init__(stack_items_added)
         self.lazy_diff = lazy_diff
@@ -149,7 +155,7 @@ class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
         from pytezos.michelson.program import MichelsonProgram
 
         stack.clear()
-        entrypoint, parameter_literal, storage_literal = cls.args
+        entrypoint, parameter_literal, storage_literal = cls.args  # type: ignore
         entrypoint_str = entrypoint.get_string()  # type: ignore
 
         parameter = parameter_literal.as_micheline_expr()

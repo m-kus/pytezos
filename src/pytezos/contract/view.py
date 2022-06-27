@@ -241,7 +241,7 @@ class ContractViewCall(ContextMixin):
         if error:
             logger.debug('\n'.join(stdout))
             raise error
-        return storage
+        return storage  # type: ignore
 
     def onchain_view(self, storage=None, balance=None, view_results: Optional[Dict[str, Any]] = None):
         """Get return value of an on-chain view.
@@ -264,4 +264,4 @@ class ContractViewCall(ContextMixin):
         if error:
             logger.debug('\n'.join(stdout))
             raise error
-        return ret
+        return ret  # type: ignore
