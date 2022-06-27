@@ -39,7 +39,7 @@ isort:             ## Format with isort
 	poetry run isort src tests scripts
 
 black:             ## Format with black
-	poetry run black src tests scripts --exclude ".*/docs.py"
+	poetry run black src tests scripts --exclude ".*/docs.|.*tests/integration_tests.*|.*tests/unit_tests.*"
 
 flake:             ## Lint with flake8
 	poetry run flakeheaven lint src tests scripts || true
@@ -102,7 +102,7 @@ update-contracts:  ## Update contract tests
 
 	poetry run python scripts/fetch_contract_data.py KT1Tr2eG3eVmPRbymrbU2UppUmKjFPXomGG9 dexter_usdtz_xtz
 	poetry run python scripts/fetch_contract_data.py KT1SWHFFrgtRJF7LecghRCA9sPWqUyURHUUW ""
-	poetry run python scripts/fetch_contract_data.py
+	# poetry run python scripts/fetch_contract_data.py
 
 	poetry run python scripts/generate_contract_tests.py
 	poetry run pytest -v tests/contract_tests
