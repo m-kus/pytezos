@@ -39,7 +39,7 @@ isort:             ## Format with isort
 	poetry run isort src tests scripts
 
 black:             ## Format with black
-	poetry run black src tests scripts --exclude ".*/docs.|.*tests/integration_tests.*|.*tests/unit_tests.*"
+	# poetry run black src tests scripts --exclude ".*/docs.py"
 
 flake:             ## Lint with flake8
 	poetry run flakeheaven lint src tests scripts || true
