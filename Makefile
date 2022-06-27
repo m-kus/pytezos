@@ -1,17 +1,90 @@
 .ONESHELL:
-.PHONY: docs
-.DEFAULT_GOAL: all
+.PHONY: $(MAKECMDGOALS)
+##
+##    🚧 PyTezos developer tools
+##
+## DEV=1                Whether to install dev dependencies
+DEV=1
+## TAG=latest           Tag for the `image` command
+TAG=latest
 
+##
 
-LINT_TARGETS ?= \
-	src \
-	scripts \
+help:              ## Show this help (default)
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-DEV ?= 1
+all:               ## Run a whole CI pipeline: lint, run tests, build docs
+	make install lint test docs
 
-all: install lint test cover
+install:           ## Install project dependencies
+	poetry install \
+	`if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
 
-update:
+lint:              ## Lint with all tools
+	make isort black flake mypy
+
+test:              ## Run test suite
+	poetry run pytest --cov-report=term-missing --cov=dipdup --cov-report=xml -n auto --dist loadscope -s -v tests
+
+docs: 			   ## Build docs
+	make kernel-docs rpc-docs
+	cd docs && rm -r build && poetry run make html && cd ..
+
+##
+
+isort:             ## Format with isort
+	poetry run isort src tests scripts
+
+black:             ## Format with black
+	poetry run black src tests scripts
+
+flake:             ## Lint with flake8
+	poetry run flakeheaven lint src tests scripts || true
+
+mypy:              ## Lint with mypy
+	poetry run mypy src scripts  # tests
+
+cover:             ## Print coverage for the current branch
+	poetry run diff-cover --compare-branch `git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'` coverage.xml
+
+build:             ## Build Python wheel package
+	poetry build
+
+image:             ## Build Docker image
+	docker buildx build . -t pytezos:${TAG}
+
+release-patch:     ## Release patch version
+	bumpversion patch
+	git push --tags
+	git push
+
+release-minor:     ## Release minor version
+	bumpversion minor
+	git push --tags
+	git push
+
+release-major:     ## Release major version
+	bumpversion major
+	git push --tags
+	git push
+
+clean:             ## Remove all files from .gitignore except for `.venv`
+	git clean -xdf --exclude=".venv"
+
+##
+
+install-kernel:    ## Install Michelson IPython kernel
+	poetry run michelson-kernel install
+
+remove-kernel:     ## Remove Michelson IPython kernel
+	jupyter kernelspec uninstall michelson -f
+
+notebook:          ## Run Jupyter notebook
+	poetry run jupyter notebook
+
+##
+
+update-tzips:      ## Update TZIP-16 schema and tests
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/metadata-schema.json -O src/pytezos/contract/metadata-schema.json
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/examples/example-000.json -O tests/unit_tests/test_contract/metadata/example-000.json
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/examples/example-001.json -O tests/unit_tests/test_contract/metadata/example-001.json
@@ -20,78 +93,13 @@ update:
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/examples/example-004.json -O tests/unit_tests/test_contract/metadata/example-004.json
 	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-16/examples/example-005.json -O tests/unit_tests/test_contract/metadata/example-005.json
 
-	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-21/metadata-schema.json -O src/pytezos/contract/token_metadata-schema.json
-	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-21/examples/example-000-base.json -O tests/unit_tests/test_contract/token_metadata/example-000-base.json
-	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-21/examples/example-010-fungible-tz21.json -O tests/unit_tests/test_contract/token_metadata/example-010-fungible-tz21.json
-	wget https://gitlab.com/tzip/tzip/-/raw/master/proposals/tzip-21/examples/example-020-digital-collectible.json -O tests/unit_tests/test_contract/token_metadata/example-020-digital-collectible.json
-
-
-install:
-	git submodule update --init  || true
-	poetry install `if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
-
-install-kernel:
-	poetry run python -m michelson_kernel install
-
-remove-kernel:
-	jupyter kernelspec uninstall michelson -f
-
-notebook:
-	PYTHONPATH="$$PYTHONPATH:src" poetry run jupyter notebook
-
-debug:
-	pip install . --force --no-deps
-
-isort:
-	poetry run isort ${LINT_TARGETS}
-
-black:
-	poetry run black ${LINT_TARGETS}
-
-pylint:
-	poetry run pylint ${LINT_TARGETS} || poetry run pylint-exit $$?
-
-mypy:
-	poetry run mypy ${LINT_TARGETS}
-
-lint: isort black pylint mypy
-
-test:
-	poetry run pytest --cov-report=term-missing --cov=pytezos --cov=michelson_kernel --cov-report=xml tests
-
-cover:
-	poetry run diff-cover coverage.xml
-
-build:
-	poetry build
-
-image:
-	docker build . -t bakingbad/pytezos:latest
-
-docs:
-	poetry run sh -c "cd docs && rm -rf ./build && $(MAKE) html && cd .."
-
-kernel-docs:
-	poetry run python scripts/gen_kernel_docs_py.py
-
-rpc-docs:
-	poetry run python scripts/fetch_docs.py
-
-release-patch:
-	bumpversion patch
-	git push --tags
-	git push
-
-release-minor:
-	bumpversion minor
-	git push --tags
-	git push
-
-release-major:
-	bumpversion major
-	git push --tags
-	git push
-
-update-contract-tests:
+update-contracts:  ## Update contract tests
+	rm -r tests/contract_tests/KT1* || true
 	poetry run python scripts/fetch_contract_data.py
-	poetry run python scripts/generatecontract_tests.py
+	poetry run python scripts/generate_contract_tests.py
+
+kernel-docs:       ## Build docs for Michelson IPython kernel
+	poetry run python scripts/gen_kernel_docs.py
+
+rpc-docs:          ## Build docs for Tezos node RPC
+	poetry run python scripts/fetch_rpc_docs.py

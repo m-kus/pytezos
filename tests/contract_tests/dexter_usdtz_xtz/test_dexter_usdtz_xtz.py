@@ -1,19 +1,18 @@
-from unittest import TestCase
-from os.path import dirname, join
 import json
+from os.path import dirname, join
+from unittest import TestCase
 
-from pytezos.michelson.micheline import get_script_section
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.format import micheline_to_michelson
-from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import get_script_section
+from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.program import MichelsonProgram
+from pytezos.michelson.types.base import MichelsonType
 
 folder = 'dexter_usdtz_xtz'
 
 
 class MainnetContractTestCaseDEXTER_USDTZ_XTZ(TestCase):
-
     @classmethod
     def setUpClass(cls):
         with open(join(dirname(__file__), f'', '__script__.json')) as f:
@@ -30,10 +29,7 @@ class MainnetContractTestCaseDEXTER_USDTZ_XTZ(TestCase):
 
     def test_parameter_type_dexter_usdtz_xtz(self):
         type_expr = self.program.parameter.as_micheline_expr()
-        self.assertEqual(
-            get_script_section(self.script, name='parameter'),
-            type_expr,
-            'micheline -> type -> micheline')
+        self.assertEqual(get_script_section(self.script, name='parameter'), type_expr, 'micheline -> type -> micheline')
 
     def test_entrypoints_dexter_usdtz_xtz(self):
         ep_types = self.program.parameter.list_entrypoints()
@@ -45,10 +41,7 @@ class MainnetContractTestCaseDEXTER_USDTZ_XTZ(TestCase):
 
     def test_storage_type_dexter_usdtz_xtz(self):
         type_expr = self.program.storage.as_micheline_expr()
-        self.assertEqual(
-            get_script_section(self.script, name='storage'),
-            type_expr,
-            'micheline -> type -> micheline')
+        self.assertEqual(get_script_section(self.script, name='storage'), type_expr, 'micheline -> type -> micheline')
 
     def test_storage_encoding_dexter_usdtz_xtz(self):
         val = self.program.storage.from_micheline_value(self.script['storage'])

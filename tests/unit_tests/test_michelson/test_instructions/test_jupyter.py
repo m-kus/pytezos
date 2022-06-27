@@ -3,14 +3,13 @@ from unittest.mock import Mock, patch
 
 from pytezos import ContractInterface
 from pytezos.context.impl import ExecutionContext
-
-from pytezos.michelson.sections import ParameterSection, StorageSection
-from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
+from pytezos.michelson.sections import ParameterSection, StorageSection
+from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import IntType, UnitType
-from pytezos.rpc import ShellQuery, RpcNode
+from pytezos.rpc import RpcNode, ShellQuery
 
 
 class JupyterInstructionsTest(TestCase):

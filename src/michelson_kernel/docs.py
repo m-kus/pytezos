@@ -145,7 +145,7 @@ docs = {
     'NEG :: bls12_381_fr : A => bls12_381_fr : A\n'
     'Negate a numerical value',
     'NEQ': 'NEQ\nNEQ :: int : A => bool : A\nCheck that the top of the stack is not equal to zero',
-    'NEVER': 'NEVER\nNEVER :: never : A => B\nClose an absurd branch',
+    'NEVER': 'NEVER\nNEVER :: never : A => B\nClose a forbidden branch',
     'NIL': 'NIL ty\nNIL ty :: A => list ty : A\nPush an empty list',
     'NONE': 'NONE ty\nNONE ty :: A => option ty : A\nPush the absent optional value',
     'NOOP': '{}\n{} :: A => A\nEmpty instruction sequence',

@@ -1,16 +1,15 @@
-from unittest import TestCase
-from os.path import dirname, join
 import json
+from os.path import dirname, join
+from unittest import TestCase
 
-from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.program import MichelsonProgram
 
 folder = 'dexter_usdtz_xtz'
 entrypoint = 'removeLiquidity'
 
 
 class MainnetOperationTestCaseDEXTER_USDTZ_XTZ(TestCase):
-
     @classmethod
     def setUpClass(cls):
         with open(join(dirname(__file__), f'', '__script__.json')) as f:

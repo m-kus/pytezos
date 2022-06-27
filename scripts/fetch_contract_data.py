@@ -1,14 +1,13 @@
 """Fetch contract data for tests from BCD and TzKT APIs"""
-from contextlib import suppress
 import json
 import logging
+from contextlib import suppress
 from os import makedirs
 from os.path import dirname, exists, join
 from typing import Any, Dict, List, Optional
 
 import requests
 from requests import JSONDecodeError
-
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

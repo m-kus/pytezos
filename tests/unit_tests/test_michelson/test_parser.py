@@ -1,11 +1,10 @@
 from unittest import TestCase
 
-from pytezos.michelson.types import TimestampType
 from pytezos.michelson.parse import MichelsonParser
+from pytezos.michelson.types import TimestampType
 
 
 class TestParsing(TestCase):
-
     def test_wrapped_expr(self):
         p = MichelsonParser()
         p.parse('(Pair 1 2)')

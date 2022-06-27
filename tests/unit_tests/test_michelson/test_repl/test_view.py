@@ -73,7 +73,6 @@ TEST_VIEW_JSON = """
 
 
 class OffchainViewTest(TestCase):
-
     def test_view_return_type_regression_251(self) -> None:
         # Need to mock the shell for unit testing. Configuring it to always return a simple
         # value for the contract's current storage state

@@ -4,7 +4,6 @@ from pytezos import pytezos
 
 
 class TestRegression(TestCase):
-
     def test_tzbtc_get_balance_view(self):
         tzbtc = pytezos.using('mainnet').contract('KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn')
         res = tzbtc.getBalance(owner='tz1QwZgNgPc3fFCCNLbrmjfB3Czms4qaobyA', contract_1=None).view()
