@@ -6,7 +6,8 @@ DEFAULT_CONSTANTS = dict(
     hard_gas_limit_per_operation=1040000,
     hard_storage_limit_per_operation=60000,
 )
-DEFAULT_TRANSACTION_GAS_LIMIT = 1450
+# FIXME: Guessed for sandbox tests to pass
+DEFAULT_TRANSACTION_GAS_LIMIT = 1451
 DEFAULT_TRANSACTION_STORAGE_LIMIT = 257
 MINIMAL_FEES = 100
 MINIMAL_MUTEZ_PER_BYTE = 1
