@@ -1,0 +1,6 @@
+parameter unit ;
+storage unit ;
+code {};
+view "transfer_tokens" unit unit {
+    PUSH mutez 0 ; UNIT ; TRANSFER_TOKENS;
+};

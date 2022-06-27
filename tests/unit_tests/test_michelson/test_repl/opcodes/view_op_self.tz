@@ -1,0 +1,6 @@
+parameter unit ;
+storage unit ;
+code {};
+view "self" unit unit {
+    SELF;
+};

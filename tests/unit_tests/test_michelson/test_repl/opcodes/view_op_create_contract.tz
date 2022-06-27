@@ -1,0 +1,9 @@
+parameter unit ;
+storage unit ;
+code {};
+view "create_contract" unit unit {
+    CREATE_CONTRACT
+            {parameter string ;
+            storage (big_map string nat) ;
+            code { UNPAIR ; DROP ; NIL operation ; PAIR }} ;
+};

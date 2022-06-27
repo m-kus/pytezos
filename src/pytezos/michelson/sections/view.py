@@ -29,6 +29,13 @@ class ViewSection(Micheline, prim='view', args_len=4):
             raise MichelsonRuntimeError('view', *e.args) from e
         return cls
 
+    @staticmethod
+    def check_code(code: Type['Micheline']) -> None:
+        if code.prim in ('CREATE_CONTRACT', 'SET_DELEGATE', 'TRANSFER_TOKENS', 'SELF'):
+            raise MichelsonRuntimeError('view', f'{code.prim} is not allowed in views')
+        for arg in getattr(code, 'args', ()):
+            ViewSection.check_code(arg)
+
     @classmethod
     def create_type(cls,
                     args: List[Union[Type['Micheline'], Any]],
@@ -41,6 +48,8 @@ class ViewSection(Micheline, prim='view', args_len=4):
         if len(name) >= 32:
             # TODO: also check for denied symbols
             raise MichelsonRuntimeError('view', f'Too long view name {view_name}')
+
+        cls.check_code(args[3])
 
         res = type(cls.__name__, (cls,), dict(args=args, name=name, **kwargs))
         return cast(Type['ViewSection'], res)

@@ -159,7 +159,6 @@ class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
 
 
 class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         sequence = cast(MichelineSequence, cls.args[0])
@@ -264,7 +263,6 @@ class LevelInstruction(MichelsonInstruction, prim='LEVEL'):
 
 
 class ViewInstruction(MichelsonInstruction, prim='VIEW', args_len=2):
-
     @classmethod
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         input_value, view_address = cast(Tuple[MichelsonType, AddressType], stack.pop2())

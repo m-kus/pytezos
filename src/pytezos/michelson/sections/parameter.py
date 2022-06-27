@@ -34,7 +34,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
                     args: List[Union[Type['Micheline'], Any]],
                     annots: Optional[list] = None,
                     **kwargs) -> Type['ParameterSection']:
-        assert not annots, 'top level annotations are not supported'
+        assert not annots, 'top level parameter annotations not supported'
         root_name = parse_name(annots, prefix='%')  # type: ignore
         root_type = cast(Type[MichelsonType], args[0])
         if issubclass(root_type, OrType):

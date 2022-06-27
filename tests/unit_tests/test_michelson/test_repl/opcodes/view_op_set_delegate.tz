@@ -1,0 +1,6 @@
+parameter unit ;
+storage unit ;
+code {};
+view "set_delegate" unit unit {
+    SET_DELEGATE;
+};
