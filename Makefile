@@ -24,7 +24,7 @@ lint:              ## Lint with all tools
 	make isort black flake mypy
 
 test:              ## Run test suite
-	poetry run pytest --cov-report=term-missing --cov=dipdup --cov-report=xml -n auto --dist loadscope -s -v tests
+	poetry run sh -c "pytest --cov-report=term-missing --cov=pytezos --cov=michelson_kernel --cov-report=xml -n auto -s -v tests/contract_tests tests/integration_tests tests/unit_tests && pytest -v tests/sandbox_tests"
 
 docs: 			   ## Build docs
 	make kernel-docs rpc-docs
