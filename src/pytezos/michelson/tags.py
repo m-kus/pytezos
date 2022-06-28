@@ -132,7 +132,7 @@ prim_tags = {
     'bls12_381_g2': b'\x81',
     'bls12_381_fr': b'\x82',
     'sapling_state': b'\x83',
-    'sapling_transaction': b'\x84',
+    'sapling_transaction_deprecated': b'\x84',
     'SAPLING_EMPTY_STATE': b'\x85',
     'SAPLING_VERIFY_UPDATE': b'\x86',
     'ticket': b'\x87',
@@ -154,6 +154,7 @@ prim_tags = {
     # FIXME: Check tags are valid
     'tx_rollup_l2_address': b'\x94',
     'MIN_BLOCK_TIME': b'\x95',
+    'sapling_transaction': b'\x96',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',

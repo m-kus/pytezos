@@ -10,6 +10,10 @@ class SaplingTransactionType(MichelsonType, prim='sapling_transaction', args_len
     pass
 
 
+class SaplingTransactionDeprecatedType(MichelsonType, prim='sapling_transaction_deprecated', args_len=1):
+    pass
+
+
 class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
 
     def __init__(self, ptr: Optional[int] = None):
