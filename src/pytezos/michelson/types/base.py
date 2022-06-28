@@ -44,8 +44,8 @@ class undefined:
 Undefined = undefined()
 
 
-def parse_name(annots: List[str], prefix: str) -> Optional[str]:
-    if annots is None:
+def parse_name(annots: Optional[List[str]], prefix: str) -> Optional[str]:
+    if not annots:
         return None
     sub_annots = [x[1:] for x in annots if x.startswith(prefix)]
     assert len(sub_annots) <= 1, f'multiple "{prefix}" annotations are not allowed: {sub_annots}'

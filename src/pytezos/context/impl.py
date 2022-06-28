@@ -398,7 +398,7 @@ class ExecutionContext(AbstractContext):
         else:
             return base58_encode(b'\x00' * 20, b'KT1').decode()
 
-    def get_dummy_l2_address(self) -> str:
+    def get_dummy_txr_address(self) -> str:
         if self.key:
             return self.key.public_key_hash()
         else:

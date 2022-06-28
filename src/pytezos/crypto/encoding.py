@@ -248,7 +248,7 @@ def is_address(v: Union[str, bytes]) -> bool:
     address = v.split('%')[0]
     return is_kt(address) or is_pkh(address)
 
-def is_l2_address(v: Union[str, bytes]) -> bool:
+def is_txr_address(v: Union[str, bytes]) -> bool:
     """ Check if value is a txr1 address
     """
     if isinstance(v, bytes):

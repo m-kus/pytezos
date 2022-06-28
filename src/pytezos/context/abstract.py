@@ -201,7 +201,7 @@ class AbstractContext:
     def get_dummy_address(self) -> str:
         raise NotImplementedError
 
-    def get_dummy_l2_address(self) -> str:
+    def get_dummy_txr_address(self) -> str:
         raise NotImplementedError
 
     def get_dummy_public_key(self) -> str:

@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Type, cast
 
 from pytezos.context.abstract import AbstractContext, get_originated_address
-from pytezos.crypto.encoding import base58_decode, is_address, is_chain_id, is_kt, is_l2_address, is_pkh, is_public_key, is_sig
+from pytezos.crypto.encoding import base58_decode, is_address, is_chain_id, is_kt, is_txr_address, is_pkh, is_public_key, is_sig
 from pytezos.michelson.forge import (forge_address, forge_base58, forge_contract, forge_public_key, optimize_timestamp, unforge_address,
                                      unforge_chain_id, unforge_contract, unforge_public_key, unforge_signature)
 from pytezos.michelson.format import format_timestamp, micheline_to_michelson
@@ -121,12 +121,12 @@ class AddressType(StringType, prim='address'):
         return self.value
 
 
-class L2AddressType(StringType, prim='tx_rollup_l2_address'):
+class TXRAddress(StringType, prim='tx_rollup_l2_address'):
 
     def __repr__(self):
         return f'{self.value[:6]}…{self.value[-3:]}'
 
-    def __lt__(self, other: 'L2AddressType') -> bool:  # type: ignore
+    def __lt__(self, other: 'TXRAddress') -> bool:  # type: ignore
         if is_kt(other.value):
             return True
         elif is_pkh(other.value):
@@ -135,18 +135,18 @@ class L2AddressType(StringType, prim='tx_rollup_l2_address'):
             return self.value < other.value
 
     @classmethod
-    def dummy(cls, context: AbstractContext) -> 'L2AddressType':
-        return cls.from_value(context.get_dummy_l2_address())
+    def dummy(cls, context: AbstractContext) -> 'TXRAddress':
+        return cls.from_value(context.get_dummy_txr_address())
 
     @classmethod
-    def from_value(cls, value: str) -> 'L2AddressType':
+    def from_value(cls, value: str) -> 'TXRAddress':
         if value.endswith('%default'):
             value = value.split('%')[0]
-        assert is_l2_address(value), f'expected txr1 address, got {value}'
+        assert is_txr_address(value), f'expected txr1 address, got {value}'
         return cls(value)
 
     @classmethod
-    def from_micheline_value(cls, val_expr) -> 'L2AddressType':
+    def from_micheline_value(cls, val_expr) -> 'TXRAddress':
         value = parse_micheline_literal(val_expr, {
             'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
             'string': lambda x: x
@@ -154,7 +154,7 @@ class L2AddressType(StringType, prim='tx_rollup_l2_address'):
         return cls.from_value(value)
 
     @classmethod
-    def from_python_object(cls, py_obj) -> 'L2AddressType':
+    def from_python_object(cls, py_obj) -> 'TXRAddress':
         return cls.from_value(py_obj)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
