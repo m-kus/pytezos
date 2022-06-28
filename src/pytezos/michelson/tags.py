@@ -151,7 +151,6 @@ prim_tags = {
     # ITHACA
     'SUB_MUTEZ': b'\x93',
     # JAKARTA
-    # FIXME: Check tags are valid
     'tx_rollup_l2_address': b'\x94',
     'MIN_BLOCK_TIME': b'\x95',
     'sapling_transaction': b'\x96',
