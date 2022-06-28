@@ -1,0 +1,11 @@
+parameter unit ;
+storage unit ;
+code {
+    DROP ;
+    PUSH unit Unit ;
+    NIL operation ;
+    PAIR ;
+};
+view "set_delegate_lambda" unit unit {
+    LAMBDA unit unit { SET_DELEGATE; };
+};

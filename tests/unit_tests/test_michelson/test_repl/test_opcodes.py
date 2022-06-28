@@ -1084,7 +1084,14 @@ class OpcodesTestCase(TestCase):
             f'(Pair "{SIGNATURE}" "hello")',
             '"edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav"',
             f'(Pair "{SIGNATURE}" "hello")'
-        )
+        ),
+        # Test view with SET_DELEGATE in lambda (forbidden otherwise)
+        (
+            'view_op_set_delegate_lambda.tz',
+            'Unit',
+            'Unit',
+            'Unit',
+        ),
     ])
     def test_opcodes(self, filename, storage, parameter, result):
         with open(join(dirname(__file__), 'opcodes', filename)) as f:
