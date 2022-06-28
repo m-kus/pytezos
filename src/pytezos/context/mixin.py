@@ -10,8 +10,8 @@ from pytezos.rpc.errors import RpcError
 
 # NOTE: Built-in key for PyTezos client, please, use responsibly.
 default_network = 'jakartanet'
-default_key = 'edskSBRJRoNMFca9WccBrFha1mborT9FcjLKC8Txz4BGdsofMQsop6k2SudSD3JpNNhUPyeLzdiDKXx9nqGoqu8shCTJ4aHwK3'
-default_key_hash = 'tz1NsNzkNeCLhknuZzQQtMLRrA7Q6AidQm1n'
+default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'
+default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 
 # NOTE: For flextesa sandbox
 alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
