@@ -126,19 +126,17 @@ class L2AddressType(StringType, prim='tx_rollup_l2_address'):
     def __repr__(self):
         return f'{self.value[:6]}…{self.value[-3:]}'
 
-    # FIXME: Adapt to new type
-    # def __lt__(self, other: 'L2AddressType') -> bool:  # type: ignore
-    #     if is_pkh(self.value) and is_kt(other.value):
-    #         return True
-    #     elif is_kt(self.value) and is_pkh(other.value):
-    #         return False
-    #     else:
-    #         return self.value < other.value
+    def __lt__(self, other: 'L2AddressType') -> bool:  # type: ignore
+        if is_kt(other.value):
+            return True
+        elif is_pkh(other.value):
+            return False
+        else:
+            return self.value < other.value
 
-    # FIXME: Adapt to new type
-    # @classmethod
-    # def dummy(cls, context: AbstractContext) -> 'L2AddressType':
-    #     return cls.from_value(context.get_dummy_address())
+    @classmethod
+    def dummy(cls, context: AbstractContext) -> 'L2AddressType':
+        return cls.from_value(context.get_dummy_l2_address())
 
     @classmethod
     def from_value(cls, value: str) -> 'L2AddressType':
