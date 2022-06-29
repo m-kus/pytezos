@@ -99,19 +99,32 @@ class MapType(MichelsonType, prim='map', args_len=2):
 
     def to_literal(self) -> Type[Micheline]:
         return MichelineSequence.create_type(
-            args=[EltLiteral.create_type(args=[k.to_literal(), v.to_literal()]) for k, v in self.items]
+            args=[
+                EltLiteral.create_type(
+                    args=[
+                        k.to_literal(),
+                        v.to_literal(),
+                    ]
+                )
+                for k, v in self.items
+            ]
         )
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         return [
-            {'prim': 'Elt', 'args': [x.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for x in elt]} for elt in self
+            {
+                'prim': 'Elt',
+                'args': [x.to_micheline_value(mode=mode, lazy_diff=lazy_diff) for x in elt],
+            }
+            for elt in self
         ]
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> dict:
         assert not comparable, f'{self.prim} is not comparable'
         return {
             k.to_python_object(try_unpack=try_unpack, comparable=True): v.to_python_object(
-                try_unpack=try_unpack, lazy_diff=lazy_diff
+                try_unpack=try_unpack,
+                lazy_diff=lazy_diff,
             )
             for k, v in self.items
         }

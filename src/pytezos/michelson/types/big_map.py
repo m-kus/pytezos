@@ -94,7 +94,15 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             return MichelineLiteral.create(self.ptr)
         else:
             return MichelineSequence.create_type(
-                args=[EltLiteral.create_type(args=[k.to_literal(), v.to_literal()]) for k, v in self.items]
+                args=[
+                    EltLiteral.create_type(
+                        args=[
+                            k.to_literal(),
+                            v.to_literal(),
+                        ]
+                    )
+                    for k, v in self.items
+                ]
             )
 
     def to_micheline_value(self, mode='readable', lazy_diff: Optional[bool] = False):
@@ -220,6 +228,10 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         return forge_script_expr(key.pack(legacy=True))
 
     def duplicate(self):
-        res = type(self)(items=deepcopy(self.items), ptr=self.ptr, removed_keys=deepcopy(self.removed_keys))
+        res = type(self)(
+            items=deepcopy(self.items),
+            ptr=self.ptr,
+            removed_keys=deepcopy(self.removed_keys),
+        )
         res.context = self.context
         return res
