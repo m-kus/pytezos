@@ -355,7 +355,10 @@ def sandbox(
     interval: float,
     blocks: int,
 ):
-    protocol_hash = {'hangzhou': HANGZHOU, 'ithaca': ITHACA}[protocol]
+    protocol_hash = {
+        'hangzhou': HANGZHOU,
+        'ithaca': ITHACA,
+    }[protocol]
 
     with SandboxedNodeContainer(image=image, port=port) as node:
         if not node.wait_for_connection():
@@ -443,9 +446,7 @@ def ligo_compile_contract(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-contract {contract_name} "{entry_point}"',
-            files_to_add=[
-                path,
-            ],
+            files_to_add=[path],
         )
         if not detach:
             for line in container.logs(stream=True):
@@ -474,9 +475,7 @@ def ligo_compile_storage(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-storage {path} "{entry_point}" "{expression}"',
-            files_to_add=[
-                path,
-            ],
+            files_to_add=[path],
         )
         if not detach:
             for line in container.logs(stream=True):
@@ -505,9 +504,7 @@ def ligo_invoke_contract(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-parameter {path} "{entry_point}" "{expression}"',
-            files_to_add=[
-                path,
-            ],
+            files_to_add=[path],
         )
         if not detach:
             for line in container.logs(stream=True):

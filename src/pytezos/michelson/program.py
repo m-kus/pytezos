@@ -143,7 +143,10 @@ class MichelsonProgram:
 
     @try_catch('END')
     def end(
-        self, stack: MichelsonStack, stdout: List[str], output_mode='readable'
+        self,
+        stack: MichelsonStack,
+        stdout: List[str],
+        output_mode='readable',
     ) -> Tuple[List[dict], Any, List[dict], PairType]:
         """Finish contract execution"""
         res = cast(PairType, stack.pop1())
@@ -162,7 +165,12 @@ class MichelsonProgram:
         return operations, storage, lazy_diff, res
 
     @try_catch('RET')
-    def ret(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> MichelsonType:
+    def ret(
+        self,
+        stack: MichelsonStack,
+        stdout: List[str],
+        output_mode='readable',
+    ) -> MichelsonType:
         view = self.get_view(self.name)
         res = stack.pop1()
         if len(stack):
@@ -265,9 +273,7 @@ class TztMichelsonProgram:
                     raise Exception('Only `Big_map` instructions can be used in `big_maps` section')
                 item.add(stack, stdout, context)
 
-    def begin(
-        self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext
-    ) -> None:  # pylint: disable=no-self-use
+    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:
         """Prepare stack for contract execution"""
 
         for item in self.input.args[0].args[::-1]:

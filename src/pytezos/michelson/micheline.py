@@ -207,7 +207,12 @@ class Micheline(metaclass=ErrorTrace):
             raise MichelsonRuntimeError(f'malformed expression `{expr}`')
 
     @classmethod
-    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['Micheline']:
+    def create_type(
+        cls,
+        args: List[Type['Micheline']],
+        annots: Optional[list] = None,
+        **kwargs,
+    ) -> Type['Micheline']:
         res = type(cls.__name__, (cls,), dict(args=args, **kwargs))
         return cast(Type['MichelsonPrimitive'], res)  # type: ignore
 
@@ -260,7 +265,12 @@ class MichelineSequence(Micheline):
 
 class GlobalConstant(Micheline, prim='constant', args_len=1):
     @classmethod
-    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['Micheline']:
+    def create_type(
+        cls,
+        args: List[Type['Micheline']],
+        annots: Optional[list] = None,
+        **kwargs,
+    ) -> Type['Micheline']:
         raise RuntimeError('Please, register global constants in advance using context helpers')
 
 
@@ -308,32 +318,51 @@ def validate_sections(sequence: Type[MichelineSequence], required_sections: Sequ
 
 
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[True]) -> MichelineT:
-    ...
-
-
-@overload
 def get_script_section(
-    sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[False]
-) -> Optional[MichelineT]:
-    ...
-
-
-@overload
-def get_script_section(
-    sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[True]
+    sequence: Type[MichelineSequence],
+    cls: None,
+    name: str,
+    required: Literal[True],
 ) -> MichelineT:
     ...
 
 
 @overload
 def get_script_section(
-    sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[False]
+    sequence: Type[MichelineSequence],
+    cls: None,
+    name: str,
+    required: Literal[False],
 ) -> Optional[MichelineT]:
     ...
 
 
-def get_script_section(sequence, cls=None, name=None, required=False):
+@overload
+def get_script_section(
+    sequence: Type[MichelineSequence],
+    cls: Type[MichelineT],
+    name: None,
+    required: Literal[True],
+) -> MichelineT:
+    ...
+
+
+@overload
+def get_script_section(
+    sequence: Type[MichelineSequence],
+    cls: Type[MichelineT],
+    name: None,
+    required: Literal[False],
+) -> Optional[MichelineT]:
+    ...
+
+
+def get_script_section(
+    sequence,
+    cls=None,
+    name=None,
+    required=False,
+):
     try:
         if cls:
             return next(arg for arg in sequence.args if issubclass(arg, cls))
@@ -348,12 +377,20 @@ def get_script_section(sequence, cls=None, name=None, required=False):
 
 
 @overload
-def get_script_sections(sequence: Type[MichelineSequence], cls: None, name: str) -> List[MichelineT]:
+def get_script_sections(
+    sequence: Type[MichelineSequence],
+    cls: None,
+    name: str,
+) -> List[MichelineT]:
     ...
 
 
 @overload
-def get_script_sections(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None) -> List[MichelineT]:
+def get_script_sections(
+    sequence: Type[MichelineSequence],
+    cls: Type[MichelineT],
+    name: None,
+) -> List[MichelineT]:
     ...
 
 

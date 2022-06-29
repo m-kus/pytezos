@@ -220,7 +220,9 @@ class MichelsonKernel(Kernel):
         )
 
     def _find_stack_items(
-        self, instructions: MichelineSequence, stack: MichelsonStack
+        self,
+        instructions: MichelineSequence,
+        stack: MichelsonStack,
     ) -> Optional[List[MichelsonInstruction]]:
         for operation in instructions.items[::-1]:
             items = getattr(operation, 'items', None)

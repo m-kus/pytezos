@@ -12,7 +12,9 @@ class ContractCallResult(OperationResult):
 
     @classmethod
     def from_run_operation(
-        cls, operation_group: Dict[str, Any], context: ExecutionContext
+        cls,
+        operation_group: Dict[str, Any],
+        context: ExecutionContext,
     ) -> List['ContractCallResult']:
         """Get a list of results from an operation group content with metadata.
 

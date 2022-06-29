@@ -63,7 +63,10 @@ class BlockHeader(ContextMixin):
 
     @classmethod
     def activate_protocol(
-        cls, protocol_hash: str, parameters: Dict[str, Any], context: ExecutionContext
+        cls,
+        protocol_hash: str,
+        parameters: Dict[str, Any],
+        context: ExecutionContext,
     ) -> 'BlockHeader':
         """Create call to bake genesis block with specified parameters
 

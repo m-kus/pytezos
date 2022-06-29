@@ -104,7 +104,11 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
         left.assert_type_equal(left_type)
 
         new_value = MichelineSequence.create_type(
-            args=[PushInstruction.create_type(args=[left_type, left.to_literal()]), PairInstruction, lambda_.value]
+            args=[
+                PushInstruction.create_type(args=[left_type, left.to_literal()]),
+                PairInstruction,
+                lambda_.value,
+            ]
         )
         res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)  # type: ignore
         stack.push(res)

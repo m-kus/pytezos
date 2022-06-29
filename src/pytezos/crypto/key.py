@@ -210,7 +210,11 @@ class Key(metaclass=InlineDocstring):
 
             salt, encrypted_sk = encoded_key[:8], encoded_key[8:]
             encryption_key = hashlib.pbkdf2_hmac(
-                hash_name="sha512", password=passphrase, salt=salt, iterations=32768, dklen=32
+                hash_name="sha512",
+                password=passphrase,
+                salt=salt,
+                iterations=32768,
+                dklen=32,
             )
             encoded_key = pysodium.crypto_secretbox_open(
                 c=encrypted_sk,

@@ -106,7 +106,16 @@ class PairingCheckInstruction(MichelsonInstruction, prim='PAIRING_CHECK'):
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         points = cast(ListType, stack.pop1())
         points.assert_type_equal(
-            ListType.create_type(args=[PairType.create_type(args=[BLS12_381_G1Type, BLS12_381_G2Type])])
+            ListType.create_type(
+                args=[
+                    PairType.create_type(
+                        args=[
+                            BLS12_381_G1Type,
+                            BLS12_381_G2Type,
+                        ]
+                    )
+                ]
+            )
         )
         prod = FQ12.one()
         for pair in points:

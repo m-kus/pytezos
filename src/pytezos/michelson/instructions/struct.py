@@ -96,7 +96,12 @@ class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         key, val, src = cast(
-            Tuple[MichelsonType, Union[OptionType, BoolType], Union[MapType, BigMapType, SetType]], stack.pop3()
+            Tuple[
+                MichelsonType,
+                Union[OptionType, BoolType],
+                Union[MapType, BigMapType, SetType],
+            ],
+            stack.pop3(),
         )
         val.assert_type_in(OptionType, BoolType)
         if isinstance(val, BoolType):

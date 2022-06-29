@@ -27,7 +27,11 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
         if isinstance(a, ListType):
             a.assert_type_in(ListType)
             res_type, convert, delim = dispatch_types(
-                a.args[0], mapping={(StringType,): (StringType, str, ''), (BytesType,): (BytesType, bytes, b'')}
+                a.args[0],
+                mapping={
+                    (StringType,): (StringType, str, ''),
+                    (BytesType,): (BytesType, bytes, b''),
+                },
             )
             res = res_type.from_value(delim.join(map(convert, a)))
             stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
@@ -36,7 +40,10 @@ class ConcatInstruction(MichelsonInstruction, prim='CONCAT'):
             res_type, convert = dispatch_types(
                 type(a),
                 type(b),
-                mapping={(StringType, StringType): (StringType, str), (BytesType, BytesType): (BytesType, bytes)},
+                mapping={
+                    (StringType, StringType): (StringType, str),
+                    (BytesType, BytesType): (BytesType, bytes),
+                },
             )
             res = res_type.from_value(convert(a) + convert(b))
             stdout.append(format_stdout(cls.prim, [a, b], [res]))  # type: ignore

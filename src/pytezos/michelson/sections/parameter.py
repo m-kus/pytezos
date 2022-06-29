@@ -40,7 +40,10 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
 
     @classmethod
     def create_type(
-        cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs
+        cls,
+        args: List[Union[Type['Micheline'], Any]],
+        annots: Optional[list] = None,
+        **kwargs,
     ) -> Type['ParameterSection']:
         assert not annots, 'top level parameter annotations not supported'
 
@@ -100,7 +103,10 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             flat_values = self.item.get_flat_values(entrypoints=True)
             assert isinstance(flat_values, dict) and len(flat_values) == 1, f'expected named type'
             entrypoint, item = next(iter(flat_values.items()))
-        return {'entrypoint': entrypoint, 'value': item.to_micheline_value(mode=mode, lazy_diff=None)}
+        return {
+            'entrypoint': entrypoint,
+            'value': item.to_micheline_value(mode=mode, lazy_diff=None),
+        }
 
     @classmethod
     def generate_pydoc(cls) -> str:

@@ -11,7 +11,9 @@ from pytezos.michelson.types.base import Undefined
 
 
 def get_type_layout(
-    flat_args: List[Tuple[str, Type[MichelsonType]]], infer_names: bool = False, entrypoints: bool = False
+    flat_args: List[Tuple[str, Type[MichelsonType]]],
+    infer_names: bool = False,
+    entrypoints: bool = False,
 ) -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
     reserved = set()
     path_to_key = {}
@@ -76,13 +78,18 @@ def wrap_parameters(expr, path):
 class ADTMixin:
     @classmethod
     def iter_type_args(
-        cls, entrypoints: bool = False, path=''
+        cls,
+        entrypoints: bool = False,
+        path='',
     ) -> Generator[Tuple[str, Type[MichelsonType]], None, None]:
         raise NotImplementedError
 
     @classmethod
     def get_flat_args(
-        cls, infer_names: bool = False, force_tuple: bool = False, entrypoints: bool = False
+        cls,
+        infer_names: bool = False,
+        force_tuple: bool = False,
+        entrypoints: bool = False,
     ) -> Union[Dict[str, Type[MichelsonType]], List[Type[MichelsonType]]]:
         flat_args = list(cls.iter_type_args(entrypoints=entrypoints))
         if force_tuple is False:
@@ -93,7 +100,9 @@ class ADTMixin:
 
     @classmethod
     def get_type_layout(
-        cls, infer_names: bool = False, entrypoints: bool = False
+        cls,
+        infer_names: bool = False,
+        entrypoints: bool = False,
     ) -> Tuple[Optional[Dict[str, str]], Optional[Dict[str, str]], Dict[int, str]]:
         flat_args = list(cls.iter_type_args(entrypoints=entrypoints))
         return get_type_layout(flat_args, infer_names=infer_names, entrypoints=entrypoints)
@@ -102,7 +111,10 @@ class ADTMixin:
         raise NotImplementedError
 
     def get_flat_values(
-        self, infer_names: bool = False, force_tuple: bool = False, entrypoints: bool = False
+        self,
+        infer_names: bool = False,
+        force_tuple: bool = False,
+        entrypoints: bool = False,
     ) -> Union[Dict[str, MichelsonType], List[MichelsonType]]:
         path_to_key, _, _ = self.get_type_layout(infer_names=infer_names, entrypoints=entrypoints)
         flat_values = list(self.iter_values())

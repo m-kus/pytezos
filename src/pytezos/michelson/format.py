@@ -73,7 +73,18 @@ def is_inline(node):
 
 
 def is_script(node):
-    return all(map(lambda x: isinstance(x, dict) and x.get('prim') in ['parameter', 'storage', 'code'], node))
+    return all(
+        map(
+            lambda x: isinstance(x, dict)
+            and x.get('prim')
+            in [
+                'parameter',
+                'storage',
+                'code',
+            ],
+            node,
+        )
+    )
 
 
 def format_node(node, indent='', inline=False, is_root=False, wrapped=False):

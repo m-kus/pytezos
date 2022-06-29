@@ -50,7 +50,10 @@ class ViewSection(Micheline, prim='view', args_len=4):
 
     @classmethod
     def create_type(
-        cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs
+        cls,
+        args: List[Union[Type['Micheline'], Any]],
+        annots: Optional[list] = None,
+        **kwargs,
     ) -> Type['ViewSection']:
         view_name = cast(Type[MichelineLiteral], args[0])
         if not issubclass(view_name, MichelineLiteral):

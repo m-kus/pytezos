@@ -232,7 +232,10 @@ class PyTezosClient(ContextMixin, ContentMixin):
         )
 
     def sleep(
-        self, num_blocks: int, time_between_blocks: Optional[int] = None, block_timeout: Optional[int] = None
+        self,
+        num_blocks: int,
+        time_between_blocks: Optional[int] = None,
+        block_timeout: Optional[int] = None,
     ) -> List[str]:
         """Sleeps until a certain amount of blocks appended to the chain
 

@@ -58,7 +58,12 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         return cls.init(items)
 
     @classmethod
-    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['PairType']:
+    def create_type(
+        cls,
+        args: List[Type['Micheline']],
+        annots: Optional[list] = None,
+        **kwargs,
+    ) -> Type['PairType']:
         if len(args) > 2:  # comb
             args = [args[0], PairType.create_type(args=args[1:])]
         else:

@@ -108,7 +108,9 @@ class ContractTokenMetadata(ContextMixin):
 
     @classmethod
     def from_json(
-        cls, token_metadata_json: Dict[str, Any], context: Optional[ExecutionContext] = None
+        cls,
+        token_metadata_json: Dict[str, Any],
+        context: Optional[ExecutionContext] = None,
     ) -> 'ContractTokenMetadata':
         """Convert token metadata from JSON object"""
 

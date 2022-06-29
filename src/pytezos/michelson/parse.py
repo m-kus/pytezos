@@ -103,10 +103,18 @@ class MichelsonParser:
         '''expr : PRIM annots args'''
         prim = p[1]
         if prim in prim_tags or prim in self.extra_primitives:
-            expr = make_expr(prim=prim, annots=p[2] or [], args=p[3] or [])
+            expr = make_expr(
+                prim=prim,
+                annots=p[2] or [],
+                args=p[3] or [],
+            )
         else:
             try:
-                expr = expand_macro(prim=prim, annots=p[2] or [], args=p[3] or [])
+                expr = expand_macro(
+                    prim=prim,
+                    annots=p[2] or [],
+                    args=p[3] or [],
+                )
             except AssertionError as e:
                 raise MichelsonParserError(p.slice[1], str(e)) from e
         p[0] = Sequence(expr) if isinstance(expr, list) else expr

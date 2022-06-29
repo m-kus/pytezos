@@ -87,7 +87,10 @@ class ContractCall(ContextMixin):
         :return: OperationGroup with hash filled
         """
         return self.as_transaction().send(
-            gas_reserve=gas_reserve, burn_reserve=burn_reserve, min_confirmations=min_confirmations, ttl=ttl
+            gas_reserve=gas_reserve,
+            burn_reserve=burn_reserve,
+            min_confirmations=min_confirmations,
+            ttl=ttl,
         )
 
     def send_async(

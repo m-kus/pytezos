@@ -88,7 +88,12 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
                 yield path + str(i), arg
 
     @classmethod
-    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['OrType']:
+    def create_type(
+        cls,
+        args: List[Type['Micheline']],
+        annots: Optional[list] = None,
+        **kwargs,
+    ) -> Type['OrType']:
         def all_units(arguments: List[Type['Micheline']]):
             for arg in arguments:
                 if issubclass(arg, OrType):

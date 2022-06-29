@@ -22,7 +22,11 @@ class KeyHash(Key):
         self._pkh = public_key_hash
 
     def __repr__(self):
-        res = [super().__repr__(), f'\nPublic key hash', self.public_key_hash()]
+        res = [
+            super().__repr__(),
+            f'\nPublic key hash',
+            self.public_key_hash(),
+        ]
         return '\n'.join(res)
 
     def public_key_hash(self):
