@@ -73,7 +73,6 @@ TEST_VIEW_JSON = """
 
 
 class OffchainViewTest(TestCase):
-
     def test_view_return_type_regression_251(self) -> None:
         # Need to mock the shell for unit testing. Configuring it to always return a simple
         # value for the contract's current storage state
@@ -81,6 +80,13 @@ class OffchainViewTest(TestCase):
         contract.context.storage_value = UnitType().to_micheline_value()
         meta = ContractMetadata.from_json(json.loads(TEST_VIEW_JSON), contract.context)
 
-        expected_view_result = {"my_first_number": 1, "my_first_nat": 42, "my_second_number": 2, "a_plain_tuple": (3, 42)}
+        expected_view_result = {
+            "my_first_number": 1,
+            "my_first_nat": 42,
+            "my_second_number": 2,
+            "a_plain_tuple": (3, 42),
+        }
         actual_view_result = meta.viewRecordLike().storage_view()
-        assert expected_view_result == actual_view_result, f"Expected: {expected_view_result} but got: {actual_view_result}"
+        assert (
+            expected_view_result == actual_view_result
+        ), f"Expected: {expected_view_result} but got: {actual_view_result}"

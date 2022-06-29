@@ -1,10 +1,15 @@
 from contextlib import suppress
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
+from typing import Union
 
 import base58
 import strict_rfc3339  # type: ignore
 
-from pytezos.crypto.encoding import base58_decode, base58_encode
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.michelson.tags import prim_tags
 
@@ -225,7 +230,7 @@ def forge_public_key(value: str) -> bytes:
     prefix = value[:4]
     res = base58.b58decode_check(value)[4:]
 
-    if prefix == 'edpk':
+    if prefix == 'edpk':  # noqa: SIM116
         return b'\x00' + res
     elif prefix == 'sppk':
         return b'\x01' + res
@@ -314,9 +319,9 @@ def forge_micheline(data: Union[List, Dict]) -> bytes:
             res.append(b'\x01')
             res.append(forge_array(data['string'].encode()))
         else:
-            assert False, data
+            raise AssertionError(data)
     else:
-        assert False, data
+        raise AssertionError(data)
 
     return b''.join(res)
 
@@ -382,7 +387,7 @@ def unforge_micheline(data: bytes) -> Union[List, Dict]:
             ptr += offset
             return {'bytes': value.hex()}
         else:
-            assert False, f'unkonwn tag {tag} at position {ptr}'
+            raise AssertionError(f'unkonwn tag {tag} at position {ptr}')
 
     result = unforge()
     assert ptr == len(data), f'have not reach EOS (pos {ptr}/{len(data)})'

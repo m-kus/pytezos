@@ -1,8 +1,10 @@
 import json
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
 
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.program import MichelsonProgram
 
 folder = 'typed_minter'

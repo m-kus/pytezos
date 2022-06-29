@@ -1,19 +1,29 @@
 import re
 from contextlib import suppress
-from typing import Dict, List, Type, cast
+from typing import Dict
+from typing import List
+from typing import Type
+from typing import cast
 
 import strict_rfc3339  # type: ignore
 
 from pytezos.context.abstract import AbstractContext
 from pytezos.context.mixin import nodes
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.micheline import MichelineLiteral, MichelsonRuntimeError
-from pytezos.michelson.sections import ParameterSection, StorageSection
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.sections import ParameterSection
+from pytezos.michelson.sections import StorageSection
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import ListType, OperationType, PairType
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import PairType
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.core import FalseLiteral, TrueLiteral
-from pytezos.rpc.node import RpcMultiNode, RpcNode
+from pytezos.michelson.types.core import FalseLiteral
+from pytezos.michelson.types.core import TrueLiteral
+from pytezos.rpc.node import RpcMultiNode
+from pytezos.rpc.node import RpcNode
 from pytezos.rpc.shell import ShellQuery
 
 
@@ -82,7 +92,6 @@ class DropAllInstruction(MichelsonInstruction, prim='DROP_ALL'):
 
 
 class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         # FIXME: MichelsonProgram copypaste
@@ -110,7 +119,6 @@ class BeginInstruction(MichelsonInstruction, prim='BEGIN', args_len=2):
 
 
 class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
-
     def __init__(self, lazy_diff: List[Dict[str, str]], result, stack_items_added: int = 0) -> None:
         super().__init__(stack_items_added)
         self.lazy_diff = lazy_diff
@@ -128,12 +136,12 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
             PairType.create_type(
                 args=[
                     ListType.create_type(args=[OperationType]),
-                    StorageSection.match(context.get_storage_expr()).args[0]
+                    StorageSection.match(context.get_storage_expr()).args[0],
                 ],
             ),
             message='list of operations + resulting storage',
         )
-        operations = ListType(items=[op for op in res.items[0]])  # type: ignore
+        operations = ListType(items=list(res.items[0]))  # type: ignore
         lazy_diff = []  # type: ignore
         storage = res.items[1].aggregate_lazy_diff(lazy_diff)
         stdout.append(format_stdout(f'END %default', [res], []))
@@ -144,7 +152,6 @@ class CommitInstruction(MichelsonInstruction, prim='COMMIT'):
 
 
 class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
-
     def __init__(self, lazy_diff: List[Dict[str, str]], result, stack_items_added: int = 0) -> None:
         super().__init__(stack_items_added)
         self.lazy_diff = lazy_diff

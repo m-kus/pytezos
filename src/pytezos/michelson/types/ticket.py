@@ -1,17 +1,21 @@
 from copy import copy
 from pprint import pformat
-from typing import List, Optional, Tuple, Type, cast
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import Micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.types.domain import AddressType, NatType
+from pytezos.michelson.types.domain import AddressType
+from pytezos.michelson.types.domain import NatType
 from pytezos.michelson.types.pair import PairType
 
 
 class TicketType(MichelsonType, prim='ticket', args_len=1):
-
     def __init__(self, ticketer: str, item: MichelsonType, amount: int):
         super(TicketType, self).__init__()
         self.ticketer = ticketer
@@ -19,7 +23,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
         self.amount = amount
 
     def __copy__(self):
-        assert False, 'forbidden'
+        raise AssertionError('forbidden')
 
     def __repr__(self):
         return pformat((self.ticketer, repr(self.item), self.amount))
@@ -60,7 +64,7 @@ class TicketType(MichelsonType, prim='ticket', args_len=1):
 
     @classmethod
     def dummy(cls, context: AbstractContext):
-        assert False, 'forbidden'
+        raise AssertionError('forbidden')
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'TicketType':

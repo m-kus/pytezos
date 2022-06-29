@@ -1,4 +1,5 @@
-from typing import Optional, Union
+from typing import Optional
+from typing import Union
 
 from deprecation import deprecated  # type: ignore
 
@@ -7,7 +8,8 @@ from pytezos.context.mixin import ContextMixin
 from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.michelson.types.base import MichelsonType, generate_pydoc
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import generate_pydoc
 
 
 class ContractData(ContextMixin):
@@ -78,7 +80,11 @@ class ContractData(ContextMixin):
         :param mode: whether to use `readable` or `optimized` (or `legacy_optimized`) encoding
         :return: Micheline JSON expression
         """
-        return type(self.data).from_python_object(py_obj).to_micheline_value(mode=mode or self.context.mode, lazy_diff=None)
+        return (
+            type(self.data)
+            .from_python_object(py_obj)
+            .to_micheline_value(mode=mode or self.context.mode, lazy_diff=None)
+        )
 
     def dummy(self):
         """Try to generate a dummy (empty) value

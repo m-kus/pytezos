@@ -1,28 +1,41 @@
-from typing import Any, Dict, List, Optional, Tuple, Type, cast
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import cast
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import base58_encode
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.instructions.tzt import BigMapInstruction, StackEltInstruction
-from pytezos.michelson.micheline import MichelineSequence, get_script_section, get_script_sections, try_catch, validate_sections
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.instructions.tzt import BigMapInstruction
+from pytezos.michelson.instructions.tzt import StackEltInstruction
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import get_script_section
+from pytezos.michelson.micheline import get_script_sections
+from pytezos.michelson.micheline import try_catch
+from pytezos.michelson.micheline import validate_sections
 from pytezos.michelson.sections.code import CodeSection
 from pytezos.michelson.sections.parameter import ParameterSection
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.michelson.sections.tzt import (
-    AmountSection,
-    BalanceSection,
-    BigMapsSection,
-    ChainIdSection,
-    InputSection,
-    NowSection,
-    OutputSection,
-    SelfSection,
-    SenderSection,
-    SourceSection,
-)
+from pytezos.michelson.sections.tzt import AmountSection
+from pytezos.michelson.sections.tzt import BalanceSection
+from pytezos.michelson.sections.tzt import BigMapsSection
+from pytezos.michelson.sections.tzt import ChainIdSection
+from pytezos.michelson.sections.tzt import InputSection
+from pytezos.michelson.sections.tzt import NowSection
+from pytezos.michelson.sections.tzt import OutputSection
+from pytezos.michelson.sections.tzt import SelfSection
+from pytezos.michelson.sections.tzt import SenderSection
+from pytezos.michelson.sections.tzt import SourceSection
 from pytezos.michelson.sections.view import ViewSection
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import ListType, MichelsonType, OperationType, PairType
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import MichelsonType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import PairType
 
 
 class MichelsonProgram:
@@ -44,12 +57,12 @@ class MichelsonProgram:
         cls = type(
             MichelsonProgram.__name__,
             (MichelsonProgram,),
-            dict(
-                parameter=ParameterSection.match(context.get_parameter_expr()),
-                storage=StorageSection.match(context.get_storage_expr()),
-                code=CodeSection.match(context.get_code_expr() if with_code else []),
-                views=[ViewSection.match(expr) for expr in context.get_views_expr()] if with_code else [],
-            ),
+            {
+                'parameter': ParameterSection.match(context.get_parameter_expr()),
+                'storage': StorageSection.match(context.get_storage_expr()),
+                'code': CodeSection.match(context.get_code_expr() if with_code else []),
+                'views': [ViewSection.match(expr) for expr in context.get_views_expr()] if with_code else [],
+            },
         )
         return cast(Type['MichelsonProgram'], cls)
 
@@ -67,12 +80,12 @@ class MichelsonProgram:
         cls = type(
             MichelsonProgram.__name__,
             (MichelsonProgram,),
-            dict(
-                parameter=get_script_section(sequence, cls=ParameterSection, required=True),  # type: ignore
-                storage=get_script_section(sequence, cls=StorageSection, required=True),  # type: ignore
-                code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
-                views=get_script_sections(sequence, cls=ViewSection),  # type: ignore
-            ),
+            {
+                'parameter': get_script_section(sequence, cls=ParameterSection, required=True),  # type: ignore
+                'storage': get_script_section(sequence, cls=StorageSection, required=True),  # type: ignore
+                'code': get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+                'views': get_script_sections(sequence, cls=ViewSection),  # type: ignore
+            },
         )
         return cast(Type['MichelsonProgram'], cls)
 
@@ -98,7 +111,7 @@ class MichelsonProgram:
 
     @classmethod
     def instantiate(cls, entrypoint: str, parameter, storage) -> 'MichelsonProgram':
-        parameter_value = cls.parameter.from_parameters(dict(entrypoint=entrypoint, value=parameter))
+        parameter_value = cls.parameter.from_parameters({'entrypoint': entrypoint, 'value': parameter})
         storage_value = cls.storage.from_micheline_value(storage)
         return cls(entrypoint, parameter_value, storage_value)
 
@@ -129,7 +142,9 @@ class MichelsonProgram:
         return cast(MichelsonInstruction, view.args[3].execute(stack, stdout, context))
 
     @try_catch('END')
-    def end(self, stack: MichelsonStack, stdout: List[str], output_mode='readable') -> Tuple[List[dict], Any, List[dict], PairType]:
+    def end(
+        self, stack: MichelsonStack, stdout: List[str], output_mode='readable'
+    ) -> Tuple[List[dict], Any, List[dict], PairType]:
         """Finish contract execution"""
         res = cast(PairType, stack.pop1())
         if len(stack):
@@ -171,12 +186,12 @@ class TztMichelsonProgram:
         cls = type(
             TztMichelsonProgram.__name__,
             (TztMichelsonProgram,),
-            dict(
-                input=InputSection.match(context.get_input_expr()),
-                output=OutputSection.match(context.get_output_expr()),
-                code=CodeSection.match(context.get_code_expr() if with_code else []),
-                big_maps=BigMapsSection.match(context.get_big_maps_expr()) if context.get_big_maps_expr() else None,
-            ),
+            {
+                'input': InputSection.match(context.get_input_expr()),
+                'output': OutputSection.match(context.get_output_expr()),
+                'code': CodeSection.match(context.get_code_expr() if with_code else []),
+                'big_maps': BigMapsSection.match(context.get_big_maps_expr()) if context.get_big_maps_expr() else None,
+            },
         )
         return cast(Type['TztMichelsonProgram'], cls)
 
@@ -187,12 +202,12 @@ class TztMichelsonProgram:
         cls = type(
             TztMichelsonProgram.__name__,
             (TztMichelsonProgram,),
-            dict(
-                input=get_script_section(sequence, cls=InputSection, required=True),  # type: ignore
-                output=get_script_section(sequence, cls=OutputSection, required=True),  # type: ignore
-                code=get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
-                big_maps=get_script_section(sequence, cls=BigMapsSection, required=False),  # type: ignore
-            ),
+            {
+                'input': get_script_section(sequence, cls=InputSection, required=True),  # type: ignore
+                'output': get_script_section(sequence, cls=OutputSection, required=True),  # type: ignore
+                'code': get_script_section(sequence, cls=CodeSection, required=True),  # type: ignore
+                'big_maps': get_script_section(sequence, cls=BigMapsSection, required=False),  # type: ignore
+            },
         )
         return cast(Type['TztMichelsonProgram'], cls)
 
@@ -250,7 +265,9 @@ class TztMichelsonProgram:
                     raise Exception('Only `Big_map` instructions can be used in `big_maps` section')
                 item.add(stack, stdout, context)
 
-    def begin(self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext) -> None:  # pylint: disable=no-self-use
+    def begin(
+        self, stack: MichelsonStack, stdout: List[str], context: ExecutionContext
+    ) -> None:  # pylint: disable=no-self-use
         """Prepare stack for contract execution"""
 
         for item in self.input.args[0].args[::-1]:

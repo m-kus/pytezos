@@ -1,7 +1,9 @@
-from typing import List, Type
+from typing import List
+from typing import Type
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.types import *
 
 

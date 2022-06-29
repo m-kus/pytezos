@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+from typing import Dict
 
 from pytezos.crypto.key import Key
 

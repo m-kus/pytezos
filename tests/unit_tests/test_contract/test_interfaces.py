@@ -1,12 +1,13 @@
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
 
-from pytezos import ContractInterface, Unit
+from pytezos import ContractInterface
+from pytezos import Unit
 from pytezos.jupyter import is_interactive
 
 
 class TestInterfaces(TestCase):
-
     def test_concat(self):
         concat = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'default_entrypoint.tz'))
         res = concat.default('bar').interpret(storage='foo')
@@ -21,17 +22,10 @@ class TestInterfaces(TestCase):
     def test_mint(self):
         token_v3 = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'token.tz'))
         alice = "tz1ibMpWS6n6MJn73nQHtK5f4ogyYC1z9T9z"
-        res = token_v3 \
-            .mint(mintOwner=alice, mintValue=3) \
-            .interpret(
-                storage={
-                    "admin": alice,
-                    "balances": {},
-                    "paused": False,
-                    "shareType": "APPLE",
-                    "totalSupply": 0
-                },
-                source=alice)
+        res = token_v3.mint(mintOwner=alice, mintValue=3).interpret(
+            storage={"admin": alice, "balances": {}, "paused": False, "shareType": "APPLE", "totalSupply": 0},
+            source=alice,
+        )
         self.assertEqual(3, res.storage['balances'][alice])
 
     def test_increment_decrement(self):
@@ -64,4 +58,4 @@ class TestInterfaces(TestCase):
 
     def test_or_entry(self):
         ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'or_entry.tz'))
-        ci.collect(collectRequest=dict(swap_id=0, token_amount=0))
+        ci.collect(collectRequest={'swap_id': 0, 'token_amount': 0})

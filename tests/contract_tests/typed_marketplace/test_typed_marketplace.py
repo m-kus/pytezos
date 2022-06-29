@@ -1,8 +1,10 @@
 import json
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
 
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.parse import michelson_to_micheline

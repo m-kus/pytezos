@@ -2,8 +2,14 @@
 import json
 import logging
 from os import makedirs
-from os.path import dirname, exists, join
-from typing import Any, Dict, List, Optional, Tuple
+from os.path import dirname
+from os.path import exists
+from os.path import join
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 import requests
 
@@ -12,7 +18,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 from pytezos.logging import logger
-
 
 TZKT_API = 'https://api.tzkt.io/v1'
 RPC_API = 'https://mainnet-tezos.giganode.io'
@@ -49,7 +54,7 @@ def get_raw_operation(level: int, hash_: str, counter: str, entrypoint: str) -> 
                 return {
                     'parameters': op['parameters'],
                     'storage': op['metadata']['operation_result']['storage'],
-                    'lazy_storage_diff': op['metadata']['operation_result'].get('lazy_storage_diff', [])
+                    'lazy_storage_diff': op['metadata']['operation_result'].get('lazy_storage_diff', []),
                 }
 
             for int_op in op['metadata'].get('internal_operation_results', ()):
@@ -57,7 +62,7 @@ def get_raw_operation(level: int, hash_: str, counter: str, entrypoint: str) -> 
                     return {
                         'parameters': int_op['parameters'],
                         'storage': int_op['result']['storage'],
-                        'lazy_storage_diff': int_op['result'].get('lazy_storage_diff', [])
+                        'lazy_storage_diff': int_op['result'].get('lazy_storage_diff', []),
                     }
     else:
         raise Exception(level, hash_, counter, entrypoint)
@@ -107,7 +112,9 @@ def get_contract_call(address: str, entrypoint: str) -> Optional[Dict[str, Any]]
 def normalize_alias(alias: Optional[str]) -> str:
     if not alias:
         return ''
-    return alias.lstrip().replace(' ', '_').replace('/', '_').replace(':', '_').replace('.', '_').replace('-', '_').lower()
+    return (
+        alias.lstrip().replace(' ', '_').replace('/', '_').replace(':', '_').replace('.', '_').replace('-', '_').lower()
+    )
 
 
 def fetch_contract_samples(limit: int) -> None:

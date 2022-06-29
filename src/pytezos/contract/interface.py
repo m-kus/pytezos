@@ -2,15 +2,23 @@ import json
 import logging
 from decimal import Decimal
 from functools import lru_cache
-from os.path import exists, expanduser
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from os.path import exists
+from os.path import expanduser
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Type
+from typing import Union
 from urllib.parse import urlparse
 
 import requests
 from cached_property import cached_property  # type: ignore
 from deprecation import deprecated  # type: ignore
 
-from pytezos.context.mixin import ContextMixin, ExecutionContext
+from pytezos.context.mixin import ContextMixin
+from pytezos.context.mixin import ExecutionContext
 from pytezos.contract.data import ContractData
 from pytezos.contract.entrypoint import ContractEntrypoint
 from pytezos.contract.metadata import ContractMetadata
@@ -25,7 +33,8 @@ from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.michelson.sections import ViewSection
-from pytezos.michelson.types import BigMapType, BytesType
+from pytezos.michelson.types import BigMapType
+from pytezos.michelson.types import BytesType
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.group import OperationGroup
 from pytezos.rpc import ShellQuery
@@ -125,7 +134,10 @@ class ContractInterface(ContextMixin):
         return ContractInterface.from_micheline(michelson_to_micheline(source), context)
 
     @staticmethod
-    def from_micheline(expression: List[Dict[str, Any]], context: Optional[ExecutionContext] = None) -> 'ContractInterface':
+    def from_micheline(
+        expression: List[Dict[str, Any]],
+        context: Optional[ExecutionContext] = None,
+    ) -> 'ContractInterface':
         """Create contract from micheline expression.
 
         :param expression: [{'prim': 'parameter'}, {'prim': 'storage'}, {'prim': 'code'}]
@@ -137,11 +149,11 @@ class ContractInterface(ContextMixin):
         else:
             code_expr = expression
         program = MichelsonProgram.match(code_expr)
-        cls = type(ContractInterface.__name__, (ContractInterface,), dict(program=program))
+        cls = type(ContractInterface.__name__, (ContractInterface,), {'program': program})
         context = ExecutionContext(
             shell=context.shell if context else None,
             key=context.key if context else None,
-            script=dict(code=code_expr),
+            script={'code': code_expr},
             global_constants=context.global_constants if context else None,
         )
         return cls(context)
@@ -154,7 +166,7 @@ class ContractInterface(ContextMixin):
         :return: ContractInterface
         """
         program = MichelsonProgram.load(context, with_code=True)
-        cls = type(ContractInterface.__name__, (ContractInterface,), dict(program=program))
+        cls = type(ContractInterface.__name__, (ContractInterface,), {'program': program})
         return cls(context)
 
     @classmethod
@@ -342,7 +354,7 @@ class ContractInterface(ContextMixin):
         """
         return ContractTokenMetadataProxy(self._get_token_metadata)  # type: ignore
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=1000)  # noqa: B019
     def _get_token_metadata(self, token_id: int) -> Optional[ContractTokenMetadata]:
         token_metadata = self._get_token_metadata_from_view(token_id)
         if token_metadata is None:

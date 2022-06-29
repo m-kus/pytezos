@@ -36,16 +36,16 @@ docs:              ## Build docs
 ##
 
 isort:             ## Format with isort
-	# poetry run isort src tests scripts
+	poetry run isort src tests scripts
 
 black:             ## Format with black
-	# poetry run black src tests scripts --exclude ".*/docs.py"
+	poetry run black src tests scripts --exclude ".*/docs.py"
 
 flake:             ## Lint with flake8
-	poetry run flakeheaven lint src tests scripts || true
+	poetry run flakeheaven lint src tests scripts
 
 mypy:              ## Lint with mypy
-	poetry run mypy src scripts  # tests
+	poetry run mypy src scripts tests
 
 cover:             ## Print coverage for the current branch
 	poetry run diff-cover --compare-branch `git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'` coverage.xml

@@ -1,13 +1,16 @@
 import logging
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import List
+from typing import Optional
+from typing import Union
 
 from pytezos.block.header import BlockHeader
 from pytezos.context.mixin import ContextMixin
 from pytezos.contract.call import ContractCall
 from pytezos.contract.interface import ContractInterface
 from pytezos.crypto.key import Key
-from pytezos.jupyter import get_class_docstring, is_interactive
+from pytezos.jupyter import get_class_docstring
+from pytezos.jupyter import is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup
@@ -25,7 +28,7 @@ class PyTezosClient(ContextMixin, ContentMixin):
 
     def __repr__(self):
         res = [
-            super(PyTezosClient, self).__repr__(),
+            super().__repr__(),
             '\nHelpers',
             get_class_docstring(self.__class__),
         ]
@@ -228,7 +231,9 @@ class PyTezosClient(ContextMixin, ContentMixin):
             block_timeout=block_timeout,
         )
 
-    def sleep(self, num_blocks: int, time_between_blocks: Optional[int] = None, block_timeout: Optional[int] = None) -> List[str]:
+    def sleep(
+        self, num_blocks: int, time_between_blocks: Optional[int] = None, block_timeout: Optional[int] = None
+    ) -> List[str]:
         """Sleeps until a certain amount of blocks appended to the chain
 
         :param num_blocks: number of blocks to wait for
@@ -238,6 +243,9 @@ class PyTezosClient(ContextMixin, ContentMixin):
         block_hash = self.shell.head.hash()
         return list(
             self.shell.wait_blocks(
-                current_block_hash=block_hash, max_blocks=num_blocks, time_between_blocks=time_between_blocks, block_timeout=block_timeout
+                current_block_hash=block_hash,
+                max_blocks=num_blocks,
+                time_between_blocks=time_between_blocks,
+                block_timeout=block_timeout,
             )
         )

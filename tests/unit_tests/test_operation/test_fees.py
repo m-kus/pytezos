@@ -1,10 +1,20 @@
-from pytezos.operation.fees import DEFAULT_CONSTANTS, DEFAULT_TRANSACTION_GAS_LIMIT, DEFAULT_TRANSACTION_STORAGE_LIMIT, calculate_fee, default_fee, default_gas_limit, default_storage_limit
+from typing import Any
+from typing import Dict
+from typing import List
 from unittest import TestCase
+
+from pytezos.operation.fees import DEFAULT_CONSTANTS
+from pytezos.operation.fees import DEFAULT_TRANSACTION_GAS_LIMIT
+from pytezos.operation.fees import DEFAULT_TRANSACTION_STORAGE_LIMIT
+from pytezos.operation.fees import calculate_fee
+from pytezos.operation.fees import default_fee
+from pytezos.operation.fees import default_gas_limit
+from pytezos.operation.fees import default_storage_limit
 
 
 class FeesTest(TestCase):
     def setUp(self) -> None:
-       self.content = {
+        self.content = {
             "kind": "transaction",
             "source": "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx",
             "fee": "404",
@@ -37,16 +47,16 @@ class FeesTest(TestCase):
 
         # Assert
         self.assertEqual(expected_fee, fee)
-    
+
     def test_default_gas_and_storage_limit(self) -> None:
         # Arrange
         node_gas_limit = 88888
         node_storage_limit = 66666
-        node_constants = dict(
-            hard_gas_limit_per_operation=node_gas_limit,
-            hard_storage_limit_per_operation=node_storage_limit,
-        )
-        testmap = {
+        node_constants = {
+            'hard_gas_limit_per_operation': node_gas_limit,
+            'hard_storage_limit_per_operation': node_storage_limit,
+        }
+        testmap: Dict[str, List[Any]] = {
             'tz_no_constants': [
                 'tz',
                 None,

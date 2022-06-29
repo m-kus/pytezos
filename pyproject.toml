@@ -90,22 +90,22 @@ pytezos = 'pytezos.cli.cli:cli'
 michelson-kernel = 'michelson_kernel.cli:cli'
 
 [tool.isort]
-line_length = 140
-force_single_line = false
+line_length = 120
+force_single_line = true
 
 [tool.black]
-line-length = 140
+line-length = 120
 target-version = ['py38', 'py39', 'py310']
 skip-string-normalization = true
 
 [tool.flakeheaven]
 format = "colored"
-max_line_length = 140
+max_line_length = 120
 show_source = true
 extended_default_ignore = []
 
 [tool.flakeheaven.plugins]
-"flake8-*" = ["+*", "-C417", "-SIM106", "-SIM114", "-SIM102"]
+"flake8-*" = ["+*", "-C417", "-SIM106", "-SIM114", "-SIM102", "-R504"]
 flake8-docstrings = ["-*"]
 
 [build-system]

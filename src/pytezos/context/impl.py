@@ -1,14 +1,21 @@
 from datetime import datetime
 from itertools import chain
-from typing import Any, List, Optional, Tuple
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from pytezos.context.abstract import AbstractContext, get_originated_address
+from pytezos.context.abstract import AbstractContext
+from pytezos.context.abstract import get_originated_address
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 from pytezos.logging import logger
-from pytezos.michelson.forge import forge_micheline, forge_script_expr
-from pytezos.michelson.micheline import get_script_section, get_script_sections
-from pytezos.operation import DEFAULT_OPERATIONS_TTL, MAX_OPERATIONS_TTL
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import forge_script_expr
+from pytezos.michelson.micheline import get_script_section
+from pytezos.michelson.micheline import get_script_sections
+from pytezos.operation import DEFAULT_OPERATIONS_TTL
+from pytezos.operation import MAX_OPERATIONS_TTL
 from pytezos.rpc.errors import RpcError
 from pytezos.rpc.shell import ShellQuery
 
@@ -16,11 +23,31 @@ DEFAULT_IPFS_GATEWAY = 'https://ipfs.io/ipfs'
 
 
 class ExecutionContext(AbstractContext):
-
-    def __init__(self, amount=None, chain_id=None, protocol=None, source=None, sender=None, balance=None,
-                 block_id=None, now=None, level=None, voting_power=None, total_voting_power=None, min_block_time=None,
-                 key=None, shell=None, address=None, counter=None, script=None, tzt=False, mode=None, ipfs_gateway=None,
-                 global_constants=None, view_results=None):
+    def __init__(
+        self,
+        amount=None,
+        chain_id=None,
+        protocol=None,
+        source=None,
+        sender=None,
+        balance=None,
+        block_id=None,
+        now=None,
+        level=None,
+        voting_power=None,
+        total_voting_power=None,
+        min_block_time=None,
+        key=None,
+        shell=None,
+        address=None,
+        counter=None,
+        script=None,
+        tzt=False,
+        mode=None,
+        ipfs_gateway=None,
+        global_constants=None,
+        view_results=None,
+    ):
         self.key: Optional[Key] = key
         self.shell: Optional[ShellQuery] = shell
         self.counter = counter
@@ -40,15 +67,15 @@ class ExecutionContext(AbstractContext):
         self.min_block_time = min_block_time
         self.tzt = tzt
         self.parameter_expr = get_script_section(script, name='parameter') if script and not tzt else None
-        self.storage_expr = get_script_section(script,  name='storage') if script and not tzt else None
+        self.storage_expr = get_script_section(script, name='storage') if script and not tzt else None
         self.code_expr = get_script_section(script, name='code') if script else None
         self.views_expr = get_script_sections(script, name='view') if script else []
         self.input_expr = get_script_section(script, name='input') if script and tzt else None
-        self.output_expr = get_script_section(script,  name='output') if script and tzt else None
+        self.output_expr = get_script_section(script, name='output') if script and tzt else None
         self.sender_expr = get_script_section(script, name='sender') if script and tzt else None
         self.balance_expr = get_script_section(script, name='balance') if script and tzt else None
         self.amount_expr = get_script_section(script, name='amount') if script and tzt else None
-        self.self_expr = get_script_section(script,  name='self') if script and tzt else None
+        self.self_expr = get_script_section(script, name='self') if script and tzt else None
         self.now_expr = get_script_section(script, name='now') if script and tzt else None
         self.source_expr = get_script_section(script, name='source') if script and tzt else None
         self.chain_id_expr = get_script_section(script, name='chain_id') if script and tzt else None
@@ -74,8 +101,15 @@ class ExecutionContext(AbstractContext):
     @property
     def script(self) -> Optional[dict]:
         if self.parameter_expr and self.storage_expr and self.code_expr:
-            return dict(code=[self.parameter_expr, self.storage_expr, self.code_expr, *self.views_expr],
-                        storage=self.storage_value)
+            return {
+                'code': [
+                    self.parameter_expr,
+                    self.storage_expr,
+                    self.code_expr,
+                    *self.views_expr,
+                ],
+                'storage': self.storage_value,
+            }
         else:
             return None
 
@@ -117,8 +151,7 @@ class ExecutionContext(AbstractContext):
         return self.counter
 
     def get_counter_offset(self) -> int:
-        """Return current count of pending transactions in mempool.
-        """
+        """Return current count of pending transactions in mempool."""
         if self.key is None:
             raise Exception('`key` is not set')
         if self.shell is None:
@@ -437,16 +470,17 @@ class ExecutionContext(AbstractContext):
         return DEFAULT_OPERATIONS_TTL
 
     def register_global_constant(self, expression):
-        """ Register global constant
+        """Register global constant
         :param expression: Micheline expression
         """
         constant_hash = forge_script_expr(forge_micheline(expression))
         self.global_constants[constant_hash] = expression
 
     def resolve_global_constants(self, expression):
-        """ Replace global constants with their respectful values or throw an error if the constant is not defined
+        """Replace global constants with their respectful values or throw an error if the constant is not defined
         :param expression: Micheline expression
         """
+
         def _resolve_constant(node):
             try:
                 constant_hash = node['args'][0]['string']

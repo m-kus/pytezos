@@ -1,18 +1,35 @@
 import logging
-from typing import List, Optional, Tuple, Type, cast
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
-from pytezos.michelson.micheline import MichelineLiteral, MichelineSequence, MichelsonRuntimeError
-from pytezos.michelson.sections import ParameterSection, StorageSection, ViewSection
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.sections import ParameterSection
+from pytezos.michelson.sections import StorageSection
+from pytezos.michelson.sections import ViewSection
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import (AddressType, ChainIdType, ContractType, KeyHashType, MutezType, NatType, OperationType, OptionType,
-                                     PairType, TimestampType, UnitType)
+from pytezos.michelson.types import AddressType
+from pytezos.michelson.types import ChainIdType
+from pytezos.michelson.types import ContractType
+from pytezos.michelson.types import KeyHashType
+from pytezos.michelson.types import MutezType
+from pytezos.michelson.types import NatType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import PairType
+from pytezos.michelson.types import TimestampType
+from pytezos.michelson.types import UnitType
 from pytezos.michelson.types.base import MichelsonType
 
 
 class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         amount = context.get_amount()
@@ -23,7 +40,6 @@ class AmountInstruction(MichelsonInstruction, prim='AMOUNT'):
 
 
 class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         balance = context.get_balance()
@@ -34,7 +50,6 @@ class BalanceInstruction(MichelsonInstruction, prim='BALANCE'):
 
 
 class ChainIdInstruction(MichelsonInstruction, prim='CHAIN_ID'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         chain_id = context.get_chain_id()
@@ -55,7 +70,6 @@ def get_entrypoint_type(context: AbstractContext, name: str, address=None) -> Op
 
 
 class SelfInstruction(MichelsonInstruction, prim='SELF'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         entrypoint = next(iter(cls.field_names), 'default')
@@ -70,7 +84,6 @@ class SelfInstruction(MichelsonInstruction, prim='SELF'):
 
 
 class SelfAddressInstruction(MichelsonInstruction, prim='SELF_ADDRESS'):
-
     @classmethod
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         res = AddressType.from_value(context.get_self_address())
@@ -80,7 +93,6 @@ class SelfAddressInstruction(MichelsonInstruction, prim='SELF_ADDRESS'):
 
 
 class SenderInstruction(MichelsonInstruction, prim='SENDER'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         sender = context.get_sender()
@@ -91,7 +103,6 @@ class SenderInstruction(MichelsonInstruction, prim='SENDER'):
 
 
 class SourceInstruction(MichelsonInstruction, prim='SOURCE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         source = context.get_source()
@@ -102,7 +113,6 @@ class SourceInstruction(MichelsonInstruction, prim='SOURCE'):
 
 
 class NowInstruction(MichelsonInstruction, prim='NOW'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         now = context.get_now()
@@ -113,7 +123,6 @@ class NowInstruction(MichelsonInstruction, prim='NOW'):
 
 
 class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         contract = cast(ContractType, stack.pop1())
@@ -125,7 +134,6 @@ class AddressInstruction(MichelsonInstruction, prim='ADDRESS'):
 
 
 class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         entrypoint = next(iter(cls.field_names), 'default')
@@ -147,7 +155,6 @@ class ContractInstruction(MichelsonInstruction, prim='CONTRACT', args_len=1):
 
 
 class ImplicitAccountInstruction(MichelsonInstruction, prim='IMPLICIT_ACCOUNT'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         key_hash = cast(KeyHashType, stack.pop1())
@@ -178,7 +185,7 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
             script=cls.args[0],  # type: ignore
             storage=initial_storage,
             balance=int(amount),
-            delegate=None if delegate.is_none() else str(delegate.get_some())
+            delegate=None if delegate.is_none() else str(delegate.get_some()),
         )
 
         stack.push(originated_address)
@@ -188,15 +195,13 @@ class CreateContractInstruction(MichelsonInstruction, prim='CREATE_CONTRACT', ar
 
 
 class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         delegate = cast(OptionType, stack.pop1())
         delegate.assert_type_equal(OptionType.create_type(args=[KeyHashType]))
 
         delegation = OperationType.delegation(
-            source=context.get_self_address(),
-            delegate=None if delegate.is_none() else str(delegate.get_some())
+            source=context.get_self_address(), delegate=None if delegate.is_none() else str(delegate.get_some())
         )
         stack.push(delegation)
         stdout.append(format_stdout(cls.prim, [delegate], [delegation]))  # type: ignore
@@ -204,7 +209,6 @@ class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
 
 
 class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         parameter, amount, destination = cast(Tuple[MichelsonType, MutezType, ContractType], stack.pop3())
@@ -223,7 +227,7 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
             amount=int(amount),
             entrypoint=destination.get_entrypoint(),
             value=parameter.to_micheline_value(),
-            param_type=param_type
+            param_type=param_type,
         )
         stack.push(transaction)
         stdout.append(format_stdout(cls.prim, [parameter, amount, destination], [transaction]))  # type: ignore
@@ -231,7 +235,6 @@ class TransferTokensInstruction(MichelsonInstruction, prim='TRANSFER_TOKENS'):
 
 
 class VotingPowerInstruction(MichelsonInstruction, prim='VOTING_POWER'):
-
     @classmethod
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         address = cast(KeyHashType, stack.pop1())
@@ -243,7 +246,6 @@ class VotingPowerInstruction(MichelsonInstruction, prim='VOTING_POWER'):
 
 
 class TotalVotingPowerInstruction(MichelsonInstruction, prim='TOTAL_VOTING_POWER'):
-
     @classmethod
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         res = NatType.from_value(context.get_total_voting_power())
@@ -253,7 +255,6 @@ class TotalVotingPowerInstruction(MichelsonInstruction, prim='TOTAL_VOTING_POWER
 
 
 class LevelInstruction(MichelsonInstruction, prim='LEVEL'):
-
     @classmethod
     def execute(cls, stack: 'MichelsonStack', stdout: List[str], context: AbstractContext):
         res = NatType.from_value(context.get_level())
@@ -312,14 +313,12 @@ class ViewInstruction(MichelsonInstruction, prim='VIEW', args_len=2):
 
 
 class OpenChestInstruction(MichelsonInstruction, prim='OPEN_CHEST'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         raise NotImplementedError
 
 
 class MinBlockTimeInstruction(MichelsonInstruction, prim='MIN_BLOCK_TIME'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = NatType.from_value(context.get_min_block_time())

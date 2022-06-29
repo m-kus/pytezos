@@ -1,18 +1,17 @@
-from typing import Any, Dict
+from typing import Any
+from typing import Dict
 
-from pytezos.michelson.forge import (
-    forge_address,
-    forge_array,
-    forge_base58,
-    forge_bool,
-    forge_int,
-    forge_int16,
-    forge_int32,
-    forge_micheline,
-    forge_nat,
-    forge_public_key,
-    forge_script,
-)
+from pytezos.michelson.forge import forge_address
+from pytezos.michelson.forge import forge_array
+from pytezos.michelson.forge import forge_base58
+from pytezos.michelson.forge import forge_bool
+from pytezos.michelson.forge import forge_int
+from pytezos.michelson.forge import forge_int16
+from pytezos.michelson.forge import forge_int32
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import forge_nat
+from pytezos.michelson.forge import forge_public_key
+from pytezos.michelson.forge import forge_script
 from pytezos.rpc.kind import operation_tags
 
 reserved_entrypoints = {

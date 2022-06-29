@@ -1,21 +1,33 @@
+from contextlib import suppress
 from functools import wraps
 from pprint import pformat
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, TypeVar, Union, cast, overload
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Sequence
+from typing import Tuple
+from typing import Type
+from typing import TypeVar
+from typing import Union
+from typing import cast
+from typing import overload
 
 from typing_extensions import Literal
 
-from pytezos.michelson.forge import unforge_address, unforge_chain_id, unforge_micheline, unforge_public_key, unforge_signature
+from pytezos.michelson.forge import unforge_address
+from pytezos.michelson.forge import unforge_chain_id
+from pytezos.michelson.forge import unforge_micheline
+from pytezos.michelson.forge import unforge_public_key
+from pytezos.michelson.forge import unforge_signature
 from pytezos.michelson.format import micheline_to_michelson
 
 
 class MichelsonRuntimeError(Exception):
-
     def format_stdout(self):
-        offset, instruction = next((
-            (len(self.args) - i, arg)
-            for i, arg in enumerate(reversed(self.args))
-            if str(arg).isupper()
-        ), (0, 'ERROR'))
+        offset, instruction = next(
+            ((len(self.args) - i, arg) for i, arg in enumerate(reversed(self.args)) if str(arg).isupper()), (0, 'ERROR')
+        )
         message = ' -> '.join(self.args[offset:])
         return f'{instruction}: {message}'
 
@@ -31,6 +43,7 @@ def catch(prim, func):
             if prim:
                 e.args = (prim, *e.args)
             raise MichelsonRuntimeError(*e.args) from e
+
     return wrapper
 
 
@@ -42,12 +55,13 @@ def try_catch(prim):
                 return func(*args, **kwargs)
             except Exception as e:
                 raise MichelsonRuntimeError(prim, *e.args) from e
+
         return wrapper
+
     return _catch
 
 
 class ErrorTrace(type):
-
     def __new__(mcs, name, bases, attrs, **kwargs):
         wrapped_attrs = {}
         for attr_name, attr in attrs.items():
@@ -104,7 +118,7 @@ def micheline_value_to_python_object(val_expr):
             elif prim == 'bytes':
                 return blind_unpack(bytes.fromhex(val_expr[prim]))
             elif prim == 'bool':
-                return True if val_expr[prim] == 'True' else False
+                return val_expr[prim] == 'True'
         elif val_expr.get('prim'):
             prim = val_expr['prim']
             if prim == 'Pair':
@@ -113,34 +127,22 @@ def micheline_value_to_python_object(val_expr):
 
 
 def blind_unpack(data: bytes):
-    try:
+    with suppress(ValueError):
         return unforge_chain_id(data)
-    except ValueError:
-        pass
-    try:
+    with suppress(ValueError, KeyError):
         return unforge_address(data)
-    except (ValueError, KeyError):
-        pass
-    try:
+    with suppress(ValueError, KeyError):
         return unforge_public_key(data)
-    except (ValueError, KeyError):
-        pass
-    try:
+    with suppress(ValueError):
         return unforge_signature(data)
-    except ValueError:
-        pass
 
     if len(data) > 0 and data.startswith(b'\x05'):
-        try:
+        with suppress(ValueError, AssertionError):
             res = unforge_micheline(data[1:])
             return micheline_value_to_python_object(res)
-        except (ValueError, AssertionError):
-            pass
 
-    try:
+    with suppress(ValueError):
         return data.decode()
-    except ValueError:
-        pass
 
     return data
 
@@ -160,10 +162,10 @@ class Micheline(metaclass=ErrorTrace):
             cls.prim = prim
 
     def __str__(self):
-        assert False, '__str__ has to be explicitly defined'
+        raise AssertionError('__str__ has to be explicitly defined')
 
     def __repr__(self):
-        assert False, '__repr__ has to be explicitly defined'
+        raise AssertionError('__repr__ has to be explicitly defined')
 
     @staticmethod
     def match(expr) -> Type['Micheline']:
@@ -192,20 +194,20 @@ class Micheline(metaclass=ErrorTrace):
                 except Exception as e:
                     raise MichelsonRuntimeError(cls.prim, *e.args) from e
             else:
-                literal = parse_micheline_literal(expr, {
-                    'int': int,
-                    'string': str,
-                    'bytes': bytes.fromhex,
-                })
+                literal = parse_micheline_literal(
+                    expr,
+                    {
+                        'int': int,
+                        'string': str,
+                        'bytes': bytes.fromhex,
+                    },
+                )
                 return MichelineLiteral.create(literal=literal)
         else:
             raise MichelsonRuntimeError(f'malformed expression `{expr}`')
 
     @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['Micheline']:
+    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['Micheline']:
         res = type(cls.__name__, (cls,), dict(args=args, **kwargs))
         return cast(Type['MichelsonPrimitive'], res)  # type: ignore
 
@@ -213,12 +215,14 @@ class Micheline(metaclass=ErrorTrace):
     def assert_type_equal(cls, other: Type['Micheline'], path='', message=''):
         comment = f' [{message}]' if message else ''
         assert cls.prim == other.prim, f'expected {other.prim}, got {cls.prim} at `{path}`{comment}'
-        assert len(cls.args) == len(other.args), \
-            f'expected {len(other.args)} args, got {len(cls.args)} at `{path}`{comment}'
+        assert len(cls.args) == len(
+            other.args
+        ), f'expected {len(other.args)} args, got {len(cls.args)} at `{path}`{comment}'
         for i, arg in enumerate(other.args):
             cls.args[i].assert_type_equal(arg, path=f'{path}/{i}', message=message)
-        assert cls.literal == other.literal, \
-            f'expected {other.literal}, got {cls.literal} at `{path}`{comment}'  # type: ignore
+        assert (
+            cls.literal == other.literal
+        ), f'expected {other.literal}, got {cls.literal} at `{path}`{comment}'  # type: ignore
 
     @classmethod
     def assert_type_in(cls, *others: Type['Micheline'], message=''):
@@ -229,19 +233,18 @@ class Micheline(metaclass=ErrorTrace):
     @classmethod
     def as_micheline_expr(cls) -> dict:
         args = [arg.as_micheline_expr() for arg in cls.args]
-        expr = dict(prim=cls.prim, args=args)
+        expr = {'prim': cls.prim, 'args': args}
         return {k: v for k, v in expr.items() if v}
 
     @classmethod
     def execute(cls, stack, stdout, context) -> 'Micheline':
-        assert False, f'`execute` has to be explicitly defined ({cls.prim})'
+        raise AssertionError(f'`execute` has to be explicitly defined ({cls.prim})')
 
 
 MichelineT = TypeVar('MichelineT', bound=Micheline)
 
 
 class MichelineSequence(Micheline):
-
     def __init__(self, items: List[Micheline]):
         super(MichelineSequence, self).__init__()
         self.items = items
@@ -256,17 +259,12 @@ class MichelineSequence(Micheline):
 
 
 class GlobalConstant(Micheline, prim='constant', args_len=1):
-
     @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['Micheline']:
+    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['Micheline']:
         raise RuntimeError('Please, register global constants in advance using context helpers')
 
 
 class MichelineLiteral(Micheline):
-
     @classmethod
     def create(cls, literal: Union[int, str, bytes]):
         return cls.create_type(args=[], annots=[], literal=literal)
@@ -280,7 +278,7 @@ class MichelineLiteral(Micheline):
         elif isinstance(cls.literal, bytes):
             return {'bytes': cls.literal.hex()}
         else:
-            assert False, f'unexpected value `{cls.literal}`'
+            raise AssertionError(f'unexpected value `{cls.literal}`')
 
     @classmethod
     def get_int(cls) -> int:
@@ -310,26 +308,28 @@ def validate_sections(sequence: Type[MichelineSequence], required_sections: Sequ
 
 
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[True])\
-        -> MichelineT:
+def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[True]) -> MichelineT:
     ...
 
 
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[False])\
-        -> Optional[MichelineT]:
+def get_script_section(
+    sequence: Type[MichelineSequence], cls: None, name: str, required: Literal[False]
+) -> Optional[MichelineT]:
     ...
 
 
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[True])\
-        -> MichelineT:
+def get_script_section(
+    sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[True]
+) -> MichelineT:
     ...
 
 
 @overload
-def get_script_section(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[False])\
-        -> Optional[MichelineT]:
+def get_script_section(
+    sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None, required: Literal[False]
+) -> Optional[MichelineT]:
     ...
 
 
@@ -348,14 +348,12 @@ def get_script_section(sequence, cls=None, name=None, required=False):
 
 
 @overload
-def get_script_sections(sequence: Type[MichelineSequence], cls: None, name: str)\
-        -> List[MichelineT]:
+def get_script_sections(sequence: Type[MichelineSequence], cls: None, name: str) -> List[MichelineT]:
     ...
 
 
 @overload
-def get_script_sections(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None)\
-        -> List[MichelineT]:
+def get_script_sections(sequence: Type[MichelineSequence], cls: Type[MichelineT], name: None) -> List[MichelineT]:
     ...
 
 

@@ -1,18 +1,29 @@
 from pprint import pformat
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 from deprecation import deprecated  # type: ignore
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
-from pytezos.crypto.encoding import base58_decode, base58_encode, is_bh
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
+from pytezos.crypto.encoding import is_bh
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.forge import forge_base58
-from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE, MAX_OPERATIONS_TTL
+from pytezos.operation import DEFAULT_BURN_RESERVE
+from pytezos.operation import DEFAULT_GAS_RESERVE
+from pytezos.operation import MAX_OPERATIONS_TTL
 from pytezos.operation.content import ContentMixin
-from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
+from pytezos.operation.fees import calculate_fee
+from pytezos.operation.fees import default_fee
+from pytezos.operation.fees import default_gas_limit
+from pytezos.operation.fees import default_storage_limit
 from pytezos.operation.forge import forge_operation_group
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
@@ -136,7 +147,9 @@ class OperationGroup(ContextMixin, ContentMixin):
             'period': lambda x: str(self.shell.head.voting_period()),
             'public_key': lambda x: self.key.public_key(),
             'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, constants)),
-            'storage_limit': lambda x: str(storage_limit) if storage_limit is not None else str(default_storage_limit(x, constants)),
+            'storage_limit': lambda x: str(storage_limit)
+            if storage_limit is not None
+            else str(default_storage_limit(x, constants)),
             'fee': lambda x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)),
         }
 

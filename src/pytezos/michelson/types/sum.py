@@ -1,10 +1,22 @@
-from typing import Generator, List, Optional, Tuple, Type, Union, cast
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.micheline import Micheline, parse_micheline_value
-from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_or
-from pytezos.michelson.types.base import MichelsonType, Undefined, undefined
-from pytezos.michelson.types.core import Unit, UnitType
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import parse_micheline_value
+from pytezos.michelson.types.adt import ADTMixin
+from pytezos.michelson.types.adt import Nested
+from pytezos.michelson.types.adt import wrap_or
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import Undefined
+from pytezos.michelson.types.base import undefined
+from pytezos.michelson.types.core import Unit
+from pytezos.michelson.types.core import UnitType
 
 
 class LeftLiteral(Micheline, prim='Left', args_len=1):
@@ -31,10 +43,7 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
     def __eq__(self, other):  # type: ignore
         if not isinstance(other, OrType):
             return False
-        return all(
-            item == other.items[i]
-            for i, item in enumerate(self.items)
-        )
+        return all(item == other.items[i] for i, item in enumerate(self.items))
 
     def __lt__(self, other: 'OrType'):  # type: ignore
         if self.is_left() and other.is_right():
@@ -79,10 +88,7 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
                 yield path + str(i), arg
 
     @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['OrType']:
+    def create_type(cls, args: List[Type['Micheline']], annots: Optional[list] = None, **kwargs) -> Type['OrType']:
         def all_units(arguments: List[Type['Micheline']]):
             for arg in arguments:
                 if issubclass(arg, OrType):
@@ -104,8 +110,10 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
         if cls.is_enum:
             doc = ' || '.join(flat_args.keys())
         else:
-            variants = [(entrypoint, arg.generate_pydoc(definitions, inferred_name=entrypoint))
-                        for entrypoint, arg in flat_args.items()]
+            variants = [
+                (entrypoint, arg.generate_pydoc(definitions, inferred_name=entrypoint))
+                for entrypoint, arg in flat_args.items()
+            ]
             if comparable:
                 doc = ' ||\n\t'.join(f'( "{entrypoint}", {arg_doc} )' for entrypoint, arg_doc in variants)
             else:
@@ -119,10 +127,13 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'OrType':
-        value = parse_micheline_value(val_expr, {
-            ('Left', 1): lambda x: (cls.args[0].from_micheline_value(x[0]), Undefined),
-            ('Right', 1): lambda x: (Undefined, cls.args[1].from_micheline_value(x[0]))
-        })
+        value = parse_micheline_value(
+            val_expr,
+            {
+                ('Left', 1): lambda x: (cls.args[0].from_micheline_value(x[0]), Undefined),
+                ('Right', 1): lambda x: (Undefined, cls.args[1].from_micheline_value(x[0])),
+            },
+        )
         return cls(value)
 
     @classmethod
@@ -143,12 +154,12 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
             assert key_to_path, f'sum type has to be named (in the scope of PyTezos)'
             return cls.from_python_object(wrap_or(py_obj[entrypoint], key_to_path[entrypoint]))
         elif isinstance(py_obj, Nested):
-            value = tuple(Undefined if py_obj[i] is Undefined
-                          else cls.args[i].from_python_object(py_obj[i])
-                          for i in [0, 1])
+            value = tuple(
+                Undefined if py_obj[i] is Undefined else cls.args[i].from_python_object(py_obj[i]) for i in [0, 1]
+            )
             return cls(value)
         else:
-            assert False, f'expected list, tuple, or dict, got `{py_obj}`'
+            raise AssertionError(f'expected list, tuple, or dict, got `{py_obj}`')
 
     def iter_values(self, path='') -> Generator[Tuple[str, MichelsonType], None, None]:
         for i, arg in enumerate(self.items):
@@ -169,27 +180,33 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
         for i, prim in enumerate(['Left', 'Right']):
             if isinstance(self.items[i], MichelsonType):
                 return {'prim': prim, 'args': [self.items[i].to_micheline_value(mode=mode, lazy_diff=lazy_diff)]}
-        assert False, f'unexpected value {self.items}'
+        raise AssertionError(f'unexpected value {self.items}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> Union[tuple, dict]:
         flat_values = self.get_flat_values(infer_names=True)
-        assert isinstance(flat_values, dict) and len(flat_values) == 1, \
-            f'sum type has to be named (in the scope of PyTezos)'
+        assert (
+            isinstance(flat_values, dict) and len(flat_values) == 1
+        ), f'sum type has to be named (in the scope of PyTezos)'
         entrypoint = next(iter(flat_values))
         if self.is_enum:
             return entrypoint  # type: ignore
         else:
-            py_obj = flat_values[entrypoint].to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable)
+            py_obj = flat_values[entrypoint].to_python_object(
+                try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable
+            )
             return (entrypoint, py_obj) if comparable else {entrypoint: py_obj}
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'OrType':
-        items = tuple(item.merge_lazy_diff(lazy_diff) if isinstance(item, MichelsonType) else item
-                      for item in self.items)
+        items = tuple(
+            item.merge_lazy_diff(lazy_diff) if isinstance(item, MichelsonType) else item for item in self.items
+        )
         return type(self)(items)  # type: ignore
 
     def aggregate_lazy_diff(self, lazy_diff: List[dict], mode='readable'):
-        items = tuple(item.aggregate_lazy_diff(lazy_diff, mode=mode) if isinstance(item, MichelsonType) else item
-                      for item in self.items)
+        items = tuple(
+            item.aggregate_lazy_diff(lazy_diff, mode=mode) if isinstance(item, MichelsonType) else item
+            for item in self.items
+        )
         return type(self)(items)  # type: ignore
 
     def attach_context(self, context: AbstractContext, big_map_copy=False):

@@ -1,10 +1,19 @@
-from typing import Any, Dict, List, Optional, Type, Union, cast
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Type
+from typing import Union
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.types import OrType
-from pytezos.michelson.types.adt import wrap_or, wrap_parameters
-from pytezos.michelson.types.base import MichelsonType, parse_name
+from pytezos.michelson.types.adt import wrap_or
+from pytezos.michelson.types.adt import wrap_parameters
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import parse_name
 from pytezos.michelson.types.core import Unit
 
 
@@ -30,10 +39,9 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         return cls
 
     @classmethod
-    def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['ParameterSection']:
+    def create_type(
+        cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs
+    ) -> Type['ParameterSection']:
         assert not annots, 'top level parameter annotations not supported'
 
         root_type = cast(Type[MichelsonType], args[0])
@@ -55,7 +63,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
 
     @classmethod
     def list_entrypoints(cls) -> Dict[str, Type[MichelsonType]]:
-        entrypoints = dict()
+        entrypoints = {}
         root_type = cls.args[0]
         if issubclass(root_type, OrType):
             flat_args = root_type.get_flat_args(entrypoints=True)
@@ -69,8 +77,10 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
     def from_parameters(cls, parameters: Dict[str, Any]) -> 'ParameterSection':
         if len(parameters) == 0:
             parameters = {'entrypoint': 'default', 'value': {'prim': 'Unit'}}
-        assert isinstance(parameters, dict) and parameters.keys() == {'entrypoint', 'value'}, \
-            f'expected {{entrypoint, value}}, got {parameters}'
+        assert isinstance(parameters, dict) and parameters.keys() == {
+            'entrypoint',
+            'value',
+        }, f'expected {{entrypoint, value}}, got {parameters}'
         entrypoint = parameters['entrypoint']
         if entrypoint == cls.root_name:
             res = cls.from_micheline_value(parameters['value'])
@@ -90,8 +100,7 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
             flat_values = self.item.get_flat_values(entrypoints=True)
             assert isinstance(flat_values, dict) and len(flat_values) == 1, f'expected named type'
             entrypoint, item = next(iter(flat_values.items()))
-        return {'entrypoint': entrypoint,
-                'value': item.to_micheline_value(mode=mode, lazy_diff=None)}
+        return {'entrypoint': entrypoint, 'value': item.to_micheline_value(mode=mode, lazy_diff=None)}
 
     @classmethod
     def generate_pydoc(cls) -> str:

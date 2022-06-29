@@ -1,5 +1,12 @@
 from traceback import format_exception
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
 import traitlets
 from ipykernel.kernelbase import Kernel
@@ -8,15 +15,18 @@ from tabulate import tabulate
 from michelson_kernel import __version__
 from michelson_kernel.docs import docs
 from pytezos import micheline_to_michelson
-from pytezos.michelson.instructions import BigMapDiffInstruction, CommitInstruction
+from pytezos.michelson.instructions import BigMapDiffInstruction
+from pytezos.michelson.instructions import CommitInstruction
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.jupyter import RunInstruction
-from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParserError
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.tags import prim_tags
-from pytezos.michelson.types import OperationType, PairType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import PairType
 from pytezos.michelson.types.domain import LambdaType
 from pytezos.michelson.types.list import ListType
 from pytezos.michelson.types.map import MapType
@@ -209,7 +219,9 @@ class MichelsonKernel(Kernel):
             },
         )
 
-    def _find_stack_items(self, instructions: MichelineSequence, stack: MichelsonStack) -> Optional[List[MichelsonInstruction]]:
+    def _find_stack_items(
+        self, instructions: MichelineSequence, stack: MichelsonStack
+    ) -> Optional[List[MichelsonInstruction]]:
         for operation in instructions.items[::-1]:
             items = getattr(operation, 'items', None)
             if isinstance(items, list):

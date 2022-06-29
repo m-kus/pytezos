@@ -1,8 +1,11 @@
 import json
-from os.path import dirname, join
-from unittest import TestCase, skip
+from os.path import dirname
+from os.path import join
+from unittest import TestCase
+from unittest import skip
 
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.parse import michelson_to_micheline
@@ -27,7 +30,7 @@ class MainnetContractTestCaseQUIPUSWAP_STABLESWAP_AMM_FACTORY(TestCase):
         cls.entrypoints = entrypoints
         # cls.maxDiff = None
 
-    @skip  # this is ok, pytezos does not preserve the original pair layout and fails to reconstruct it
+    @skip('this is ok, pytezos does not preserve the original pair layout and fails to reconstruct it')
     def test_parameter_type_quipuswap_stableswap_amm_factory(self):
         type_expr = self.program.parameter.as_micheline_expr()
         self.assertEqual(get_script_section(self.script, name='parameter'), type_expr, 'micheline -> type -> micheline')
@@ -40,7 +43,7 @@ class MainnetContractTestCaseQUIPUSWAP_STABLESWAP_AMM_FACTORY(TestCase):
                 expected_type = MichelsonType.match(self.entrypoints['entrypoints'][name])
                 expected_type.assert_type_equal(ep_type)
 
-    @skip  # this is ok, pytezos does not preserve the original pair layout and fails to reconstruct it
+    @skip('this is ok, pytezos does not preserve the original pair layout and fails to reconstruct it')
     def test_storage_type_quipuswap_stableswap_amm_factory(self):
         type_expr = self.program.storage.as_micheline_expr()
         self.assertEqual(get_script_section(self.script, name='storage'), type_expr, 'micheline -> type -> micheline')

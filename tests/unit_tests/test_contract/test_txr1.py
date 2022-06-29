@@ -1,4 +1,5 @@
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
 
 from pytezos import ContractInterface
@@ -7,7 +8,9 @@ from pytezos import ContractInterface
 class Txr1ContractTest(TestCase):
     def test_txr1(self):
         contract = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'txr1.tz'))
-        res = contract.default(['KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X', 'txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi']).interpret()
+        res = contract.default(
+            ['KT1ENowZcfjAwYPSresbMBHnLMUhhuACWL7X', 'txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi']
+        ).interpret()
         self.assertEqual(
             res.operations[0],
             {

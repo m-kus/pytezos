@@ -1,6 +1,7 @@
 import difflib
 import re
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 
 import simplejson as json
 
@@ -16,11 +17,7 @@ def make_patch(a, b, filename, context_size=0):
     Returns empty string if strings are identical.
     """
     diffs = difflib.unified_diff(
-        a=a.splitlines(True),
-        b=b.splitlines(True),
-        fromfile=filename,
-        tofile=filename,
-        n=context_size
+        a=a.splitlines(True), b=b.splitlines(True), fromfile=filename, tofile=filename, n=context_size
     )
     diffs = map(lambda x: x if x[-1] == '\n' else x + '\n' + _no_eol + '\n', diffs)
     return ''.join(diffs)
@@ -65,7 +62,7 @@ def apply_patch(source, patch, revert=False):
             if len(line) > 0:
                 if line[0] == sign or line[0] == ' ':
                     target += line[1:]
-                sl += (line[0] != sign)
+                sl += line[0] != sign
 
     target += ''.join(source[sl:])
     return target
@@ -82,8 +79,8 @@ def generate_unidiff_html(diffs: list, output_path=None):
     if output_path:
         with open(output_path, 'w') as f:
             f.write(html)
-    else:
-        return html
+        return None
+    return html
 
 
 def generate_jsondiff_html(left: dict, right: dict, output_path=None):
@@ -93,5 +90,5 @@ def generate_jsondiff_html(left: dict, right: dict, output_path=None):
     if output_path:
         with open(output_path, 'w') as f:
             f.write(html)
-    else:
-        return html
+        return None
+    return html

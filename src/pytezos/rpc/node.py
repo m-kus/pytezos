@@ -1,6 +1,10 @@
 import json
 from pprint import pformat
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 import requests
 import requests.exceptions
@@ -79,7 +83,7 @@ class RpcNode:
 
     def __repr__(self) -> str:
         res = [
-            super(RpcNode, self).__repr__(),
+            super().__repr__(),
             '\nNode address',
             self.uri[0],
         ]
@@ -117,7 +121,9 @@ class RpcNode:
         logger.debug('<<<<< %s\n%s', res.status_code, json.dumps(res.json(), indent=4))
         return res
 
-    def get(self, path: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None) -> requests.Response:
+    def get(
+        self, path: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None
+    ) -> requests.Response:
         return self.request('GET', path, params=params, timeout=timeout).json()
 
     def post(self, path: str, params: Optional[Dict[str, Any]] = None, json=None) -> Union[requests.Response, str]:

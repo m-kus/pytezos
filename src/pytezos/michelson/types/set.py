@@ -1,13 +1,15 @@
 from copy import copy
-from typing import Generator, List, Type
+from typing import Generator
+from typing import List
+from typing import Type
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.micheline import Micheline, MichelineSequence
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.types.base import MichelsonType
 
 
 class SetType(MichelsonType, prim='set', args_len=1):
-
     def __init__(self, items: List[MichelsonType]):
         super(SetType, self).__init__()
         self.items = items
@@ -44,7 +46,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
     @classmethod
     def check_constraints(cls, items: List[MichelsonType]):
         assert len(set(items)) == len(items), f'duplicate elements found'
-        assert items == list(sorted(items)), f'set elements are not sorted'
+        assert items == sorted(items), f'set elements are not sorted'
 
     @classmethod
     def dummy(cls, context: AbstractContext):
@@ -66,7 +68,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
             assert isinstance(py_obj, set), f'expected set or list, got {type(py_obj).__name__}'
             py_set = py_obj
         items = list(map(cls.args[0].from_python_object, py_set))
-        items = list(sorted(items))
+        items = sorted(items)
         return cls(items)
 
     def to_literal(self) -> Type[Micheline]:
@@ -77,16 +79,16 @@ class SetType(MichelsonType, prim='set', args_len=1):
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         assert not comparable, f'{self.prim} is not comparable'
-        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack,
-                                                     lazy_diff=lazy_diff,
-                                                     comparable=True), self))
+        return list(
+            map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=True), self)
+        )
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
-        arg_doc = cls.args[0].generate_pydoc(definitions,
-                                             inferred_name=f'{name}_item' if name else None,
-                                             comparable=True)
+        arg_doc = cls.args[0].generate_pydoc(
+            definitions, inferred_name=f'{name}_item' if name else None, comparable=True
+        )
         return f'{{ {arg_doc}, … }}'
 
     def contains(self, item: MichelsonType) -> bool:
@@ -98,7 +100,7 @@ class SetType(MichelsonType, prim='set', args_len=1):
             return copy(self)
         else:
             items = [item] + self.items
-            return type(self)(list(sorted(items)))
+            return type(self)(sorted(items))
 
     def remove(self, item: MichelsonType) -> 'SetType':
         if self.contains(item):

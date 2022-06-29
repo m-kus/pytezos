@@ -1,16 +1,15 @@
-from unittest.case import TestCase, skip
+from unittest.case import TestCase
+from unittest.case import skip
 
 from pytezos import MichelsonRuntimeError
 from pytezos.michelson.instructions import CommitInstruction
 from pytezos.michelson.repl import Interpreter
-from pytezos.michelson.types import (
-    PairType,
-    IntType,
-    UnitType,
-    ListType,
-    BigMapType,
-    OperationType,
-)
+from pytezos.michelson.types import BigMapType
+from pytezos.michelson.types import IntType
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import PairType
+from pytezos.michelson.types import UnitType
 
 
 class InterpreterTest(TestCase):
@@ -187,11 +186,7 @@ class InterpreterTest(TestCase):
         )
         self.assertEqual({}, interpreter.context.big_maps)
         commit_instruction = next(
-            (
-                i
-                for i in result.instructions.items[0].items[::-1]
-                if isinstance(i, CommitInstruction)
-            )
+            (i for i in result.instructions.items[0].items[::-1] if isinstance(i, CommitInstruction))  # type: ignore
         )
         self.assertEqual(
             [
@@ -291,11 +286,7 @@ class InterpreterTest(TestCase):
             result.stdout,
         )
         commit_instruction = next(
-            (
-                i
-                for i in result.instructions.items[0].items[::-1]
-                if isinstance(i, CommitInstruction)
-            )
+            (i for i in result.instructions.items[0].items[::-1] if isinstance(i, CommitInstruction))  # type: ignore
         )
         self.assertEqual(
             PairType(

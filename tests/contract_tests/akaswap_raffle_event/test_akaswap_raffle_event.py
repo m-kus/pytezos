@@ -1,8 +1,11 @@
 import json
-from os.path import dirname, join
-from unittest import TestCase, skip
+from os.path import dirname
+from os.path import join
+from unittest import TestCase
+from unittest import skip
 
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.parse import michelson_to_micheline
@@ -43,7 +46,7 @@ class MainnetContractTestCaseAKASWAP_RAFFLE_EVENT(TestCase):
         type_expr = self.program.storage.as_micheline_expr()
         self.assertEqual(get_script_section(self.script, name='storage'), type_expr, 'micheline -> type -> micheline')
 
-    @skip  # this is a strange edge case when node didn't leave the named pair non-flattened
+    @skip('this is a strange edge case when node didn\'t leave the named pair non-flattened')
     def test_storage_encoding_akaswap_raffle_event(self):
         val = self.program.storage.from_micheline_value(self.script['storage'])
         val_expr = val.to_micheline_value(mode='optimized')

@@ -1,8 +1,11 @@
-from typing import List, Optional, Tuple
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 from pyblake2 import blake2b  # type: ignore
 
-from pytezos.crypto.encoding import base58_decode, base58_encode
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 
 
@@ -14,17 +17,12 @@ def get_originated_address(index: int, opg_hash=None):
 
 
 class KeyHash(Key):
-
     def __init__(self, public_key_hash):
-        super(KeyHash, self).__init__(0)
+        super().__init__(0)
         self._pkh = public_key_hash
 
     def __repr__(self):
-        res = [
-            super(Key, self).__repr__(),
-            f'\nPublic key hash',
-            self.public_key_hash()
-        ]
+        res = [super().__repr__(), f'\nPublic key hash', self.public_key_hash()]
         return '\n'.join(res)
 
     def public_key_hash(self):
@@ -44,7 +42,6 @@ class KeyHash(Key):
 
 
 class AbstractContext:
-
     def reset(self):
         raise NotImplementedError
 

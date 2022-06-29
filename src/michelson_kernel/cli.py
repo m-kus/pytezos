@@ -2,7 +2,8 @@ import json
 import os
 import shutil
 import sys
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from tempfile import TemporaryDirectory
 
 import click

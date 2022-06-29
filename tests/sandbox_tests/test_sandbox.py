@@ -1,10 +1,10 @@
 from pytezos.sandbox.node import SandboxedNodeTestCase
-from pytezos.sandbox.parameters import sandbox_addresses, sandbox_commitment
+from pytezos.sandbox.parameters import sandbox_addresses
+from pytezos.sandbox.parameters import sandbox_commitment
 
 
 # NOTE: Node won't be wiped between tests so alphabetical order of method names matters
 class SandboxTestCase(SandboxedNodeTestCase):
-
     def test_1_activate_protocol(self) -> None:
         header = self.client.shell.head.header()
         self.assertIsNotNone(header.get('content'))
@@ -15,10 +15,15 @@ class SandboxTestCase(SandboxedNodeTestCase):
     def test_3_create_transaction(self) -> None:
         bootstrap3 = self.client.shell.contracts[sandbox_addresses['bootstrap3']]()
         print(bootstrap3['balance'])
-        opg = self.client.transaction(
-            destination=sandbox_addresses['bootstrap3'],
-            amount=42,
-        ).fill().sign().inject(min_confirmations=0)
+        opg = (
+            self.client.transaction(
+                destination=sandbox_addresses['bootstrap3'],
+                amount=42,
+            )
+            .fill()
+            .sign()
+            .inject(min_confirmations=0)
+        )
         self.assertIsNotNone(self.client.shell.mempool.pending_operations[opg['hash']])
 
     def test_4_bake_block(self) -> None:
@@ -35,8 +40,13 @@ class SandboxTestCase(SandboxedNodeTestCase):
 
     def test_6_reveal_pk_and_send_tez(self) -> None:
         client = self.get_client(key=sandbox_commitment)
-        res = client.reveal().transaction(destination=sandbox_addresses['bootstrap4'], amount=1000) \
-            .autofill().sign().inject()
+        res = (
+            client.reveal()
+            .transaction(destination=sandbox_addresses['bootstrap4'], amount=1000)
+            .autofill()
+            .sign()
+            .inject()
+        )
         balance_change = sum(int(op.get('amount', 0)) + int(op['fee']) for op in res['contents'])
         self.bake_block()
         self.assertEqual(100500000000 - balance_change, int(client.account()['balance']))

@@ -1,11 +1,19 @@
-from os.path import exists, expanduser
-from typing import Any, Dict, Optional, Union
+from os.path import exists
+from os.path import expanduser
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
 from pytezos.context.impl import ExecutionContext
-from pytezos.crypto.encoding import is_pkh, is_public_key
-from pytezos.crypto.key import Key, is_installed
+from pytezos.crypto.encoding import is_pkh
+from pytezos.crypto.encoding import is_public_key
+from pytezos.crypto.key import Key
+from pytezos.crypto.key import is_installed
 from pytezos.jupyter import InlineDocstring
-from pytezos.rpc import RpcMultiNode, RpcNode, ShellQuery
+from pytezos.rpc import RpcMultiNode
+from pytezos.rpc import RpcNode
+from pytezos.rpc import ShellQuery
 from pytezos.rpc.errors import RpcError
 
 # NOTE: Built-in key for PyTezos client, please, use responsibly.
@@ -51,11 +59,15 @@ keys = {
 
 class KeyHash(Key):
     def __init__(self, public_key_hash):
-        super(KeyHash, self).__init__(b'\x00' * 32)
+        super().__init__(b'\x00' * 32)
         self._pkh = public_key_hash
 
     def __repr__(self):
-        res = [super(Key, self).__repr__(), f'\nPublic key hash', self.public_key_hash()]
+        res = [
+            super().__repr__(),
+            f'\nPublic key hash',
+            self.public_key_hash(),
+        ]
         return '\n'.join(res)
 
     def public_key_hash(self):
@@ -78,7 +90,7 @@ class ContextMixin(metaclass=InlineDocstring):
     """Mixin for blockchain interaction, stores node connection and key object."""
 
     def __init__(self, context: Optional[ExecutionContext] = None):
-        super(ContextMixin, self).__init__()
+        super().__init__()
         if context is None:
             context = ExecutionContext(
                 shell=ShellQuery(RpcNode(nodes[default_network][0])),
@@ -105,7 +117,7 @@ class ContextMixin(metaclass=InlineDocstring):
         return self.context.block_id
 
     def __repr__(self):
-        res = [super(ContextMixin, self).__repr__(), '\nProperties']
+        res = [super().__repr__(), '\nProperties']
         if self.context.key is not None:
             res.append(f'.key\t\t{self.key.public_key_hash()}')
         if self.context.shell is not None:

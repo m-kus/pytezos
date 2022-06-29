@@ -1,13 +1,19 @@
-from typing import List, Tuple, cast
+from typing import List
+from typing import Tuple
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import MichelsonType, NatType, OptionType, PairType, TicketType
+from pytezos.michelson.types import MichelsonType
+from pytezos.michelson.types import NatType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import PairType
+from pytezos.michelson.types import TicketType
 
 
 class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         pair = cast(PairType, stack.pop1())
@@ -26,7 +32,6 @@ class JoinTicketsInstruction(MichelsonInstruction, prim='JOIN_TICKETS'):
 
 
 class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         ticket = cast(TicketType, stack.pop1())
@@ -39,13 +44,12 @@ class ReadTicketInstruction(MichelsonInstruction, prim='READ_TICKET'):
 
 
 class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         ticket, amounts = cast(Tuple[TicketType, PairType], stack.pop2())
         ticket.assert_type_in(TicketType)
         amounts.assert_type_in(PairType)
-        a, b = tuple(amounts)  # type: NatType, NatType  # type: ignore
+        a, b = cast(Tuple[NatType, NatType], tuple(amounts))
         a.assert_type_equal(NatType)
         b.assert_type_equal(NatType)
         res = ticket.split(int(a), int(b))
@@ -59,7 +63,6 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
 
 
 class TicketInstruction(MichelsonInstruction, prim='TICKET'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         item, amount = cast(Tuple[MichelsonType, NatType], stack.pop2())

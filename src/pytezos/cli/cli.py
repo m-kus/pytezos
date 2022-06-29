@@ -4,22 +4,37 @@ import sys
 import tarfile
 import time
 from glob import glob
-from os.path import abspath, dirname, exists, join, split
+from os.path import abspath
+from os.path import dirname
+from os.path import exists
+from os.path import join
+from os.path import split
 from pprint import pformat
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 import click
 import docker  # type: ignore
 
-from pytezos import ContractInterface, __version__, pytezos
-from pytezos.cli.github import create_deployment, create_deployment_status
+from pytezos import ContractInterface
+from pytezos import __version__
+from pytezos import pytezos
+from pytezos.cli.github import create_deployment
+from pytezos.cli.github import create_deployment_status
 from pytezos.context.mixin import default_network
-from pytezos.logging import DEFAULT_LOGGING_CONFIG, logger
+from pytezos.logging import DEFAULT_LOGGING_CONFIG
+from pytezos.logging import logger
 from pytezos.michelson.types.base import generate_pydoc
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
-from pytezos.sandbox.node import DOCKER_IMAGE, TEZOS_NODE_PORT, SandboxedNodeContainer, get_next_baker_key
-from pytezos.sandbox.parameters import EDO, FLORENCE, HANGZHOU, ITHACA
+from pytezos.sandbox.node import DOCKER_IMAGE
+from pytezos.sandbox.node import TEZOS_NODE_PORT
+from pytezos.sandbox.node import SandboxedNodeContainer
+from pytezos.sandbox.node import get_next_baker_key
+from pytezos.sandbox.parameters import EDO
+from pytezos.sandbox.parameters import FLORENCE
+from pytezos.sandbox.parameters import HANGZHOU
+from pytezos.sandbox.parameters import ITHACA
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {
@@ -70,7 +85,9 @@ def cli(*_args, **_kwargs):
 
 @cli.command(help='Manage contract storage')
 @click.option('--action', '-a', type=str, help='One of `schema`, `default`.')
-@click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
+@click.option(
+    '--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>'
+)
 @click.pass_context
 def storage(_ctx, action: str, path: Optional[str]) -> None:
     contract = get_contract(path)
@@ -84,7 +101,9 @@ def storage(_ctx, action: str, path: Optional[str]) -> None:
 
 @cli.command(help='Manage contract storage')
 @click.option('--action', '-a', type=str, default='schema', help='One of `schema`')
-@click.option('--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>')
+@click.option(
+    '--path', '-p', type=str, default=None, help='Path to the .tz file, or the following uri: <network>:<KT-address>'
+)
 @click.pass_context
 def parameter(_ctx, action: str, path: Optional[str]) -> None:
     contract = get_contract(path)
@@ -207,8 +226,8 @@ def update_smartpy(ctx, tag):
 def run_smartpy_container(
     tag: str = 'latest',
     command: str = '',
-    files_to_add: List[str] = [],
-    mounts: List[docker.types.Mount] = [],
+    files_to_add: Optional[List[str]] = None,
+    mounts: Optional[List[docker.types.Mount]] = None,
 ):
     try:
         client = get_docker_client()
@@ -216,11 +235,11 @@ def run_smartpy_container(
             image=f'{SMARTPY_CLI_IMAGE}:{tag}',
             command=command,
             detach=True,
-            mounts=mounts,
+            mounts=mounts or [],
         )
         buffer = io.BytesIO()
         with tarfile.open(fileobj=buffer, mode='w:gz') as archive:
-            for filename in files_to_add:
+            for filename in files_to_add or []:
                 with open(filename, 'rb') as current_file:
                     current_file_data = current_file.read()
                     current_file_buffer = io.BytesIO(initial_bytes=current_file_data)
@@ -240,7 +259,9 @@ def run_smartpy_container(
 @cli.command(help='Run SmartPy CLI command "test"')
 @click.option('--script', '-s', type=str, help='Path to script', default='script.py')
 @click.option('--output-directory', '-o', type=str, help='Output directory', default='./smartpy-output')
-@click.option('--protocol', type=click.Choice(['delphi', 'edo', 'florence', 'proto10']), help='Protocol to use', default='edo')
+@click.option(
+    '--protocol', type=click.Choice(['delphi', 'edo', 'florence', 'proto10']), help='Protocol to use', default='edo'
+)
 @click.option('--detach', '-d', type=bool, help='Run container in detached mode', default=False)
 @click.option('--tag', '-t', type=str, help='Version or tag of SmartPy to use', default='latest')
 @click.pass_context
@@ -259,14 +280,14 @@ def smartpy_test(
         container = run_smartpy_container(
             tag=tag,
             command=f'test /root/smartpy-cli/{script_name} /root/output --protocol {protocol}',
-            files_to_add=[path, ],
+            files_to_add=[path],
             mounts=[
                 docker.types.Mount(
                     target='/root/output',
                     source=output_directory,
-                    type='bind'
+                    type='bind',
                 )
-            ]
+            ],
         )
         if container is None:
             raise Exception('Could not create container. Try running update-smartpy.')
@@ -281,7 +302,9 @@ def smartpy_test(
 @click.option('--script', '-s', type=str, help='Path to script', default='script.py')
 @click.option('--output-directory', '-o', type=str, help='Output directory', default='./smartpy-output')
 @click.option('--detach', '-d', type=bool, help='Run container in detached mode', default=False)
-@click.option('--protocol', type=click.Choice(['delphi', 'edo', 'florence', 'proto10']), help='Protocol to use', default='edo')
+@click.option(
+    '--protocol', type=click.Choice(['delphi', 'edo', 'florence', 'proto10']), help='Protocol to use', default='edo'
+)
 @click.option('--tag', '-t', type=str, help='Version or tag of SmartPy to use', default='latest')
 @click.pass_context
 def smartpy_compile(
@@ -299,14 +322,14 @@ def smartpy_compile(
         container = run_smartpy_container(
             tag=tag,
             command=f'compile /root/smartpy-cli/{script_name} /root/output --protocol {protocol}',
-            files_to_add=[path,],
+            files_to_add=[path],
             mounts=[
                 docker.types.Mount(
                     target='/root/output',
                     source=output_directory,
-                    type='bind'
+                    type='bind',
                 )
-            ]
+            ],
         )
         if container is None:
             raise Exception('Could not create container. Try running update-smartpy.')
@@ -332,10 +355,7 @@ def sandbox(
     interval: float,
     blocks: int,
 ):
-    protocol_hash = {
-        'hangzhou': HANGZHOU,
-        'ithaca': ITHACA
-    }[protocol]
+    protocol_hash = {'hangzhou': HANGZHOU, 'ithaca': ITHACA}[protocol]
 
     with SandboxedNodeContainer(image=image, port=port) as node:
         if not node.wait_for_connection():
@@ -376,7 +396,7 @@ def update_ligo(
 def run_ligo_container(
     tag: str = '0.13.0',
     command: str = '',
-    files_to_add: List[str] = [],
+    files_to_add: Optional[List[str]] = None,
 ):
     try:
         client = get_docker_client()
@@ -387,7 +407,7 @@ def run_ligo_container(
         )
         buffer = io.BytesIO()
         with tarfile.open(fileobj=buffer, mode='w:gz') as archive:
-            for filename in files_to_add:
+            for filename in files_to_add or []:
                 with open(filename, 'rb') as current_file:
                     current_file_data = current_file.read()
                     current_file_buffer = io.BytesIO(initial_bytes=current_file_data)
@@ -423,7 +443,9 @@ def ligo_compile_contract(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-contract {contract_name} "{entry_point}"',
-            files_to_add=[path,]
+            files_to_add=[
+                path,
+            ],
         )
         if not detach:
             for line in container.logs(stream=True):
@@ -452,7 +474,9 @@ def ligo_compile_storage(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-storage {path} "{entry_point}" "{expression}"',
-            files_to_add=[path,],
+            files_to_add=[
+                path,
+            ],
         )
         if not detach:
             for line in container.logs(stream=True):
@@ -481,7 +505,9 @@ def ligo_invoke_contract(
         container = run_ligo_container(
             tag=tag,
             command=f'compile-parameter {path} "{entry_point}" "{expression}"',
-            files_to_add=[path,],
+            files_to_add=[
+                path,
+            ],
         )
         if not detach:
             for line in container.logs(stream=True):

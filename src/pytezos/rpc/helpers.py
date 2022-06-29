@@ -175,7 +175,10 @@ class PreapplyBlockQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/preapply/b
         """
         return self._post(
             json=block,
-            params=dict(sort=sort, timestamp=timestamp),
+            params={
+                'sort': sort,
+                'timestamp': timestamp,
+            },
         )
 
 

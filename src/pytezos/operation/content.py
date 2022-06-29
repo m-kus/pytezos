@@ -1,5 +1,8 @@
 from decimal import Decimal
-from typing import Any, Dict, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
 from pytezos.jupyter import inline_doc
 

@@ -1,6 +1,9 @@
 from decimal import Decimal
 from pprint import pformat
-from typing import Any, Dict, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
 from deprecation import deprecated  # type: ignore
 
@@ -12,8 +15,10 @@ from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE
-from pytezos.operation.content import format_mutez, format_tez
+from pytezos.operation import DEFAULT_BURN_RESERVE
+from pytezos.operation import DEFAULT_GAS_RESERVE
+from pytezos.operation.content import format_mutez
+from pytezos.operation.content import format_tez
 from pytezos.operation.group import OperationGroup
 
 
@@ -81,7 +86,9 @@ class ContractCall(ContextMixin):
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :return: OperationGroup with hash filled
         """
-        return self.as_transaction().send(gas_reserve=gas_reserve, burn_reserve=burn_reserve, min_confirmations=min_confirmations, ttl=ttl)
+        return self.as_transaction().send(
+            gas_reserve=gas_reserve, burn_reserve=burn_reserve, min_confirmations=min_confirmations, ttl=ttl
+        )
 
     def send_async(
         self,

@@ -1,6 +1,9 @@
 import functools
 import operator
-from typing import Any, Dict, Iterator, List
+from typing import Any
+from typing import Dict
+from typing import Iterator
+from typing import List
 
 from pytezos.rpc.errors import RpcError
 
@@ -110,7 +113,8 @@ class OperationResult:
         :returns: list of errors [{"id": "", ...}]
         """
         all_errors = (
-            result.get("errors", []) if result["status"] != "applied" else [] for result in OperationResult.iter_results(operation_group)
+            result.get("errors", []) if result["status"] != "applied" else []
+            for result in OperationResult.iter_results(operation_group)
         )
         return functools.reduce(operator.iconcat, all_errors, [])
 
@@ -122,7 +126,7 @@ class OperationResult:
         OR a single content {"kind": "transaction", ...}
         :returns: list of addresses ["tz12345...", ...]
         """
-        originated_contracts = list()
+        originated_contracts = []
         for result in OperationResult.iter_results(operation_group):
             originated_contracts.extend(result.get('originated_contracts', []))
         return originated_contracts
@@ -144,7 +148,7 @@ class OperationResult:
         elif content.get('result'):
             return content['result']
         else:
-            assert False, content
+            raise AssertionError(content)
 
     @classmethod
     def from_operation_group(cls, operation_group: Dict[str, Any], **predicates) -> List['OperationResult']:

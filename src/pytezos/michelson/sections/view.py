@@ -1,7 +1,14 @@
-from typing import Any, List, Optional, Type, Union, cast
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Type
+from typing import Union
+from typing import cast
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelsonRuntimeError
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.types.base import MichelsonType
 
 
@@ -9,6 +16,7 @@ class ViewSection(Micheline, prim='view', args_len=4):
     """
     Syntax: view {name} {arg_type} {ret_type} {code}
     """
+
     args: List[Type[MichelsonType]]  # type: ignore
     name: str
 
@@ -41,10 +49,9 @@ class ViewSection(Micheline, prim='view', args_len=4):
             ViewSection.check_code(arg, lambda_)
 
     @classmethod
-    def create_type(cls,
-                    args: List[Union[Type['Micheline'], Any]],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['ViewSection']:
+    def create_type(
+        cls, args: List[Union[Type['Micheline'], Any]], annots: Optional[list] = None, **kwargs
+    ) -> Type['ViewSection']:
         view_name = cast(Type[MichelineLiteral], args[0])
         if not issubclass(view_name, MichelineLiteral):
             raise MichelsonRuntimeError('view', 'Expected view name as first argument', view_name)

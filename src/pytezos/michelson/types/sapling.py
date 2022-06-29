@@ -1,8 +1,13 @@
 from copy import copy
-from typing import List, Optional, Type
+from typing import List
+from typing import Optional
+from typing import Type
 
 from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelineSequence, parse_micheline_literal
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.types.base import MichelsonType
 
 
@@ -15,7 +20,6 @@ class SaplingTransactionDeprecatedType(MichelsonType, prim='sapling_transaction_
 
 
 class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
-
     def __init__(self, ptr: Optional[int] = None):
         super(SaplingStateType, self).__init__()
         self.ptr = ptr
@@ -40,7 +44,7 @@ class SaplingStateType(MichelsonType, prim='sapling_state', args_len=1):
         elif isinstance(val_expr, list):
             return cls()
         else:
-            assert False, f'unexpected value {val_expr}'
+            raise AssertionError(f'unexpected value {val_expr}')
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
         if lazy_diff:

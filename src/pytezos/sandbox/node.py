@@ -1,11 +1,16 @@
 import atexit
 import logging
 import unittest
-from concurrent.futures import FIRST_EXCEPTION, Future, ThreadPoolExecutor, wait
+from concurrent.futures import FIRST_EXCEPTION
+from concurrent.futures import Future
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import wait
+from contextlib import suppress
 from pprint import pprint
 from threading import Event
 from time import sleep
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 import requests.exceptions
 from testcontainers.core.container import Container  # type: ignore
@@ -14,7 +19,8 @@ from testcontainers.core.generic import DockerContainer  # type: ignore
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
-from pytezos.sandbox.parameters import LATEST, sandbox_addresses
+from pytezos.sandbox.parameters import LATEST
+from pytezos.sandbox.parameters import sandbox_addresses
 
 DOCKER_IMAGE = 'bakingbad/sandboxed-node:v13.0-1'
 MAX_ATTEMPTS = 100
@@ -24,12 +30,12 @@ TEZOS_NODE_PORT = 8732
 
 def kill_existing_containers():
     docker = DockerClient()
-    running_containers: List[Container] = docker.client.containers.list(filters={'status': 'running', 'ancestor': DOCKER_IMAGE})
+    running_containers: List[Container] = docker.client.containers.list(
+        filters={'status': 'running', 'ancestor': DOCKER_IMAGE}
+    )
     for container in running_containers:
-        try:
+        with suppress(Exception):
             container.stop(timeout=1)
-        except:
-            pass  # Can be stopped in parallel
 
 
 atexit.register(kill_existing_containers)
@@ -44,7 +50,9 @@ def worker_callback(f):
     trace = []
     tb = e.__traceback__
     while tb is not None:
-        trace.append({"filename": tb.tb_frame.f_code.co_filename, "name": tb.tb_frame.f_code.co_name, "lineno": tb.tb_lineno})
+        trace.append(
+            {"filename": tb.tb_frame.f_code.co_filename, "name": tb.tb_frame.f_code.co_name, "lineno": tb.tb_lineno}
+        )
         tb = tb.tb_next
     pprint({'type': type(e).__name__, 'message': str(e), 'trace': trace})
 
@@ -57,13 +65,13 @@ def get_next_baker_key(client: PyTezosClient) -> str:
 
 class SandboxedNodeContainer(DockerContainer):
     def __init__(self, image=DOCKER_IMAGE, port=TEZOS_NODE_PORT):
-        super(SandboxedNodeContainer, self).__init__(image)
+        super().__init__(image)
         self.with_bind_ports(TEZOS_NODE_PORT, port)
         self.url = f'http://localhost:{port}'
         self.client = PyTezosClient().using(shell=self.url)
 
     def start(self):
-        super(SandboxedNodeContainer, self).start()
+        super().start()
         if self.get_wrapped_container() is None:
             raise RuntimeError('Failed to create a container')
 
@@ -179,7 +187,9 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
         if cls.node_container is None:
             raise RuntimeError('sandboxed node container is not created')
         cls.exit_event = Event()
-        cls.baker = cls.executor.submit(cls.autobake, cls.TIME_BETWEEN_BLOCKS, cls.node_container.url, cls.exit_event, cls.min_fee)
+        cls.baker = cls.executor.submit(
+            cls.autobake, cls.TIME_BETWEEN_BLOCKS, cls.node_container.url, cls.exit_event, cls.min_fee
+        )
         cls.baker.add_done_callback(worker_callback)
 
     @classmethod
