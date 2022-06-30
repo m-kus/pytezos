@@ -261,7 +261,13 @@ class BoolType(MichelsonType, prim='bool'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'BoolType':
-        value = parse_micheline_value(val_expr, {('False', 0): lambda x: False, ('True', 0): lambda x: True})
+        value = parse_micheline_value(
+            val_expr,
+            {
+                ('False', 0): lambda x: False,
+                ('True', 0): lambda x: True,
+            },
+        )
         return cls(value)
 
     @classmethod

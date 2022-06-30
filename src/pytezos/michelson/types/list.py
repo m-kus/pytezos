@@ -72,7 +72,15 @@ class ListType(MichelsonType, prim='list', args_len=1):
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         assert not comparable, f'list is not comparable'
-        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff), self))
+        return list(
+            map(
+                lambda x: x.to_python_object(
+                    try_unpack=try_unpack,
+                    lazy_diff=lazy_diff,
+                ),
+                self,
+            )
+        )
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         items = [item.merge_lazy_diff(lazy_diff) for item in self]

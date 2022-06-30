@@ -77,7 +77,10 @@ def files_to_proto(files: List[Tuple[str, str]]) -> dict:
         else:
             components[name] = {'name': name, key: data}
 
-    proto = {'expected_env_version': 0, 'components': list(components.values())}  # TODO: this is V1
+    proto = {
+        'expected_env_version': 0,  # TODO: this is V1
+        'components': list(components.values()),
+    }
     return proto
 
 
@@ -170,7 +173,10 @@ class Protocol(metaclass=InlineDocstring):
 
         :returns: dict with protocol hash and modules
         """
-        data = {'hash': self.hash(), 'modules': list(map(lambda x: x['name'], self._proto.get('components', [])))}
+        data = {
+            'hash': self.hash(),
+            'modules': list(map(lambda x: x['name'], self._proto.get('components', []))),
+        }
         return data
 
     def export_tar(self, output_path=None):
@@ -204,7 +210,12 @@ class Protocol(metaclass=InlineDocstring):
         theirs = proto_to_files(proto())
 
         for filename, their_text in theirs:
-            patch = make_patch(a=yours.get(filename, ''), b=their_text, filename=filename, context_size=context_size)
+            patch = make_patch(
+                a=yours.get(filename, ''),
+                b=their_text,
+                filename=filename,
+                context_size=context_size,
+            )
             files.append((filename, patch))
 
         return Protocol(files_to_proto(files))

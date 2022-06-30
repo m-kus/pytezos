@@ -147,7 +147,10 @@ class ParameterSection(Micheline, prim='parameter', args_len=1):
         return self.item.to_micheline_value(mode=mode, lazy_diff=None)
 
     def to_python_object(self, try_unpack=False, lazy_diff=None) -> dict:
-        py_obj = self.item.to_python_object(try_unpack=try_unpack, lazy_diff=None)
+        py_obj = self.item.to_python_object(
+            try_unpack=try_unpack,
+            lazy_diff=None,
+        )
         if issubclass(self.args[0], OrType):
             return py_obj
         else:

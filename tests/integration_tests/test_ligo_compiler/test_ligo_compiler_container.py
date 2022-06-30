@@ -48,8 +48,13 @@ class TestLigoCompiler(TestCase):
     def test_update_ligo(self):
         result = self.runner.invoke(cli, ['update-ligo'])
         self.assertEqual(result.exit_code, 0)
-        self.assertTrue(self._caplog.records[0].message.startswith('Pulling ligolang/ligo'))
-        self.assertEqual(self._caplog.records[-1].message, 'Pulled Ligo compiler image successfully!')
+        self.assertTrue(
+            self._caplog.records[0].message.startswith('Pulling ligolang/ligo'),
+        )
+        self.assertEqual(
+            self._caplog.records[-1].message,
+            'Pulled Ligo compiler image successfully!',
+        )
 
     def test_compile_contract(self):
         contract_tmp_file = self._tmp_path / "contract.ligo"
@@ -60,7 +65,12 @@ class TestLigoCompiler(TestCase):
         self.assertEqual(result.exit_code, 0)
 
         result = self.runner.invoke(
-            cli, ['ligo-compile-contract', f'--path={str(self._tmp_path / "contract.ligo")}', '--entry-point=main']
+            cli,
+            [
+                'ligo-compile-contract',
+                f'--path={str(self._tmp_path / "contract.ligo")}',
+                '--entry-point=main',
+            ],
         )
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, TEST_CONTRACT_COMPILATION_RESULT)

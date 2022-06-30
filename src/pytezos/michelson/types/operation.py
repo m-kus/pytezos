@@ -32,7 +32,10 @@ class OperationType(MichelsonType, prim='operation'):
         content = {
             'kind': 'origination',
             'source': source,
-            'script': {'code': script.as_micheline_expr(), 'storage': storage.to_micheline_value()},
+            'script': {
+                'code': script.as_micheline_expr(),
+                'storage': storage.to_micheline_value(),
+            },
             'balance': str(balance),
         }
         if delegate is not None:
@@ -41,7 +44,11 @@ class OperationType(MichelsonType, prim='operation'):
 
     @classmethod
     def delegation(cls, source: str, delegate: Optional[str] = None) -> 'OperationType':
-        content = {'kind': 'delegation', 'source': source, 'delegate': delegate}
+        content = {
+            'kind': 'delegation',
+            'source': source,
+            'delegate': delegate,
+        }
         return cls(content)
 
     @classmethod

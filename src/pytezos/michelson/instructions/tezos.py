@@ -201,7 +201,8 @@ class SetDelegateInstruction(MichelsonInstruction, prim='SET_DELEGATE'):
         delegate.assert_type_equal(OptionType.create_type(args=[KeyHashType]))
 
         delegation = OperationType.delegation(
-            source=context.get_self_address(), delegate=None if delegate.is_none() else str(delegate.get_some())
+            source=context.get_self_address(),
+            delegate=None if delegate.is_none() else str(delegate.get_some()),
         )
         stack.push(delegation)
         stdout.append(format_stdout(cls.prim, [delegate], [delegation]))  # type: ignore

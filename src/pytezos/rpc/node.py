@@ -122,7 +122,10 @@ class RpcNode:
         return res
 
     def get(
-        self, path: str, params: Optional[Dict[str, Any]] = None, timeout: Optional[int] = None
+        self,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        timeout: Optional[int] = None,
     ) -> requests.Response:
         return self.request('GET', path, params=params, timeout=timeout).json()
 

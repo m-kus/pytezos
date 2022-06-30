@@ -18,7 +18,12 @@ class TestDataConversion(TestCase):
         with io.open(contract_path, 'r') as contract_input:
             cls.michelson_contract = contract_input.read()
 
-    @parameterized.expand([('storage_for_data_conversion_test.tz',), ('storage_for_data_conversion_test_ptr.tz',)])
+    @parameterized.expand(
+        [
+            ('storage_for_data_conversion_test.tz',),
+            ('storage_for_data_conversion_test_ptr.tz',),
+        ]
+    )
     def test_decode_from_michelson(self, file_name):
         """
         Ensure that a valid Michelson contract with valid storage can be instantiated in Python

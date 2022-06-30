@@ -15,9 +15,24 @@ logger.setLevel(DEBUG)
 class ExecutionTestCase(TestCase):
     @parameterized.expand(
         [
-            ['florence_contract_#643_compare.tz', 'Unit', '0', {'int': '1'}],
-            ['florence_contract_#643_with_%.tz', 'Unit', 'Unit', {'prim': 'Unit'}],
-            ['florence_contract_#643_without_%.tz', 'Unit', 'Unit', {'prim': 'Unit'}],
+            [
+                'florence_contract_#643_compare.tz',
+                'Unit',
+                '0',
+                {'int': '1'},
+            ],
+            [
+                'florence_contract_#643_with_%.tz',
+                'Unit',
+                'Unit',
+                {'prim': 'Unit'},
+            ],
+            [
+                'florence_contract_#643_without_%.tz',
+                'Unit',
+                'Unit',
+                {'prim': 'Unit'},
+            ],
         ]
     )
     def test_execution(self, filename, parameter, storage, result):

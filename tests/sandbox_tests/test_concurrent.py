@@ -24,7 +24,11 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
             self.client.origination(ci.script())
             .autofill()
             .sign()
-            .inject(time_between_blocks=self.TIME_BETWEEN_BLOCKS, min_confirmations=1, block_timeout=5)
+            .inject(
+                time_between_blocks=self.TIME_BETWEEN_BLOCKS,
+                min_confirmations=1,
+                block_timeout=5,
+            )
         )
         self.assertEqual(1, len(OperationResult.originated_contracts(res)))
 
@@ -32,7 +36,11 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
         contract = self.get_contract()
         txs = [contract.increment(i) for i in range(10)]
         opg = self.client.bulk(*txs).autofill()
-        opg.sign().inject(time_between_blocks=self.TIME_BETWEEN_BLOCKS, min_confirmations=1, block_timeout=5)
+        opg.sign().inject(
+            time_between_blocks=self.TIME_BETWEEN_BLOCKS,
+            min_confirmations=1,
+            block_timeout=5,
+        )
         self.assertEqual(45, int(contract.storage()))
 
     def test_3_send_multiple_calls(self) -> None:
@@ -50,5 +58,10 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
             )
             for idx, i in enumerate(range(1))
         ]
-        self.client.wait(*txs, time_between_blocks=self.TIME_BETWEEN_BLOCKS, min_confirmations=1, block_timeout=5)
+        self.client.wait(
+            *txs,
+            time_between_blocks=self.TIME_BETWEEN_BLOCKS,
+            min_confirmations=1,
+            block_timeout=5,
+        )
         self.assertEqual(1, int(contract.storage() - value_before))

@@ -17,7 +17,11 @@ def make_patch(a, b, filename, context_size=0):
     Returns empty string if strings are identical.
     """
     diffs = difflib.unified_diff(
-        a=a.splitlines(True), b=b.splitlines(True), fromfile=filename, tofile=filename, n=context_size
+        a=a.splitlines(True),
+        b=b.splitlines(True),
+        fromfile=filename,
+        tofile=filename,
+        n=context_size,
     )
     diffs = map(lambda x: x if x[-1] == '\n' else x + '\n' + _no_eol + '\n', diffs)
     return ''.join(diffs)

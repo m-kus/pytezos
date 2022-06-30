@@ -61,8 +61,15 @@ class MapType(MichelsonType, prim='map', args_len=2):
     @classmethod
     def generate_pydoc(cls, definitions: List[Tuple[str, str]], inferred_name=None, comparable=False):
         name = cls.field_name or cls.type_name or inferred_name
-        key = cls.args[0].generate_pydoc(definitions, inferred_name=f'{name}_key' if name else None, comparable=True)
-        val = cls.args[1].generate_pydoc(definitions, inferred_name=f'{name}_value' if name else None)
+        key = cls.args[0].generate_pydoc(
+            definitions,
+            inferred_name=f'{name}_key' if name else None,
+            comparable=True,
+        )
+        val = cls.args[1].generate_pydoc(
+            definitions,
+            inferred_name=f'{name}_value' if name else None,
+        )
         return f'{{ {key}: {val}, … }}'
 
     @classmethod

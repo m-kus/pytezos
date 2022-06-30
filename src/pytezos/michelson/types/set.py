@@ -80,7 +80,14 @@ class SetType(MichelsonType, prim='set', args_len=1):
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         assert not comparable, f'{self.prim} is not comparable'
         return list(
-            map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=True), self)
+            map(
+                lambda x: x.to_python_object(
+                    try_unpack=try_unpack,
+                    lazy_diff=lazy_diff,
+                    comparable=True,
+                ),
+                self,
+            )
         )
 
     @classmethod

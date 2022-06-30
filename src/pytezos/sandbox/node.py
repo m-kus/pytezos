@@ -31,7 +31,10 @@ TEZOS_NODE_PORT = 8732
 def kill_existing_containers():
     docker = DockerClient()
     running_containers: List[Container] = docker.client.containers.list(
-        filters={'status': 'running', 'ancestor': DOCKER_IMAGE}
+        filters={
+            'status': 'running',
+            'ancestor': DOCKER_IMAGE,
+        }
     )
     for container in running_containers:
         with suppress(Exception):
@@ -51,10 +54,20 @@ def worker_callback(f):
     tb = e.__traceback__
     while tb is not None:
         trace.append(
-            {"filename": tb.tb_frame.f_code.co_filename, "name": tb.tb_frame.f_code.co_name, "lineno": tb.tb_lineno}
+            {
+                "filename": tb.tb_frame.f_code.co_filename,
+                "name": tb.tb_frame.f_code.co_name,
+                "lineno": tb.tb_lineno,
+            }
         )
         tb = tb.tb_next
-    pprint({'type': type(e).__name__, 'message': str(e), 'trace': trace})
+    pprint(
+        {
+            'type': type(e).__name__,
+            'message': str(e),
+            'trace': trace,
+        }
+    )
 
 
 def get_next_baker_key(client: PyTezosClient) -> str:
@@ -188,7 +201,11 @@ class SandboxedNodeAutoBakeTestCase(SandboxedNodeTestCase):
             raise RuntimeError('sandboxed node container is not created')
         cls.exit_event = Event()
         cls.baker = cls.executor.submit(
-            cls.autobake, cls.TIME_BETWEEN_BLOCKS, cls.node_container.url, cls.exit_event, cls.min_fee
+            cls.autobake,
+            cls.TIME_BETWEEN_BLOCKS,
+            cls.node_container.url,
+            cls.exit_event,
+            cls.min_fee,
         )
         cls.baker.add_done_callback(worker_callback)
 

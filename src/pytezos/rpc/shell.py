@@ -49,7 +49,11 @@ class ShellQuery(RpcQuery, path=''):
     @property
     def cycles(self):
         """Operate on cycles rather than blocks."""
-        return CyclesQuery(node=self.node, path=self._wild_path + '/chains/{}/blocks', params=self._params + ['main'])
+        return CyclesQuery(
+            node=self.node,
+            path=self._wild_path + '/chains/{}/blocks',
+            params=self._params + ['main'],
+        )
 
     @property
     def voting_periods(self):
@@ -57,7 +61,9 @@ class ShellQuery(RpcQuery, path=''):
         Operate on voting periods rather than blocks.
         """
         return VotingPeriodsQuery(
-            node=self.node, path=self._wild_path + '/chains/{}/blocks', params=self._params + ['main']
+            node=self.node,
+            path=self._wild_path + '/chains/{}/blocks',
+            params=self._params + ['main'],
         )
 
     @property
@@ -195,7 +201,9 @@ class ShellQuery(RpcQuery, path=''):
             raise StopIteration('Only %d of %d operations were included, stopping', len(operations), len(opg_hashes))
 
         for _ in self.wait_blocks(
-            block_hash, max_blocks=min_confirmations - 1, time_between_blocks=time_between_blocks
+            block_hash,
+            max_blocks=min_confirmations - 1,
+            time_between_blocks=time_between_blocks,
         ):
             for opg_hash in opg_hashes:
                 confirmations[opg_hash] += 1

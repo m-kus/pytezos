@@ -44,7 +44,13 @@ class BLS12_381_FrType(IntType, prim='bls12_381_fr'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'IntType':
-        value = parse_micheline_literal(val_expr, {'int': int, 'bytes': lambda x: cls.bytes_to_int(bytes.fromhex(x))})
+        value = parse_micheline_literal(
+            val_expr,
+            {
+                'int': int,
+                'bytes': lambda x: cls.bytes_to_int(bytes.fromhex(x)),
+            },
+        )
         return cls.from_value(value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):

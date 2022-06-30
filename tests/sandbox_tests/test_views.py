@@ -16,7 +16,10 @@ code = """
 
 class ViewTestCase(SandboxedNodeTestCase):
     def originate_contract(self, storage):
-        ci = ContractInterface.from_michelson(code).using(shell=self.client.shell, key=self.client.key)
+        ci = ContractInterface.from_michelson(code).using(
+            shell=self.client.shell,
+            key=self.client.key,
+        )
         res = ci.originate(initial_storage=storage).send()
         self.bake_block()
 

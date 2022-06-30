@@ -98,9 +98,17 @@ class TestHashes(TestCase):
         self.assertEqual(operation_hashes_llo, res)
 
     def test_payload_hash_empty(self):
-        res = block_payload_hash(predecessor=predecessor_2, payload_round=0, operation_hashes=operation_hashes_2)
+        res = block_payload_hash(
+            predecessor=predecessor_2,
+            payload_round=0,
+            operation_hashes=operation_hashes_2,
+        )
         self.assertEqual(block_payload_hash_2, res)
 
     def test_payload_hash_tx(self):
-        res = block_payload_hash(predecessor=predecessor_1, payload_round=0, operation_hashes=operation_hashes_1)
+        res = block_payload_hash(
+            predecessor=predecessor_1,
+            payload_round=0,
+            operation_hashes=operation_hashes_1,
+        )
         self.assertEqual(block_payload_hash_1, res)

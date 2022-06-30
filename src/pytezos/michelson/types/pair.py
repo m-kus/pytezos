@@ -201,11 +201,18 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         flat_values = self.get_flat_values(force_tuple=comparable)
         if isinstance(flat_values, dict):
             return {
-                name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+                name: arg.to_python_object(
+                    try_unpack=try_unpack,
+                    lazy_diff=lazy_diff,
+                )
                 for name, arg in flat_values.items()
             }
         return tuple(
-            arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable)
+            arg.to_python_object(
+                try_unpack=try_unpack,
+                lazy_diff=lazy_diff,
+                comparable=comparable,
+            )
             for arg in flat_values
         )
 

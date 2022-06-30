@@ -197,7 +197,9 @@ class OrType(MichelsonType, ADTMixin, prim='or', args_len=2):
             return entrypoint  # type: ignore
         else:
             py_obj = flat_values[entrypoint].to_python_object(
-                try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable
+                try_unpack=try_unpack,
+                lazy_diff=lazy_diff,
+                comparable=comparable,
             )
             return (entrypoint, py_obj) if comparable else {entrypoint: py_obj}
 

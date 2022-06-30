@@ -38,7 +38,9 @@ def calculate_fee(
 
 
 def default_fee(
-    content: Dict[str, Any], gas_limit: Optional[int] = None, minimal_nanotez_per_gas_unit: Optional[int] = None
+    content: Dict[str, Any],
+    gas_limit: Optional[int] = None,
+    minimal_nanotez_per_gas_unit: Optional[int] = None,
 ) -> int:
     """Take hard gas limit instead of precise amount (no simulation) and calculate fee.
 

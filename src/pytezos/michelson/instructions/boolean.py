@@ -17,7 +17,12 @@ from pytezos.michelson.types import NatType
 def execute_boolean_add(prim: str, stack: MichelsonStack, stdout: List[str], add: Callable):
     a, b = cast(Tuple[Union[BoolType, NatType], ...], stack.pop2())
     res_type, convert = dispatch_types(
-        type(a), type(b), mapping={(BoolType, BoolType): (BoolType, bool), (NatType, NatType): (NatType, int)}
+        type(a),
+        type(b),
+        mapping={
+            (BoolType, BoolType): (BoolType, bool),
+            (NatType, NatType): (NatType, int),
+        },
     )
     val = add((convert(a), convert(b)))
     res = res_type.from_value(val)

@@ -59,4 +59,9 @@ class TestStateless(SandboxedNodeTestCase):
         ty = MichelsonType.match(ty_expr)
         val_expr = ty.from_python_object(payload).to_micheline_value()
 
-        self.client.shell.head.helpers.scripts.typecheck_data.post({'data': val_expr, 'type': ty_expr})
+        self.client.shell.head.helpers.scripts.typecheck_data.post(
+            {
+                'data': val_expr,
+                'type': ty_expr,
+            }
+        )

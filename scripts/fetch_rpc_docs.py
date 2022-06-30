@@ -31,7 +31,10 @@ def parse_describe_output(data, root='/'):
                 elif k == 'subdirs':
                     if 'dynamic_dispatch' in v:
                         arg = v['dynamic_dispatch']['arg']
-                        info[path]['item'] = {'name': arg['name'], 'descr': arg.get('descr', no_descr)}
+                        info[path]['item'] = {
+                            'name': arg['name'],
+                            'descr': arg.get('descr', no_descr),
+                        }
                         parse_node(v['dynamic_dispatch']['tree'], join(path, '{}'))
                     if 'suffixes' in v:
                         info[path]['props'] = list(map(lambda x: x['name'], v['suffixes']))

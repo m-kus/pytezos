@@ -156,12 +156,18 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             src_ptr, dst_ptr, action = self.ptr, self.ptr, 'update'
 
         def make_update(key: MichelsonType, val: Optional[MichelsonType]) -> dict:
-            update = {'key': key.to_micheline_value(mode=mode), 'key_hash': forge_script_expr(key.pack(legacy=True))}
+            update = {
+                'key': key.to_micheline_value(mode=mode),
+                'key_hash': forge_script_expr(key.pack(legacy=True)),
+            }
             if val is not None:
                 update['value'] = val.to_micheline_value(mode=mode)
             return update
 
-        diff = {'action': action, 'updates': [make_update(key, val) for key, val in self]}
+        diff = {
+            'action': action,
+            'updates': [make_update(key, val) for key, val in self],
+        }
         if action == 'alloc':
             key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
             diff['key_type'] = key_type  # type: ignore
@@ -169,7 +175,13 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         elif action == 'copy':
             pass  # TODO:
 
-        lazy_diff.append({'kind': 'big_map', 'id': str(dst_ptr), 'diff': diff})
+        lazy_diff.append(
+            {
+                'kind': 'big_map',
+                'id': str(dst_ptr),
+                'diff': diff,
+            }
+        )
         res = type(self)(items=[], ptr=dst_ptr)
         res.context = self.context
         return res

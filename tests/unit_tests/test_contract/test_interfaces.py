@@ -23,7 +23,13 @@ class TestInterfaces(TestCase):
         token_v3 = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'token.tz'))
         alice = "tz1ibMpWS6n6MJn73nQHtK5f4ogyYC1z9T9z"
         res = token_v3.mint(mintOwner=alice, mintValue=3).interpret(
-            storage={"admin": alice, "balances": {}, "paused": False, "shareType": "APPLE", "totalSupply": 0},
+            storage={
+                "admin": alice,
+                "balances": {},
+                "paused": False,
+                "shareType": "APPLE",
+                "totalSupply": 0,
+            },
             source=alice,
         )
         self.assertEqual(3, res.storage['balances'][alice])

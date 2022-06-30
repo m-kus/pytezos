@@ -9,7 +9,12 @@ from pytezos.rpc.node import RpcNode
 
 def format_docstring(class_type, query_path):
     res = ['']
-    methods = {'GET': '()', 'POST': '.post()', 'PUT': '.put()', 'DELETE': '.delete()'}
+    methods = {
+        'GET': '()',
+        'POST': '.post()',
+        'PUT': '.put()',
+        'DELETE': '.delete()',
+    }
     rpc_doc = rpc_docs.get(query_path, {})
 
     for method, func in methods.items():
@@ -82,14 +87,21 @@ class RpcQuery(metaclass=InlineDocstring):
 
     def _spawn_query(self, wild_path, params):
         child_class = self.__extensions__.get(wild_path, RpcQuery)
-        return child_class(path=wild_path, node=self.node, params=params)
+        return child_class(
+            path=wild_path,
+            node=self.node,
+            params=params,
+        )
 
     @property
     def path(self):
         return self._wild_path.format(*self._params)
 
     def __call__(self, **params):
-        return self.node.get(path=self.path, params=params)
+        return self.node.get(
+            path=self.path,
+            params=params,
+        )
 
     def _getitem(self, item):
         return self._spawn_query(wild_path=self._wild_path + '/{}', params=self._params + [item])
@@ -99,25 +111,45 @@ class RpcQuery(metaclass=InlineDocstring):
             if attr in {'main', 'test', 'head', 'genesis'}:
                 return self._getitem(attr)
             else:
-                return self._spawn_query(wild_path=f'{self._wild_path}/{attr}', params=self._params)
+                return self._spawn_query(
+                    wild_path=f'{self._wild_path}/{attr}',
+                    params=self._params,
+                )
         raise AttributeError(attr)
 
     def __getitem__(self, child_id):
         return self._getitem(child_id)
 
     def _get(self, params=None):
-        return self.node.get(path=self.path, params=params, timeout=self._timeout)
+        return self.node.get(
+            path=self.path,
+            params=params,
+            timeout=self._timeout,
+        )
 
     def _post(self, json=None, params=None):
-        return self.node.post(path=self.path, params=params, json=json)
+        return self.node.post(
+            path=self.path,
+            params=params,
+            json=json,
+        )
 
     def _put(self, params=None):
-        return self.node.put(path=self.path, params=params)
+        return self.node.put(
+            path=self.path,
+            params=params,
+        )
 
     def _delete(self, params=None):
-        return self.node.delete(path=self.path, params=params)
+        return self.node.delete(
+            path=self.path,
+            params=params,
+        )
 
     @property
     def _parent(self):
         dir_path = dirname(self._wild_path)
-        return self._spawn_query(wild_path=dir_path, params=self._params[: dir_path.count('{}')])
+        return self._spawn_query(
+            wild_path=dir_path,
+            params=self._params[: dir_path.count('{}')],
+        )

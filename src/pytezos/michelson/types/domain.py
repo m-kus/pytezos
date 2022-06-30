@@ -116,7 +116,11 @@ class AddressType(StringType, prim='address'):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'AddressType':
         value = parse_micheline_literal(
-            val_expr, {'bytes': lambda x: unforge_contract(bytes.fromhex(x)), 'string': lambda x: x}
+            val_expr,
+            {
+                'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
         )
         return cls.from_value(value)
 
@@ -162,7 +166,11 @@ class TXRAddress(StringType, prim='tx_rollup_l2_address'):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'TXRAddress':
         value = parse_micheline_literal(
-            val_expr, {'bytes': lambda x: unforge_contract(bytes.fromhex(x)), 'string': lambda x: x}
+            val_expr,
+            {
+                'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
         )
         return cls.from_value(value)
 
@@ -198,7 +206,11 @@ class KeyType(StringType, prim='key'):
         https://crypto.stackexchange.com/questions/70754/ec-key-compression
         For secp256r1 (aka p256) we need to cut the first byte (for unknown reason)
         """
-        curves = {'edpk': (0, 0), 'sppk': (1, 0), 'p2pk': (2, 1)}
+        curves = {
+            'edpk': (0, 0),
+            'sppk': (1, 0),
+            'p2pk': (2, 1),
+        }
         res = curves[self.prefix][0] - curves[other.prefix][0]
         if res < 0:
             return True
@@ -220,7 +232,11 @@ class KeyType(StringType, prim='key'):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'KeyType':
         value = parse_micheline_literal(
-            val_expr, {'bytes': lambda x: unforge_public_key(bytes.fromhex(x)), 'string': lambda x: x}
+            val_expr,
+            {
+                'bytes': lambda x: unforge_public_key(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
         )
         return cls.from_value(value)
 
@@ -286,7 +302,11 @@ class SignatureType(StringType, prim='signature'):
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'SignatureType':
         value = parse_micheline_literal(
-            val_expr, {'bytes': lambda x: unforge_signature(bytes.fromhex(x)), 'string': lambda x: x}
+            val_expr,
+            {
+                'bytes': lambda x: unforge_signature(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
         )
         return cls.from_value(value)
 

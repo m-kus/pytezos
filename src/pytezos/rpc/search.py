@@ -10,7 +10,13 @@ from pytezos.rpc.node import RpcError
 from pytezos.rpc.query import RpcQuery
 
 
-def find_state_change_intervals(head: int, last: int, get: Callable, equals: Callable, step=60) -> Generator:
+def find_state_change_intervals(
+    head: int,
+    last: int,
+    get: Callable,
+    equals: Callable,
+    step=60,
+) -> Generator:
     succ_value = get(head)
     logger.debug('%s at head %s' % succ_value, head)
 
@@ -24,7 +30,13 @@ def find_state_change_intervals(head: int, last: int, get: Callable, equals: Cal
             succ_value = value
 
 
-def find_state_change(head: int, last: int, get: Callable, equals: Callable, pred_value: Any) -> (int, Any):  # type: ignore
+def find_state_change(
+    head: int,
+    last: int,
+    get: Callable,
+    equals: Callable,
+    pred_value: Any,
+) -> (int, Any):  # type: ignore
     def bisect(start: int, end: int):
         if end == start + 1:
             return end, get(end)
@@ -42,7 +54,12 @@ def find_state_change(head: int, last: int, get: Callable, equals: Callable, pre
 
 
 def walk_state_change_interval(
-    head: int, last: int, get: Callable, equals: Callable, head_value: Any, last_value: Any
+    head: int,
+    last: int,
+    get: Callable,
+    equals: Callable,
+    head_value: Any,
+    last_value: Any,
 ) -> Generator:
     level = last
     value = last_value
@@ -52,7 +69,13 @@ def walk_state_change_interval(
         yield level, value
 
 
-def find_state_changes(head: int, last: int, get: Callable, equals: Callable, step=60) -> Generator:
+def find_state_changes(
+    head: int,
+    last: int,
+    get: Callable,
+    equals: Callable,
+    step=60,
+) -> Generator:
     state_change_intervals = find_state_change_intervals(head, last, get, equals, step)
     for int_head, int_head_value, int_tail, int_last_value in state_change_intervals:
         yield from walk_state_change_interval(
