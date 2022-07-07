@@ -127,7 +127,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         if ttl is None:
             ttl = self.context.get_operations_ttl()
         if not 0 < ttl <= MAX_OPERATIONS_TTL:
-            raise Exception('`ttl` has to be in range (0, 60]')
+            raise Exception(f'`ttl` has to be in range (0, {MAX_OPERATIONS_TTL}]')
 
         chain_id = self.chain_id or self.context.get_chain_id()
         protocol = self.protocol or self.context.get_protocol()
