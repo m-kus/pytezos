@@ -24,6 +24,7 @@ lint:              ## Lint with all tools
 	make isort black flake mypy
 
 test:              ## Run test suite
+	# FIXME: https://github.com/pytest-dev/pytest-xdist/issues/385#issuecomment-1177147322
 	poetry run sh -c "pytest --cov-report=term-missing --cov=pytezos --cov=michelson_kernel --cov-report=xml -n auto -s -v tests/contract_tests tests/integration_tests tests/unit_tests && pytest -xv tests/sandbox_tests"
 
 docs:              ## Build docs

@@ -1,6 +1,7 @@
 import json
 import logging
 from decimal import Decimal
+from functools import cached_property
 from functools import lru_cache
 from os.path import exists
 from os.path import expanduser
@@ -11,10 +12,10 @@ from typing import List
 from typing import Optional
 from typing import Type
 from typing import Union
+from typing import cast
 from urllib.parse import urlparse
 
 import requests
-from cached_property import cached_property  # type: ignore
 from deprecation import deprecated  # type: ignore
 
 from pytezos.context.mixin import ContextMixin
@@ -402,7 +403,7 @@ class ContractInterface(ContextMixin):
     def _get_token_metadata_from_view(self, token_id: int) -> Optional[ContractTokenMetadata]:
         self._logger.info('Trying to fetch token %s metadata from off-chain view', token_id)
         try:
-            token_metadata_json = self.metadata.tokenMetadata(token_id).storage_view()[1]
+            token_metadata_json = cast(ContractMetadata, self.metadata).tokenMetadata(token_id).storage_view()[1]
             return ContractTokenMetadata.from_json(token_metadata_json)
         except KeyError:
             self._logger.info('There\'s no off-chain view named `token_metadata`')
