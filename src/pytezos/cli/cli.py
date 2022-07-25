@@ -31,10 +31,9 @@ from pytezos.sandbox.node import DOCKER_IMAGE
 from pytezos.sandbox.node import TEZOS_NODE_PORT
 from pytezos.sandbox.node import SandboxedNodeContainer
 from pytezos.sandbox.node import get_next_baker_key
-from pytezos.sandbox.parameters import EDO
-from pytezos.sandbox.parameters import FLORENCE
 from pytezos.sandbox.parameters import HANGZHOU
 from pytezos.sandbox.parameters import ITHACA
+from pytezos.sandbox.parameters import JAKARTA
 
 kernel_js_path = join(dirname(dirname(__file__)), 'assets', 'kernel.js')
 kernel_json = {
@@ -80,7 +79,8 @@ def get_docker_client():
 @click.version_option(__version__)
 @click.pass_context
 def cli(*_args, **_kwargs):
-    pass
+    if not logging.getLogger().hasHandlers():
+        logging.config.dictConfig(DEFAULT_LOGGING_CONFIG)
 
 
 @cli.command(help='Manage contract storage')
@@ -342,7 +342,7 @@ def smartpy_compile(
 
 @cli.command(help='Run containerized sandbox node')
 @click.option('--image', type=str, help='Docker image to use', default=DOCKER_IMAGE)
-@click.option('--protocol', type=click.Choice(['hangzhou', 'ithaca']), help='Protocol to use', default='ithaca')
+@click.option('--protocol', type=click.Choice(['jakarta']), help='Protocol to use', default='jakarta')
 @click.option('--port', '-p', type=int, help='Port to expose', default=TEZOS_NODE_PORT)
 @click.option('--interval', '-i', type=float, help='Interval between baked blocks (in seconds)', default=1.0)
 @click.option('--blocks', '-b', type=int, help='Number of blocks to bake before exit')
@@ -356,11 +356,11 @@ def sandbox(
     blocks: int,
 ):
     protocol_hash = {
-        'hangzhou': HANGZHOU,
-        'ithaca': ITHACA,
+        'jakarta': JAKARTA,
     }[protocol]
 
-    with SandboxedNodeContainer(image=image, port=port) as node:
+    node = SandboxedNodeContainer(image=image, port=port)
+    with node:
         if not node.wait_for_connection():
             raise TimeoutError('Failed to connect to the sandboxed node')
 
@@ -514,6 +514,4 @@ def ligo_invoke_contract(
 
 
 if __name__ == '__main__':
-    if not logging.getLogger().hasHandlers():
-        logging.config.dictConfig(DEFAULT_LOGGING_CONFIG)
     cli(prog_name='pytezos')

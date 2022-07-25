@@ -87,7 +87,6 @@ class SandboxedNodeContainer(DockerContainer):
         super().start()
         if self.get_wrapped_container() is None:
             raise RuntimeError('Failed to create a container')
-        return self
 
     def wait_for_connection(self, max_attempts=MAX_ATTEMPTS, attempt_delay=ATTEMPT_DELAY) -> bool:
         attempts = max_attempts

@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased](https://github.com/baking-bad/pytezos/compare/3.6.0...master)
+
+### Fixed
+
+* Fixed `pytezos sandbox` command crash.
+* Fixed setting default logging config.
+
 ## [3.6.0](https://github.com/baking-bad/pytezos/compare/3.5.1...3.6.0) (2022-06-28)
 
 ### Added
