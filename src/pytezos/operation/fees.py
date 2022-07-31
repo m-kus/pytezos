@@ -68,13 +68,13 @@ def default_gas_limit(
     values: Dict[str, int] = {
         'reveal': 1000,
         'delegation': 1000,
-        'origination': constants['hard_gas_limit_per_operation'],
+        'origination': int(constants['hard_gas_limit_per_operation']),
         'transaction': (
-            constants['hard_gas_limit_per_operation']
+            int(constants['hard_gas_limit_per_operation'])
             if content.get('destination', '').startswith('KT')
             else DEFAULT_TRANSACTION_GAS_LIMIT
         ),
-        'register_global_constant': constants['hard_gas_limit_per_operation'],
+        'register_global_constant': int(constants['hard_gas_limit_per_operation']),
     }
     return values[content['kind']]
 
@@ -93,12 +93,12 @@ def default_storage_limit(
     values: Dict[str, int] = {
         'reveal': 0,
         'delegation': 0,
-        'origination': constants['hard_storage_limit_per_operation'],
+        'origination': int(constants['hard_storage_limit_per_operation']),
         'transaction': (
-            constants['hard_storage_limit_per_operation']
+            int(constants['hard_storage_limit_per_operation'])
             if content.get('destination', '').startswith('KT')
             else DEFAULT_TRANSACTION_STORAGE_LIMIT
         ),
-        'register_global_constant': constants['hard_storage_limit_per_operation'],
+        'register_global_constant': int(constants['hard_storage_limit_per_operation']),
     }
     return values[content['kind']]

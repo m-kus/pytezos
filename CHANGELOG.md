@@ -11,6 +11,7 @@
 * Fixed PLY & -OO mode incompatibility
 * Fixed `pytezos sandbox` command crash.
 * Fixed setting default logging config.
+* Large batches do not hit gas per block exhausted anymore, fee is specified for the first operation only.
 
 ## [3.6.0](https://github.com/baking-bad/pytezos/compare/3.5.1...3.6.0) (2022-06-28)
 

@@ -42,7 +42,7 @@ class SandboxTestCase(SandboxedNodeTestCase):
         client = self.get_client(key=sandbox_commitment)
         res = (
             client.reveal()
-            .transaction(destination=sandbox_addresses['bootstrap4'], amount=1000)
+            .transaction(destination=sandbox_addresses['bootstrap4'], amount=1000000)
             .autofill()
             .sign()
             .inject()
