@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased](https://github.com/baking-bad/pytezos/compare/3.6.0...master)
+## [3.6.1](https://github.com/baking-bad/pytezos/compare/3.6.0...3.6.1) (2022-08-01)
 
 ### Added
 

@@ -268,7 +268,7 @@ class OperationGroup(ContextMixin, ContentMixin):
         counter_offset = self.context.get_counter_offset()
         opg.contents.clear()
 
-        for i, content in enumerate(opg_with_metadata['contents']):
+        for content in opg_with_metadata['contents']:
             if validation_passes[content['kind']] == 3:
                 if gas_limit is not None:
                     gas_limit_new = gas_limit // num_contents
