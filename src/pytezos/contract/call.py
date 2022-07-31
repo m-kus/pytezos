@@ -271,12 +271,17 @@ class ContractCall(ContextMixin):
             return self.run_code(storage=storage, source=source, sender=sender, gas_limit=gas_limit)
         return self.run_operation()
 
-    def callback_view(self):
+    def callback_view(self, storage=None):
         """Get return value of an on-chain callback method.
 
+        :param storage: initial storage as Python object,
+                        if None then the current one will be taken (if context attached), otherwise empty (dummy)
         :returns: Decoded parameters of a callback
         """
-        if self.address:
+        if storage:
+            storage_ty = StorageSection.match(self.context.storage_expr)
+            initial_storage = storage_ty.from_python_object(storage).to_micheline_value(lazy_diff=True)
+        elif self.address:
             initial_storage = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
         else:
             storage_ty = StorageSection.match(self.context.storage_expr)

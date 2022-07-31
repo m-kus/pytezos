@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/baking-bad/pytezos/compare/3.6.0...master)
 
+### Added
+
+* one can supply initial storage when executing a callback view
+
 ### Fixed
 
 * Fixed PLY & -OO mode incompatibility

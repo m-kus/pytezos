@@ -15,3 +15,15 @@ class CallbackViewTestCase(TestCase):
             callback=None,
         ).callback_view()
         print(res)
+
+    def test_initial_storage(self):
+        usds = pytezos.using('mainnet').contract('KT1REEb5VxWRjcHm5GzDMwErMmNFftsE5Gpf')
+        storage = usds.storage()
+        storage['ledger'] = {'tz1PNsHbJRejCnnYzbsQ1CR8wUdEQqVjWen1': 42}
+        res = usds.balance_of(
+            requests=[
+                {'owner': 'tz1PNsHbJRejCnnYzbsQ1CR8wUdEQqVjWen1', 'token_id': 0},
+            ],
+            callback=None,
+        ).callback_view(storage=storage)
+        self.assertEqual(42, res[0]['balance'])
