@@ -4,6 +4,7 @@
 
 ### Fixed
 
+* Fixed PLY & -OO mode incompatibility
 * Fixed `pytezos sandbox` command crash.
 * Fixed setting default logging config.
 

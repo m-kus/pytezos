@@ -14,6 +14,13 @@ from pytezos.michelson.macros import expr as make_expr
 from pytezos.michelson.tags import prim_tags
 
 
+def doc(docstring):
+    def decorate(func):
+        func.__doc__ = docstring
+        return func
+    return decorate
+
+
 class MichelsonParserError(ValueError):
     def __init__(self, token: LexToken, message=None):
         message = message or f'failed to parse expression {token}'
@@ -64,26 +71,25 @@ class MichelsonParser:
 
     tokens = SimpleMichelsonLexer.tokens
 
+    @doc('''instr : expr 
+                  | empty''')
     def p_instr(self, p):
-        '''instr : expr
-        | empty
-        '''
         p[0] = p[1]
 
+    @doc('instr : INT')
     def p_instr_int(self, p):
-        '''instr : INT'''
         p[0] = {'int': p[1]}
 
+    @doc('instr : BYTE')
     def p_instr_byte(self, p):
-        '''instr : BYTE'''
         p[0] = {'bytes': p[1][2:]}  # strip 0x prefix
 
+    @doc('instr : STR')
     def p_instr_str(self, p):
-        '''instr : STR'''
         p[0] = {'string': json.loads(p[1])}
 
+    @doc('instr : instr SEMI instr')
     def p_instr_list(self, p):
-        '''instr : instr SEMI instr'''
         p[0] = []
         for i in [p[1], p[3]]:
             if type(i) is list:
@@ -91,16 +97,16 @@ class MichelsonParser:
             elif i is not None:
                 p[0].append(i)
 
+    @doc('instr : LEFT_CURLY instr RIGHT_CURLY')
     def p_instr_subseq(self, p):
-        '''instr : LEFT_CURLY instr RIGHT_CURLY'''
         p[0] = Sequence()
         if type(p[2]) is list:
             p[0].extend(p[2])
         elif p[2] is not None:
             p[0].append(p[2])
 
+    @doc('expr : PRIM annots args')
     def p_expr(self, p):
-        '''expr : PRIM annots args'''
         prim = p[1]
         if prim in prim_tags or prim in self.extra_primitives:
             expr = make_expr(
@@ -119,59 +125,57 @@ class MichelsonParser:
                 raise MichelsonParserError(p.slice[1], str(e)) from e
         p[0] = Sequence(expr) if isinstance(expr, list) else expr
 
+    @doc('''annots : annot 
+                   | empty''')
     def p_annots(self, p):
-        '''annots : annot
-        | empty
-        '''
         if p[1] is not None:
             p[0] = [p[1]]
 
+    @doc('annots : annots annot')
     def p_annots_list(self, p):
-        '''annots : annots annot'''
         p[0] = []
         if type(p[1]) == list:
             p[0].extend(p[1])
         if p[2] is not None:
             p[0].append(p[2])
 
+    @doc('annot : ANNOT')
     def p_annot(self, p):
-        '''annot : ANNOT'''
         p[0] = p[1]
 
+    @doc('''args : arg 
+                 | empty''')
     def p_args(self, p):
-        '''args : arg
-        | empty
-        '''
         p[0] = []
         if p[1] is not None:
             p[0].append(p[1])
 
+    @doc('args : args arg')
     def p_args_list(self, p):
-        '''args : args arg'''
         p[0] = []
         if type(p[1]) == list:
             p[0].extend(p[1])
         if p[2] is not None:
             p[0].append(p[2])
 
+    @doc('arg : PRIM')
     def p_arg_prim(self, p):
-        '''arg : PRIM'''
         p[0] = {'prim': p[1]}
 
+    @doc('arg : INT')
     def p_arg_int(self, p):
-        '''arg : INT'''
         p[0] = {'int': p[1]}
 
+    @doc('arg : BYTE')
     def p_arg_byte(self, p):
-        '''arg : BYTE'''
         p[0] = {'bytes': p[1][2:]}  # strip 0x prefix
 
+    @doc('arg : STR')
     def p_arg_str(self, p):
-        '''arg : STR'''
         p[0] = {'string': json.loads(p[1])}
 
+    @doc('arg : LEFT_CURLY instr RIGHT_CURLY')
     def p_arg_subseq(self, p):
-        '''arg : LEFT_CURLY instr RIGHT_CURLY'''
         if type(p[2]) == list:
             p[0] = p[2]
         elif p[2] is not None:
@@ -179,12 +183,13 @@ class MichelsonParser:
         else:
             p[0] = []
 
+    @doc('arg : LEFT_PAREN expr RIGHT_PAREN')
     def p_arg_group(self, p):
-        '''arg : LEFT_PAREN expr RIGHT_PAREN'''
         p[0] = p[2]
 
+    @doc('empty :')
     def p_empty(self, p):
-        '''empty :'''
+        ...
 
     def p_error(self, p):
         raise MichelsonParserError(p)
