@@ -156,15 +156,19 @@ class OperationGroup(ContextMixin, ContentMixin):
             'secret': lambda i, x: self.key.activation_code,
             'period': lambda i, x: str(self.shell.head.voting_period()),
             'public_key': lambda i, x: self.key.public_key(),
-            'gas_limit': lambda i, x: str(min(
-                hard_gas_limit_per_content,
-                gas_limit if gas_limit is not None else default_gas_limit(x, constants))),
-            'storage_limit': lambda i, x: str(min(
-                hard_storage_limit_per_content,
-                storage_limit if storage_limit is not None else default_storage_limit(x, constants))),
-            'fee': lambda i, x: str(
-                default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)
-                if i == 0 else 0),
+            'gas_limit': lambda i, x: str(
+                min(
+                    hard_gas_limit_per_content,
+                    gas_limit if gas_limit is not None else default_gas_limit(x, constants),
+                )
+            ),
+            'storage_limit': lambda i, x: str(
+                min(
+                    hard_storage_limit_per_content,
+                    storage_limit if storage_limit is not None else default_storage_limit(x, constants),
+                )
+            ),
+            'fee': lambda i, x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit) if i == 0 else 0),
         }
 
         def fill_content(idx, content):
