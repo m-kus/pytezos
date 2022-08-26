@@ -29,9 +29,10 @@ attrs = "^21.4.0"
 base58 = "^2.1.1"
 bson = "^0.5.10"
 cattrs = "^22.1.0"
+# FIXME: Why?
 click = "^8.0.3,<=8.0.4"
 deprecation = "^2.1.0"
-docker = ">=5.0.3"
+docker = "^6.0.0"
 # FIXME: Broken `cattrs` dependency
 exceptiongroup = "^1.0.0-rc.8"
 fastecdsa = "^2.2.3"
