@@ -1,7 +1,7 @@
 .ONESHELL:
 .PHONY: $(MAKECMDGOALS)
 ##
-##    🚧 PyTezos developer tools
+##    🚧 Developer tools
 ##
 ##  DEV=1               Whether to install dev dependencies
 DEV=1

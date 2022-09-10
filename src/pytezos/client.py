@@ -4,13 +4,14 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+from pytezos_core.jupyter import get_class_docstring
+from pytezos_core.jupyter import is_interactive
+
 from pytezos.block.header import BlockHeader
 from pytezos.context.mixin import ContextMixin
 from pytezos.contract.call import ContractCall
 from pytezos.contract.interface import ContractInterface
 from pytezos.crypto.key import Key
-from pytezos.jupyter import get_class_docstring
-from pytezos.jupyter import is_interactive
 from pytezos.logging import logger
 from pytezos.operation.content import ContentMixin
 from pytezos.operation.group import OperationGroup

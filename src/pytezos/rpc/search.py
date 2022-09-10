@@ -3,8 +3,9 @@ from typing import Callable
 from typing import Generator
 from typing import Tuple
 
+from pytezos_core.jupyter import get_attr_docstring
+
 from pytezos.crypto.encoding import is_bh
-from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
 from pytezos.rpc.node import RpcError
 from pytezos.rpc.query import RpcQuery

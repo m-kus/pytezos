@@ -10,12 +10,12 @@ from typing import Tuple
 import netstruct  # type: ignore
 import requests
 import simplejson as json
+from pytezos_core.jupyter import InlineDocstring
+from pytezos_core.jupyter import get_class_docstring
 from tqdm import tqdm  # type: ignore
 
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
-from pytezos.jupyter import InlineDocstring
-from pytezos.jupyter import get_class_docstring
 from pytezos.protocol.diff import apply_patch
 from pytezos.protocol.diff import generate_unidiff_html
 from pytezos.protocol.diff import make_patch

@@ -4,7 +4,7 @@ from typing import Dict
 from typing import Optional
 from typing import Union
 
-from pytezos.jupyter import inline_doc
+from pytezos_core.jupyter import inline_doc
 
 
 def format_mutez(value: Optional[Union[int, Decimal]]) -> str:

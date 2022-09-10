@@ -12,9 +12,9 @@ from typing import Optional
 import requests
 import simplejson as json
 from deprecation import deprecated  # type: ignore
+from pytezos_core.jupyter import get_attr_docstring
 
 from pytezos.crypto.encoding import base58_decode
-from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
 from pytezos.rpc.kind import validation_passes
 from pytezos.rpc.protocol import BlockQuery

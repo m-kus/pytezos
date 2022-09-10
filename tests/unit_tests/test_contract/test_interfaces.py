@@ -2,9 +2,10 @@ from os.path import dirname
 from os.path import join
 from unittest import TestCase
 
+from pytezos_core.jupyter import is_interactive
+
 from pytezos import ContractInterface
 from pytezos import Unit
-from pytezos.jupyter import is_interactive
 
 
 class TestInterfaces(TestCase):

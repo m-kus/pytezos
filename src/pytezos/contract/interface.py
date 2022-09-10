@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 
 import requests
 from deprecation import deprecated  # type: ignore
+from pytezos_core.jupyter import get_class_docstring
 
 from pytezos.context.mixin import ContextMixin
 from pytezos.context.mixin import ExecutionContext
@@ -27,7 +28,6 @@ from pytezos.contract.result import ContractCallResult
 from pytezos.contract.token_metadata import ContractTokenMetadata
 from pytezos.contract.view import ContractView
 from pytezos.crypto.key import Key
-from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.micheline import MichelsonRuntimeError

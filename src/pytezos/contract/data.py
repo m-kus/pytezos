@@ -2,10 +2,10 @@ from typing import Optional
 from typing import Union
 
 from deprecation import deprecated  # type: ignore
+from pytezos_core.jupyter import get_class_docstring
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
-from pytezos.jupyter import get_class_docstring
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.types.base import MichelsonType

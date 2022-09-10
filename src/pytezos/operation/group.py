@@ -6,6 +6,7 @@ from typing import Optional
 from typing import Union
 
 from deprecation import deprecated  # type: ignore
+from pytezos_core.jupyter import get_class_docstring
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
@@ -13,7 +14,6 @@ from pytezos.crypto.encoding import base58_decode
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.encoding import is_bh
 from pytezos.crypto.key import blake2b_32
-from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.forge import forge_base58
 from pytezos.operation import DEFAULT_BURN_RESERVE

@@ -4,11 +4,12 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
+from pytezos_core.jupyter import get_class_docstring
+
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.contract.call import ContractCallResult
 from pytezos.contract.call import skip_nones
-from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.repl import Interpreter

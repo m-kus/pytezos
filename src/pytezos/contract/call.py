@@ -6,11 +6,11 @@ from typing import Optional
 from typing import Union
 
 from deprecation import deprecated  # type: ignore
+from pytezos_core.jupyter import get_class_docstring
 
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.contract.result import ContractCallResult
-from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.repl import Interpreter

@@ -5,12 +5,13 @@ from typing import Dict
 from typing import Optional
 from typing import Union
 
+from pytezos_core.jupyter import InlineDocstring
+
 from pytezos.context.impl import ExecutionContext
 from pytezos.crypto.encoding import is_pkh
 from pytezos.crypto.encoding import is_public_key
 from pytezos.crypto.key import Key
 from pytezos.crypto.key import is_installed
-from pytezos.jupyter import InlineDocstring
 from pytezos.rpc import RpcMultiNode
 from pytezos.rpc import RpcNode
 from pytezos.rpc import ShellQuery
