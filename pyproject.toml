@@ -3,7 +3,16 @@ name = "pytezos"
 version = "3.6.1"
 description = "Python toolkit for Tezos"
 license = "MIT"
-authors = ["Michael Zaikin <mz@baking-bad.org>", "Arthur Breitman", "Roman Serikov"]
+authors = [
+    "Michael Zaikin <mz@baking-bad.org>",
+    "Arthur Breitman",
+    "Roman Serikov",
+    "Lev Gorodetskiy <github@droserasprout.space>",
+]
+maintainers = [
+    "Michael Zaikin <mz@baking-bad.org>",
+    "Lev Gorodetskiy <github@droserasprout.space>",
+]
 readme = "README.md"
 repository = "https://github.com/baking-bad/pytezos"
 homepage = "https://pytezos.org"
