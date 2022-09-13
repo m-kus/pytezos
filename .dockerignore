@@ -1,25 +1,16 @@
-dist/
-docs/
-examples/
-assets/
-.pytest_cache
-.ipynb_checkpoints
-*.egg-info
-scripts
-tests
-*.ipynb
-*.json
-*.zip
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-.venv
-.dockerignore
-.gitignore
-Dockerfile
-binder/Dockerfile
-*.dockerfile
-docker-compose.yml
-LICENSE
-.git
+# Ignore all
+*
+
+# Add build files
+!Makefile
+!pyproject.toml
+!poetry.lock
+!README.md
+!requirements**
+
+# Add code
+!src/**
+
+# Ignore caches
+**/.mypy_cache
+**/__pycache__

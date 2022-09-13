@@ -1,57 +1,41 @@
-ARG POETRY=1.0.5
-ARG PENDULUM=2.1.0
-ARG PYTEST=5.4
-
-FROM python:3.8-alpine3.13 AS build
-ARG POETRY
-COPY . /pytezos
-RUN apk update \
-	&& apk --no-cache add --virtual build-deps \
-	    build-base \
-		libffi-dev \
-		libressl-dev \
-	&& pip3 install cryptography==3.3.2 poetry==$POETRY \
-	&& cd /pytezos && poetry build
-
-
-FROM python:3.8-alpine3.13
-ARG POETRY
-ARG PENDULUM
-ARG PYTEST
-COPY --from=build /pytezos/dist/*.whl /tmp/pytezos/
-RUN apk update \
-	&& apk --no-cache add --virtual build-deps \
+FROM python:3.10-alpine3.16 AS compile-image
+RUN apk add --update --no-cache \
 		build-base \
-		autoconf \
-		automake \
 		git \
 		gmp-dev \
-		isl \
-		libatomic \
 		libffi-dev \
-		libgomp \
 		libressl-dev \
-		libtool \
-		zeromq-dev \
-		make \
-		mpfr4 \
-		mpc1 \
-		musl-dev \
-		openssl \
-	&& apk --no-cache add \
-		binutils \
+		libsodium \
 		libsodium-dev \
+    && mkdir -p /opt/pytezos/src/pytezos \
+    && touch /opt/pytezos/src/pytezos/__init__.py \
+    && mkdir -p /opt/pytezos/src/michelson_kernel \
+    && touch /opt/pytezos/src/michelson_kernel/__init__.py
+WORKDIR /opt/pytezos
+ENV PATH="/opt/pytezos/bin:$PATH"
+ENV PYTHON_PATH="/opt/pytezos/src:$PATH"
+
+COPY pyproject.toml requirements.txt README.md /opt/pytezos/
+
+RUN /usr/local/bin/pip install \
+		--prefix /opt/pytezos \
+		--no-cache-dir \
+		--disable-pip-version-check \
+		--no-deps \
+		-r /opt/pytezos/requirements.txt -e .
+
+FROM python:3.10-alpine3.16 AS build-image
+RUN apk --no-cache add \
+		binutils \
+		gmp-dev \
 		gmp \
-	&& git clone https://github.com/bitcoin-core/secp256k1.git /tmp/secp256k1 && cd /tmp/secp256k1 \
-	&& ./autogen.sh \
-	&& ./configure \
-	&& make install \
-	&& cd / && rm -rf /tmp/secp256k1 \
-	&& pip3 install --upgrade pip setuptools wheel \
-	&& pip3 install --no-cache-dir cryptography==3.3.2 poetry==$POETRY pytest~=$PYTEST \
-	&& pip3 install --no-build-isolation --no-cache-dir pendulum==$PENDULUM \
-	&& pip3 install --no-cache-dir /tmp/pytezos/*.whl && rm -rf /tmp/pytezos \
-	&& pip3 uninstall --yes poetry \
-	&& rm -rf ~/.cache/pip && apk del py-pip \
-	&& apk del build-deps \
-	&& rm -f /sbin/apk && rm -rf /etc/apk && rm -rf /lib/apk && rm -rf /usr/share/apk && rm -rf /var/lib/apk
+		libsodium-dev \
+	&& adduser -D pytezos
+
+USER pytezos
+ENV PATH="/opt/pytezos/bin:$PATH"
+ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.10/site-packages:$PYTHONPATH"
+WORKDIR /home/pytezos/
+
+COPY --chown=pytezos --from=compile-image /opt/pytezos /opt/pytezos
+COPY --chown=pytezos . /opt/pytezos
