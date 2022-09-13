@@ -31,7 +31,7 @@ jobs:
         poetry build
         poetry publish
     - name: Build github release
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: 'marvinpinto/action-automatic-releases@latest'
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        repo_token: '${{ secrets.GITHUB_TOKEN }}'
         prerelease: false

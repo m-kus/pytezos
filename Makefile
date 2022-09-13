@@ -70,12 +70,11 @@ image:             ## Build all Docker images
 
 image-pytezos:     ## Build pytezos Docker image
 	docker buildx build . --progress plain -t pytezos:${TAG}
-	docker run --rm pytezos:${TAG} python -c "from pytezos_core.key import is_installed; assert is_installed(); import secp256k1; secp256k1.PrivateKey(); print('OK')"
+	docker run --rm pytezos:${TAG} python -c "from pytezos_core.key import is_installed; assert is_installed()"
 
 image-kernel:      ## Build michelson-kernel Docker image
 	docker buildx build . --progress plain -t michelson-kernel:${TAG} -f Dockerfile.kernel
-	docker run --rm --entrypoint sh michelson-kernel:${TAG} python -c "import pytezos; print(pytezos.__version__)"
-	docker run --rm --entrypoint sh michelson-kernel:${TAG} python -c "import michelson_kernel; print(michelson_kernel.__version__)"
+	docker run --rm michelson-kernel:${TAG} --help
 
 image-legacy:      ## Build legacy pytezos Docker image
 	docker buildx build . --progress plain -t pytezos:${TAG}-legacy -f Dockerfile.legacy

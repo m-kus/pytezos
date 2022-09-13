@@ -1,30 +1,43 @@
-FROM python:3.10-slim-buster
+FROM python:3.10-alpine3.16 AS compile-image
+RUN apk add --update --no-cache \
+		build-base \
+		git \
+		gmp-dev \
+		libffi-dev \
+		libressl-dev \
+		libsodium \
+		libsodium-dev \
+    && mkdir -p /opt/pytezos/src/pytezos \
+    && touch /opt/pytezos/src/pytezos/__init__.py \
+    && mkdir -p /opt/pytezos/src/michelson_kernel \
+    && touch /opt/pytezos/src/michelson_kernel/__init__.py
+WORKDIR /opt/pytezos
+ENV PATH="/opt/pytezos/bin:$PATH"
+ENV PYTHON_PATH="/opt/pytezos/src:$PATH"
 
-RUN apt update && \
-    apt install -y build-essential pkg-config libsodium-dev libsecp256k1-dev libgmp-dev make curl git && \
-    rm -rf /var/lib/apt/lists/*
-RUN pip install poetry
-RUN useradd -ms /bin/bash jupyter
+COPY pyproject.toml requirements.kernel.txt README.md /opt/pytezos/
 
-RUN mkdir /home/jupyter/michelson-kernel
-RUN mkdir /home/jupyter/notebooks
-COPY Makefile pyproject.toml poetry.lock README.md /home/jupyter/michelson-kernel/
-# We want to copy our code at the last layer but not to break poetry's "packages" section
-RUN mkdir -p /home/jupyter/michelson-kernel/src/michelson_kernel && \
-    touch /home/jupyter/michelson-kernel/src/michelson_kernel/__init__.py && \ 
-    mkdir -p /home/jupyter/michelson-kernel/src/pytezos && \
-    touch /home/jupyter/michelson-kernel/src/pytezos/__init__.py
+RUN /usr/local/bin/pip install \
+		--prefix /opt/pytezos \
+		--no-cache-dir \
+		--disable-pip-version-check \
+		--no-deps \
+		-r /opt/pytezos/requirements.txt -e .
 
-WORKDIR /home/jupyter/michelson-kernel
-RUN poetry config virtualenvs.in-project true
-RUN make install DEV=0
+FROM python:3.10-alpine3.16 AS build-image
+RUN apk --no-cache add \
+		binutils \
+		gmp-dev \
+		gmp \
+		libsodium-dev \
+	&& adduser -D pytezos
 
-COPY . /home/jupyter/michelson-kernel/
-RUN chown -R jupyter /home/jupyter/
-
-USER jupyter
-RUN make install-kernel
-
-WORKDIR /home/jupyter/notebooks
+USER pytezos
+ENV PATH="/opt/pytezos/bin:$PATH"
+ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.10/site-packages:$PYTHONPATH"
+WORKDIR /home/pytezos/
 EXPOSE 8888
 ENTRYPOINT [ "/home/jupyter/michelson-kernel/.venv/bin/jupyter", "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax" ]
+
+COPY --chown=pytezos --from=compile-image /opt/pytezos /opt/pytezos
+COPY --chown=pytezos . /opt/pytezos
