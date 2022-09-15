@@ -1,10 +1,21 @@
 # Changelog
 
-## [3.6.1](https://github.com/baking-bad/pytezos/compare/3.6.0...3.6.1) (2022-08-04)
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog],
+and this project adheres to [Semantic Versioning].
+
+## [Unreleased]
+
+### Changed
+
+* `pytezos.crypto` module has been splitted into a separate package `pytezos_crypto`. Existing imports will continue to work.
+
+## [3.6.1] - 2022-08-04
 
 ### Added
 
-* one can supply initial storage when executing a callback view
+* One can supply initial storage when executing a callback view.
 
 ### Fixed
 
@@ -13,7 +24,7 @@
 * Fixed setting default logging config.
 * Large batches do not hit gas per block exhausted anymore, fee is specified for the first operation only.
 
-## [3.6.0](https://github.com/baking-bad/pytezos/compare/3.5.1...3.6.0) (2022-06-28)
+## [3.6.0] - 2022-06-28
 
 ### Added
 
@@ -27,13 +38,13 @@
 
 * Protocols older than 13.0 (Jakatra) are no longer supported.
 
-## [3.5.1](https://github.com/baking-bad/pytezos/compare/3.5.0...3.5.1) (2022-05-18)
+## [3.5.1] - 2022-05-18
 
 ### Fixed
 
 * Unforging for `pair` with 3 args and annots was working incorrectly (@konchunas)
 
-## [3.5.0](https://github.com/baking-bad/pytezos/compare/3.4.2...3.5.0) (2022-04-29)
+## [3.5.0] - 2022-04-29
 
 ### Fixed
 
@@ -46,9 +57,9 @@
 * Minimum Python version is now 3.8, Python 3.10 support is added
 * Blocks observer now handles reorgs and waits for N levels instead of N blocks
 
-## 3.4.2 - 2022-03-26
+## [3.4.2] - 2022-03-26
 
-### Fixed`
+### Fixed
 
 * time_between_blocks no longer exists, minimum_block_delay used instead
 * sandbox tests -> re-create node container per each case (cannot rollback in Tenderbake)
@@ -59,13 +70,13 @@
 * `SUB_MUTEZ` instruction support in REPL
 * Implementations of `Operation_list_hash`, `Operation_list_list_hash`, and `Block_payload_hash`
 
-## 3.4.1 - 2022-03-22
+## [3.4.1] - 2022-03-22
 
 ### Fixed
 
 * Issue with `lazy_storage_diff`
 
-## 3.4.0 - 2022-03-22
+## [3.4.0] - 2022-03-22
 
 ### Fixed
 
@@ -76,7 +87,7 @@
 * Default protocol is Ithaca
 * Sandbox node version is updated to v12
 
-## 3.3.6 - 2022-03-10
+## [3.3.6] - 2022-03-10
 
 ### Fixed
 
@@ -86,13 +97,13 @@
 
 * Installation hints for M1 (credits to @konchunas)
 
-## 3.3.5 - 2022-02-28
+## [3.3.5] - 2022-02-28
 
 ### Fixed
 
 * Metadata big map can be located in a nested structure, not necessarily on the top-level (as per TZIP-16)
 
-## 3.3.4 - 2021-12-23
+## [3.3.4] - 2021-12-23
 
 ### Fixed
 
@@ -106,14 +117,14 @@
 
 * `Key.verify` returns `True` if the signature is valid (it was `None` before)
 
-## 3.3.3 - 2021-12-14
+## [3.3.3] - 2021-12-14
 
 ### Fixed
 
 * Always try to fetch the latest storage in off-chain or on-chain views
 * Fixed case with `GET` instruction returning `None` with wrong type (key type instead of value type)
 
-## 3.3.2 - 2021-12-12
+## [3.3.2] - 2021-12-12
 
 ### Added
 
@@ -123,7 +134,7 @@
 
 * Regression in offline view behavior for storage with bigmaps
 
-## 3.3.1 - 2021-12-01
+## [3.3.1] - 2021-12-01
 
 ### Added
 
@@ -133,7 +144,7 @@
 
 * Results returned from the callback views are now fully-annotated (based on the callback contract type)
 
-## 3.3.0 - 2021-11-26
+## [3.3.0] - 2021-11-26
 
 ### Added
 
@@ -160,3 +171,24 @@
 
 * `pytezos sandbox` CLI command now works properly and provides almost flextesa-like experience at lesser cost
 * Operation branch was calculated incorrectly based on the TTL (before `head~{60-ttl}`, after `head~{120-ttl}`)
+
+<!-- Links -->
+[keep a changelog]: https://keepachangelog.com/en/1.0.0/
+[semantic versioning]: https://semver.org/spec/v2.0.0.html
+
+<!-- Versions -->
+[Unreleased]: https://github.com/baking-bad/pytezos/compare/3.6.1...HEAD
+[3.6.1]: https://github.com/baking-bad/pytezos/compare/3.6.0...3.6.1
+[3.6.0]: https://github.com/baking-bad/pytezos/compare/3.5.1...3.6.0
+[3.5.1]: https://github.com/baking-bad/pytezos/compare/3.5.0...3.5.1
+[3.5.0]: https://github.com/baking-bad/pytezos/compare/3.4.2...3.5.0
+[3.4.2]: https://github.com/baking-bad/pytezos/compare/3.4.1...3.4.2
+[3.4.1]: https://github.com/baking-bad/pytezos/compare/3.4.0...3.4.1
+[3.4.0]: https://github.com/baking-bad/pytezos/compare/3.3.6...3.4.0
+[3.3.6]: https://github.com/baking-bad/pytezos/compare/3.3.5...3.3.6
+[3.3.5]: https://github.com/baking-bad/pytezos/compare/3.3.4...3.3.5
+[3.3.4]: https://github.com/baking-bad/pytezos/compare/3.3.3...3.3.4
+[3.3.3]: https://github.com/baking-bad/pytezos/compare/3.3.2...3.3.3
+[3.3.2]: https://github.com/baking-bad/pytezos/compare/3.3.1...3.3.2
+[3.3.1]: https://github.com/baking-bad/pytezos/compare/3.3.0...3.3.1
+[3.3.0]: https://github.com/baking-bad/pytezos/releases/tag/3.3.0
