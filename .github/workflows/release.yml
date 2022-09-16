@@ -5,33 +5,117 @@ on:
       - '*.*.*'
 
 jobs:
-  build:
-    name: Build
+  release:
+    name: Release
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
-    - uses: actions/checkout@master
-    - name: Set env
-      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'
-    - uses: abatilo/actions-poetry@v2.1.4
-    - name: Install dependencies
-      run: |
-        sudo apt-get update -q
-        sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
-    - name: Install project
-      run: make install
-    - name: Poetry publish
-      run: |
-        poetry config http-basic.pypi __token__ ${{secrets.PYPI_TOKEN}}
-        poetry build
-        poetry publish
-    - name: Build github release
-      uses: 'marvinpinto/action-automatic-releases@latest'
-      with:
-        repo_token: '${{ secrets.GITHUB_TOKEN }}'
-        prerelease: false
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up metadata (pytezos)
+        id: meta-pytezos
+        uses: docker/metadata-action@v3
+        with:
+          images: bakingbad/pytezos
+          flavor: |
+            latest=false
+          tags: |
+            type=pep440,pattern={{version}}
+            type=pep440,pattern={{major}}
+            type=pep440,pattern={{major}}.{{minor}}
+
+      - name: Set up metadata (michelson-kernel)
+        id: meta-kernel
+        uses: docker/metadata-action@v3
+        with:
+          images: bakingbad/michelson-kernel
+          flavor: |
+            latest=false
+          tags: |
+            type=pep440,pattern={{version}}
+            type=pep440,pattern={{major}}
+            type=pep440,pattern={{major}}.{{minor}}
+
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10.x'
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: '1.2.0'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
+
+      - name: Install project
+        run: make install
+      - name: Run lint
+        run: make lint
+      - name: Run tests
+        run: make test
+
+      - name: Publish stable image (pytezos)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-pytezos.outputs.tags }}
+          labels: ${{ steps.meta-pytezos.outputs.labels }}
+
+      - name: Publish stable image (michelson-kernel)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile.kernel
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-kernel;.outputs.tags }}
+          labels: ${{ steps.meta-kernel.outputs.labels }}
+
+      - name: Publish package on PyPi
+        run: |
+          poetry config http-basic.pypi __token__ ${{secrets.PYPI_TOKEN}}
+          poetry build
+          poetry publish
+
+      - name: Parse changelog
+        id: changelog
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          version: ${{ github.ref_name }}
+
+      - name: Publish GitHub release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ steps.changelog.outputs.version }} - ${{ steps.changelog.outputs.date }}
+          body: |
+            ${{ steps.changelog.outputs.changes }}
+          draft: true
+          prerelease: ${{ steps.changelog.outputs.status == 'prereleased' }}
