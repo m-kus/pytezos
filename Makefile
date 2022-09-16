@@ -141,7 +141,7 @@ update:            ## Update dependencies, export requirements.txt (wait an eter
 	poetry export --without-hashes -o requirements.kernel.txt
 
 	rm poetry.lock
-	poetry remove ipykernel jupyter-client
+	poetry remove notebook
 	poetry export --without-hashes -o requirements.txt
 
 	mv pyproject.toml.bak pyproject.toml

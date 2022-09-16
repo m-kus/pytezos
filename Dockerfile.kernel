@@ -22,7 +22,7 @@ RUN /usr/local/bin/pip install \
 		--no-cache-dir \
 		--disable-pip-version-check \
 		--no-deps \
-		-r /opt/pytezos/requirements.txt -e .
+		-r /opt/pytezos/requirements.kernel.txt -e .
 
 FROM python:3.10-alpine3.16 AS build-image
 RUN apk --no-cache add \
@@ -37,7 +37,7 @@ ENV PATH="/opt/pytezos/bin:$PATH"
 ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.10/site-packages:$PYTHONPATH"
 WORKDIR /home/pytezos/
 EXPOSE 8888
-ENTRYPOINT [ "/home/jupyter/michelson-kernel/.venv/bin/jupyter", "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax" ]
+ENTRYPOINT [ "jupyter", "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax" ]
 
 COPY --chown=pytezos --from=compile-image /opt/pytezos /opt/pytezos
 COPY --chown=pytezos . /opt/pytezos
