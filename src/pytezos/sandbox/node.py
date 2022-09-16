@@ -13,6 +13,7 @@ from typing import List
 from typing import Optional
 
 import requests.exceptions
+from docker.errors import DockerException  # type: ignore
 from testcontainers.core.container import Container  # type: ignore
 from testcontainers.core.docker_client import DockerClient  # type: ignore
 from testcontainers.core.generic import DockerContainer  # type: ignore
@@ -29,7 +30,11 @@ TEZOS_NODE_PORT = 8732
 
 
 def kill_existing_containers():
-    docker = DockerClient()
+    try:
+        docker = DockerClient()
+    except DockerException:
+        return
+
     running_containers: List[Container] = docker.client.containers.list(
         filters={
             'status': 'running',

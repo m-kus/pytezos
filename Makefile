@@ -66,7 +66,6 @@ build:             ## Build Python wheel package
 image:             ## Build all Docker images
 	make image-pytezos
 	make image-kernel
-	make image-legacy
 
 image-pytezos:     ## Build pytezos Docker image
 	docker buildx build . --progress plain -t pytezos:${TAG}
@@ -75,10 +74,6 @@ image-pytezos:     ## Build pytezos Docker image
 image-kernel:      ## Build michelson-kernel Docker image
 	docker buildx build . --progress plain -t michelson-kernel:${TAG} -f Dockerfile.kernel
 	docker run --rm michelson-kernel:${TAG} --help
-
-image-legacy:      ## Build legacy pytezos Docker image
-	docker buildx build . --progress plain -t pytezos:${TAG}-legacy -f Dockerfile.legacy
-	docker run --rm  pytezos:${TAG}-legacy python -c "from pytezos.crypto.key import is_installed; assert is_installed()"
 
 release-patch:     ## Release patch version
 	bumpversion patch

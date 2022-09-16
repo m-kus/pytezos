@@ -22,7 +22,8 @@ RUN /usr/local/bin/pip install \
 		--no-cache-dir \
 		--disable-pip-version-check \
 		--no-deps \
-		-r /opt/pytezos/requirements.txt -e .
+		-r /opt/pytezos/requirements.txt -e . \
+	&& rm -r /opt/pytezos/src/michelson_kernel /opt/pytezos/bin/michelson-kernel
 
 FROM python:3.10-alpine3.16 AS build-image
 RUN apk --no-cache add \
@@ -36,6 +37,7 @@ USER pytezos
 ENV PATH="/opt/pytezos/bin:$PATH"
 ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.10/site-packages:$PYTHONPATH"
 WORKDIR /home/pytezos/
+ENTRYPOINT [ "pytezos" ]
 
 COPY --chown=pytezos --from=compile-image /opt/pytezos /opt/pytezos
 COPY --chown=pytezos . /opt/pytezos
