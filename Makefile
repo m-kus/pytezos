@@ -32,8 +32,8 @@ test:              ## Run test suite
 		--cov-report=term-missing \
 		--cov=pytezos \
 		--cov=michelson_kernel \
-		--cov-report=xml
-		-n auto -s -v tests/contract_tests tests/integration_tests tests/unit_tests && \
+		--cov-report=xml \
+		-n auto -s -v tests/contract_tests tests/integration_tests tests/unit_tests;
 		pytest -xv tests/sandbox_tests"
 
 docs:              ## Build docs
