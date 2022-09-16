@@ -46,7 +46,7 @@ jobs:
         id: meta-pytezos
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/bakingbad/pytezos
+          images: ${{ env.DOCKER_REGISTRY }}/baking-bad/pytezos
           flavor: |
             latest=false
           tags: |
@@ -57,7 +57,7 @@ jobs:
         id: meta-kernel
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/bakingbad/michelson-kernel
+          images: ${{ env.DOCKER_REGISTRY }}/baking-bad/michelson-kernel
           flavor: |
             latest=false
           tags: |
