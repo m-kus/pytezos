@@ -1088,6 +1088,8 @@ class OpcodesTestCase(TestCase):
                 'Unit',
                 'Unit',
             ),
+            # Test event emitting
+            ('emit.tz', 'Unit', 'Unit', 'Unit'),
         ]
     )
     def test_opcodes(self, filename, storage, parameter, result):

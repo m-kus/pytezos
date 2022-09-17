@@ -326,3 +326,19 @@ class MinBlockTimeInstruction(MichelsonInstruction, prim='MIN_BLOCK_TIME'):
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
         return cls(stack_items_added=1)
+
+
+class EmitInstruction(MichelsonInstruction, prim='EMIT', args_len=1):
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        event_type = cast(Type[MichelsonType], cls.args[0])
+        payload = stack.pop1()
+        payload.assert_type_equal(event_type)
+        tag = cls.field_names[0] if len(cls.field_names) == 1 else ''
+        raw_payload = payload.to_micheline_value()
+        res = OperationType.event(
+            source=context.get_self_address(), event_type=event_type, payload=raw_payload, tag=tag
+        )
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [payload], [res], arg=f'%{tag}'))  # type: ignore
+        return cls(stack_items_added=0)

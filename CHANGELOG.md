@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.7.0](https://github.com/baking-bad/pytezos/compare/3.6.1...3.7.0) (2022-09-17)
+
+### Added
+
+* `EMIT` instruction support added
+
+### Changed
+
+* `consumed_milligas` is used instead of deprecated `consumed_gas` field
+
 ## [3.6.1](https://github.com/baking-bad/pytezos/compare/3.6.0...3.6.1) (2022-08-04)
 
 ### Added

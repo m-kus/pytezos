@@ -9,7 +9,8 @@ GRANADA = 'PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV'
 HANGZHOU = 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx'
 ITHACA = 'Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A'
 JAKARTA = 'PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY'
-LATEST = JAKARTA
+KATHMANDU = 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
+LATEST = KATHMANDU
 
 protocol_version = {
     EDO: 8,
@@ -18,6 +19,7 @@ protocol_version = {
     HANGZHOU: 11,
     ITHACA: 12,
     JAKARTA: 13,
+    KATHMANDU: 14,
 }
 
 sandbox_commitment = {
@@ -113,6 +115,11 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'sc_rollup_origination_size': 6314.0,
         'sc_rollup_challenge_window_in_blocks': 20160.0,
         'sc_rollup_max_available_messages': 1000000.0,
+        'sc_rollup_stake_amount': '32000000',
+        'sc_rollup_commitment_period_in_blocks': 30.0,
+        'sc_rollup_max_lookahead_in_blocks': 30000.0,
+        'sc_rollup_max_active_outbox_levels': 20160.0,
+        'sc_rollup_max_outbox_messages_per_level': 100.0,
         'blocks_per_stake_snapshot': 4.0,
         'consensus_committee_size': 526.0,
         'consensus_threshold': 0.0,
@@ -129,4 +136,13 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'minimal_block_delay': '1',
         'liquidity_baking_subsidy': '2500000',
         'liquidity_baking_sunset_level': 2032928.0,
+        'nonce_revelation_threshold': 2.0,
+        'vdf_difficulty': '50000',
+        'dal_parametric': {
+            'feature_enable': False,
+            'number_of_slots': 16.0,
+            'number_of_shards': 256.0,
+            'endorsement_lag': 1.0,
+            'availability_threshold': 50.0,
+        },
     }

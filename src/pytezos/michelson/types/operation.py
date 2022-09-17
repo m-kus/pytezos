@@ -73,6 +73,17 @@ class OperationType(MichelsonType, prim='operation'):
         }
         return cls(content, ty=param_type)
 
+    @classmethod
+    def event(cls, source: str, event_type: Type[MichelsonType], payload: Any, tag: str) -> 'OperationType':
+        content = {
+            'kind': 'event',
+            'source': source,
+            'event_type': event_type.as_micheline_expr(),
+            'payload': payload,
+            'tag': tag,
+        }
+        return cls(content, ty=event_type)
+
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         kind = self.content['kind']
         assert self.ty, f'data type is not defined for {kind}'
@@ -80,6 +91,8 @@ class OperationType(MichelsonType, prim='operation'):
             data = self.ty.from_micheline_value(self.content['parameters']['value'])
         elif kind == 'origination':
             data = self.ty.from_micheline_value(self.content['script']['storage'])
+        elif kind == 'event':
+            data = self.ty.from_micheline_value(self.content['payload'])
         else:
             raise AssertionError(f'not applicable for {kind}')
         return data.to_python_object(try_unpack=try_unpack)
