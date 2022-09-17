@@ -335,9 +335,8 @@ class EmitInstruction(MichelsonInstruction, prim='EMIT', args_len=1):
         payload = stack.pop1()
         payload.assert_type_equal(event_type)
         tag = cls.field_names[0] if len(cls.field_names) == 1 else ''
-        raw_payload = payload.to_micheline_value()
         res = OperationType.event(
-            source=context.get_self_address(), event_type=event_type, payload=raw_payload, tag=tag
+            source=context.get_self_address(), event_type=event_type, payload=payload.to_micheline_value(), tag=tag
         )
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [payload], [res], arg=f'%{tag}'))  # type: ignore

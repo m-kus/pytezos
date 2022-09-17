@@ -17,7 +17,7 @@ from pytezos.rpc import ShellQuery
 from pytezos.rpc.errors import RpcError
 
 # NOTE: Built-in key for PyTezos client, please, use responsibly.
-default_network = 'jakartanet'
+default_network = 'ghostnet'
 default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'
 default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 
@@ -37,13 +37,9 @@ nodes = {
     'sandbox': ['http://127.0.0.1:8732/'],
     'sandboxnet': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
-    'florencenet': ['https://testnet-tezos.giganode.io'],
-    'granadanet': ['https://rpc.tzkt.io/granadanet'],
-    'kaizen': ['https://rpc.tzkt.io/granadanet'],
-    'kaizennet': ['https://rpc.tzkt.io/granadanet'],
-    'hangzhounet': ['https://rpc.tzkt.io/hangzhou2net'],
-    'ithacanet': ['https://rpc.tzkt.io/ithacanet'],
+    'ghostnet': ['https://rpc.tzkt.io/ghostnet'],
     'jakartanet': ['https://rpc.tzkt.io/jakartanet'],
+    'kathmandunet': ['https://rpc.tzkt.io/kathmandunet'],
 }
 keys = {
     'alice': alice_key,

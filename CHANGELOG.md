@@ -9,6 +9,7 @@
 ### Changed
 
 * `consumed_milligas` is used instead of deprecated `consumed_gas` field
+* `ghostnet` is now a default network in pytezos client (as it is permanent)
 
 ## [3.6.1](https://github.com/baking-bad/pytezos/compare/3.6.0...3.6.1) (2022-08-04)
 
