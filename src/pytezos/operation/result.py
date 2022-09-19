@@ -198,7 +198,7 @@ class OperationResult:
         return cls(
             parameters=content.get('parameters'),
             storage=operation_result.get('storage'),
-            lazy_diff=operation_result.get('lazy_diff', []),
+            lazy_diff=operation_result.get('lazy_storage_diff', []),
             # TODO: if it is already an internal operation, we should think... (build a tree?)
             operations=cls.get_contents(content, source=content['destination']),
         )

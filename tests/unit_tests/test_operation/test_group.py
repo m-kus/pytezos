@@ -1,8 +1,11 @@
 from contextlib import suppress
 from unittest import TestCase
 from unittest.mock import patch
+from os.path import join, dirname
+import json
 
 from pytezos.client import PyTezosClient
+from pytezos.operation.result import OperationResult
 
 
 class TestOperationGroup(TestCase):
@@ -34,3 +37,11 @@ class TestOperationGroup(TestCase):
 
                 # Assert
                 rpc_mock.assert_called_with(mock_call)
+
+    def test_operation_result(self):
+        with open(join(dirname(__file__), 'data', 'op3GZiumMFEGWNPae1GDGEG2skKEibhEgusKc7XBG7gzxbSg5SD.json')) as f:
+            data = json.loads(f.read())
+
+        res = OperationResult.from_operation_group(data)
+        self.assertEqual(1, len(res))
+        self.assertEqual(6, len(res[0].lazy_diff))
