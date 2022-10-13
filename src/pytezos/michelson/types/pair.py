@@ -159,6 +159,13 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
                 yield from item.iter_comb(include_nodes=include_nodes)
             else:
                 yield item
+                
+    def unpairn_comb(self, count) -> Generator[MichelsonType, None, None]:
+        for i, item in enumerate(self):
+            if i == 1 and isinstance(item, PairType) and not (item.field_name or item.type_name) and count > 0:
+                yield from item.unpairn_comb(count - 1)
+            else:
+                yield item
 
     def access_comb(self, idx: int) -> MichelsonType:
         return next(item for i, item in enumerate(self.iter_comb(include_nodes=True)) if i == idx)

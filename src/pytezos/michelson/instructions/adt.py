@@ -118,8 +118,7 @@ class UnpairnInstruction(MichelsonInstruction, prim='UNPAIR', args_len=1):
         assert count >= 2, f'invalid argument, must be >= 2'
         pair = cast(PairType, stack.pop1())
         pair.assert_type_in(PairType)
-        leaves = list(pair.iter_comb())
-        assert len(leaves) == count, f'expected {count} leaves, got {len(leaves)}'
+        leaves = list(pair.unpairn_comb(count - 2))
         for leaf in reversed(leaves):
             stack.push(leaf)
         stdout.append(format_stdout(cls.prim, [pair], leaves, count))  # type: ignore
