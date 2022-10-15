@@ -29,11 +29,7 @@ alice_key_hash = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
 dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'
 
 nodes = {
-    'mainnet': [
-        'https://mainnet-tezos.giganode.io/',
-        'https://api.tez.ie/',
-        'https://tezos-prod.cryptonomic-infra.tech/',
-    ],
+    'mainnet': ['https://rpc.tzkt.io/mainnet'],
     'sandbox': ['http://127.0.0.1:8732/'],
     'sandboxnet': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
