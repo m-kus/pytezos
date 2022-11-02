@@ -28,7 +28,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - uses: abatilo/actions-poetry@v2.1.4
     - name: Install binary dependencies
-      run: make install-deps
+      run: OSTYPE=$OSTYPE make install-deps
     - name: Install project dependencies
       run: make install
     - name: Run lint
