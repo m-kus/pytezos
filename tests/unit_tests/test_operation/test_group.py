@@ -1,8 +1,9 @@
+import json
 from contextlib import suppress
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
 from unittest.mock import patch
-from os.path import join, dirname
-import json
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.result import OperationResult

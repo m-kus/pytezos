@@ -54,7 +54,7 @@ secp256k1 = "^0.14.0"
 simplejson = "^3.17.6"
 strict-rfc3339 = "^0.7"
 tabulate = "^0.8.9"
-testcontainers = "^3.5.0"
+testcontainers = "^3.7.0"
 tqdm = "^4.62.3"
 
 [tool.poetry.dev-dependencies]
@@ -105,7 +105,7 @@ show_source = true
 extended_default_ignore = []
 
 [tool.flakeheaven.plugins]
-"flake8-*" = ["+*", "-C417", "-SIM106", "-SIM114", "-SIM102", "-R504"]
+"flake8-*" = ["+*", "-C417", "-SIM106", "-SIM114", "-SIM102", "-R504", "-R505", "-R506", "-R507"]
 flake8-docstrings = ["-*"]
 
 [build-system]
