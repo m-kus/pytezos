@@ -8,10 +8,6 @@ jobs:
   build:
     name: Build
     runs-on: ${{ matrix.os }}
-    env:
-      DOCKER_HOST: "tcp://docker:2375"
-      DOCKER_TLS_CERTDIR: ""
-      DOCKER_DRIVER: overlay2
     strategy:
       matrix:
         include:
