@@ -17,9 +17,9 @@ all:               ## Run a whole CI pipeline: lint, run tests, build docs
 	make install lint test docs
 
 install-deps:      ## Install binary dependencies
-ifeq ("$(OSTYPE)", "linux-gnu")
+ifneq (,$(findstring linux-gnu,$(OSTYPE)))
 	sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev pkg-config
-else ifeq ("$(OSTYPE)", "darwin")
+else ifneq (,$(findstring darwin,$(OSTYPE)))
 	brew tap cuber/homebrew-libsecp256k1
 	brew install libsodium libsecp256k1 gmp pkg-config
 else
