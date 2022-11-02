@@ -119,7 +119,7 @@ class ExecutionContext(AbstractContext):
             raise Exception('`shell` is not set')
         if self._sandboxed is None:
             version = self.shell.version()
-            self._sandboxed = version['network_version']['chain_name'] == 'SANDBOXED_TEZOS'
+            self._sandboxed = 'SANDBOXED' in version['network_version']['chain_name']
         return self._sandboxed
 
     def reset(self):
