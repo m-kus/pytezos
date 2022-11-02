@@ -16,6 +16,17 @@ help:              ## Show this help (default)
 all:               ## Run a whole CI pipeline: lint, run tests, build docs
 	make install lint test docs
 
+install-deps:      ## Install binary dependencies
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev pkg-config
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		brew tap cuber/homebrew-libsecp256k1
+		brew install libsodium libsecp256k1 gmp pkg-config
+	else
+		echo "Unsupported platform $OSTYPE"
+		exit 1
+	fi
+
 install:           ## Install project dependencies
 	poetry install \
 	`if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
