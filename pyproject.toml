@@ -54,7 +54,7 @@ secp256k1 = "^0.14.0"
 simplejson = "^3.17.6"
 strict-rfc3339 = "^0.7"
 tabulate = "^0.8.9"
-testcontainers = "^3.4.2"
+testcontainers = "^3.5.0"
 tqdm = "^4.62.3"
 
 [tool.poetry.dev-dependencies]
