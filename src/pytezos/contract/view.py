@@ -153,6 +153,15 @@ class ContractViewCall(ContextMixin):
         self.return_ty_expr = return_ty_expr
         self.code_expr = code_expr
 
+    def __repr__(self) -> str:
+        res = [
+            super().__repr__(),
+            f'.name\t{self.name}',
+            '\nHelpers',
+            get_class_docstring(self.__class__),
+        ]
+        return '\n'.join(res)
+
     def _encode_storage(self, storage=None):
         try:
             storage_ty = MichelsonType.match(self.context.storage_expr)
