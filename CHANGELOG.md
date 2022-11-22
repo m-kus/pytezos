@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.7.2](https://github.com/baking-bad/pytezos/compare/3.7.1...3.7.2) (2022-11-22)
+
+### Added
+
+* `ContractView.run_view` helper that allows to execute on-chain view via special RPC endpoint
+
 ## [3.7.1](https://github.com/baking-bad/pytezos/compare/3.7.0...3.7.1) (2022-10-15)
 
 ### Fixed
