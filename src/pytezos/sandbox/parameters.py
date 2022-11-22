@@ -10,7 +10,8 @@ HANGZHOU = 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx'
 ITHACA = 'Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A'
 JAKARTA = 'PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY'
 KATHMANDU = 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
-LATEST = KATHMANDU
+LIMA = 'PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW'
+LATEST = LIMA
 
 protocol_version = {
     EDO: 8,
@@ -20,6 +21,7 @@ protocol_version = {
     ITHACA: 12,
     JAKARTA: 13,
     KATHMANDU: 14,
+    LIMA: 15,
 }
 
 sandbox_commitment = {
@@ -78,7 +80,6 @@ sandbox_params: Dict[str, Any] = {
     'hard_gas_limit_per_operation': '1040000',
     'hard_gas_limit_per_block': '10400000',
     'proof_of_work_threshold': str((1 << 63) - 1),
-    'tokens_per_roll': '8000000000',
     'seed_nonce_revelation_tip': '125000',
     'origination_size': 257.0,
     'cost_per_byte': '250',
@@ -114,12 +115,18 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'sc_rollup_enable': False,
         'sc_rollup_origination_size': 6314.0,
         'sc_rollup_challenge_window_in_blocks': 20160.0,
-        'sc_rollup_max_available_messages': 1000000.0,
+        'sc_rollup_max_number_of_messages_per_commitment_period': 300000000.0,
         'sc_rollup_stake_amount': '32000000',
         'sc_rollup_commitment_period_in_blocks': 30.0,
         'sc_rollup_max_lookahead_in_blocks': 30000.0,
         'sc_rollup_max_active_outbox_levels': 20160.0,
         'sc_rollup_max_outbox_messages_per_level': 100.0,
+        'sc_rollup_number_of_sections_in_dissection': 32.0,
+        'sc_rollup_timeout_period_in_blocks': 20160.0,
+        'sc_rollup_max_number_of_cemented_commitments': 5.0,
+        'zk_rollup_enable': False,
+        'zk_rollup_origination_size': 4000.0,
+        'zk_rollup_min_pending_to_process': 10.0,
         'blocks_per_stake_snapshot': 4.0,
         'consensus_committee_size': 526.0,
         'consensus_threshold': 0.0,
@@ -135,7 +142,6 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'ratio_of_frozen_deposits_slashed_per_double_endorsement': {'numerator': 1.0, 'denominator': 2.0},
         'minimal_block_delay': '1',
         'liquidity_baking_subsidy': '2500000',
-        'liquidity_baking_sunset_level': 2032928.0,
         'nonce_revelation_threshold': 2.0,
         'vdf_difficulty': '50000',
         'dal_parametric': {
@@ -144,5 +150,9 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
             'number_of_shards': 256.0,
             'endorsement_lag': 1.0,
             'availability_threshold': 50.0,
+            'slot_size': 1048576.0,
+            'redundancy_factor': 16.0,
+            'page_size': 4096.0
         },
+        'minimal_stake': '6000'
     }
