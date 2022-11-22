@@ -230,6 +230,44 @@ class ContractViewCall(ContextMixin):
         res = self.shell.blocks[self.block_id].helpers.scripts.run_code.post(query)
         return ContractCallResult.from_run_code(res, parameters=parameters, context=self.context)
 
+    def run_view(
+        self,
+        source=None,
+        sender=None,
+        chain_id=None,
+        gas_limit=None,
+        level=None,
+        now=None
+    ) -> Any:
+        """Execute using special RPC endpoint for executing views.
+
+        :param source: patch SOURCE
+        :param sender: patch SENDER
+        :param chain_id: patch CHAIN_ID
+        :param gas_limit: restrict max consumed gas
+        :param level: patch LEVEL
+        :param now: patch NOW
+        :returns: decoded view result
+        """
+        query = skip_nones(
+            contract=self.address,
+            view=self.name,
+            input=self.param_expr,
+            source=sender,
+            payer=source,
+            chain_id=chain_id or self.context.get_chain_id(),
+            unparsing_mode="Readable",
+            unlimited_gas=True if gas_limit is None else False,
+            gas=str(gas_limit) if gas_limit is not None else None,
+            level=str(level) if level is not None else None,
+            now=str(now) if now is not None else None
+        )
+        res = self.shell.blocks[self.block_id].helpers.scripts.run_script_view.post(query)
+        py_obj = MichelsonType\
+            .match(self.return_ty_expr).from_micheline_value(res['data'])\
+            .to_python_object()
+        return py_obj
+
     def storage_view(self, storage=None):
         """Get return value of an off-chain view.
 
@@ -258,7 +296,7 @@ class ContractViewCall(ContextMixin):
         return storage  # type: ignore
 
     def onchain_view(self, storage=None, balance=None, view_results: Optional[Dict[str, Any]] = None):
-        """Get return value of an on-chain view.
+        """Get return value of an on-chain view (not supporting recursive views).
 
         :param storage: override current contract storage (as Python object)
         :param balance: patch BALANCE
