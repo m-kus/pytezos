@@ -198,7 +198,7 @@ class ShellQuery(RpcQuery, path=''):
                 break
 
         if len(operations) < len(opg_hashes):
-            raise StopIteration('Only %d of %d operations were included, stopping', len(operations), len(opg_hashes))
+            raise StopIteration('Only %d of %d operations were included, stopping' % (len(operations), len(opg_hashes)))
 
         for _ in self.wait_blocks(
             block_hash,
