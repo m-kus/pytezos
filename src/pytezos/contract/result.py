@@ -38,7 +38,7 @@ class ContractCallResult(OperationResult):
             kwargs = {}  # type: ignore
             if hasattr(res, 'storage') and res.storage is not None:  # type: ignore
                 storage = program.storage.from_micheline_value(res.storage)  # type: ignore
-                if hasattr(res, 'lazy_storage_diff'):
+                if hasattr(res, 'lazy_diff'):
                     kwargs.update(lazy_diff=res.lazy_diff)  # type: ignore
                     storage = storage.merge_lazy_diff(res.lazy_diff)  # type: ignore
                 kwargs.update(storage=storage.to_python_object())
