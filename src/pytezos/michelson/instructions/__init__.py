@@ -38,6 +38,7 @@ from pytezos.michelson.instructions.control import IfLeftInstruction
 from pytezos.michelson.instructions.control import IfNoneInstruction
 from pytezos.michelson.instructions.control import IterInstruction
 from pytezos.michelson.instructions.control import LambdaInstruction
+from pytezos.michelson.instructions.control import LambdaRecInstruction
 from pytezos.michelson.instructions.control import LoopInstruction
 from pytezos.michelson.instructions.control import LoopLeftInstruction
 from pytezos.michelson.instructions.control import MapInstruction

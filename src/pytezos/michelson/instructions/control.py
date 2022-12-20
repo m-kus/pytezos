@@ -73,6 +73,16 @@ class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
         return cls(stack_items_added=1)
 
 
+class LambdaRecInstruction(MichelsonInstruction, prim='LAMBDA_REC', args_len=3):
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        lambda_type = LambdaType.create_type(args=cls.args[:2])
+        res = lambda_type(cls.args[2])  # type: ignore
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
+        return cls(stack_items_added=1)
+
+
 class ExecInstruction(MichelsonInstruction, prim='EXEC'):
     def __init__(self, item: MichelsonInstruction):
         super(ExecInstruction, self).__init__(stack_items_added=1)

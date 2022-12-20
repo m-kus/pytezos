@@ -136,7 +136,7 @@ prim_tags = {
     'SAPLING_EMPTY_STATE': b'\x85',
     'SAPLING_VERIFY_UPDATE': b'\x86',
     'ticket': b'\x87',
-    'TICKET': b'\x88',
+    'TICKET_DEPRECATED': b'\x88',
     'READ_TICKET': b'\x89',
     'SPLIT_TICKET': b'\x8A',
     'JOIN_TICKETS': b'\x8B',
@@ -156,6 +156,10 @@ prim_tags = {
     'sapling_transaction': b'\x96',
     # KATHMANDU
     'EMIT': b'\x97',
+    # LIMA
+    'Lambda_rec': b'\x98',
+    'LAMBDA_REC': b'\x99',
+    'TICKET': b'\x9A',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',
