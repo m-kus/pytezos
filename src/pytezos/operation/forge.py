@@ -20,6 +20,7 @@ reserved_entrypoints = {
     'do': b'\x02',
     'set_delegate': b'\x03',
     'remove_delegate': b'\x04',
+    'deposit': b'\x05',
 }
 
 
