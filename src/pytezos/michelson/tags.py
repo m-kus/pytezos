@@ -156,6 +156,9 @@ prim_tags = {
     'sapling_transaction': b'\x96',
     # KATHMANDU
     'EMIT': b'\x97',
+    # Lima
+    'Lambda_rec': b'\x98',
+    'LAMBDA_REC': b'\x99',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',
