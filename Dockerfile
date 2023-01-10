@@ -1,5 +1,4 @@
-ARG POETRY=1.0.5
-ARG PENDULUM=2.1.0
+ARG POETRY=1.3.2
 ARG PYTEST=5.4
 
 FROM python:3.8-alpine3.13 AS build
@@ -16,7 +15,6 @@ RUN apk update \
 
 FROM python:3.8-alpine3.13
 ARG POETRY
-ARG PENDULUM
 ARG PYTEST
 COPY --from=build /pytezos/dist/*.whl /tmp/pytezos/
 RUN apk update \
@@ -49,7 +47,6 @@ RUN apk update \
 	&& cd / && rm -rf /tmp/secp256k1 \
 	&& pip3 install --upgrade pip setuptools wheel \
 	&& pip3 install --no-cache-dir cryptography==3.3.2 poetry==$POETRY pytest~=$PYTEST \
-	&& pip3 install --no-build-isolation --no-cache-dir pendulum==$PENDULUM \
 	&& pip3 install --no-cache-dir /tmp/pytezos/*.whl && rm -rf /tmp/pytezos \
 	&& pip3 uninstall --yes poetry \
 	&& rm -rf ~/.cache/pip && apk del py-pip \
