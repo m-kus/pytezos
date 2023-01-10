@@ -81,8 +81,8 @@ class LambdaRecInstruction(MichelsonInstruction, prim='LAMBDA_REC', args_len=3):
         lambda_type = LambdaType.create_type(args=cls.args[:2])
 
         inner = LambdaRecInstruction.create_type(args=cls.args.copy())
-        inner.depth = cls.depth + 1
-        if inner.depth > 256:
+        inner.depth = cls.depth + 1  # type: ignore
+        if cls.depth + 1 > 256:
             raise MichelsonRuntimeError("Maximum recursive depth reached")
 
         body = MichelineSequence.create_type(args=[inner, cls.args[2]])

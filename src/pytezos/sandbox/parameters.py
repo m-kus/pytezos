@@ -152,7 +152,7 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
             'availability_threshold': 50.0,
             'slot_size': 1048576.0,
             'redundancy_factor': 16.0,
-            'page_size': 4096.0
+            'page_size': 4096.0,
         },
-        'minimal_stake': '6000'
+        'minimal_stake': '6000',
     }
