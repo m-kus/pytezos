@@ -24,7 +24,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.8,<3.12"
 attrs = "^21.4.0"
 base58 = "^2.1.1"
 bson = "^0.5.10"
@@ -42,11 +42,8 @@ jupyter-client = "^7.1.0"
 mnemonic = "^0.20"
 netstruct = "^1.1.2"
 notebook = "^6.4.6"
-pendulum = "^2.1.2"
 ply = "^3.11"
-pyblake2 = "^1.1.2"
 py-ecc = "^6.0.0"
-pysha3 = "^1.0.2"
 pysodium = "^0.7.10"
 python-dateutil = "^2.8.2"
 requests = "^2.26.0"

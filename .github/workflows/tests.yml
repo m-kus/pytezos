@@ -19,7 +19,7 @@ jobs:
             python-version: '3.9'
           - os: macos-latest
             arch: arm64
-            python-version: '3.8'
+            python-version: '3.11'
     steps:
     - uses: actions/checkout@master
     - name: Set up Python

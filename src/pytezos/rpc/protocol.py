@@ -4,8 +4,7 @@ from itertools import count
 from typing import Iterator
 
 import bson  # type: ignore
-import pendulum
-from pendulum.parsing.exceptions import ParserError
+import strict_rfc3339  # type: ignore
 
 from pytezos.crypto.encoding import is_bh
 from pytezos.crypto.encoding import is_ogh
@@ -15,9 +14,10 @@ from pytezos.rpc.search import BlockSliceQuery
 
 
 def to_timestamp(v):
-    with suppress(ParserError):
-        v = pendulum.parse(v)
-    if isinstance(v, datetime):
+    if isinstance(v, str):
+        with suppress(strict_rfc3339.InvalidRFC3339Error):
+            v = int(strict_rfc3339.rfc3339_to_timestamp(v))
+    elif isinstance(v, datetime):
         v = int(v.timestamp())
     return v
 
