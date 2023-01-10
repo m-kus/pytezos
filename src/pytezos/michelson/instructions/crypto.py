@@ -1,6 +1,6 @@
+from hashlib import sha3_256
 from hashlib import sha256
 from hashlib import sha512
-from hashlib import sha3_256
 from typing import Callable
 from typing import List
 from typing import Tuple

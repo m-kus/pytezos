@@ -1,6 +1,5 @@
-from typing import List
-
 from hashlib import blake2b
+from typing import List
 
 from pytezos.crypto.encoding import base58_decode
 from pytezos.crypto.encoding import base58_encode

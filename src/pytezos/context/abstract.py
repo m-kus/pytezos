@@ -1,8 +1,7 @@
+from hashlib import blake2b  # type: ignore
 from typing import List
 from typing import Optional
 from typing import Tuple
-
-from hashlib import blake2b  # type: ignore
 
 from pytezos.crypto.encoding import base58_decode
 from pytezos.crypto.encoding import base58_encode

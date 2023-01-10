@@ -2,6 +2,7 @@ import binascii
 import hashlib
 import json
 from getpass import getpass
+from hashlib import blake2b
 from os import environ as env
 from os.path import abspath
 from os.path import expanduser
@@ -11,7 +12,6 @@ from typing import Optional
 from typing import Union
 
 from mnemonic import Mnemonic
-from hashlib import blake2b
 
 from pytezos.crypto.encoding import base58_decode
 from pytezos.crypto.encoding import base58_encode
