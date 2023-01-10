@@ -1090,6 +1090,8 @@ class OpcodesTestCase(TestCase):
             ),
             # Test event emitting
             ('emit.tz', 'Unit', 'Unit', 'Unit'),
+            # Test recursive lambda
+            ('lambda_rec.tz', '0', '0', '5'),
         ]
     )
     def test_opcodes(self, filename, storage, parameter, result):
