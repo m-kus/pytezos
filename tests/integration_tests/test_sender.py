@@ -12,8 +12,8 @@ code { DROP ;
        PAIR }
 """
 initial = 'tz1h3rQ8wBxFd8L9B3d7Jhaawu6Z568XU3xY'
-source = 'KT1WhouvVKZFH94VXj9pa8v4szvfrBwXoBUj'
-sender = 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'
+source = 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'
+sender = 'KT1WhouvVKZFH94VXj9pa8v4szvfrBwXoBUj'
 
 
 class SenderContractTest(TestCase):
