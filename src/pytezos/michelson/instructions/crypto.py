@@ -12,6 +12,7 @@ from py_ecc.fields import optimized_bls12_381_FQ12 as FQ12
 from pytezos.context.abstract import AbstractContext
 from pytezos.crypto.key import Key
 from pytezos.crypto.key import blake2b_32
+from pytezos.crypto.keccak import Keccak256
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.stack import MichelsonStack
@@ -60,6 +61,13 @@ class Sha3Instruction(MichelsonInstruction, prim='SHA3'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         execute_hash(cls.prim, stack, stdout, lambda x: sha3_256(bytes(x)).digest())  # type: ignore
+        return cls(stack_items_added=1)
+
+
+class KeccakInstruction(MichelsonInstruction, prim='KECCAK'):
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        execute_hash(cls.prim, stack, stdout, lambda x: Keccak256(bytes(x)).digest())  # type: ignore
         return cls(stack_items_added=1)
 
 

@@ -52,6 +52,7 @@ from pytezos.michelson.instructions.crypto import SaplingVerifyUpdateInstruction
 from pytezos.michelson.instructions.crypto import Sha3Instruction
 from pytezos.michelson.instructions.crypto import Sha256Instruction
 from pytezos.michelson.instructions.crypto import Sha512Instruction
+from pytezos.michelson.instructions.crypto import KeccakInstruction
 from pytezos.michelson.instructions.generic import ConcatInstruction
 from pytezos.michelson.instructions.generic import NeverInstruction
 from pytezos.michelson.instructions.generic import PackInstruction
@@ -72,7 +73,6 @@ from pytezos.michelson.instructions.jupyter import PrintInstruction
 from pytezos.michelson.instructions.jupyter import ResetInstruction
 from pytezos.michelson.instructions.jupyter import ResetValueInstruction
 from pytezos.michelson.instructions.jupyter import RunInstruction
-from pytezos.michelson.instructions.keccak import KeccakInstruction
 from pytezos.michelson.instructions.stack import DigInstruction
 from pytezos.michelson.instructions.stack import DropInstruction
 from pytezos.michelson.instructions.stack import DropnInstruction

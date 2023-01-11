@@ -1,16 +1,9 @@
+# Using implementation from https://github.com/ctz/keccak/blob/f7fb2365f7bfeedd7308960baa0b3e470205f997/keccak.py
 from binascii import hexlify
 from copy import deepcopy
 from functools import reduce
-
-# Using implementation from https://github.com/ctz/keccak/blob/f7fb2365f7bfeedd7308960baa0b3e470205f997/keccak.py
 from math import log
 from operator import xor
-from typing import List
-
-from pytezos.context.abstract import AbstractContext
-from pytezos.michelson.instructions.base import MichelsonInstruction
-from pytezos.michelson.instructions.crypto import execute_hash
-from pytezos.michelson.stack import MichelsonStack
 
 # The Keccak-f round constants.
 RoundConstants = [
@@ -383,10 +376,3 @@ class KeccakHash:
 
 
 Keccak256 = KeccakHash.preset(1088, 512, 256)
-
-
-class KeccakInstruction(MichelsonInstruction, prim='KECCAK'):
-    @classmethod
-    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        execute_hash(cls.prim, stack, stdout, lambda x: Keccak256(bytes(x)).digest())  # type: ignore
-        return cls(stack_items_added=1)
