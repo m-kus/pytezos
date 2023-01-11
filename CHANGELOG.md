@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.7.4](https://github.com/baking-bad/pytezos/compare/3.7.3...3.7.4) (2023-01-12)
+
+### Fixed
+
+* `TICKET` binary tag was changed in accordance with Lima
+
+### Added
+
+* `LAMBDA_REC` instruction support
+* Optional custom headers for node RPC requests
+
 ## [3.7.3](https://github.com/baking-bad/pytezos/compare/3.7.2...3.7.3) (2022-12-20)
 
 ### Fixed

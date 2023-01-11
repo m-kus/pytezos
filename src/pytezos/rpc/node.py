@@ -74,12 +74,13 @@ class RpcError(Exception):
 class RpcNode:
     """Request proxy for a single Tezos node."""
 
-    def __init__(self, uri: Union[str, List[str]]) -> None:
+    def __init__(self, uri: Union[str, List[str]], headers: Optional[Dict[str, str]] = None) -> None:
         if not uri:
             raise RuntimeError()
         if not isinstance(uri, list):
             uri = [uri]
         self.uri = uri
+        self.headers = headers or {}
 
     def __repr__(self) -> str:
         res = [
@@ -105,6 +106,7 @@ class RpcNode:
             headers={
                 'content-type': 'application/json',
                 'user-agent': 'PyTezos',
+                **self.headers
             },
             **kwargs,
         )
