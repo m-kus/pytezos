@@ -5,7 +5,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-import bson  # type: ignore
+import simple_bson as bson  # type: ignore
 
 from pytezos.block.forge import bump_fitness
 from pytezos.block.forge import forge_block_header

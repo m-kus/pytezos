@@ -3,7 +3,7 @@ from datetime import datetime
 from itertools import count
 from typing import Iterator
 
-import bson  # type: ignore
+import simple_bson as bson  # type: ignore
 import strict_rfc3339  # type: ignore
 
 from pytezos.crypto.encoding import is_bh

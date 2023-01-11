@@ -27,7 +27,6 @@ packages = [
 python = ">=3.8,<3.12"
 attrs = "^21.4.0"
 base58 = "^2.1.1"
-bson = "^0.5.10"
 cattrs = "^22.1.0"
 # FIXME: Why?
 click = "^8.0.3,<=8.0.4"
@@ -53,6 +52,7 @@ strict-rfc3339 = "^0.7"
 tabulate = "^0.8.9"
 testcontainers = "^3.7.0"
 tqdm = "^4.62.3"
+simple-bson = "^0.0.3"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

@@ -284,21 +284,6 @@ css = ["tinycss2 (>=1.1.0,<1.2)"]
 dev = ["Sphinx (==4.3.2)", "black (==22.3.0)", "build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "mypy (==0.961)", "pip-tools (==6.6.2)", "pytest (==7.1.2)", "tox (==3.25.0)", "twine (==4.0.1)", "wheel (==0.37.1)"]
 
 [[package]]
-name = "bson"
-version = "0.5.10"
-description = "BSON codec for Python"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "bson-0.5.10.tar.gz", hash = "sha256:d6511b2ab051139a9123c184de1a04227262173ad593429d21e443d6462d6590"},
-]
-
-[package.dependencies]
-python-dateutil = ">=2.4.0"
-six = ">=1.9.0"
-
-[[package]]
 name = "bump2version"
 version = "1.0.1"
 description = "Version-bump your software with a single command!"
@@ -2614,6 +2599,18 @@ objc = ["pyobjc-framework-Cocoa"]
 win32 = ["pywin32"]
 
 [[package]]
+name = "simple-bson"
+version = "0.0.3"
+description = "Python Bson Compatible Library"
+category = "main"
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "simple-bson-0.0.3.tar.gz", hash = "sha256:5abc3df2047141763abe0ad282f78e88b012566e9196182877f99ad7ef3d42c7"},
+    {file = "simple_bson-0.0.3-py3-none-any.whl", hash = "sha256:5cb1921d013b2d4af846d0d385de2cbf2b37e4042d1d9d55e44b5514990dfea1"},
+]
+
+[[package]]
 name = "simplejson"
 version = "3.18.1"
 description = "Simple, fast, extensible JSON encoder/decoder for Python"
@@ -3430,4 +3427,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "c3ba5eed907c61dc87f04c2bb046af7eee385a4961858f660a20cd2f49d6dab4"
+content-hash = "f87523e132d5ef88a67bf27aea9a325ce5acdf409e663a65e670a43fe653d1dc"
