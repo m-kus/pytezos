@@ -16,7 +16,7 @@ code {
                 # create a ticket
                 PUSH nat 10;
                 PUSH unit Unit;
-                TICKET;
+                TICKET_DEPRECATED;
 
                 PAIR ;
 

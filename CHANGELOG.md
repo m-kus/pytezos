@@ -4,7 +4,7 @@
 
 ### Fixed
 
-* `TICKET` binary tag was changed in accordance with Lima
+* `TICKET` binary tag and semantics was changed in accordance with Lima
 
 ### Added
 

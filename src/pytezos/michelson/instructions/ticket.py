@@ -62,13 +62,32 @@ class SplitTicketInstruction(MichelsonInstruction, prim='SPLIT_TICKET'):
         return cls(stack_items_added=1)
 
 
-class TicketInstruction(MichelsonInstruction, prim='TICKET'):
+class TicketDeprecatedInstruction(MichelsonInstruction, prim='TICKET_DEPRECATED'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         item, amount = cast(Tuple[MichelsonType, NatType], stack.pop2())
         amount.assert_type_equal(NatType)
         address = context.get_self_address()
         res = TicketType.create(address, item, int(amount))
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [item, amount], [res]))  # type: ignore
+        return cls(stack_items_added=1)
+
+
+class TicketInstruction(MichelsonInstruction, prim='TICKET'):
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        item, amount = cast(Tuple[MichelsonType, NatType], stack.pop2())
+        amount.assert_type_equal(NatType)
+        address = context.get_self_address()
+
+        if int(amount) > 0:
+            ticket = TicketType.create(address, item, int(amount))
+            res = OptionType.from_some(ticket)
+        else:
+            ticket_ty = TicketType.create_type(args=[item.get_anon_type()])
+            res = OptionType.none(ticket_ty)
+
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [item, amount], [res]))  # type: ignore
         return cls(stack_items_added=1)
