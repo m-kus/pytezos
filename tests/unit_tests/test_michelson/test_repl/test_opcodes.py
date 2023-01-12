@@ -1093,7 +1093,7 @@ class OpcodesTestCase(TestCase):
             # Test recursive lambda
             ('lambda_rec.tz', '0', '0', '5'),
             # Backport ticket cases
-            ('ticketer.tz', '42', '"KT1VG2WtYdSWz5E7chTeAdDPZNy2MpP8pTfL"', '42')
+            ('ticketer.tz', '42', '"KT1VG2WtYdSWz5E7chTeAdDPZNy2MpP8pTfL"', '42'),
         ]
     )
     def test_opcodes(self, filename, storage, parameter, result):

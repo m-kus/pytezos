@@ -103,11 +103,7 @@ class RpcNode:
         res = requests.request(
             method=method,
             url=_urljoin(self.uri[0], path),
-            headers={
-                'content-type': 'application/json',
-                'user-agent': 'PyTezos',
-                **self.headers
-            },
+            headers={'content-type': 'application/json', 'user-agent': 'PyTezos', **self.headers},
             **kwargs,
         )
         if res.status_code == 401:
