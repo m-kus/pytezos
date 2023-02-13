@@ -72,7 +72,8 @@ build:             ## Build Python wheel package
 	poetry build
 
 image:             ## Build Docker image
-	docker buildx build . -t pytezos:${TAG}
+	docker buildx build . --file Dockerfile -t pytezos:${TAG}
+	docker buildx build . --file Kernel.dockerfile -t michelson-kernel:${TAG}
 
 release-patch:     ## Release patch version
 	bumpversion patch
@@ -91,6 +92,10 @@ release-major:     ## Release major version
 
 clean:             ## Remove all files from .gitignore except for `.venv`
 	git clean -xdf --exclude=".venv"
+
+update:
+	poetry update
+	poetry export --without-hashes -o requirements.txt
 
 ##
 

@@ -1,0 +1,52 @@
+name: Test
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'poetry.lock'
+      - '.github/workflows/test.yml'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-latest
+            arch: arm64
+          # - os: macos-latest
+          #   arch: amd64
+          - os: macos-latest
+            arch: arm64
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'poetry'
+
+      - name: Install binary dependencies
+        run: OSTYPE=$OSTYPE make install-deps
+
+      - name: Install project
+        run: make install
+
+      - name: Run lint
+        run: make lint
+        if: contains(matrix.os, 'ubuntu') && contains(matrix.arch, 'amd64')
+      - name: Run tests
+        run: make test

@@ -46,13 +46,13 @@ from pytezos.michelson.instructions.control import PushInstruction
 from pytezos.michelson.instructions.crypto import Blake2bInstruction
 from pytezos.michelson.instructions.crypto import CheckSignatureInstruction
 from pytezos.michelson.instructions.crypto import HashKeyInstruction
+from pytezos.michelson.instructions.crypto import KeccakInstruction
 from pytezos.michelson.instructions.crypto import PairingCheckInstruction
 from pytezos.michelson.instructions.crypto import SaplingEmptyStateInstruction
 from pytezos.michelson.instructions.crypto import SaplingVerifyUpdateInstruction
 from pytezos.michelson.instructions.crypto import Sha3Instruction
 from pytezos.michelson.instructions.crypto import Sha256Instruction
 from pytezos.michelson.instructions.crypto import Sha512Instruction
-from pytezos.michelson.instructions.crypto import KeccakInstruction
 from pytezos.michelson.instructions.generic import ConcatInstruction
 from pytezos.michelson.instructions.generic import NeverInstruction
 from pytezos.michelson.instructions.generic import PackInstruction

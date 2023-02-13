@@ -10,9 +10,9 @@ from py_ecc import optimized_bls12_381 as bls12_381
 from py_ecc.fields import optimized_bls12_381_FQ12 as FQ12
 
 from pytezos.context.abstract import AbstractContext
+from pytezos.crypto.keccak import Keccak256
 from pytezos.crypto.key import Key
 from pytezos.crypto.key import blake2b_32
-from pytezos.crypto.keccak import Keccak256
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.stack import MichelsonStack

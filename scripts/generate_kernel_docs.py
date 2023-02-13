@@ -32,7 +32,6 @@ def generate():
     for section in ['instructions', 'types']:
         args_key = {'instructions': 'op_args', 'types': 'ty_args'}[section]
         for primitive, body in meta[section].items():
-
             docs[primitive] = format_entry(
                 title=sema[section].get(primitive, {}).get(args_key, ''),
                 concl=sema[section].get(primitive, {}).get('ty', ''),

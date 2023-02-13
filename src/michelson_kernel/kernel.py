@@ -79,7 +79,6 @@ static_macros = [
 
 
 def parse_token(line: str, cursor_pos: int) -> Tuple[str, int, int]:
-
     begin_pos = next((i + 1 for i in range(cursor_pos - 1, 0, -1) if line[i] in ' ;({\n'), 0)
     end_pos = next((i for i in range(cursor_pos, len(line)) if line[i] in ' ;){\n'), len(line))
     return line[begin_pos:end_pos], begin_pos, end_pos
@@ -334,7 +333,6 @@ class MichelsonKernel(Kernel):
         *,
         cell_id=None,
     ):
-
         interpreter_result = self.interpreter.execute(code)
 
         if not silent and interpreter_result.stdout:

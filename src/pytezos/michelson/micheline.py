@@ -322,7 +322,7 @@ def get_script_section(
     cls: None,
     name: str,
     required: Literal[True],
-) -> MichelineT:
+) -> Micheline:
     ...
 
 
@@ -332,7 +332,7 @@ def get_script_section(
     cls: None,
     name: str,
     required: Literal[False],
-) -> Optional[MichelineT]:
+) -> Optional[Micheline]:
     ...
 
 

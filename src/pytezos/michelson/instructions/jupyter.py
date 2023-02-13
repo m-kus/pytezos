@@ -177,12 +177,10 @@ class RunInstruction(MichelsonInstruction, prim='RUN', args_len=3):
 
 
 class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):
-
     allowed_primitives = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-
         res_type: MichelsonType
         res_type = cls.args[0]  # type: ignore
 
@@ -204,7 +202,6 @@ class PatchInstruction(MichelsonInstruction, prim='PATCH', args_len=1):
 
 
 class PatchValueInstruction(MichelsonInstruction, prim='PATCH', args_len=2):
-
     allowed_primitives = ['AMOUNT', 'BALANCE', 'CHAIN_ID', 'SENDER', 'SOURCE', 'NOW']
 
     @classmethod
