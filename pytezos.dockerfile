@@ -27,17 +27,17 @@ WORKDIR /opt/pytezos
 ENV PATH="/opt/pytezos/bin:$PATH"
 ENV PYTHON_PATH="/opt/pytezos/src:$PATH"
 
-COPY pyproject.toml requirements.txt README.md /opt/pytezos/
+COPY pyproject.toml requirements.slim.txt README.md /opt/pytezos/
 
-RUN /usr/local/bin/pip install --prefix /opt/pytezos --no-cache-dir --disable-pip-version-check --no-deps -r /opt/pytezos/requirements.txt -e .
+RUN /usr/local/bin/pip install --prefix /opt/pytezos --no-cache-dir --disable-pip-version-check --no-deps -r /opt/pytezos/requirements.slim.txt -e .
 
 FROM python:3.11-alpine3.17 AS build-image
 RUN apk add --update --no-cache \
 	binutils \
 	gmp-dev \
-	libsodium-dev
+	libsodium-dev \
+	libsecp256k1-dev
 
-RUN apk add --update --no-cache binutils gmp-dev libsodium-dev libsecp256k1-dev
 RUN adduser -D pytezos
 USER pytezos
 ENV PATH="/opt/pytezos/bin:$PATH"

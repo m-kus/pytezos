@@ -48,7 +48,7 @@ def install(_ctx) -> None:
         with open(os.path.join(td, 'kernel.json'), 'w') as f:
             json.dump(kernel_json, f, sort_keys=True)
 
-        kernel_spec.install_kernel_spec(td, 'michelson', prefix=sys.prefix)
+        kernel_spec.install_kernel_spec(td, 'michelson', user=True)
 
 
 @cli.command(help='Remove Michelson kernel from current environment')

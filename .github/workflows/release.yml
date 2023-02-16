@@ -54,7 +54,17 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: Dockerfile
+          file: pytezos.dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-default.outputs.tags }}
+          labels: ${{ steps.meta-default.outputs.labels }}
+
+      - name: Publish stable image (michelson-kernel)
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: michelson-kernel.dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta-default.outputs.tags }}

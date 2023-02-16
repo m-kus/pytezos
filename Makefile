@@ -72,8 +72,8 @@ build:             ## Build Python wheel package
 	poetry build
 
 image:             ## Build Docker image
-	docker buildx build . --file Dockerfile -t pytezos:${TAG}
-	docker buildx build . --file Kernel.dockerfile -t michelson-kernel:${TAG}
+	docker buildx build . --file pytezos.dockerfile -t pytezos:${TAG}
+	docker buildx build . --file michelson-kernel.dockerfile -t michelson-kernel:${TAG}
 
 release-patch:     ## Release patch version
 	bumpversion patch
@@ -93,9 +93,24 @@ release-major:     ## Release major version
 clean:             ## Remove all files from .gitignore except for `.venv`
 	git clean -xdf --exclude=".venv"
 
-update:
+update:         ## Update dependencies, export requirements.txt
+	git checkout HEAD requirements.* poetry.lock
+
+	make install
 	poetry update
+
+	cp pyproject.toml pyproject.toml.bak
+	cp poetry.lock poetry.lock.bak
+
 	poetry export --without-hashes -o requirements.txt
+	poetry export --without-hashes -o requirements.dev.txt --with dev
+	poetry remove jupyter-client ipykernel notebook
+	poetry export --without-hashes -o requirements.slim.txt
+
+	mv pyproject.toml.bak pyproject.toml
+	mv poetry.lock.bak poetry.lock
+
+	make install
 
 ##
 
