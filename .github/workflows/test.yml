@@ -22,10 +22,11 @@ jobs:
             arch: amd64
           - os: ubuntu-latest
             arch: arm64
+          # FIXME: docker.errors.DockerException: Error while fetching server API version
           # - os: macos-latest
           #   arch: amd64
-          - os: macos-latest
-            arch: arm64
+          # - os: macos-latest
+          #   arch: arm64
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
