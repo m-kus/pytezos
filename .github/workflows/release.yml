@@ -44,7 +44,7 @@ jobs:
           tags: type=pep440,pattern={{version}}
 
       - name: Set up metadata (michelson-kernel)
-        id: meta-pytezos
+        id: meta-michelson-kernel
         uses: docker/metadata-action@v3
         with:
           images: bakingbad/michelson-kernel
@@ -57,8 +57,8 @@ jobs:
           file: pytezos.dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta-default.outputs.tags }}
-          labels: ${{ steps.meta-default.outputs.labels }}
+          tags: ${{ steps.meta-pytezos.outputs.tags }}
+          labels: ${{ steps.meta-pytezos.outputs.labels }}
 
       - name: Publish stable image (michelson-kernel)
         uses: docker/build-push-action@v3
@@ -67,8 +67,8 @@ jobs:
           file: michelson-kernel.dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta-default.outputs.tags }}
-          labels: ${{ steps.meta-default.outputs.labels }}
+          tags: ${{ steps.meta-michelson-kernel.outputs.tags }}
+          labels: ${{ steps.meta-michelson-kernel.outputs.labels }}
 
       - name: Poetry publish
         run: |
