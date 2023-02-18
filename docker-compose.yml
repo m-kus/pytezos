@@ -3,7 +3,7 @@ services:
   notebook:
     build:
       context: .
-      dockerfile: Kernel.dockerfile
+      dockerfile: michelson-kernel.dockerfile
     ports:
       - 8888:8888
 
