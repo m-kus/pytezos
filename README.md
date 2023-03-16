@@ -39,7 +39,9 @@
 
 ## Installation
 
-You need to install cryptographic packages before installing the library/building the project:
+Make sure you have Python 3.8+ installed and set as default in the system.  
+
+You also need to install cryptographic packages before installing the library/building the project:
 
 #### Linux
 

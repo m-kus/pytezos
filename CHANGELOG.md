@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.9.0](https://github.com/baking-bad/pytezos/compare/3.8.0...3.9.0) (2023-03-18)
+
+### Fixed
+
+* Quickstart tutorial
+
+### Added
+
 ## [3.8.0](https://github.com/baking-bad/pytezos/compare/3.7.4...3.8.0) (2023-02-21)
 
 ### Fixed
