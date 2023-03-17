@@ -39,9 +39,9 @@ test:              ## Run test suite
 	poetry run sh -c "pytest --cov-report=term-missing --cov=pytezos --cov=michelson_kernel --cov-report=xml -n auto -s -v tests/contract_tests tests/integration_tests tests/unit_tests && pytest -xv tests/sandbox_tests"
 
 test-ci:
-	poetry run sh -c "pytest -sv tests/contract_tests tests/integration_tests tests/unit_tests"
+	poetry run sh -c "pytest --junitxml="test_results.xml" -sv tests/contract_tests tests/integration_tests tests/unit_tests"
 ifneq (,$(findstring linux-gnu,$(OSTYPE)))
-	poetry run sh -c "pytest -sv tests/sandbox_tests"
+	poetry run sh -c "pytest --junitxml="sandbox_test_results.xml" -xv tests/sandbox_tests"
 endif
 
 docs:              ## Build docs

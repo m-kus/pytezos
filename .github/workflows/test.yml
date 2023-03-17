@@ -49,5 +49,12 @@ jobs:
       - name: Run lint
         run: make lint
         if: contains(matrix.os, 'ubuntu') && contains(matrix.arch, 'amd64')
+
       - name: Run tests
-        run: make test
+        run: make test-ci
+
+      - name: Publish results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: always()
+        with:
+          junit_files: "*.xml"
