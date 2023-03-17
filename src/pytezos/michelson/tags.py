@@ -160,6 +160,9 @@ prim_tags = {
     'Lambda_rec': b'\x98',
     'LAMBDA_REC': b'\x99',
     'TICKET': b'\x9A',
+    # MUMBAI
+    'BYTES': b'\x9B',
+    'NAT': b'\x9C',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',

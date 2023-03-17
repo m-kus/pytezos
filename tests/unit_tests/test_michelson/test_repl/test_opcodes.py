@@ -1446,6 +1446,9 @@ class OpcodesTestCase(TestCase):
                 f'Pair (Pair {input_x} {input_y}) (Pair (Pair {proof_a} {proof_b}) {proof_c})',
                 'Unit',
             ),
+            # Bytes <-> Int, Nat
+            ("bytes_of_nat.tz", "Unit", "Unit", "Unit"),
+            ("bytes_of_int.tz", "Unit", "Unit", "Unit"),
         ]
     )
     def test_bls_opcodes(self, filename, storage, parameter, result):

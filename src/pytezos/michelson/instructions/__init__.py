@@ -15,7 +15,8 @@ from pytezos.michelson.instructions.arithmetic import LslInstruction
 from pytezos.michelson.instructions.arithmetic import LsrInstruction
 from pytezos.michelson.instructions.arithmetic import MulInstruction
 from pytezos.michelson.instructions.arithmetic import NegInstruction
-from pytezos.michelson.instructions.arithmetic import SubInstruction
+from pytezos.michelson.instructions.arithmetic import NatInstruction
+from pytezos.michelson.instructions.arithmetic import BytesInstruction
 from pytezos.michelson.instructions.boolean import AndInstruction
 from pytezos.michelson.instructions.boolean import NotInstruction
 from pytezos.michelson.instructions.boolean import OrInstruction

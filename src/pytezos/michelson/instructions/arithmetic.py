@@ -16,6 +16,7 @@ from pytezos.michelson.types import BLS12_381_FrType
 from pytezos.michelson.types import BLS12_381_G1Type
 from pytezos.michelson.types import BLS12_381_G2Type
 from pytezos.michelson.types import IntType
+from pytezos.michelson.types import BytesType
 from pytezos.michelson.types import MutezType
 from pytezos.michelson.types import NatType
 from pytezos.michelson.types import OptionType
@@ -251,9 +252,12 @@ class SubMutezInstruction(MichelsonInstruction, prim='SUB_MUTEZ'):
 class IntInstruction(MichelsonInstruction, prim='INT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        a = cast(Union[NatType, BLS12_381_FrType], stack.pop1())
-        a.assert_type_in(NatType, BLS12_381_FrType)
-        res = IntType.from_value(int(a))
+        a = cast(Union[NatType, BLS12_381_FrType, BytesType], stack.pop1())
+        if issubclass(type(a), BytesType):
+            res = IntType.from_value(int.from_bytes(bytes(a), 'big', signed=True))
+        else:
+            a.assert_type_in(NatType, BLS12_381_FrType)
+            res = IntType.from_value(int(a))
         stack.push(res)
         stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
         return cls(stack_items_added=1)
@@ -270,4 +274,27 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
             res = OptionType.none(NatType)
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
+        return cls(stack_items_added=1)
+
+class NatInstruction(MichelsonInstruction, prim='NAT'):
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        a = cast(BytesType, stack.pop1())
+        a.assert_type_in(BytesType)
+        res = NatType.from_value(int.from_bytes(bytes(a), 'big'))
+        stack.push(res)
+        stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
+        return cls(stack_items_added=1)
+    
+class BytesInstruction(MichelsonInstruction, prim='BYTES'):
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        a = cast(Union[NatType, IntType], stack.pop1())
+        a.assert_type_in(NatType, IntType)
+        val = int(a)
+        signed = issubclass(type(a), IntType)
+        val = val.to_bytes((val.bit_length() + 7) // 8, 'big', signed=signed)
+        res = BytesType.from_value(val)
+        stack.push(res)
+        stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
         return cls(stack_items_added=1)
