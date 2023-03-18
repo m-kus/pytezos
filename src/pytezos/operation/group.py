@@ -61,8 +61,7 @@ class OperationGroup(ContextMixin, ContentMixin):
             '\nPayload',
             pformat(self.json_payload()),
             '\nHash',
-            self.opg_hash or '(Not sent)'
-            '\nHelpers',
+            self.opg_hash or '(Not sent)' '\nHelpers',
             get_class_docstring(self.__class__),
         ]
         return '\n'.join(res)

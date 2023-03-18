@@ -15,8 +15,8 @@ from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import BLS12_381_FrType
 from pytezos.michelson.types import BLS12_381_G1Type
 from pytezos.michelson.types import BLS12_381_G2Type
-from pytezos.michelson.types import IntType
 from pytezos.michelson.types import BytesType
+from pytezos.michelson.types import IntType
 from pytezos.michelson.types import MutezType
 from pytezos.michelson.types import NatType
 from pytezos.michelson.types import OptionType
@@ -252,10 +252,11 @@ class SubMutezInstruction(MichelsonInstruction, prim='SUB_MUTEZ'):
 class IntInstruction(MichelsonInstruction, prim='INT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        a = cast(Union[NatType, BLS12_381_FrType, BytesType], stack.pop1())
-        if issubclass(type(a), BytesType):
+        a = stack.pop1()
+        if isinstance(a, BytesType):
             res = IntType.from_value(int.from_bytes(bytes(a), 'big', signed=True))
         else:
+            a = cast(Union[NatType, BLS12_381_FrType], a)
             a.assert_type_in(NatType, BLS12_381_FrType)
             res = IntType.from_value(int(a))
         stack.push(res)
@@ -276,6 +277,7 @@ class IsNatInstruction(MichelsonInstruction, prim='ISNAT'):
         stdout.append(format_stdout(cls.prim, [a], [res]))  # type: ignore
         return cls(stack_items_added=1)
 
+
 class NatInstruction(MichelsonInstruction, prim='NAT'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
@@ -285,16 +287,22 @@ class NatInstruction(MichelsonInstruction, prim='NAT'):
         stack.push(res)
         stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
         return cls(stack_items_added=1)
-    
+
+
 class BytesInstruction(MichelsonInstruction, prim='BYTES'):
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = cast(Union[NatType, IntType], stack.pop1())
         a.assert_type_in(NatType, IntType)
-        val = int(a)
-        signed = issubclass(type(a), IntType)
-        val = val.to_bytes((val.bit_length() + 7) // 8, 'big', signed=signed)
-        res = BytesType.from_value(val)
+        int_val = int(a)
+        signed = isinstance(a, IntType)
+        if signed:
+            length = (8 + (int_val + (int_val < 0)).bit_length()) // 8
+        else:
+            length = (7 + int_val.bit_length()) // 8
+        # NOTE: the shortest big-endian encoding of natural number or integer n
+        byte_val = int_val.to_bytes(length, 'big', signed=signed).lstrip(b'\x00')
+        res = BytesType.from_value(byte_val)
         stack.push(res)
         stdout.append(f'{cls.prim} / {repr(a)} => {repr(res)}')
         return cls(stack_items_added=1)

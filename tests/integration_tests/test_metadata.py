@@ -1,5 +1,4 @@
 from unittest import TestCase
-from unittest import skip
 
 from pytezos import pytezos
 
@@ -12,5 +11,5 @@ class TestMetadata(TestCase):
 
     def test_domains(self):
         td = pytezos.using('mainnet').contract('KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS')
-        res = td.metadata.resolveAddress('tz1PN9FWDGoASBTvgppaQbbPdGhkrnTNmcVz').storage_view()
-        self.assertEqual('tz1PN9FWDGoASBTvgppaQbbPdGhkrnTNmcVz', res['address'])
+        res = td.metadata.resolveAddress('tz2Li3UTeiQQzh32EH4VriVa7owyUWFj1NKJ').storage_view()
+        self.assertEqual('tz2Li3UTeiQQzh32EH4VriVa7owyUWFj1NKJ', res['address'])

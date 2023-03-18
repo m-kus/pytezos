@@ -8,15 +8,15 @@ from pytezos.michelson.instructions.adt import UnpairInstruction
 from pytezos.michelson.instructions.adt import UpdatenInstruction
 from pytezos.michelson.instructions.arithmetic import AbsInstruction
 from pytezos.michelson.instructions.arithmetic import AddInstruction
+from pytezos.michelson.instructions.arithmetic import BytesInstruction
 from pytezos.michelson.instructions.arithmetic import EdivInstruction
 from pytezos.michelson.instructions.arithmetic import IntInstruction
 from pytezos.michelson.instructions.arithmetic import IsNatInstruction
 from pytezos.michelson.instructions.arithmetic import LslInstruction
 from pytezos.michelson.instructions.arithmetic import LsrInstruction
 from pytezos.michelson.instructions.arithmetic import MulInstruction
-from pytezos.michelson.instructions.arithmetic import NegInstruction
 from pytezos.michelson.instructions.arithmetic import NatInstruction
-from pytezos.michelson.instructions.arithmetic import BytesInstruction
+from pytezos.michelson.instructions.arithmetic import NegInstruction
 from pytezos.michelson.instructions.boolean import AndInstruction
 from pytezos.michelson.instructions.boolean import NotInstruction
 from pytezos.michelson.instructions.boolean import OrInstruction
