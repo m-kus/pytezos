@@ -37,6 +37,7 @@ nodes = {
     'jakartanet': ['https://rpc.tzkt.io/jakartanet'],
     'kathmandunet': ['https://rpc.tzkt.io/kathmandunet'],
     'limanet': ['https://rpc.tzkt.io/limanet'],
+    'mumbainet': ['https://rpc.tzkt.io/mumbainet'],
 }
 keys = {
     'alice': alice_key,

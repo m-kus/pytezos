@@ -22,7 +22,7 @@ from pytezos.operation.group import OperationGroup
 from pytezos.sandbox.parameters import LATEST
 from pytezos.sandbox.parameters import sandbox_addresses
 
-DOCKER_IMAGE = 'bakingbad/sandboxed-node:v15.0-1'
+DOCKER_IMAGE = 'bakingbad/sandboxed-node:v16.0-2'
 MAX_ATTEMPTS = 100
 ATTEMPT_DELAY = 0.1
 TEZOS_NODE_PORT = 8732

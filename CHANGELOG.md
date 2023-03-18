@@ -8,6 +8,15 @@
 
 ### Added
 
+* `NAT`, `BYTES` opcodes support
+* Minimal support for `tz4` and `sr1` addresses
+
+### Changed
+
+* `INT` opcode semantics changed
+* Block time and dependent variables are changed according to the proto
+* Sandbox node binaries updated to v16
+
 ## [3.8.0](https://github.com/baking-bad/pytezos/compare/3.7.4...3.8.0) (2023-02-21)
 
 ### Fixed

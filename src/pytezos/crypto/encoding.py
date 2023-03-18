@@ -19,9 +19,10 @@ base58_encodings = [
     (b"tz1", 36, tb([6, 161, 159]), 20, "ed25519 public key hash"),
     (b"tz2", 36, tb([6, 161, 161]), 20, "secp256k1 public key hash"),
     (b"tz3", 36, tb([6, 161, 164]), 20, "p256 public key hash"),
+    (b"tz4", 36, tb([6, 161, 16]), 20, "BLS-MinPk"),
     (b"KT1", 36, tb([2, 90, 121]), 20, "originated address"),
-    # FIXME: replace with tb()
-    (b"txr1", 37, b'\x01\x80x\x1f', 20, "tx_rollup_l2_address"),
+    (b"txr1", 37, tb([1, 128, 120, 31]), 20, "tx_rollup_l2_address"),
+    (b"sr1", 36, tb([6, 124, 117]), 20, "address prefix for originated smart rollup"),
     (b"id", 30, tb([153, 103]), 16, "cryptobox public key hash"),
     (b'expr', 54, tb([13, 44, 64, 27]), 32, u'script expression'),
     (b"edsk", 54, tb([13, 15, 58, 7]), 32, "ed25519 seed"),
@@ -124,7 +125,7 @@ def validate_pkh(v: Union[str, bytes]):
     :param v: string or bytes
     :raises ValueError: if parameter is not a public key hash
     """
-    return _validate(v, prefixes=[b'tz1', b'tz2', b'tz3'])
+    return _validate(v, prefixes=[b'tz1', b'tz2', b'tz3', b'tz4'])
 
 
 def validate_l2_pkh(v: Union[str, bytes]):

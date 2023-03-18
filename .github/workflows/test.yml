@@ -51,7 +51,7 @@ jobs:
         if: contains(matrix.os, 'ubuntu') && contains(matrix.arch, 'amd64')
 
       - name: Run tests
-        run: make test-ci
+        run: OSTYPE=$OSTYPE make test-ci
 
       - name: Publish results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2

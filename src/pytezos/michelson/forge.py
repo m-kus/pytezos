@@ -163,10 +163,14 @@ def forge_address(value: str, tz_only=False) -> bytes:
         res = b'\x00\x01' + address
     elif prefix == 'tz3':
         res = b'\x00\x02' + address
+    elif prefix == 'tz4':
+        res = b'\x00\x03' + address
     elif prefix == 'KT1':
         res = b'\x01' + address + b'\x00'
     elif prefix == 'txr1':
         res = b'\x02' + address + b'\x00'
+    elif prefix == 'sr1':
+        res = b'\x03' + address + b'\x00'
     else:
         raise ValueError(f'Can\'t forge address: unknown prefix `{prefix}`')
 
@@ -183,6 +187,7 @@ def unforge_address(data: bytes) -> str:
         b'\x00\x00': b'tz1',
         b'\x00\x01': b'tz2',
         b'\x00\x02': b'tz3',
+        b'\x00\x03': b'tz4',
     }
 
     for bin_prefix, tz_prefix in tz_prefixes.items():
@@ -193,6 +198,8 @@ def unforge_address(data: bytes) -> str:
         return base58_encode(data[1:-1], b'KT1').decode()
     elif data.startswith(b'\x02') and data.endswith(b'\x00'):
         return base58_encode(data[1:-1], b'txr1').decode()
+    elif data.startswith(b'\x03') and data.endswith(b'\x00'):
+        return base58_encode(data[1:-1], b'sr1').decode()
     else:
         return base58_encode(data[1:], tz_prefixes[b'\x00' + data[:1]]).decode()
 

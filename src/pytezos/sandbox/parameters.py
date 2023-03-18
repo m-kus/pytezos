@@ -11,7 +11,8 @@ ITHACA = 'Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A'
 JAKARTA = 'PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY'
 KATHMANDU = 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
 LIMA = 'PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW'
-LATEST = LIMA
+MUMBAI = 'PtMumbai2TmsJHNGRkD8v8YDbtao7BLUC3wjASn1inAKLFCjaH1'
+LATEST = MUMBAI
 
 protocol_version = {
     EDO: 8,
@@ -22,6 +23,7 @@ protocol_version = {
     JAKARTA: 13,
     KATHMANDU: 14,
     LIMA: 15,
+    MUMBAI: 16,
 }
 
 sandbox_commitment = {
@@ -94,7 +96,7 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
     return {
         **sandbox_params.copy(),
         'cache_sampler_state_cycles': 8.0,
-        'tx_rollup_enable': True,
+        'tx_rollup_enable': False,
         'tx_rollup_origination_size': 4000.0,
         'liquidity_baking_toggle_ema_threshold': 1000000000.0,
         'cache_script_size': 100000000.0,
@@ -112,18 +114,19 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'tx_rollup_max_ticket_payload_size': 2048.0,
         'tx_rollup_rejection_max_proof_size': 30000.0,
         'tx_rollup_sunset_level': 3473409.0,
-        'sc_rollup_enable': False,
-        'sc_rollup_origination_size': 6314.0,
-        'sc_rollup_challenge_window_in_blocks': 20160.0,
-        'sc_rollup_max_number_of_messages_per_commitment_period': 300000000.0,
-        'sc_rollup_stake_amount': '32000000',
-        'sc_rollup_commitment_period_in_blocks': 30.0,
-        'sc_rollup_max_lookahead_in_blocks': 30000.0,
-        'sc_rollup_max_active_outbox_levels': 20160.0,
-        'sc_rollup_max_outbox_messages_per_level': 100.0,
-        'sc_rollup_number_of_sections_in_dissection': 32.0,
-        'sc_rollup_timeout_period_in_blocks': 20160.0,
-        'sc_rollup_max_number_of_cemented_commitments': 5.0,
+        'smart_rollup_enable': True,
+        'smart_rollup_arith_pvm_enable': False,
+        'smart_rollup_origination_size': 6314.0,
+        'smart_rollup_challenge_window_in_blocks': 20160.0,
+        'smart_rollup_stake_amount': '32000000',
+        'smart_rollup_commitment_period_in_blocks': 30.0,
+        'smart_rollup_max_lookahead_in_blocks': 30000.0,
+        'smart_rollup_max_active_outbox_levels': 20160.0,
+        'smart_rollup_max_outbox_messages_per_level': 100.0,
+        'smart_rollup_number_of_sections_in_dissection': 32.0,
+        'smart_rollup_timeout_period_in_blocks': 20160.0,
+        'smart_rollup_max_number_of_cemented_commitments': 5.0,
+        'smart_rollup_max_number_of_parallel_games': 32.0,
         'zk_rollup_enable': False,
         'zk_rollup_origination_size': 4000.0,
         'zk_rollup_min_pending_to_process': 10.0,
@@ -147,12 +150,12 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'dal_parametric': {
             'feature_enable': False,
             'number_of_slots': 16.0,
-            'number_of_shards': 256.0,
-            'endorsement_lag': 1.0,
+            'attestation_lag': 1.0,
             'availability_threshold': 50.0,
-            'slot_size': 1048576.0,
             'redundancy_factor': 16.0,
             'page_size': 4096.0,
+            'slot_size': 1048576.0,
+            'number_of_shards': 256.0,
         },
         'minimal_stake': '6000',
     }
