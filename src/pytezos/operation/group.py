@@ -115,7 +115,8 @@ class OperationGroup(ContextMixin, ContentMixin):
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :param counter: Override counter value (for manual handling)
-        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, MAX for sandbox),
+            -1 for MAX (if you have a private network and issues with block RPC queries)
         :param gas_limit: Override gas_limit value (for manual handling)
         :param storage_limit: Override storage_limit value (for manual handling)
         :param minimal_nanotez_per_gas_unit: Override minimal_nanotez_per_gas_unit constant (for manual handling)
@@ -127,6 +128,8 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         if ttl is None:
             ttl = self.context.get_operations_ttl()
+        elif ttl == -1:
+            ttl = MAX_OPERATIONS_TTL
         if not 0 < ttl <= MAX_OPERATIONS_TTL:
             raise Exception(f'`ttl` has to be in range (0, {MAX_OPERATIONS_TTL}]')
 

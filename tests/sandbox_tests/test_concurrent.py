@@ -1,4 +1,5 @@
 from pytezos import ContractInterface
+from pytezos.operation import MAX_OPERATIONS_TTL
 from pytezos.operation.result import OperationResult
 from pytezos.sandbox.node import SandboxedNodeAutoBakeTestCase
 
@@ -51,7 +52,7 @@ class ConcurrentTransactionsTestCase(SandboxedNodeAutoBakeTestCase):
         self.client.context.protocol = self.client.context.get_protocol()
         txs = [
             contract.increment(1).send_async(
-                ttl=120,
+                ttl=MAX_OPERATIONS_TTL,
                 counter=counter + idx,
                 storage_limit=10,
                 gas_limit=50000,
