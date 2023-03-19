@@ -18,10 +18,10 @@ class TestOperationGroup(TestCase):
         testmap = {
             "branch_offset_sandboxed": [5, None, True, 'head~5'],
             "branch_offset_not_sandboxed": [5, None, False, 'head~5'],
-            "ttl_sandboxed": [None, 10, True, 'head~110'],
-            "ttl_not_sandboxed": [None, 10, False, 'head~110'],
+            "ttl_sandboxed": [None, 10, True, 'head~230'],
+            "ttl_not_sandboxed": [None, 10, False, 'head~230'],
             "ttl_sandboxed_default": [None, None, True, 'head~0'],
-            "ttl_not_sandboxed_default": [None, None, False, 'head~115'],
+            "ttl_not_sandboxed_default": [None, None, False, 'head~235'],
         }
 
         client = PyTezosClient()
