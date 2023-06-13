@@ -12,7 +12,8 @@ JAKARTA = 'PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY'
 KATHMANDU = 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
 LIMA = 'PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW'
 MUMBAI = 'PtMumbai2TmsJHNGRkD8v8YDbtao7BLUC3wjASn1inAKLFCjaH1'
-LATEST = MUMBAI
+NAIROBI = 'PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf'
+LATEST = NAIROBI
 
 protocol_version = {
     EDO: 8,
@@ -24,6 +25,7 @@ protocol_version = {
     KATHMANDU: 14,
     LIMA: 15,
     MUMBAI: 16,
+    NAIROBI: 17,
 }
 
 sandbox_commitment = {
@@ -93,6 +95,7 @@ sandbox_params: Dict[str, Any] = {
 
 
 def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
+    # https://gitlab.com/tezos/tezos/-/blob/master/src/proto_017_PtNairob/lib_parameters/default_parameters.ml
     return {
         **sandbox_params.copy(),
         'cache_sampler_state_cycles': 8.0,
@@ -149,12 +152,13 @@ def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
         'vdf_difficulty': '50000',
         'dal_parametric': {
             'feature_enable': False,
-            'number_of_slots': 16.0,
+            'number_of_slots': 256.0,
             'attestation_lag': 1.0,
-            'availability_threshold': 50.0,
-            'redundancy_factor': 16.0,
+            'attestation_threshold': 50.0,
+            'blocks_per_epoch': 4.0,
             'page_size': 4096.0,
             'slot_size': 1048576.0,
+            'redundancy_factor': 16.0,
             'number_of_shards': 256.0,
         },
         'minimal_stake': '6000',

@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.10.0](https://github.com/baking-bad/pytezos/compare/3.9.0...3.10.0) (2023-06-13)
+
+### Added
+
+* Compatibility with Nairobi protocol
+
 ## [3.9.0](https://github.com/baking-bad/pytezos/compare/3.8.0...3.9.0) (2023-03-29)
 
 ### Fixed

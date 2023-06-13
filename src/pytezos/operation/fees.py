@@ -66,7 +66,7 @@ def default_gas_limit(
     if constants is None:
         constants = DEFAULT_CONSTANTS
     values: Dict[str, int] = {
-        'reveal': 1000,
+        'reveal': {'tz1': 176, 'tz2': 162, 'tz3': 1101, 'tz4': 1681}[content['source'][:3]],
         'delegation': 1000,
         'origination': int(constants['hard_gas_limit_per_operation']),
         'transaction': (
