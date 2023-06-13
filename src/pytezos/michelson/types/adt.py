@@ -28,7 +28,7 @@ def get_type_layout(
             assert entrypoints is False, f'duplicate key {key}'
             path_to_key[bin_path] = f'{arg.prim}_{i}'
 
-    idx_to_path = {i: path for i, path in enumerate(path_to_key)}
+    idx_to_path = dict(enumerate(path_to_key))
     if len(reserved) == 0 and infer_names is False and entrypoints is False:
         path_to_key = None  # type: ignore
         key_to_path = None
