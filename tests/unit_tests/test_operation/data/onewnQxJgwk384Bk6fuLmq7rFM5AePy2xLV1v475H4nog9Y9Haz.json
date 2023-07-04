@@ -1,0 +1,20 @@
+{
+  "protocol": "PtMumbai2TmsJHNGRkD8v8YDbtao7BLUC3wjASn1inAKLFCjaH1",
+  "chain_id": "NetXgbcrNtXD2yA",
+  "hash": "onewnQxJgwk384Bk6fuLmq7rFM5AePy2xLV1v475H4nog9Y9Haz",
+  "branch": "BLnrC6C82E6Yu5nL8r4xjGJ7GBLw7yP7xoNwZv9fgcFxiVawEWr",
+  "contents": [
+    {
+      "kind": "smart_rollup_add_messages",
+      "source": "tz1gHx9WdZPnuN97dGhDd6cTzYL2hHqsQ4hR",
+      "fee": "559",
+      "counter": "655084",
+      "gas_limit": "1104",
+      "storage_limit": "0",
+      "message": [
+        "ad25cd5d83599cfa11ab615c43303af67a1d4abc4871da312791ce972459a3b5ca46ad616b0002298c03ed7d454a101eb7022bc95f7e5f41ac78e50201e80700004798d2cc98473d7e250c898885718afd2e4efbcb1a1595ab9730761ed830de0f6c0002298c03ed7d454a101eb7022bc95f7e5f41ac789901020000c0843d00002d1c0e6ccf50d7e0cd19fe197eb1a3f82c14142e0082f37a1c0499a827ac3c452222ad9a4fee8162616e5f7672669b53cf2f9062a755e02bfb97a9e090249b4fa3767046515dd424f31dcc135a0465eea1b33f5a0f"
+      ]
+    }
+  ],
+  "signature": "siguokBDFN8wcEBvMBWqezQUJpEPoePc1jgE8UBrN7gNrDGZsWqTWqxoiMN31ogrXMN6Wdz5cfsP73vnFVr4coQ7HgoSEgNU"
+}

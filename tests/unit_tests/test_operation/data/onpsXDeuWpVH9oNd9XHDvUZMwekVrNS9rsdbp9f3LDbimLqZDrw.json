@@ -1,0 +1,27 @@
+{
+  "protocol": "PtMumbai2TmsJHNGRkD8v8YDbtao7BLUC3wjASn1inAKLFCjaH1",
+  "chain_id": "NetXgbcrNtXD2yA",
+  "hash": "onpsXDeuWpVH9oNd9XHDvUZMwekVrNS9rsdbp9f3LDbimLqZDrw",
+  "branch": "BMXYFU1tW3tmNwtqbMBvLk7rLY25dKcqKEt33dyQYMRcPvtZPvv",
+  "contents": [
+    {
+      "kind": "transfer_ticket",
+      "source": "tz2Kdt1Ekdzff1ry2bChhMB7cTTquZWBX4Td",
+      "fee": "842",
+      "counter": "693916",
+      "gas_limit": "5039",
+      "storage_limit": "110",
+      "ticket_contents": {
+        "string": "Ticket"
+      },
+      "ticket_ty": {
+        "prim": "string"
+      },
+      "ticket_ticketer": "KT1Uau1xTG3dPxSuJKEM1TcRjq4mjeU3kJ64",
+      "ticket_amount": "1",
+      "destination": "KT1JMtdk62C4uht6sxhrgTfw9rq6BaLcyo74",
+      "entrypoint": "save"
+    }
+  ],
+  "signature": "sigQ4UKNnPjYvGFyha1MqJyfTm1X6F21wzjzmpZaBE3xHmRiEyYpMbFDUE4jEaR3TvbB3XFecS9zKxL5eCg27maPbkTADhsM"
+}

@@ -75,6 +75,9 @@ def default_gas_limit(
             else DEFAULT_TRANSACTION_GAS_LIMIT
         ),
         'register_global_constant': int(constants['hard_gas_limit_per_operation']),
+        'transfer_ticket': int(constants['hard_gas_limit_per_operation']),
+        'smart_rollup_add_messages': int(constants['hard_gas_limit_per_operation']),
+        'smart_rollup_execute_outbox_message': int(constants['hard_gas_limit_per_operation']),
     }
     return values[content['kind']]
 
@@ -100,5 +103,8 @@ def default_storage_limit(
             else DEFAULT_TRANSACTION_STORAGE_LIMIT
         ),
         'register_global_constant': int(constants['hard_storage_limit_per_operation']),
+        'transfer_ticket': int(constants['hard_storage_limit_per_operation']),
+        'smart_rollup_add_messages': int(constants['hard_storage_limit_per_operation']),
+        'smart_rollup_execute_outbox_message': int(constants['hard_storage_limit_per_operation']),
     }
     return values[content['kind']]

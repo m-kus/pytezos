@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.10.1](https://github.com/baking-bad/pytezos/compare/3.10.0...3.10.1) (2023-07-04)
+
+### Added
+
+* Sending/forging new operation kinds: `transfer_ticket`, `smart_rollup_add_messages`, and `smart_rollup_execute_outbox_message`
+
 ## [3.10.0](https://github.com/baking-bad/pytezos/compare/3.9.0...3.10.0) (2023-06-13)
 
 ### Added
