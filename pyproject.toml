@@ -40,9 +40,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
-attrs = "^21.4.0"
+attrs = ">=21.4.0"
 base58 = "^2.1.1"
-cattrs = "^22.1.0"
+cattrs = ">=22.1.0"
 click = "^8.1.3"
 cryptography = "^41.0.0"
 deprecation = "^2.1.0"
@@ -72,11 +72,6 @@ simple-bson = "^0.0.3"
 black = "*"
 bump2version = "*"
 diff-cover = "*"
-flake8-return = "*"
-flake8-comprehensions = "*"
-flake8-bugbear = "*"
-flake8-simplify = "*"
-flakeheaven = "*"
 isort = "*"
 mypy = "*"
 pytest = "*"
@@ -95,6 +90,7 @@ types-simplejson = "*"
 types-tabulate = "*"
 parameterized = "*"
 PyYAML = "*"
+ruff = "*"
 
 [tool.poetry.scripts]
 pytezos = 'pytezos.cli.cli:cli'
@@ -109,15 +105,33 @@ line-length = 120
 target-version = ['py38', 'py39', 'py310', 'py311']
 skip-string-normalization = true
 
-[tool.flakeheaven]
-format = "colored"
-max_line_length = 120
-show_source = true
-extended_default_ignore = []
-
-[tool.flakeheaven.plugins]
-"flake8-*" = ["+*", "-C417", "-SIM106", "-SIM114", "-SIM102", "-R504", "-R505", "-R506", "-R507"]
-flake8-docstrings = ["-*"]
+[tool.ruff]
+line-length = 120
+ignore = [
+    "B904",
+    "C417",
+    "C901",
+    "E402",
+    "E713",
+    "E721",
+    "E741",
+    "F401",
+    "F403",
+    "F405",
+    "F541",
+    "F811",
+    "F821",
+    "F841",
+    "R504",
+    "R505",
+    "R506",
+    "R507",
+    "SIM102",
+    "SIM108",
+    "SIM114",
+]
+target-version = "py311"
+extend-select = ["B", "C", "R", "SIM"]
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]
