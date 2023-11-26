@@ -103,7 +103,7 @@ update:         ## Update dependencies, export requirements.txt
 
 	poetry export --without-hashes -o requirements.txt
 	poetry export --without-hashes -o requirements.dev.txt --with dev
-	poetry remove jupyter-client ipykernel notebook
+	poetry remove notebook
 	poetry export --without-hashes -o requirements.slim.txt
 
 	mv pyproject.toml.bak pyproject.toml
