@@ -201,6 +201,15 @@ def is_kt(v: Union[str, bytes]) -> bool:
     return True
 
 
+def is_sr(v: Union[str, bytes]) -> bool:
+    """Check if value is a smart rollup address."""
+    try:
+        _validate(v, prefixes=[b'sr1'])
+    except (ValueError, TypeError):
+        return False
+    return True
+
+
 def is_public_key(v: Union[str, bytes]) -> bool:
     """Check if value is a public key."""
     try:
@@ -224,7 +233,7 @@ def is_address(v: Union[str, bytes]) -> bool:
     if isinstance(v, bytes):
         v = v.decode()
     address = v.split('%')[0]
-    return is_kt(address) or is_pkh(address)
+    return is_kt(address) or is_pkh(address) or is_sr(address)
 
 
 def is_txr_address(v: Union[str, bytes]) -> bool:

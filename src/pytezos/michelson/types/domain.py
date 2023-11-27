@@ -110,7 +110,7 @@ class AddressType(StringType, prim='address'):
     def from_value(cls, value: str) -> 'AddressType':
         if value.endswith('%default'):
             value = value.split('%')[0]
-        assert is_address(value), f'expected tz/KT address, got {value}'
+        assert is_address(value), f'expected tz/KT/sr address, got {value}'
         return cls(value)
 
     @classmethod

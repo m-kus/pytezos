@@ -1,6 +1,12 @@
 # Changelog
 
-## [3.10.1](https://github.com/baking-bad/pytezos/compare/3.10.1...3.10.2) (2023-07-05)
+## [3.10.3](https://github.com/baking-bad/pytezos/compare/3.10.2...3.10.3) (2023-11-27)
+
+### Fixed
+
+* Smart rollup address validation
+
+## [3.10.2](https://github.com/baking-bad/pytezos/compare/3.10.1...3.10.2) (2023-07-05)
 
 ### Fixed
 
