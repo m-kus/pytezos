@@ -32,7 +32,7 @@ install:           ## Install project dependencies
 	`if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
 
 lint:              ## Lint with all tools
-	make isort black flake mypy
+	make isort black ruff mypy
 
 test:              ## Run test suite
 	# FIXME: https://github.com/pytest-dev/pytest-xdist/issues/385#issuecomment-1177147322
@@ -61,8 +61,8 @@ isort:             ## Format with isort
 black:             ## Format with black
 	poetry run black src tests scripts --exclude ".*/docs.py"
 
-flake:             ## Lint with flake8
-	poetry run flakeheaven lint src tests scripts
+ruff:             ## Lint with ruff
+	poetry run ruff check src tests scripts
 
 mypy:              ## Lint with mypy
 	poetry run mypy src scripts tests
@@ -74,8 +74,8 @@ build:             ## Build Python wheel package
 	poetry build
 
 image:             ## Build Docker image
-	docker buildx build . --file pytezos.dockerfile -t pytezos:${TAG}
-	docker buildx build . --file michelson-kernel.dockerfile -t michelson-kernel:${TAG}
+	docker buildx build . --file pytezos.dockerfile -t pytezos:${TAG} --load
+	docker buildx build . --file michelson-kernel.dockerfile -t michelson-kernel:${TAG} --load
 
 release-patch:     ## Release patch version
 	bumpversion patch
@@ -103,7 +103,7 @@ update:         ## Update dependencies, export requirements.txt
 
 	poetry export --without-hashes -o requirements.txt
 	poetry export --without-hashes -o requirements.dev.txt --with dev
-	poetry remove jupyter-client ipykernel notebook
+	poetry remove notebook
 	poetry export --without-hashes -o requirements.slim.txt
 
 	mv pyproject.toml.bak pyproject.toml

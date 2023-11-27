@@ -43,7 +43,7 @@ USER pytezos
 ENV PATH="/opt/pytezos/bin:$PATH"
 ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.11/site-packages:$PYTHONPATH"
 WORKDIR /home/pytezos/
-ENTRYPOINT [ "/opt/pytezos/bin/jupyter", "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax" ]
+ENTRYPOINT [ "/opt/pytezos/bin/jupyter-notebook", "--port=8888", "--ip=0.0.0.0" , "--no-browser", "--no-mathjax" ]
 EXPOSE 8888
 
 COPY --chown=pytezos --from=compile-image /opt/pytezos /opt/pytezos
