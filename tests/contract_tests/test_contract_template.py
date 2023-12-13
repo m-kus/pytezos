@@ -1,19 +1,20 @@
-from unittest import TestCase
-from os.path import dirname, join
 import json
+from os.path import dirname
+from os.path import join
+from unittest import TestCase
 
-from pytezos.michelson.micheline import get_script_section
-from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.program import MichelsonProgram
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import get_script_section
 from pytezos.michelson.parse import michelson_to_micheline
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
+from pytezos.michelson.program import MichelsonProgram
+from pytezos.michelson.types.base import MichelsonType
 
-folder = 'dexter_usdtz_xtz'
+folder = 'typed_minter'
 
 
 class MainnetContractTestCaseTemplate(TestCase):
-
     @classmethod
     def setUpClass(cls):
         with open(join(dirname(__file__), f'{folder}', '__script__.json')) as f:
@@ -30,10 +31,7 @@ class MainnetContractTestCaseTemplate(TestCase):
 
     def test_parameter_type_template(self):
         type_expr = self.program.parameter.as_micheline_expr()
-        self.assertEqual(
-            get_script_section(self.script, name='parameter'),
-            type_expr,
-            'micheline -> type -> micheline')
+        self.assertEqual(get_script_section(self.script, name='parameter'), type_expr, 'micheline -> type -> micheline')
 
     def test_entrypoints_template(self):
         ep_types = self.program.parameter.list_entrypoints()
@@ -45,18 +43,15 @@ class MainnetContractTestCaseTemplate(TestCase):
 
     def test_storage_type_template(self):
         type_expr = self.program.storage.as_micheline_expr()
-        self.assertEqual(
-            get_script_section(self.script, name='storage'),
-            type_expr,
-            'micheline -> type -> micheline')
+        self.assertEqual(get_script_section(self.script, name='storage'), type_expr, 'micheline -> type -> micheline')
 
     def test_storage_encoding_template(self):
         val = self.program.storage.from_micheline_value(self.script['storage'])
-        val_expr = val.to_micheline_value(mode='legacy_optimized')
+        val_expr = val.to_micheline_value(mode='optimized')
         self.assertEqual(self.script['storage'], val_expr, 'micheline -> value -> micheline')
 
         val_ = self.program.storage.from_python_object(val.to_python_object())
-        val_expr_ = val_.to_micheline_value(mode='legacy_optimized')
+        val_expr_ = val_.to_micheline_value(mode='optimized')
         self.assertEqual(self.script['storage'], val_expr_, 'value -> pyobj -> value -> micheline')
 
     def test_script_parsing_formatting(self):

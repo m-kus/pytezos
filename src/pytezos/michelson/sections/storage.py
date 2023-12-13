@@ -1,7 +1,9 @@
-from typing import List, Type
+from typing import List
+from typing import Type
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline, MichelsonRuntimeError
+from pytezos.context.abstract import AbstractContext
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.types import *
 
 
@@ -57,7 +59,10 @@ class StorageSection(Micheline, prim='storage', args_len=1):
         return self.item.to_micheline_value(mode=mode, lazy_diff=lazy_diff)
 
     def to_python_object(self, try_unpack=False, lazy_diff=False):
-        return self.item.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+        return self.item.to_python_object(
+            try_unpack=try_unpack,
+            lazy_diff=lazy_diff,
+        )
 
     def attach_context(self, context: AbstractContext):
         self.item.attach_context(context)

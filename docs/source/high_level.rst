@@ -37,3 +37,9 @@ Contract storage proxy
    :members:
    :special-members: __call__
    :inherited-members:
+
+Contract view proxy
++++++++++++++++++++
+.. autoclass:: pytezos.contract.view.ContractView
+   :members:
+   :inherited-members:

@@ -1,45 +1,32 @@
-from copy import copy, deepcopy
-from typing import Callable, Generator, List, Optional, Tuple, Type, Union
+from copy import copy
+from copy import deepcopy
+from typing import Callable
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.forge import forge_script_expr
-from pytezos.michelson.micheline import Micheline, MichelineLiteral, MichelineSequence, parse_micheline_literal
-from pytezos.michelson.types.base import MichelsonType, Undefined
-from pytezos.michelson.types.map import EltLiteral, MapType
-
-
-def big_map_diff_to_lazy_diff(big_map_diff: List[dict]):
-    lazy_diff = dict()
-    for diff in big_map_diff:
-        if diff['action'] in ['copy', 'remove']:
-            continue
-        ptr = diff['big_map']
-        if ptr not in lazy_diff:
-            lazy_diff[ptr] = {
-                'kind': 'big_map',
-                'id': ptr,
-                'diff': {'action': 'update', 'updates': []}
-            }
-        if diff['action'] == 'alloc':
-            lazy_diff[ptr]['diff']['action'] = diff['action']
-            lazy_diff[ptr]['diff']['key_type'] = diff['key_type']
-            lazy_diff[ptr]['diff']['value_type'] = diff['value_type']
-        elif diff['action'] == 'update':
-            item = {'key': diff['key'], 'key_hash': diff['key_hash']}
-            if diff.get('value'):
-                item['value'] = diff['value']
-            lazy_diff[ptr]['diff']['updates'].append(item)
-        else:
-            raise NotImplementedError(diff['action'])
-    return list(lazy_diff.values())
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import Undefined
+from pytezos.michelson.types.map import EltLiteral
+from pytezos.michelson.types.map import MapType
 
 
 class BigMapType(MapType, prim='big_map', args_len=2):
-
-    def __init__(self,
-                 items: List[Tuple[MichelsonType, MichelsonType]],
-                 ptr: Optional[int] = None,
-                 removed_keys: Optional[List[MichelsonType]] = None):
+    def __init__(
+        self,
+        items: List[Tuple[MichelsonType, MichelsonType]],
+        ptr: Optional[int] = None,
+        removed_keys: Optional[List[MichelsonType]] = None,
+    ):
         super(BigMapType, self).__init__(items=items)
         self.ptr = ptr
         self.removed_keys = removed_keys or []
@@ -60,7 +47,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
             elements = [f'{repr(k)}: {repr(v)}' for k, v in self]
             return f'{{{", ".join(elements)}}}'
 
-    def __deepcopy__(self, memodict={}):
+    def __deepcopy__(self, memodict):
         return self.duplicate()
 
     def __getitem__(self, key_obj) -> Optional[MichelsonType]:  # type: ignore
@@ -74,7 +61,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
     @staticmethod
     def from_items(items: List[Tuple[MichelsonType, MichelsonType]]):
-        assert False, 'forbidden'
+        raise AssertionError('forbidden')
 
     @classmethod
     def generate_pydoc(cls, definitions: list, inferred_name=None, comparable=False):
@@ -106,10 +93,17 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         if self.ptr is not None:
             return MichelineLiteral.create(self.ptr)
         else:
-            return MichelineSequence.create_type(args=[
-                EltLiteral.create_type(args=[k.to_literal(), v.to_literal()])
-                for k, v in self.items
-            ])
+            return MichelineSequence.create_type(
+                args=[
+                    EltLiteral.create_type(
+                        args=[
+                            k.to_literal(),
+                            v.to_literal(),
+                        ]
+                    )
+                    for k, v in self.items
+                ]
+            )
 
     def to_micheline_value(self, mode='readable', lazy_diff: Optional[bool] = False):
         if lazy_diff is None:
@@ -128,8 +122,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         if lazy_diff:
             assert not comparable, f'big_map is not comparable'
             res = super(BigMapType, self).to_python_object(try_unpack=try_unpack)
-            removals = {key.to_python_object(try_unpack=try_unpack, comparable=True): None
-                        for key in self.removed_keys}
+            removals = {key.to_python_object(try_unpack=try_unpack, comparable=True): None for key in self.removed_keys}
             return {**res, **removals}
         else:
             assert self.ptr is not None, f'Big_map id is not defined'
@@ -138,8 +131,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'BigMapType':
         assert self.ptr is not None, f'Big_map id is not defined'
         assert isinstance(lazy_diff, list), f'expected list, got {type(lazy_diff).__name__}'
-        diff = next((item for item in lazy_diff
-                     if item['kind'] == 'big_map' and item['id'] == str(self.ptr)), None)
+        diff = next((item for item in lazy_diff if item['kind'] == 'big_map' and item['id'] == str(self.ptr)), None)
         if diff:
             items: List[Tuple[MichelsonType, MichelsonType]] = []
             removed_keys: List[MichelsonType] = []
@@ -166,7 +158,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         def make_update(key: MichelsonType, val: Optional[MichelsonType]) -> dict:
             update = {
                 'key': key.to_micheline_value(mode=mode),
-                'key_hash': forge_script_expr(key.pack(legacy=True))
+                'key_hash': forge_script_expr(key.pack(legacy=True)),
             }
             if val is not None:
                 update['value'] = val.to_micheline_value(mode=mode)
@@ -174,7 +166,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
 
         diff = {
             'action': action,
-            'updates': [make_update(key, val) for key, val in self]
+            'updates': [make_update(key, val) for key, val in self],
         }
         if action == 'alloc':
             key_type, val_type = [arg.as_micheline_expr() for arg in self.args]
@@ -183,11 +175,13 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         elif action == 'copy':
             pass  # TODO:
 
-        lazy_diff.append({
-            'kind': 'big_map',
-            'id': str(dst_ptr),
-            'diff': diff
-        })
+        lazy_diff.append(
+            {
+                'kind': 'big_map',
+                'id': str(dst_ptr),
+                'diff': diff,
+            }
+        )
         res = type(self)(items=[], ptr=dst_ptr)
         res.context = self.context
         return res
@@ -232,7 +226,7 @@ class BigMapType(MapType, prim='big_map', args_len=2):
                 removed_keys.add(key)
         else:
             if val is not None:
-                items = list(sorted(self.items + [(key, val)], key=lambda x: x[0]))
+                items = sorted(self.items + [(key, val)], key=lambda x: x[0])
                 if key in removed_keys:
                     removed_keys.remove(key)
             else:  # do nothing
@@ -246,9 +240,10 @@ class BigMapType(MapType, prim='big_map', args_len=2):
         return forge_script_expr(key.pack(legacy=True))
 
     def duplicate(self):
-        res = type(self)(items=deepcopy(self.items),
-                         ptr=self.ptr,
-                         removed_keys=deepcopy(self.removed_keys))
+        res = type(self)(
+            items=deepcopy(self.items),
+            ptr=self.ptr,
+            removed_keys=deepcopy(self.removed_keys),
+        )
         res.context = self.context
         return res
-

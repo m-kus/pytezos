@@ -1,4 +1,5 @@
-from unittest import TestCase, skip
+from unittest import TestCase
+from unittest import skip
 
 from pytezos import ContractInterface
 
@@ -11,15 +12,14 @@ code { DROP ;
        PAIR }
 """
 initial = 'tz1h3rQ8wBxFd8L9B3d7Jhaawu6Z568XU3xY'
-source = 'KT1WhouvVKZFH94VXj9pa8v4szvfrBwXoBUj'
-sender = 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'
+source = 'tz1irF8HUsQp2dLhKNMhteG1qALNU9g3pfdN'
+sender = 'KT1WhouvVKZFH94VXj9pa8v4szvfrBwXoBUj'
 
 
 class SenderContractTest(TestCase):
-
     @classmethod
     def setUpClass(cls):
-        cls.ci = ContractInterface.from_michelson(code).using('mainnet')
+        cls.ci = ContractInterface.from_michelson(code).using(shell='https://rpc.tzkt.io/mainnet')
 
     def test_sender(self):
         res = self.ci.default().run_code(storage=initial, source=source, sender=sender)

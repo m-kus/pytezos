@@ -1,30 +1,47 @@
 from decimal import Decimal
-from typing import Type, cast
+from typing import Type
+from typing import cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.context.abstract import get_originated_address
-from pytezos.crypto.encoding import base58_decode, is_address, is_chain_id, is_kt, is_pkh, is_public_key, is_sig
-from pytezos.michelson.forge import (forge_address, forge_base58, forge_contract, forge_public_key, optimize_timestamp, unforge_address,
-                                     unforge_chain_id, unforge_contract, unforge_public_key, unforge_signature)
-from pytezos.michelson.format import format_timestamp, micheline_to_michelson
-from pytezos.michelson.micheline import Micheline, parse_micheline_literal
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import is_address
+from pytezos.crypto.encoding import is_chain_id
+from pytezos.crypto.encoding import is_kt
+from pytezos.crypto.encoding import is_pkh
+from pytezos.crypto.encoding import is_public_key
+from pytezos.crypto.encoding import is_sig
+from pytezos.crypto.encoding import is_txr_address
+from pytezos.michelson.forge import forge_address
+from pytezos.michelson.forge import forge_base58
+from pytezos.michelson.forge import forge_contract
+from pytezos.michelson.forge import forge_public_key
+from pytezos.michelson.forge import optimize_timestamp
+from pytezos.michelson.forge import unforge_address
+from pytezos.michelson.forge import unforge_chain_id
+from pytezos.michelson.forge import unforge_contract
+from pytezos.michelson.forge import unforge_public_key
+from pytezos.michelson.forge import unforge_signature
+from pytezos.michelson.format import format_timestamp
+from pytezos.michelson.format import micheline_to_michelson
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import parse_micheline_literal
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.types.base import Undefined
-from pytezos.michelson.types.core import IntType, MichelsonType, NatType, StringType
+from pytezos.michelson.types.core import IntType
+from pytezos.michelson.types.core import MichelsonType
+from pytezos.michelson.types.core import NatType
+from pytezos.michelson.types.core import StringType
 
 
 class TimestampType(IntType, prim='timestamp'):  # type: ignore
-
     @classmethod
     def from_value(cls, value: int) -> 'TimestampType':
         return cls(value)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'TimestampType':
-        value = parse_micheline_literal(val_expr, {
-            'int': int,
-            'string': optimize_timestamp
-        })
+        value = parse_micheline_literal(val_expr, {'int': int, 'string': optimize_timestamp})
         return cls.from_value(value)
 
     @classmethod
@@ -34,7 +51,7 @@ class TimestampType(IntType, prim='timestamp'):  # type: ignore
         elif isinstance(py_obj, str):
             value = optimize_timestamp(py_obj)
         else:
-            assert False, f'unexpected value type {py_obj}'
+            raise AssertionError(f'unexpected value type {py_obj}')
         return cls.from_value(value)
 
     def to_micheline_value(self, mode='readable', lazy_diff=False):
@@ -43,16 +60,15 @@ class TimestampType(IntType, prim='timestamp'):  # type: ignore
         elif mode == 'readable':
             return {'string': format_timestamp(self.value)}
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
 class MutezType(NatType, prim='mutez'):
-
     def __repr__(self):
-        return str(Decimal(self.value) / 10 ** 6)
+        return str(Decimal(self.value) / 10**6)
 
     @classmethod
     def from_value(cls, value: int) -> 'MutezType':
@@ -66,16 +82,15 @@ class MutezType(NatType, prim='mutez'):
         if isinstance(py_obj, int):
             value = py_obj
         elif isinstance(py_obj, Decimal):
-            value = int(py_obj * (10 ** 6))
+            value = int(py_obj * (10**6))
         elif isinstance(py_obj, str):
-            value = int(Decimal(py_obj) * (10 ** 6))
+            value = int(Decimal(py_obj) * (10**6))
         else:
-            assert False, f'unexpected value type {py_obj}'
+            raise AssertionError(f'unexpected value type {py_obj}')
         return cls.from_value(value)
 
 
 class AddressType(StringType, prim='address'):
-
     def __repr__(self):
         return f'{self.value[:6]}…{self.value[-3:]}'
 
@@ -95,15 +110,18 @@ class AddressType(StringType, prim='address'):
     def from_value(cls, value: str) -> 'AddressType':
         if value.endswith('%default'):
             value = value.split('%')[0]
-        assert is_address(value), f'expected tz/KT address, got {value}'
+        assert is_address(value), f'expected tz/KT/sr address, got {value}'
         return cls(value)
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'AddressType':
-        value = parse_micheline_literal(val_expr, {
-            'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
-            'string': lambda x: x
-        })
+        value = parse_micheline_literal(
+            val_expr,
+            {
+                'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
+        )
         return cls.from_value(value)
 
     @classmethod
@@ -116,14 +134,63 @@ class AddressType(StringType, prim='address'):
         elif mode == 'readable':
             return {'string': self.value}
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
+
+    def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
+        return self.value
+
+
+class TXRAddress(StringType, prim='tx_rollup_l2_address'):
+    def __repr__(self):
+        return f'{self.value[:6]}…{self.value[-3:]}'
+
+    def __lt__(self, other: 'TXRAddress') -> bool:  # type: ignore
+        if is_kt(other.value):
+            return True
+        elif is_pkh(other.value):
+            return False
+        else:
+            return self.value < other.value
+
+    @classmethod
+    def dummy(cls, context: AbstractContext) -> 'TXRAddress':
+        return cls.from_value(context.get_dummy_txr_address())
+
+    @classmethod
+    def from_value(cls, value: str) -> 'TXRAddress':
+        if value.endswith('%default'):
+            value = value.split('%')[0]
+        assert is_txr_address(value), f'expected txr1 address, got {value}'
+        return cls(value)
+
+    @classmethod
+    def from_micheline_value(cls, val_expr) -> 'TXRAddress':
+        value = parse_micheline_literal(
+            val_expr,
+            {
+                'bytes': lambda x: unforge_contract(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
+        )
+        return cls.from_value(value)
+
+    @classmethod
+    def from_python_object(cls, py_obj) -> 'TXRAddress':
+        return cls.from_value(py_obj)
+
+    def to_micheline_value(self, mode='readable', lazy_diff=False):
+        if mode in ['optimized', 'legacy_optimized']:
+            return {'bytes': forge_contract(self.value).hex()}  # because address can also have an entrypoint
+        elif mode == 'readable':
+            return {'string': self.value}
+        else:
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
 class KeyType(StringType, prim='key'):
-
     @property
     def raw(self) -> bytes:
         return base58_decode(self.value.encode())
@@ -142,7 +209,7 @@ class KeyType(StringType, prim='key'):
         curves = {
             'edpk': (0, 0),
             'sppk': (1, 0),
-            'p2pk': (2, 1)
+            'p2pk': (2, 1),
         }
         res = curves[self.prefix][0] - curves[other.prefix][0]
         if res < 0:
@@ -164,10 +231,13 @@ class KeyType(StringType, prim='key'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'KeyType':
-        value = parse_micheline_literal(val_expr, {
-            'bytes': lambda x: unforge_public_key(bytes.fromhex(x)),
-            'string': lambda x: x
-        })
+        value = parse_micheline_literal(
+            val_expr,
+            {
+                'bytes': lambda x: unforge_public_key(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
+        )
         return cls.from_value(value)
 
     @classmethod
@@ -180,14 +250,13 @@ class KeyType(StringType, prim='key'):
         elif mode == 'readable':
             return {'string': self.value}
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
 class KeyHashType(StringType, prim='key_hash'):
-
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'KeyHashType':
         return cls.from_value(context.get_dummy_key_hash())
@@ -199,10 +268,9 @@ class KeyHashType(StringType, prim='key_hash'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'KeyHashType':
-        value = parse_micheline_literal(val_expr, {
-            'bytes': lambda x: unforge_address(bytes.fromhex(x)),
-            'string': lambda x: x
-        })
+        value = parse_micheline_literal(
+            val_expr, {'bytes': lambda x: unforge_address(bytes.fromhex(x)), 'string': lambda x: x}
+        )
         return cls.from_value(value)
 
     @classmethod
@@ -215,14 +283,13 @@ class KeyHashType(StringType, prim='key_hash'):
         elif mode == 'readable':
             return {'string': self.value}
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
 class SignatureType(StringType, prim='signature'):
-
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'SignatureType':
         return cls.from_value(context.get_dummy_signature())
@@ -234,10 +301,13 @@ class SignatureType(StringType, prim='signature'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'SignatureType':
-        value = parse_micheline_literal(val_expr, {
-            'bytes': lambda x: unforge_signature(bytes.fromhex(x)),
-            'string': lambda x: x
-        })
+        value = parse_micheline_literal(
+            val_expr,
+            {
+                'bytes': lambda x: unforge_signature(bytes.fromhex(x)),
+                'string': lambda x: x,
+            },
+        )
         return cls.from_value(value)
 
     @classmethod
@@ -250,14 +320,13 @@ class SignatureType(StringType, prim='signature'):
         elif mode == 'readable':
             return {'string': self.value}
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
 class ChainIdType(StringType, prim='chain_id'):
-
     @classmethod
     def dummy(cls, context: AbstractContext) -> 'ChainIdType':
         return cls.from_value(context.get_dummy_chain_id())
@@ -269,10 +338,9 @@ class ChainIdType(StringType, prim='chain_id'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'ChainIdType':
-        value = parse_micheline_literal(val_expr, {
-            'bytes': lambda x: unforge_chain_id(bytes.fromhex(x)),
-            'string': lambda x: x
-        })
+        value = parse_micheline_literal(
+            val_expr, {'bytes': lambda x: unforge_chain_id(bytes.fromhex(x)), 'string': lambda x: x}
+        )
         return cls.from_value(value)
 
     @classmethod
@@ -285,14 +353,13 @@ class ChainIdType(StringType, prim='chain_id'):
         elif mode == 'readable':
             return {'string': self.value}
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         return self.value
 
 
 class ContractType(AddressType, prim='contract', args_len=1):
-
     def __repr__(self):
         address, entrypoint = self.get_address(), self.get_entrypoint()
         return f'{address[:6]}…{address[-3:]}%{entrypoint}'
@@ -329,7 +396,6 @@ class ContractType(AddressType, prim='contract', args_len=1):
 
 
 class LambdaType(MichelsonType, prim='lambda', args_len=2):  # type: ignore
-
     def __init__(self, value: Type[Micheline]):
         super(LambdaType, self).__init__()
         self.value = value

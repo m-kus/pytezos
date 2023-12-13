@@ -1,8 +1,16 @@
-from typing import Generator, List, Optional, Tuple, Type, Union, cast
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline
-from pytezos.michelson.types.adt import ADTMixin, Nested, wrap_pair
+from pytezos.michelson.types.adt import ADTMixin
+from pytezos.michelson.types.adt import Nested
+from pytezos.michelson.types.adt import wrap_pair
 from pytezos.michelson.types.base import MichelsonType
 
 
@@ -11,7 +19,6 @@ class PairLiteral(Micheline, prim='Pair', args_len=None):
 
 
 class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
-
     def __init__(self, items: Tuple[MichelsonType, ...]):
         super(PairType, self).__init__()
         self.items = items
@@ -19,13 +26,10 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
     def __eq__(self, other):  # type: ignore
         if not isinstance(other, PairType):
             return False
-        return all(
-            item == other.items[i]
-            for i, item in enumerate(self.items)
-        )
+        return all(item == other.items[i] for i, item in enumerate(self.items))
 
     def __lt__(self, other: 'PairType'):  # type: ignore
-        for i, item in enumerate(self.items):
+        for i, item in enumerate(self.items):  # noqa: SIM111
             if item > other.items[i]:
                 return False
         return True
@@ -54,10 +58,12 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         return cls.init(items)
 
     @classmethod
-    def create_type(cls,
-                    args: List[Type['Micheline']],
-                    annots: Optional[list] = None,
-                    **kwargs) -> Type['PairType']:
+    def create_type(
+        cls,
+        args: List[Type['Micheline']],
+        annots: Optional[list] = None,
+        **kwargs,
+    ) -> Type['PairType']:
         if len(args) > 2:  # comb
             args = [args[0], PairType.create_type(args=args[1:])]
         else:
@@ -78,15 +84,11 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         name = cls.field_name or cls.type_name or inferred_name or f'{cls.prim}_{len(definitions)}'
         flat_args = cls.get_flat_args(force_tuple=comparable)
         if isinstance(flat_args, dict):
-            fields = [
-                (name, arg.generate_pydoc(definitions, inferred_name=name))
-                for name, arg in flat_args.items()
-            ]
+            fields = [(name, arg.generate_pydoc(definitions, inferred_name=name)) for name, arg in flat_args.items()]
             doc = '{\n' + ',\n'.join(f'\t  "{name}": {arg_doc}' for name, arg_doc in fields) + '\n\t}'
         else:
             items = [
-                arg.generate_pydoc(definitions, inferred_name=f'{arg.prim}_{i}')
-                for i, arg in enumerate(flat_args)
+                arg.generate_pydoc(definitions, inferred_name=f'{arg.prim}_{i}') for i, arg in enumerate(flat_args)
             ]
             if all(arg.prim in ['pair', 'or'] or not arg.args for arg in flat_args):
                 return f'( {", ".join(items)} )'
@@ -107,14 +109,14 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         elif isinstance(val_expr, list):
             args = val_expr
         else:
-            assert False, f'either dict(prim) or list expected, got {type(val_expr).__name__}'
+            raise AssertionError(f'either dict(prim) or list expected, got {type(val_expr).__name__}')
 
         if len(args) == 2:
             value = tuple(cls.args[i].from_micheline_value(arg) for i, arg in enumerate(args))
         elif len(args) > 2:
             value = cls.args[0].from_micheline_value(args[0]), cls.args[1].from_micheline_value(args[1:])
         else:
-            assert False, f'at least two args expected, got {len(args)}'
+            raise AssertionError(f'at least two args expected, got {len(args)}')
         return cls(value)
 
     @classmethod
@@ -122,7 +124,7 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         if isinstance(py_obj, list):
             py_obj = tuple(py_obj)
 
-        if isinstance(py_obj, tuple) or isinstance(py_obj, dict):
+        if isinstance(py_obj, (tuple, dict)):
             path_to_key, key_to_path, idx_to_path = cls.get_type_layout()
             if isinstance(py_obj, tuple):
                 py_obj = {idx_to_path[i]: value for i, value in enumerate(py_obj)}
@@ -140,7 +142,7 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
             value = tuple(cls.args[i].from_python_object(py_obj[i]) for i in [0, 1])
             return cls(value)
         else:
-            assert False, f'expected list, tuple, or dict, got {type(py_obj).__name__}'
+            raise AssertionError(f'expected list, tuple, or dict, got {type(py_obj).__name__}')
 
     def iter_values(self, path='') -> Generator[Tuple[str, MichelsonType], None, None]:
         for i, item in enumerate(self.items):
@@ -155,6 +157,13 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
         for i, item in enumerate(self):
             if i == 1 and isinstance(item, PairType) and not (item.field_name or item.type_name):
                 yield from item.iter_comb(include_nodes=include_nodes)
+            else:
+                yield item
+
+    def unpairn_comb(self, count) -> Generator[MichelsonType, None, None]:
+        for i, item in enumerate(self):
+            if i == 1 and isinstance(item, PairType) and not (item.field_name or item.type_name) and count > 0:
+                yield from item.unpairn_comb(count - 1)
             else:
                 yield item
 
@@ -191,19 +200,26 @@ class PairType(MichelsonType, ADTMixin, prim='pair', args_len=None):
             elif len(args) >= 4:
                 return args
             else:
-                assert False, f'unexpected number of args {len(args)}'
+                raise AssertionError(f'unexpected number of args {len(args)}')
         else:
-            assert False, f'unsupported mode {mode}'
+            raise AssertionError(f'unsupported mode {mode}')
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False) -> Union[dict, tuple]:
         flat_values = self.get_flat_values(force_tuple=comparable)
         if isinstance(flat_values, dict):
             return {
-                name: arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff)
+                name: arg.to_python_object(
+                    try_unpack=try_unpack,
+                    lazy_diff=lazy_diff,
+                )
                 for name, arg in flat_values.items()
             }
         return tuple(
-            arg.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff, comparable=comparable)
+            arg.to_python_object(
+                try_unpack=try_unpack,
+                lazy_diff=lazy_diff,
+                comparable=comparable,
+            )
             for arg in flat_values
         )
 

@@ -1,0 +1,47 @@
+{
+  "entrypoints": {
+    "swap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%color"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%pixel"
+          ]
+        }
+      ]
+    },
+    "set_pause": {
+      "prim": "bool"
+    },
+    "set_limit": {
+      "prim": "nat"
+    },
+    "payout_balance": {
+      "prim": "unit"
+    },
+    "mint": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%color"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%pixel"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "parameters": {
+    "entrypoint": "tdtm_fa2_callback",
+    "value": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "2829"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "2349"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "1535"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "1303"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "1074"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "728"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f4f0b530d43b45a3c8dc7827590ca3f49b57b4d7"
+              },
+              {
+                "int": "680"
+              }
+            ]
+          },
+          {
+            "int": "1"
+          }
+        ]
+      }
+    ]
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000f2cc25a5d1b28be77ff0a44e2a3ffeca46777f18"
+              },
+              {
+                "int": "399"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "0000b28066369a8ed09ba9d3d47f19598440266013f0"
+              },
+              {
+                "bytes": "697066733a2f2f6261666b726569636b7265336a66367766666167797a657974366b7962776272793233747576637a7934376e707a7073366e71647a736a366d7069"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "203"
+          },
+          {
+            "int": "175096"
+          }
+        ]
+      },
+      {
+        "int": "62"
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "1654531200"
+          },
+          {
+            "int": "1653235200"
+          }
+        ]
+      },
+      {
+        "bytes": "0116792301dabdff922c0ce6f0f39405b83aeb5bc800"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "False"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "string": "8c5375c22b65211e0fdd62eeae83c831b538abfc0c2a797b52e4a2e634ecbbac"
+            },
+            {
+              "int": "0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "01c6c3bcbb1555c3cc5ed9e174efdd20984a2edde000"
+        },
+        {
+          "bytes": "01feed9115873fd1f0e7e941cd90058823229e486000"
+        }
+      ]
+    },
+    [
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "1"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1"
+              },
+              {
+                "int": "120"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "2"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "121"
+              },
+              {
+                "int": "240"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "3"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "241"
+              },
+              {
+                "int": "360"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "4"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "361"
+              },
+              {
+                "int": "480"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "5"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "481"
+              },
+              {
+                "int": "720"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "6"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "721"
+              },
+              {
+                "int": "960"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "7"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "961"
+              },
+              {
+                "int": "1200"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "8"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1201"
+              },
+              {
+                "int": "1440"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "9"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1441"
+              },
+              {
+                "int": "1920"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "10"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "1921"
+              },
+              {
+                "int": "2400"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "11"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "2401"
+              },
+              {
+                "int": "2880"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "12"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "int": "2881"
+              },
+              {
+                "int": "3360"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    {
+      "bytes": "01125b47ee42ea61efab7225c207480c8b7dcfc8c500"
+    },
+    {
+      "int": "6370"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "175096",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

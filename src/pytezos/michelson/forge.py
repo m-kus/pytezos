@@ -1,10 +1,15 @@
 from contextlib import suppress
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
+from typing import Union
 
-import base58  # type: ignore
+import base58
 import strict_rfc3339  # type: ignore
 
-from pytezos.crypto.encoding import base58_decode, base58_encode
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
 from pytezos.michelson.tags import prim_tags
 
@@ -148,8 +153,9 @@ def forge_address(value: str, tz_only=False) -> bytes:
     :param value: base58 encoded address or key_hash
     :param tz_only: True indicates that it's a key_hash (will be encoded in a more compact form)
     """
-    prefix = value[:3]
-    address = base58.b58decode_check(value)[3:]
+    prefix_len = 4 if value.startswith('txr1') else 3
+    prefix = value[:prefix_len]
+    address = base58.b58decode_check(value)[prefix_len:]
 
     if prefix == 'tz1':
         res = b'\x00\x00' + address
@@ -157,8 +163,14 @@ def forge_address(value: str, tz_only=False) -> bytes:
         res = b'\x00\x01' + address
     elif prefix == 'tz3':
         res = b'\x00\x02' + address
+    elif prefix == 'tz4':
+        res = b'\x00\x03' + address
     elif prefix == 'KT1':
         res = b'\x01' + address + b'\x00'
+    elif prefix == 'txr1':
+        res = b'\x02' + address + b'\x00'
+    elif prefix == 'sr1':
+        res = b'\x03' + address + b'\x00'
     else:
         raise ValueError(f'Can\'t forge address: unknown prefix `{prefix}`')
 
@@ -175,6 +187,7 @@ def unforge_address(data: bytes) -> str:
         b'\x00\x00': b'tz1',
         b'\x00\x01': b'tz2',
         b'\x00\x02': b'tz3',
+        b'\x00\x03': b'tz4',
     }
 
     for bin_prefix, tz_prefix in tz_prefixes.items():
@@ -183,6 +196,10 @@ def unforge_address(data: bytes) -> str:
 
     if data.startswith(b'\x01') and data.endswith(b'\x00'):
         return base58_encode(data[1:-1], b'KT1').decode()
+    elif data.startswith(b'\x02') and data.endswith(b'\x00'):
+        return base58_encode(data[1:-1], b'txr1').decode()
+    elif data.startswith(b'\x03') and data.endswith(b'\x00'):
+        return base58_encode(data[1:-1], b'sr1').decode()
     else:
         return base58_encode(data[1:], tz_prefixes[b'\x00' + data[:1]]).decode()
 
@@ -220,7 +237,7 @@ def forge_public_key(value: str) -> bytes:
     prefix = value[:4]
     res = base58.b58decode_check(value)[4:]
 
-    if prefix == 'edpk':
+    if prefix == 'edpk':  # noqa: SIM116
         return b'\x00' + res
     elif prefix == 'sppk':
         return b'\x01' + res
@@ -309,9 +326,9 @@ def forge_micheline(data: Union[List, Dict]) -> bytes:
             res.append(b'\x01')
             res.append(forge_array(data['string'].encode()))
         else:
-            assert False, data
+            raise AssertionError(data)
     else:
-        assert False, data
+        raise AssertionError(data)
 
     return b''.join(res)
 
@@ -347,14 +364,11 @@ def unforge_micheline(data: bytes) -> Union[List, Dict]:
         else:
             assert args_len == 0, f'unexpected args len {args_len}'
 
-        if annots:
+        if annots or args_len == 3:
             value, offset = unforge_array(data[ptr:])
             ptr += offset
             if len(value) > 0:
                 expr['annots'] = value.decode().split(' ')
-
-        if args_len == 3:
-            ptr += 4
 
         return expr
 
@@ -380,7 +394,7 @@ def unforge_micheline(data: bytes) -> Union[List, Dict]:
             ptr += offset
             return {'bytes': value.hex()}
         else:
-            assert False, f'unkonwn tag {tag} at position {ptr}'
+            raise AssertionError(f'unkonwn tag {tag} at position {ptr}')
 
     result = unforge()
     assert ptr == len(data), f'have not reach EOS (pos {ptr}/{len(data)})'

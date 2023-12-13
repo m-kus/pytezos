@@ -1,0 +1,126 @@
+{
+  "parameters": {
+    "entrypoint": "swapTokens",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "100000"
+        },
+        {
+          "int": "17"
+        }
+      ]
+    }
+  },
+  "storage": [
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+        },
+        {
+          "prim": "True"
+        }
+      ]
+    },
+    {
+      "bytes": "01de89cf6f8f5ec570fa9c5da1d4b796e76312064300"
+    },
+    {
+      "bytes": "0100f42eb1f25677dd7b0a94aba3a7aea61e2fd30d00"
+    },
+    [
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "1"
+          },
+          {
+            "int": "7"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "5"
+          },
+          {
+            "int": "6"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "10"
+          },
+          {
+            "int": "5"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "11"
+          },
+          {
+            "int": "4"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "17"
+          },
+          {
+            "int": "2"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "18"
+          },
+          {
+            "int": "3"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "19"
+          },
+          {
+            "int": "1"
+          }
+        ]
+      },
+      {
+        "prim": "Elt",
+        "args": [
+          {
+            "int": "20"
+          },
+          {
+            "int": "0"
+          }
+        ]
+      }
+    ]
+  ],
+  "lazy_storage_diff": []
+}

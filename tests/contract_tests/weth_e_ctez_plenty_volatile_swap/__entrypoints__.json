@@ -1,0 +1,133 @@
+{
+  "entrypoints": {
+    "forwardFee": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%epoch"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%feeDistributor"
+          ]
+        }
+      ]
+    },
+    "Swap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%MinimumTokenOut"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%recipient"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%requiredTokenAddress"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%requiredTokenId"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%tokenAmountIn"
+          ]
+        }
+      ]
+    },
+    "RemoveLiquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%lpAmount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%recipient"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token1_min"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token2_min"
+          ]
+        }
+      ]
+    },
+    "ModifyMaxSwapAmount": {
+      "prim": "nat"
+    },
+    "ModifyFee": {
+      "prim": "nat"
+    },
+    "ChangeSystem": {
+      "prim": "address"
+    },
+    "ChangeState": {
+      "prim": "unit"
+    },
+    "ChangeAdmin": {
+      "prim": "address"
+    },
+    "AddLiquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%recipient"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token1_max"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token2_max"
+          ]
+        }
+      ]
+    }
+  }
+}

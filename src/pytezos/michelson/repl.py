@@ -1,12 +1,20 @@
 from copy import deepcopy
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import cast
 
 from attr import dataclass
 
 from pytezos.context.impl import ExecutionContext
-from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
-from pytezos.michelson.parse import MichelsonParser, MichelsonParserError, michelson_to_micheline
-from pytezos.michelson.program import MichelsonProgram, TztMichelsonProgram
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import MichelsonRuntimeError
+from pytezos.michelson.parse import MichelsonParser
+from pytezos.michelson.parse import MichelsonParserError
+from pytezos.michelson.parse import michelson_to_micheline
+from pytezos.michelson.program import MichelsonProgram
+from pytezos.michelson.program import TztMichelsonProgram
 from pytezos.michelson.sections import CodeSection
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.types import OperationType
@@ -106,7 +114,7 @@ class Interpreter:
             sender=sender,
             balance=balance,
             block_id=block_id,
-            script=dict(code=script, storage=storage),
+            script={'code': script, 'storage': storage},
             **kwargs,
         )
         stack = MichelsonStack()
@@ -221,7 +229,7 @@ class Interpreter:
             sender=sender,
             balance=balance,
             block_id=block_id,
-            script=dict(code=script),
+            script={'code': script},
             tzt=True,
             **kwargs,
         )

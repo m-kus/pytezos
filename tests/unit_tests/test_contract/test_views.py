@@ -1,10 +1,12 @@
-from os.path import join, dirname
-from pytezos import ContractInterface, MichelsonRuntimeError
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
+
+from pytezos import ContractInterface
+from pytezos import MichelsonRuntimeError
 
 
 class ViewsTest(TestCase):
-
     def test_onchain_view(self):
         ci = ContractInterface.from_file(join(dirname(__file__), 'contracts', 'view_toplevel_lib.tz'))
 

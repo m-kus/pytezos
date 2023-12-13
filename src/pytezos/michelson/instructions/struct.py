@@ -1,13 +1,22 @@
-from typing import List, Tuple, Union, cast
+from typing import List
+from typing import Tuple
+from typing import Union
+from typing import cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.instructions.base import MichelsonInstruction, format_stdout
+from pytezos.context.abstract import AbstractContext
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BigMapType, BoolType, ListType, MapType, MichelsonType, OptionType, SetType
+from pytezos.michelson.types import BigMapType
+from pytezos.michelson.types import BoolType
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import MapType
+from pytezos.michelson.types import MichelsonType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import SetType
 
 
 class ConsInstruction(MichelsonInstruction, prim='CONS'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         elt, lst = cast(Tuple[MichelsonType, ListType], stack.pop2())
@@ -19,7 +28,6 @@ class ConsInstruction(MichelsonInstruction, prim='CONS'):
 
 
 class NilInstruction(MichelsonInstruction, prim='NIL', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = ListType.empty(cls.args[0])  # type: ignore
@@ -29,7 +37,6 @@ class NilInstruction(MichelsonInstruction, prim='NIL', args_len=1):
 
 
 class EmptyBigMapInstruction(MichelsonInstruction, prim='EMPTY_BIG_MAP', args_len=2):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = BigMapType.empty(key_type=cls.args[0], val_type=cls.args[1])  # type: ignore
@@ -40,7 +47,6 @@ class EmptyBigMapInstruction(MichelsonInstruction, prim='EMPTY_BIG_MAP', args_le
 
 
 class EmptyMapInstruction(MichelsonInstruction, prim='EMPTY_MAP', args_len=2):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = MapType.empty(key_type=cls.args[0], val_type=cls.args[1])  # type: ignore
@@ -50,7 +56,6 @@ class EmptyMapInstruction(MichelsonInstruction, prim='EMPTY_MAP', args_len=2):
 
 
 class EmptySetInstruction(MichelsonInstruction, prim='EMPTY_SET', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = SetType.empty(item_type=cls.args[0])  # type: ignore
@@ -60,7 +65,6 @@ class EmptySetInstruction(MichelsonInstruction, prim='EMPTY_SET', args_len=1):
 
 
 class GetInstruction(MichelsonInstruction, prim='GET'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         key, src = cast(Tuple[MichelsonType, Union[MapType, BigMapType]], stack.pop2())
@@ -76,7 +80,6 @@ class GetInstruction(MichelsonInstruction, prim='GET'):
 
 
 class GetAndUpdateInstruction(MichelsonInstruction, prim='GET_AND_UPDATE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         key, val, src = cast(Tuple[MichelsonType, OptionType, Union[MapType, BigMapType]], stack.pop3())
@@ -90,11 +93,16 @@ class GetAndUpdateInstruction(MichelsonInstruction, prim='GET_AND_UPDATE'):
 
 
 class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        key, val, src = cast(Tuple[MichelsonType, Union[OptionType, BoolType], Union[MapType, BigMapType, SetType]],
-                             stack.pop3())
+        key, val, src = cast(
+            Tuple[
+                MichelsonType,
+                Union[OptionType, BoolType],
+                Union[MapType, BigMapType, SetType],
+            ],
+            stack.pop3(),
+        )
         val.assert_type_in(OptionType, BoolType)
         if isinstance(val, BoolType):
             src.assert_type_in(SetType)
@@ -108,7 +116,6 @@ class UpdateInstruction(MichelsonInstruction, prim='UPDATE'):
 
 
 class MemInstruction(MichelsonInstruction, prim='MEM'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         key, src = cast(Tuple[MichelsonType, Union[SetType, MapType, BigMapType]], stack.pop2())
@@ -120,7 +127,6 @@ class MemInstruction(MichelsonInstruction, prim='MEM'):
 
 
 class NoneInstruction(MichelsonInstruction, prim='NONE', args_len=1):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         res = OptionType.none(cls.args[0])  # type: ignore
@@ -130,7 +136,6 @@ class NoneInstruction(MichelsonInstruction, prim='NONE', args_len=1):
 
 
 class SomeInstruction(MichelsonInstruction, prim='SOME'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         some = stack.pop1()

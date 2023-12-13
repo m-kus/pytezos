@@ -5,16 +5,16 @@ from typing import Tuple
 
 from pytezos.michelson.tags import prim_tags
 
-COMPARE = dict(prim='COMPARE')
-UNIT = dict(prim='UNIT')
-FAILWITH = dict(prim='FAILWITH')
-DUP = dict(prim='DUP')
-SWAP = dict(prim='SWAP')
-CAR = dict(prim='CAR')
-CDR = dict(prim='CDR')
-CAR__ = dict(prim='CAR', annots=['@%%'])
-CDR__ = dict(prim='CDR', annots=['@%%'])
-DROP = dict(prim='DROP')
+COMPARE = {'prim': 'COMPARE'}
+UNIT = {'prim': 'UNIT'}
+FAILWITH = {'prim': 'FAILWITH'}
+DUP = {'prim': 'DUP'}
+SWAP = {'prim': 'SWAP'}
+CAR = {'prim': 'CAR'}
+CDR = {'prim': 'CDR'}
+CAR__ = {'prim': 'CAR', 'annots': ['@%%']}
+CDR__ = {'prim': 'CDR', 'annots': ['@%%']}
+DROP = {'prim': 'DROP'}
 FAIL = [[UNIT, FAILWITH]]
 
 macros = []
@@ -29,7 +29,9 @@ def macro(regexp):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
+
         return wrapper
+
     return register_macro
 
 
@@ -43,7 +45,7 @@ def seq(instr=None) -> list:
 
 
 def expand_macro(prim, annots, args, internal=False):
-    """ Expands Michelson macro.
+    """Expands Michelson macro.
 
     :param prim: macro name
     :param annots: annotations (optional)
@@ -63,7 +65,7 @@ def expand_macro(prim, annots, args, internal=False):
             res = handler(groups[0], annots, args)
             return res if internal else seq(res)
 
-    assert False, f'unknown primitive `{prim}`'
+    raise AssertionError(f'unknown primitive `{prim}`')
 
 
 def get_field_annots(annots):
@@ -86,86 +88,121 @@ def dip_n(instr, depth=1):
     if depth <= 0:
         return instr
     elif depth == 1:
-        return expr(prim='DIP', args=[seq(instr)])
+        return expr(
+            prim='DIP',
+            args=[seq(instr)],
+        )
     else:
-        return expr(prim='DIP', args=[{'int': str(depth)}, seq(instr)])
+        return expr(
+            prim='DIP',
+            args=[{'int': str(depth)}, seq(instr)],
+        )
 
 
 @macro(r'^CMP(EQ|NEQ|LT|GT|LE|GE)$')
 def expand_cmpx(prim, annots, args) -> list:
     assert not args
-    return [COMPARE,
-            expr(prim=prim, annots=annots)]
+    return [
+        COMPARE,
+        expr(prim=prim, annots=annots),
+    ]
 
 
 @macro(r'^IF(EQ|NEQ|LT|GT|LE|GE)$')
 def expand_ifx(prim, annots, args) -> list:
     assert len(args) == 2
-    return [expr(prim=prim, annots=annots),
-            expr(prim='IF', args=args)]
+    return [
+        expr(prim=prim, annots=annots),
+        expr(prim='IF', args=args),
+    ]
 
 
 @macro(r'^IFCMP(EQ|NEQ|LT|GT|LE|GE)$')
 def expand_ifcmpx(prim, annots, args) -> list:
     assert len(args) == 2
-    return [[COMPARE, expr(prim=prim, annots=annots)],
-            expr(prim='IF', args=args)]
+    return [
+        [COMPARE, expr(prim=prim, annots=annots)],
+        expr(prim='IF', args=args),
+    ]
 
 
 @macro(r'^FAIL$')
 def expand_fail(prim, annots, args) -> list:
     assert not annots
     assert not args
-    return [UNIT, FAILWITH]
+    return [
+        UNIT,
+        FAILWITH,
+    ]
 
 
 @macro(r'^ASSERT$')
 def expand_assert(prim, annots, args) -> dict:
     assert not annots
     assert not args
-    return expr(prim='IF', args=[[], FAIL])
+    return expr(
+        prim='IF',
+        args=[[], FAIL],
+    )
 
 
 @macro(r'^ASSERT_(EQ|NEQ|LT|LE|GT|GE)$')
 def expand_assert_x(prim, annots, args) -> list:
     assert not args
     assert not annots  # TODO: ask why
-    return expand_ifx(prim, annots=[], args=[[], FAIL])
+    return expand_ifx(
+        prim,
+        annots=[],
+        args=[[], FAIL],
+    )
 
 
 @macro(r'^ASSERT_CMP(EQ|NEQ|LT|LE|GT|GE)$')
 def expand_assert_cmpx(prim, annots, args) -> list:
     assert not args
     assert not annots  # TODO: ask why
-    return expand_ifcmpx(prim, annots=[], args=[[], FAIL])
+    return expand_ifcmpx(
+        prim,
+        annots=[],
+        args=[[], FAIL],
+    )
 
 
 @macro(r'^ASSERT_NONE$')
 def expand_assert_none(prim, annots, args) -> dict:
     assert not annots
     assert not args
-    return expr(prim='IF_NONE', args=[[], FAIL])
+    return expr(
+        prim='IF_NONE',
+        args=[[], FAIL],
+    )
 
 
 @macro('^ASSERT_SOME$')
 def expand_assert_some(prim, annots, args) -> dict:
     assert not args
-    return expr(prim='IF_NONE',
-                args=[FAIL, [expr(prim='RENAME', annots=annots)]])
+    return expr(
+        prim='IF_NONE',
+        args=[FAIL, [expr(prim='RENAME', annots=annots)]],
+    )
 
 
 @macro('^ASSERT_LEFT$')
 def expand_assert_left(prim, annots, args) -> dict:
     assert not args
-    return expr(prim='IF_LEFT',
-                args=[[expr(prim='RENAME', annots=annots)], FAIL])
+    return expr(
+        prim='IF_LEFT',
+        args=[[expr(prim='RENAME', annots=annots)], FAIL],
+    )
 
 
 @macro('^ASSERT_RIGHT$')
 def expand_assert_right(prim, annots, args) -> dict:
     assert not args
-    return expr(prim='IF_LEFT',
-                args=[FAIL, [expr(prim='RENAME', annots=annots)]])
+    return expr(
+        prim='IF_LEFT',
+        args=[FAIL, [expr(prim='RENAME', annots=annots)]],
+    )
 
 
 @macro(r'^D(II+)P$')
@@ -179,7 +216,11 @@ def expand_dixp(prim, annots, args) -> dict:
 def expand_duxp(prim, annots, args) -> dict:
     assert not args
     depth = len(prim)
-    return expr(prim='DUP', annots=annots, args=[{'int': str(depth)}])
+    return expr(
+        prim='DUP',
+        annots=annots,
+        args=[{'int': str(depth)}],
+    )
 
 
 def build_pxr_tree(pxr_macro, pxr_annots) -> PxrNode:
@@ -189,10 +230,22 @@ def build_pxr_tree(pxr_macro, pxr_annots) -> PxrNode:
             dip_depth = depth
             left, l_annot, prim, annots, depth = parse(prim, annots, depth)
             right, r_annot, prim, annots, depth = parse(prim, annots, depth)
-            return PxrNode(dip_depth, [l_annot, r_annot], [left, right], is_root), None, prim, annots, depth
+            return (
+                PxrNode(
+                    dip_depth,
+                    [l_annot, r_annot],
+                    [left, right],
+                    is_root,
+                ),
+                None,
+                prim,
+                annots,
+                depth,
+            )
         else:
             annot, annots = (annots[0], annots[1:]) if annots else (None, [])
             return letter, annot, prim, annots, depth + 1
+
     root, _, _, _, _ = parse(pxr_macro, pxr_annots, is_root=True)
     return root
 
@@ -237,44 +290,78 @@ def expand_cxr(prim, annots) -> list:
 @macro(r'^CA([AD]+)R$')
 def expand_caxr(prim, annots, args) -> list:
     assert not args
-    return [CAR, *expand_cxr(prim, annots)]
+    return [
+        CAR,
+        *expand_cxr(prim, annots),
+    ]
 
 
 @macro(r'^CD([AD]+)R$')
 def expand_cdxr(prim, annots, args) -> list:
     assert not args
-    return [CDR, *expand_cxr(prim, annots)]
+    return [
+        CDR,
+        *expand_cxr(prim, annots),
+    ]
 
 
 @macro(r'^IF_SOME$')
 def expand_if_some(prim, annots, args) -> dict:
     assert not annots
     assert len(args) == 2
-    return expr(prim='IF_NONE', args=list(reversed(args)))
+    return expr(
+        prim='IF_NONE',
+        args=list(reversed(args)),
+    )
 
 
 @macro(r'^IF_RIGHT$')
 def expand_if_right(prim, annots, args) -> dict:
     assert not annots
     assert len(args) == 2
-    return expr(prim='IF_LEFT', args=list(reversed(args)))
+    return expr(
+        prim='IF_LEFT',
+        args=list(reversed(args)),
+    )
 
 
 @macro(r'^SET_CAR$')
 def expand_set_car(prim, annots, args) -> list:
     assert not args
-    return [SWAP, expr(prim='UPDATE', args=[{'int': '1'}], annots=annots)]
+    return [
+        SWAP,
+        expr(
+            prim='UPDATE',
+            args=[{'int': '1'}],
+            annots=annots,
+        ),
+    ]
 
 
 @macro(r'^SET_CDR$')
 def expand_set_cdr(prim, annots, args) -> list:
     assert not args
-    return [SWAP, expr(prim='UPDATE', args=[{'int': '2'}], annots=annots)]
+    return [
+        SWAP,
+        expr(
+            prim='UPDATE',
+            args=[{'int': '2'}],
+            annots=annots,
+        ),
+    ]
 
 
 def expand_set_cxr(prim, annots):
-    set_cxr = expand_macro(prim=f'SET_C{prim}R', annots=get_field_annots(annots), args=[], internal=True)
-    pair = expr(prim='PAIR', annots=['%@', '%@'] + get_var_annots(annots))
+    set_cxr = expand_macro(
+        prim=f'SET_C{prim}R',
+        annots=get_field_annots(annots),
+        args=[],
+        internal=True,
+    )
+    pair = expr(
+        prim='PAIR',
+        annots=['%@', '%@'] + get_var_annots(annots),
+    )
     return set_cxr, pair
 
 
@@ -282,21 +369,25 @@ def expand_set_cxr(prim, annots):
 def expand_set_caxr(prim, annots, args) -> list:
     assert not args
     set_cxr, pair = expand_set_cxr(prim, annots)
-    return [DUP,
-            dip_n([CAR__, set_cxr]),
-            CDR__,
-            SWAP,
-            pair]
+    return [
+        DUP,
+        dip_n([CAR__, set_cxr]),
+        CDR__,
+        SWAP,
+        pair,
+    ]
 
 
 @macro(r'^SET_CD([AD]+)R$')
 def expand_set_cdxr(prim, annots, args) -> list:
     assert not args
     set_cxr, pair = expand_set_cxr(prim, annots)
-    return [DUP,
-            dip_n([CDR__, set_cxr]),
-            CAR__,
-            pair]
+    return [
+        DUP,
+        dip_n([CDR__, set_cxr]),
+        CAR__,
+        pair,
+    ]
 
 
 def get_map_cxr_annots(annots) -> Tuple[str, list]:
@@ -311,44 +402,74 @@ def get_map_cxr_annots(annots) -> Tuple[str, list]:
 @macro(r'^MAP_CAR$')
 def expand_map_car(prim, annots, args) -> list:
     car_annot, var_annots = get_map_cxr_annots(annots)
-    return [DUP,
-            CDR__,
-            dip_n([expr(prim='CAR', annots=var_annots), *args]),
-            SWAP,
-            expr(prim='PAIR', annots=[car_annot, '%@'])]
+    return [
+        DUP,
+        CDR__,
+        dip_n(
+            [
+                expr(
+                    prim='CAR',
+                    annots=var_annots,
+                ),
+                *args,
+            ]
+        ),
+        SWAP,
+        expr(
+            prim='PAIR',
+            annots=[car_annot, '%@'],
+        ),
+    ]
 
 
 @macro(r'^MAP_CDR$')
 def expand_map_cdr(prim, annots, args) -> list:
     cdr_annot, var_annots = get_map_cxr_annots(annots)
-    return [DUP,
-            expr(prim='CDR', annots=var_annots),
-            *args,
-            SWAP,
-            CAR__,
-            expr(prim='PAIR', annots=['%@', cdr_annot])]
+    return [
+        DUP,
+        expr(prim='CDR', annots=var_annots),
+        *args,
+        SWAP,
+        CAR__,
+        expr(
+            prim='PAIR',
+            annots=['%@', cdr_annot],
+        ),
+    ]
 
 
 def expand_map_cxr(prim, annots, args):
-    set_cxr = expand_macro(prim=f'MAP_C{prim}R', annots=get_field_annots(annots), args=args, internal=True)
-    pair = expr(prim='PAIR', annots=['%@', '%@'] + get_var_annots(annots))
+    set_cxr = expand_macro(
+        prim=f'MAP_C{prim}R',
+        annots=get_field_annots(annots),
+        args=args,
+        internal=True,
+    )
+    pair = expr(
+        prim='PAIR',
+        annots=['%@', '%@'] + get_var_annots(annots),
+    )
     return set_cxr, pair
 
 
 @macro(r'^MAP_CA([AD]+)R$')
 def expand_map_caxr(prim, annots, args) -> list:
     map_cxr, pair = expand_map_cxr(prim, annots, args)
-    return [DUP,
-            dip_n([CAR__, map_cxr]),
-            CDR__,
-            SWAP,
-            pair]
+    return [
+        DUP,
+        dip_n([CAR__, map_cxr]),
+        CDR__,
+        SWAP,
+        pair,
+    ]
 
 
 @macro(r'^MAP_CD([AD]+)R$')
 def expand_map_cdxr(prim, annots, args) -> list:
     map_cxr, pair = expand_map_cxr(prim, annots, args)
-    return [DUP,
-            dip_n([CDR__, map_cxr]),
-            CAR__,
-            pair]
+    return [
+        DUP,
+        dip_n([CDR__, map_cxr]),
+        CAR__,
+        pair,
+    ]

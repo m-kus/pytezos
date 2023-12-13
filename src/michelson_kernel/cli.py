@@ -2,12 +2,13 @@ import json
 import os
 import shutil
 import sys
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from tempfile import TemporaryDirectory
 
 import click
-from ipykernel.kernelapp import IPKernelApp  # type: ignore
-from jupyter_client.kernelspec import KernelSpecManager  # type: ignore
+from ipykernel.kernelapp import IPKernelApp
+from jupyter_client.kernelspec import KernelSpecManager
 
 from michelson_kernel import __version__
 from michelson_kernel.kernel import MichelsonKernel
@@ -47,7 +48,7 @@ def install(_ctx) -> None:
         with open(os.path.join(td, 'kernel.json'), 'w') as f:
             json.dump(kernel_json, f, sort_keys=True)
 
-        kernel_spec.install_kernel_spec(td, 'michelson', prefix=sys.prefix)
+        kernel_spec.install_kernel_spec(td, 'michelson', user=True)
 
 
 @cli.command(help='Remove Michelson kernel from current environment')

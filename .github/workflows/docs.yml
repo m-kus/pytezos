@@ -1,0 +1,50 @@
+name: Docs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    tags:
+      - "*.*.*"
+    branches:
+      - "**"
+    paths:
+      - "docs/**"
+      - "scripts/**"
+      - ".github/workflows/docs.yml"
+
+jobs:
+  docs:
+    name: Docs
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Configure poetry
+        run: poetry config installer.modern-installation false
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+
+      - name: Install binary dependencies
+        run: OSTYPE=$OSTYPE make install-deps
+
+      - name: Install project
+        run: make install
+
+      - name: Make docs
+        run: poetry run make docs
+
+      - name: Deploy to GH Pages
+        if: github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html

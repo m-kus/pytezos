@@ -175,7 +175,10 @@ class PreapplyBlockQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/preapply/b
         """
         return self._post(
             json=block,
-            params=dict(sort=sort, timestamp=timestamp),
+            params={
+                'sort': sort,
+                'timestamp': timestamp,
+            },
         )
 
 
@@ -261,6 +264,34 @@ class ScriptsRunCodeQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/r
                 "source": <account address>,  // optional
                 "payer": <account address>,  // optional
                 "gas": <bignum>  // optional
+            }
+
+        :param invocation: JSON input
+        :returns: Resulting storage, spawned operations, and bigmap diff
+        """
+        return self._post(json=invocation)
+
+
+class ScriptsRunScriptViewQuery(RpcQuery, path='/chains/{}/blocks/{}/helpers/scripts/run_script_view'):
+    def post(self, invocation):
+        """Simulate a call to a michelson view
+
+        invocation format:
+
+        .. code-block:: python
+
+            {
+                "contract": <address>,
+                "view": <string>,
+                "input": <michelson expression>,
+                "unlimited_gas": <boolean>,
+                "chain_id": <base58 encoded>,
+                "source": <account address>,  // optional
+                "payer": <account address>,  // optional
+                "gas": <bignum>,  // optional
+                "unparsing_mode": <Readable | Optimized | Optimized_legacy>,
+                "now": <integer>,  // optional
+                "level": <integer>,  // optional
             }
 
         :param invocation: JSON input

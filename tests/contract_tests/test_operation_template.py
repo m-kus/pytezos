@@ -1,17 +1,17 @@
-from unittest import TestCase
-from os.path import dirname, join
 import json
+from os.path import dirname
+from os.path import join
+from unittest import TestCase
 
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.program import MichelsonProgram
-from pytezos.michelson.types.big_map import big_map_diff_to_lazy_diff
-from pytezos.michelson.forge import forge_micheline, unforge_micheline
 
-folder = 'dexter_usdtz_xtz'
-entrypoint = 'removeLiquidity'
+folder = 'typed_minter'
+entrypoint = 'mint_TYPED'
 
 
 class MainnetOperationTestCaseTemplate(TestCase):
-
     @classmethod
     def setUpClass(cls):
         with open(join(dirname(__file__), f'{folder}', '__script__.json')) as f:
@@ -36,8 +36,9 @@ class MainnetOperationTestCaseTemplate(TestCase):
 
     def test_lazy_storage_template(self):
         storage = self.program.storage.from_micheline_value(self.operation['storage'])
-        lazy_diff = big_map_diff_to_lazy_diff(self.operation['big_map_diff'])
-        extended_storage = storage.merge_lazy_diff(lazy_diff)
+        lazy_storage_diff = self.operation['lazy_storage_diff']
+
+        extended_storage = storage.merge_lazy_diff(lazy_storage_diff)
         py_obj = extended_storage.to_python_object(try_unpack=True, lazy_diff=True)
         # pprint(py_obj)
 

@@ -1,12 +1,15 @@
-from typing import Generator, List, Tuple, Type
+from typing import Generator
+from typing import List
+from typing import Tuple
+from typing import Type
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline, MichelineSequence
+from pytezos.context.abstract import AbstractContext
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.types.base import MichelsonType
 
 
 class ListType(MichelsonType, prim='list', args_len=1):
-
     def __init__(self, items: List[MichelsonType]):
         super(ListType, self).__init__()
         self.items = items
@@ -69,7 +72,15 @@ class ListType(MichelsonType, prim='list', args_len=1):
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         assert not comparable, f'list is not comparable'
-        return list(map(lambda x: x.to_python_object(try_unpack=try_unpack, lazy_diff=lazy_diff), self))
+        return list(
+            map(
+                lambda x: x.to_python_object(
+                    try_unpack=try_unpack,
+                    lazy_diff=lazy_diff,
+                ),
+                self,
+            )
+        )
 
     def merge_lazy_diff(self, lazy_diff: List[dict]) -> 'MichelsonType':
         items = [item.merge_lazy_diff(lazy_diff) for item in self]

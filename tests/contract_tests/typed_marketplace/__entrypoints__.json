@@ -1,0 +1,66 @@
+{
+  "entrypoints": {
+    "update_royalties": {
+      "prim": "nat"
+    },
+    "update_fee": {
+      "prim": "nat"
+    },
+    "swap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%fa2"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%objkt_id"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%objkt_amount"
+          ]
+        },
+        {
+          "prim": "mutez",
+          "annots": [
+            "%xtz_per_objkt"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%royalties"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%creator"
+          ]
+        }
+      ]
+    },
+    "set_pause_swaps": {
+      "prim": "bool"
+    },
+    "set_pause_collects": {
+      "prim": "bool"
+    },
+    "payout_balance": {
+      "prim": "unit"
+    },
+    "collect": {
+      "prim": "nat"
+    },
+    "cancel_swap": {
+      "prim": "nat"
+    }
+  }
+}

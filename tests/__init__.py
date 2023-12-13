@@ -1,1 +1,1 @@
-import michelson_kernel # pylint: disable=unused-import
+import michelson_kernel  # pylint: disable=unused-import

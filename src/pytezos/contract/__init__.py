@@ -1,6 +1,8 @@
 from contextlib import suppress
-from datetime import datetime, timezone
-from typing import Any, Type
+from datetime import datetime
+from datetime import timezone
+from typing import Any
+from typing import Type
 
 import dateutil.parser
 from cattr import Converter

@@ -1,7 +1,8 @@
 import inspect
 import re
 import sys
-from functools import lru_cache, update_wrapper
+from functools import lru_cache
+from functools import update_wrapper
 from typing import Optional
 
 

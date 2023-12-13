@@ -1,0 +1,136 @@
+{
+  "entrypoints": {
+    "tez_to_ctez_callback": {
+      "prim": "nat"
+    },
+    "tez_to_ctez": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%minCashBought"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%recipient"
+          ]
+        }
+      ]
+    },
+    "remove_liquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%lqtBurned"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%minCashWithdrawn"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%minTezWithdrawn"
+          ]
+        }
+      ]
+    },
+    "forwardFee": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%epoch"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%feeDistributor"
+          ]
+        }
+      ]
+    },
+    "default": {
+      "prim": "unit"
+    },
+    "ctez_to_tez_callback": {
+      "prim": "nat"
+    },
+    "ctez_to_tez": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%cashSold"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%minTezBought"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%recipient"
+          ]
+        }
+      ]
+    },
+    "add_liquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%maxCashDeposited"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%minLqtMinted"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%owner"
+          ]
+        }
+      ]
+    },
+    "ChangeSystem": {
+      "prim": "address"
+    },
+    "ChangeState": {
+      "prim": "unit"
+    },
+    "ChangeLockState": {
+      "prim": "unit"
+    },
+    "ChangeBakerAddress": {
+      "prim": "option",
+      "args": [
+        {
+          "prim": "key_hash"
+        }
+      ]
+    },
+    "ChangeAdmin": {
+      "prim": "address"
+    }
+  }
+}

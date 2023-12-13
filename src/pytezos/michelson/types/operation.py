@@ -1,11 +1,12 @@
-from typing import Any, Optional, Type
+from typing import Any
+from typing import Optional
+from typing import Type
 
 from pytezos.michelson.micheline import MichelineSequence
 from pytezos.michelson.types.base import MichelsonType
 
 
 class OperationType(MichelsonType, prim='operation'):
-
     def __init__(self, content: dict, ty: Optional[Type[MichelsonType]] = None):
         super(OperationType, self).__init__()
         self.content = content
@@ -20,20 +21,22 @@ class OperationType(MichelsonType, prim='operation'):
         return self.content == other.content
 
     @classmethod
-    def origination(cls,
-                    source: str,
-                    script: Type[MichelineSequence],
-                    storage: MichelsonType,
-                    balance: int = 0,
-                    delegate: Optional[str] = None) -> 'OperationType':
+    def origination(
+        cls,
+        source: str,
+        script: Type[MichelineSequence],
+        storage: MichelsonType,
+        balance: int = 0,
+        delegate: Optional[str] = None,
+    ) -> 'OperationType':
         content = {
             'kind': 'origination',
             'source': source,
             'script': {
                 'code': script.as_micheline_expr(),
-                'storage': storage.to_micheline_value()
+                'storage': storage.to_micheline_value(),
             },
-            'balance': str(balance)
+            'balance': str(balance),
         }
         if delegate is not None:
             content['delegate'] = delegate
@@ -44,13 +47,20 @@ class OperationType(MichelsonType, prim='operation'):
         content = {
             'kind': 'delegation',
             'source': source,
-            'delegate': delegate
+            'delegate': delegate,
         }
         return cls(content)
 
     @classmethod
-    def transaction(cls, source: str, destination: str, amount: int, entrypoint: str, value: Any, param_type: Type[MichelsonType]) \
-            -> 'OperationType':
+    def transaction(
+        cls,
+        source: str,
+        destination: str,
+        amount: int,
+        entrypoint: str,
+        value: Any,
+        param_type: Type[MichelsonType],
+    ) -> 'OperationType':
         content = {
             'kind': 'transaction',
             'source': source,
@@ -58,10 +68,21 @@ class OperationType(MichelsonType, prim='operation'):
             'amount': str(amount),
             'parameters': {
                 'entrypoint': entrypoint,
-                'value': value
-            }
+                'value': value,
+            },
         }
         return cls(content, ty=param_type)
+
+    @classmethod
+    def event(cls, source: str, event_type: Type[MichelsonType], payload: Any, tag: str) -> 'OperationType':
+        content = {
+            'kind': 'event',
+            'source': source,
+            'event_type': event_type.as_micheline_expr(),
+            'payload': payload,
+            'tag': tag,
+        }
+        return cls(content, ty=event_type)
 
     def to_python_object(self, try_unpack=False, lazy_diff=False, comparable=False):
         kind = self.content['kind']
@@ -70,6 +91,8 @@ class OperationType(MichelsonType, prim='operation'):
             data = self.ty.from_micheline_value(self.content['parameters']['value'])
         elif kind == 'origination':
             data = self.ty.from_micheline_value(self.content['script']['storage'])
+        elif kind == 'event':
+            data = self.ty.from_micheline_value(self.content['payload'])
         else:
-            assert False, f'not applicable for {kind}'
+            raise AssertionError(f'not applicable for {kind}')
         return data.to_python_object(try_unpack=try_unpack)

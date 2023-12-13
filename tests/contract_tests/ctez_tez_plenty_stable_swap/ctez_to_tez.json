@@ -1,0 +1,143 @@
+{
+  "parameters": {
+    "entrypoint": "ctez_to_tez",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "10000000"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "10618794"
+            },
+            {
+              "string": "tz1ZL7ekzieKxwngCCyjsCN5qhu1ohwJQEBy"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "prim": "True"
+              },
+              {
+                "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+              }
+            ]
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              {
+                "bytes": "01c71a724e60088d398e7724739faa7488dfab46b100"
+              },
+              {
+                "int": "0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "19991543628"
+          },
+          {
+            "bytes": "0157006fcca7770ededb7fc644a1a354f7ebbdae1800"
+          }
+        ]
+      },
+      {
+        "int": "1000"
+      },
+      {
+        "bytes": "013463d7aff77ae4d127b2740650998919b2b5535700"
+      },
+      {
+        "int": "41373385577"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Some",
+              "args": [
+                {
+                  "int": "10618794"
+                }
+              ]
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Some",
+              "args": [
+                {
+                  "bytes": "0000962e69da4522f40dea8b9e8d1b87cad56fcde40f"
+                }
+              ]
+            },
+            {
+              "prim": "Some",
+              "args": [
+                {
+                  "bytes": "0000962e69da4522f40dea8b9e8d1b87cad56fcde40f"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "False"
+        },
+        {
+          "int": "21406012530"
+        }
+      ]
+    },
+    {
+      "prim": "Some",
+      "args": [
+        {
+          "int": "10000000"
+        }
+      ]
+    },
+    {
+      "prim": "None"
+    },
+    {
+      "int": "0"
+    }
+  ],
+  "lazy_storage_diff": []
+}

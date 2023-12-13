@@ -21,11 +21,11 @@ define([
                 // data
                 { regex: /(?:Unit|True|False|Pair|Left|Right|Some|None|Elt)(?=\s|;|\)|$)/, token: "keyword" },
                 // instruction
-                { regex: /(?:INT|ISNAT|CAST|RENAME|DROP|DUP|SWAP|PUSH|SOME|NONE|UNIT|IF_NONE|PAIR|CAR|CDR|LEFT|RIGHT|IF_LEFT|IF_RIGHT|NIL|CONS|IF_CONS|SIZE|EMPTY_SET|EMPTY_MAP|MAP|ITER|MEM|GET|UPDATE|IF|LOOP|LOOP_LEFT|LAMBDA|EXEC|DIP|FAILWITH|CONCAT|SLICE|PACK|UNPACK|ADD|SUB|MUL|EDIV|ABS|NEG|LSL|LSR|OR|AND|XOR|NOT|COMPARE|EQ|NEQ|LT|GT|LE|GE|CHECK_SIGNATURE|BLAKE2B|SHA256|SHA512|HASH_KEY|DIG|DUG|EMPTY_BIG_MAP|APPLY|NEVER|UNPAIR|VOTING_POWER|KECCAK|SHA3|PAIRING_CHECK|SAPLING_VERIFY_UPDATE|TICKET|READ_TICKET|SPLIT_TICKET|JOIN_TICKETS|GET_AND_UPDATE)(?=\s|;|\}|$)/, token: "meta"},
-                { regex: /(?:SELF|CONTRACT|TRANSFER_TOKENS|SET_DELEGATE|CREATE_CONTRACT|IMPLICIT_ACCOUNT|NOW|AMOUNT|BALANCE|STEPS_TO_QUOTA|SOURCE|SENDER|ADDRESS|CHAIN_ID|LEVEL|SELF_ADDRESS|TOTAL_VOTING_POWER|SAPLING_EMPTY_STATE)(?=\s|;|\}|$)/, token: "operator"},
+                { regex: /(?:INT|ISNAT|NAT|BYTES|CAST|RENAME|DROP|DUP|SWAP|PUSH|SOME|NONE|UNIT|IF_NONE|PAIR|CAR|CDR|LEFT|RIGHT|IF_LEFT|IF_RIGHT|NIL|CONS|IF_CONS|SIZE|EMPTY_SET|EMPTY_MAP|MAP|ITER|MEM|GET|UPDATE|IF|LOOP|LOOP_LEFT|LAMBDA|EXEC|DIP|FAILWITH|CONCAT|SLICE|PACK|UNPACK|ADD|SUB|MUL|EDIV|ABS|NEG|LSL|LSR|OR|AND|XOR|NOT|COMPARE|EQ|NEQ|LT|GT|LE|GE|CHECK_SIGNATURE|BLAKE2B|SHA256|SHA512|HASH_KEY|DIG|DUG|EMPTY_BIG_MAP|APPLY|NEVER|UNPAIR|VOTING_POWER|KECCAK|SHA3|PAIRING_CHECK|SAPLING_VERIFY_UPDATE|TICKET|READ_TICKET|SPLIT_TICKET|JOIN_TICKETS|GET_AND_UPDATE)(?=\s|;|\}|$)/, token: "meta"},
+                { regex: /(?:SELF|CONTRACT|TRANSFER_TOKENS|SET_DELEGATE|CREATE_CONTRACT|IMPLICIT_ACCOUNT|NOW|AMOUNT|BALANCE|STEPS_TO_QUOTA|SOURCE|SENDER|ADDRESS|CHAIN_ID|LEVEL|SELF_ADDRESS|TOTAL_VOTING_POWER|SAPLING_EMPTY_STATE|MIN_BLOCK_TIME)(?=\s|;|\}|$)/, token: "operator"},
                 // type
                 { regex: /(?:option|list|set|contract|pair|or|lambda|map|big_map)(?=\s|\)|$)/, token: "builtin" },
-                { regex: /(?:key|unit|signature|operation|address|int|nat|string|bytes|mutez|bool|key_hash|timestamp|chain_id|never|bls12_381_g1|bls12_381_g2|bls12_381_fr|sapling_state|sapling_transaction)(?=\s|\)|\}|;|$)/, token: "builtin" },
+                { regex: /(?:key|unit|signature|operation|address|int|nat|string|bytes|mutez|bool|key_hash|timestamp|chain_id|never|bls12_381_g1|bls12_381_g2|bls12_381_fr|sapling_state|sapling_transaction|sapling_transaction_deprecated|tx_rollup_l2_address)(?=\s|\)|\}|;|$)/, token: "builtin" },
                 // macros
                 { regex: /(?:IF_SOME|FAIL|ASSERT|ASSERT_NONE|ASSERT_SOME|ASSERT_LEFT|ASSERT_RIGHT|UNPAIR|(?:SET|MAP)_C[AD]+R)(?=\s|;|\}|$)/, token: "string-2" },
                 { regex: /(?:DII+P|C[AD]{2,}R|DUU+P|P[PAI]{3,}R|UNP[PAI]{3,}R)(?=\s|;|\}|$)/, token: "string-2" },

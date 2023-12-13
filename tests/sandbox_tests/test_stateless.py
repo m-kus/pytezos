@@ -1,10 +1,10 @@
 from random import SystemRandom
 
-from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos import ContractInterface
+from pytezos.crypto.key import Key
 from pytezos.michelson.parse import michelson_to_micheline
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.crypto.key import Key
+from pytezos.sandbox.node import SandboxedNodeTestCase
 
 rnd = SystemRandom()
 
@@ -15,7 +15,6 @@ def get_random_key():
 
 
 class TestStateless(SandboxedNodeTestCase):
-
     def test_now(self):
         code = """
         parameter unit;
@@ -53,20 +52,16 @@ class TestStateless(SandboxedNodeTestCase):
     def test_map_order(self):
         self.bake_block()
 
-        random_keys = [
-            (i, get_random_key())
-            for i in range(100)
-        ]
-        payload = {
-            key.public_key(): i
-            for i, key in random_keys
-        }
+        random_keys = [(i, get_random_key()) for i in range(100)]
+        payload = {key.public_key(): i for i, key in random_keys}
 
         ty_expr = michelson_to_micheline('map key int')
         ty = MichelsonType.match(ty_expr)
         val_expr = ty.from_python_object(payload).to_micheline_value()
 
-        self.client.shell.head.helpers.scripts.typecheck_data.post(dict(
-            data=val_expr,
-            type=ty_expr
-        ))
+        self.client.shell.head.helpers.scripts.typecheck_data.post(
+            {
+                'data': val_expr,
+                'type': ty_expr,
+            }
+        )

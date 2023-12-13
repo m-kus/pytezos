@@ -140,3 +140,5 @@ cython_debug/
 
 .vscode
 .idea/
+
+.flakeheaven_cache/

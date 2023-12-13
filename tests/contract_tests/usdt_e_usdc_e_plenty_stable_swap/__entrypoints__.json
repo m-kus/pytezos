@@ -1,0 +1,130 @@
+{
+  "entrypoints": {
+    "remove_liquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%lpAmount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%recipient"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token1_min"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token2_min"
+          ]
+        }
+      ]
+    },
+    "forwardFee": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%epoch"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%feeDistributor"
+          ]
+        }
+      ]
+    },
+    "add_liquidity": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": [
+            "%recipient"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token1_max"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token2_max"
+          ]
+        }
+      ]
+    },
+    "Swap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%MinimumTokenOut"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%recipient"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%requiredTokenAddress"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%requiredTokenId"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%tokenAmountIn"
+          ]
+        }
+      ]
+    },
+    "ModifyFee": {
+      "prim": "nat"
+    },
+    "ChangeSystem": {
+      "prim": "address"
+    },
+    "ChangeState": {
+      "prim": "unit"
+    },
+    "ChangeAdmin": {
+      "prim": "address"
+    }
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "parameters": {
+    "entrypoint": "oracle_callback",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        {
+          "string": "XTZ-USD"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "1654703820"
+            },
+            {
+              "int": "2042600"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000f2cc25a5d1b28be77ff0a44e2a3ffeca46777f18"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "0"
+                    },
+                    {
+                      "int": "5457601050967808"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "1"
+                    },
+                    {
+                      "int": "2394929683679795"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "2"
+                    },
+                    {
+                      "int": "6209693907896192"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "3"
+                    },
+                    {
+                      "int": "7016432971878886"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "4"
+                    },
+                    {
+                      "int": "987493093853081"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "5"
+                    },
+                    {
+                      "int": "2882019993749657"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "6"
+                    },
+                    {
+                      "int": "4014867357356748"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "7"
+                    },
+                    {
+                      "int": "6482219532487014"
+                    }
+                  ]
+                }
+              ],
+              {
+                "int": "179381"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "bytes": "0116792301dabdff922c0ce6f0f39405b83aeb5bc800"
+      },
+      {
+        "prim": "False"
+      },
+      {
+        "int": "8"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "179382"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "99"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "1654704000"
+        },
+        {
+          "int": "1654012800"
+        }
+      ]
+    },
+    {
+      "int": "179383"
+    },
+    {
+      "bytes": "01125b47ee42ea61efab7225c207480c8b7dcfc8c500"
+    },
+    {
+      "int": "7909"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "179383",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "exprutQkbiKNaV5aj1k6i3mtoReS8W6xBgUFYENQqfdrCixmMc4dMG",
+            "key": {
+              "int": "49"
+            }
+          },
+          {
+            "key_hash": "exprubrcsHKY4Y139ooPwfmCDuEdmMQ1eeke77aLmXDd5eRi7AA6Zz",
+            "key": {
+              "int": "62"
+            }
+          },
+          {
+            "key_hash": "exprubLEsh8heX4o7EQUiaodrScEurez7ZLvvtenXMszkvfYwmEpN2",
+            "key": {
+              "int": "27"
+            }
+          },
+          {
+            "key_hash": "expruSaT2MyUZbskffYFdu9FcpvKgWmBf4NqujDMyuFjj5JCDGo1tB",
+            "key": {
+              "int": "85"
+            }
+          },
+          {
+            "key_hash": "expruRw2ySzFY5rPJQnU146mL5w221qyfe69Weve74hWkc8hdV3BnQ",
+            "key": {
+              "int": "56"
+            }
+          },
+          {
+            "key_hash": "expruG878q64y3mqNkMdpNnwrkXzcBZQGEsE13wdUfTFM9xi4kMUAp",
+            "key": {
+              "int": "64"
+            }
+          },
+          {
+            "key_hash": "expru2dKqDfZG8hu4wNGkiyunvq2hdSKuVYtcKta7BWP6Q18oNxKjS",
+            "key": {
+              "int": "1"
+            }
+          },
+          {
+            "key_hash": "exprtYr3EtdzGJNZ3uSaa7sZbMR61EkPQztyyCuXjDPdNU6FS4Lyq4",
+            "key": {
+              "int": "67"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "179382",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "179381",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

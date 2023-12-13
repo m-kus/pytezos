@@ -1,18 +1,29 @@
 from pprint import pformat
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 from deprecation import deprecated  # type: ignore
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
-from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.crypto.encoding import base58_decode, base58_encode, is_bh
+from pytezos.context.impl import ExecutionContext
+from pytezos.context.mixin import ContextMixin
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
+from pytezos.crypto.encoding import is_bh
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.forge import forge_base58
-from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE, MAX_OPERATIONS_TTL
+from pytezos.operation import DEFAULT_BURN_RESERVE
+from pytezos.operation import DEFAULT_GAS_RESERVE
+from pytezos.operation import MAX_OPERATIONS_TTL
 from pytezos.operation.content import ContentMixin
-from pytezos.operation.fees import calculate_fee, default_fee, default_gas_limit, default_storage_limit
+from pytezos.operation.fees import calculate_fee
+from pytezos.operation.fees import default_fee
+from pytezos.operation.fees import default_gas_limit
+from pytezos.operation.fees import default_storage_limit
 from pytezos.operation.forge import forge_operation_group
 from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
@@ -49,7 +60,8 @@ class OperationGroup(ContextMixin, ContentMixin):
             super().__repr__(),
             '\nPayload',
             pformat(self.json_payload()),
-            '\nHelpers',
+            '\nHash',
+            self.opg_hash or '(Not sent)' '\nHelpers',
             get_class_docstring(self.__class__),
         ]
         return '\n'.join(res)
@@ -103,7 +115,8 @@ class OperationGroup(ContextMixin, ContentMixin):
         (not optimal, use `autofill` to simulate operation and get precise values).
 
         :param counter: Override counter value (for manual handling)
-        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
+        :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, MAX for sandbox),
+            -1 for MAX (if you have a private network and issues with block RPC queries)
         :param gas_limit: Override gas_limit value (for manual handling)
         :param storage_limit: Override storage_limit value (for manual handling)
         :param minimal_nanotez_per_gas_unit: Override minimal_nanotez_per_gas_unit constant (for manual handling)
@@ -115,41 +128,62 @@ class OperationGroup(ContextMixin, ContentMixin):
 
         if ttl is None:
             ttl = self.context.get_operations_ttl()
+        elif ttl == -1:
+            ttl = MAX_OPERATIONS_TTL
         if not 0 < ttl <= MAX_OPERATIONS_TTL:
-            raise Exception('`ttl` has to be in range (0, 60]')
+            raise Exception(f'`ttl` has to be in range (0, {MAX_OPERATIONS_TTL}]')
 
         chain_id = self.chain_id or self.context.get_chain_id()
         protocol = self.protocol or self.context.get_protocol()
         branch = self.branch or self.shell.blocks[f'head~{MAX_OPERATIONS_TTL - ttl}'].hash()
         source = self.key.public_key_hash()
+        constants = self.shell.head.context.constants()
 
         if counter is not None:
             self.context.set_counter(counter - 1)  # which is supposedly the current state (head)
+
+        if gas_limit is None:
+            hard_gas_limit_per_content = int(constants['hard_gas_limit_per_operation']) // len(self.contents)
+        else:
+            hard_gas_limit_per_content = gas_limit // len(self.contents)
+
+        if storage_limit is None:
+            hard_storage_limit_per_content = int(constants['hard_storage_limit_per_operation']) // len(self.contents)
+        else:
+            hard_storage_limit_per_content = storage_limit // len(self.contents)
 
         replace_map = {
             'pkh': source,
             'source': source,
             'delegate': source,  # self registration
-            'counter': lambda x: str(self.context.get_counter()),
-            'secret': lambda x: self.key.activation_code,
-            'period': lambda x: str(self.shell.head.voting_period()),
-            'public_key': lambda x: self.key.public_key(),
-            'gas_limit': lambda x: str(gas_limit) if gas_limit is not None else str(default_gas_limit(x, self.context.constants)),
-            'storage_limit': lambda x: str(storage_limit)
-            if storage_limit is not None
-            else str(default_storage_limit(x, self.context.constants)),
-            'fee': lambda x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit)),
+            'counter': lambda i, x: str(self.context.get_counter()),
+            'secret': lambda i, x: self.key.activation_code,
+            'period': lambda i, x: str(self.shell.head.voting_period()),
+            'public_key': lambda i, x: self.key.public_key(),
+            'gas_limit': lambda i, x: str(
+                min(
+                    hard_gas_limit_per_content,
+                    gas_limit if gas_limit is not None else default_gas_limit(x, constants),
+                )
+            ),
+            'storage_limit': lambda i, x: str(
+                min(
+                    hard_storage_limit_per_content,
+                    storage_limit if storage_limit is not None else default_storage_limit(x, constants),
+                )
+            ),
+            'fee': lambda i, x: str(default_fee(x, gas_limit, minimal_nanotez_per_gas_unit) if i == 0 else 0),
         }
 
-        def fill_content(content):
+        def fill_content(idx, content):
             content = content.copy()
             for k, v in replace_map.items():
                 if content.get(k) in ['', '0']:
-                    content[k] = v(content) if callable(v) else v
+                    content[k] = v(idx, content) if callable(v) else v
             return content
 
         return self._spawn(
-            contents=list(map(fill_content, self.contents)),
+            contents=[fill_content(idx=i, content=x) for i, x in enumerate(self.contents)],
             protocol=protocol,
             chain_id=chain_id,
             branch=branch,
@@ -222,9 +256,9 @@ class OperationGroup(ContextMixin, ContentMixin):
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :param fee: Explicitly set fee for operation. If not set fee will be calculated depending on results of operation dry-run.
         :param gas_limit: Explicitly set gas limit for operation. If not set gas limit will be calculated depending on results of
-            operation dry-run.
+            operation dry-run. In case of batch will be evenly split between operations.
         :param storage_limit: Explicitly set storage limit for operation. If not set storage limit will be calculated depending on
-            results of operation dry-run.
+            results of operation dry-run. In case of batch will be evenly split between operations.
         :rtype: OperationGroup
         """
         if kwargs.get('branch_offset') is not None:
@@ -236,40 +270,46 @@ class OperationGroup(ContextMixin, ContentMixin):
         if not OperationResult.is_applied(opg_with_metadata):
             raise RpcError.from_errors(OperationResult.errors(opg_with_metadata))
 
-        extra_size = (32 + 64) // len(opg.contents) + 1  # size of serialized branch and signature
+        fee_acc = 0
+        extra_size = 32 + 64  # size of serialized branch and signature + safe reserve
+        num_contents = len(opg_with_metadata['contents'])
+        counter_offset = self.context.get_counter_offset()
+        opg.contents.clear()
 
-        def fill_content(content: Dict[str, Any]) -> Dict[str, Any]:
+        for content in opg_with_metadata['contents']:
             if validation_passes[content['kind']] == 3:
-                _gas_limit, _storage_limit, _fee = gas_limit, storage_limit, fee
-
-                if _gas_limit is None:
-                    _gas_limit = OperationResult.consumed_gas(content)
+                if gas_limit is not None:
+                    gas_limit_new = gas_limit // num_contents
+                else:
+                    gas_limit_new = OperationResult.consumed_gas(content)
                     if content['kind'] in ['origination', 'transaction']:
-                        _gas_limit += gas_reserve
+                        gas_limit_new += gas_reserve
 
-                if storage_limit is None:
-                    _paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
-                    _burned = OperationResult.burned(content)
-                    _storage_limit = _paid_storage_size_diff + _burned
+                if storage_limit is not None:
+                    storage_limit_new = storage_limit // num_contents
+                else:
+                    paid_storage_size_diff = OperationResult.paid_storage_size_diff(content)
+                    burned = OperationResult.burned(content)
+                    storage_limit_new = paid_storage_size_diff + burned
                     if content['kind'] in ['origination', 'transaction']:
-                        _storage_limit += burn_reserve
-
-                if _fee is None:
-                    _fee = calculate_fee(content, _gas_limit, extra_size)
+                        storage_limit_new += burn_reserve
 
                 current_counter = int(content['counter'])
                 content.update(
-                    gas_limit=str(_gas_limit),
-                    storage_limit=str(_storage_limit),
-                    fee=str(_fee),
-                    counter=str(current_counter + self.context.get_counter_offset()),
+                    counter=str(current_counter + counter_offset),
+                    gas_limit=str(gas_limit_new),
+                    storage_limit=str(storage_limit_new),
+                    fee='0',
                 )
+                fee_acc += calculate_fee(content, gas_limit_new, extra_size=1 + extra_size // num_contents)
 
             content.pop('metadata')
             logger.debug("autofilled transaction content: %s" % content)
-            return content
+            opg.contents.append(content)
 
-        opg.contents = list(map(fill_content, opg_with_metadata['contents']))
+        if fee or fee_acc:
+            opg.contents[0]['fee'] = str(fee if fee is not None else fee_acc)
+
         return opg
 
     def sign(self) -> 'OperationGroup':

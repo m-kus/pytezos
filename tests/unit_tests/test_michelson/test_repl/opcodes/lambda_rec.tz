@@ -1,0 +1,17 @@
+{ parameter int;
+  storage int;
+  code { CAR;
+         LAMBDA_REC int int {
+         			  SWAP ;
+         			  DUP ;
+                      PUSH int 5 ;
+                      IFCMPEQ { SWAP ; DROP } {
+						PUSH int 1;
+						ADD ;
+						EXEC
+					  }
+					};
+         SWAP;
+         EXEC;
+         NIL operation;
+         PAIR}}

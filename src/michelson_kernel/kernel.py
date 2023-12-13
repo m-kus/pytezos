@@ -1,21 +1,32 @@
 from traceback import format_exception
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
-from ipykernel.kernelbase import Kernel  # type: ignore
+import traitlets
+from ipykernel.kernelbase import Kernel
 from tabulate import tabulate
 
 from michelson_kernel import __version__
 from michelson_kernel.docs import docs
 from pytezos import micheline_to_michelson
-from pytezos.michelson.instructions import BigMapDiffInstruction, CommitInstruction
+from pytezos.michelson.instructions import BigMapDiffInstruction
+from pytezos.michelson.instructions import CommitInstruction
 from pytezos.michelson.instructions.base import MichelsonInstruction
 from pytezos.michelson.instructions.jupyter import RunInstruction
-from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.parse import MichelsonParserError
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.stack import MichelsonStack
 from pytezos.michelson.tags import prim_tags
-from pytezos.michelson.types import OperationType, PairType
+from pytezos.michelson.types import OperationType
+from pytezos.michelson.types import PairType
 from pytezos.michelson.types.domain import LambdaType
 from pytezos.michelson.types.list import ListType
 from pytezos.michelson.types.map import MapType
@@ -68,7 +79,6 @@ static_macros = [
 
 
 def parse_token(line: str, cursor_pos: int) -> Tuple[str, int, int]:
-
     begin_pos = next((i + 1 for i in range(cursor_pos - 1, 0, -1) if line[i] in ' ;({\n'), 0)
     end_pos = next((i for i in range(cursor_pos, len(line)) if line[i] in ' ;){\n'), len(line))
     return line[begin_pos:end_pos], begin_pos, end_pos
@@ -187,10 +197,12 @@ class MichelsonKernel(Kernel):
         'codemirror_mode': 'michelson',
     }
     banner = 'Michelson (Tezos VM language)'
-    help_links = [
-        'https://michelson.nomadic-labs.com/',
-        'https://tezos.gitlab.io/whitedoc/michelson.html',
-    ]
+    help_links = traitlets.List(
+        [
+            'https://michelson.nomadic-labs.com/',
+            'https://tezos.gitlab.io/whitedoc/michelson.html',
+        ]
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -206,7 +218,11 @@ class MichelsonKernel(Kernel):
             },
         )
 
-    def _find_stack_items(self, instructions: MichelineSequence, stack: MichelsonStack) -> Optional[List[MichelsonInstruction]]:
+    def _find_stack_items(
+        self,
+        instructions: MichelineSequence,
+        stack: MichelsonStack,
+    ) -> Optional[List[MichelsonInstruction]]:
         for operation in instructions.items[::-1]:
             items = getattr(operation, 'items', None)
             if isinstance(items, list):
@@ -307,8 +323,16 @@ class MichelsonKernel(Kernel):
         )
         return result
 
-    def do_execute(self, code, silent, store_history=True, user_expressions=None, allow_stdin=False):
-
+    def do_execute(
+        self,
+        code,
+        silent,
+        store_history=True,
+        user_expressions=None,
+        allow_stdin=False,
+        *,
+        cell_id=None,
+    ):
         interpreter_result = self.interpreter.execute(code)
 
         if not silent and interpreter_result.stdout:
@@ -346,7 +370,13 @@ class MichelsonKernel(Kernel):
         res['status'] = 'ok'
         return res
 
-    def do_inspect(self, code, cursor_pos, detail_level=0):
+    def do_inspect(
+        self,
+        code,
+        cursor_pos,
+        detail_level=0,
+        omit_sections=(),
+    ):
         token, _, _ = parse_token(code, cursor_pos)
         docstring = docs.get(token)
         if docstring:

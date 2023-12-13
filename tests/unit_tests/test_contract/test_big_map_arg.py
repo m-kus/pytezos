@@ -1,8 +1,8 @@
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
-from os.path import dirname, join
 
 from pytezos import ContractInterface
-
 
 code = """
 parameter (big_map nat nat);
@@ -13,7 +13,6 @@ bob = "tz1iBobBobBobBobBobBobBobBobBodTWLCX"
 
 
 class BigMapArgTest(TestCase):
-
     def test_pass_big_map_diff(self):
         ci = ContractInterface.from_michelson(code)
         res = ci.call({2: 2}).interpret(storage={1: 1})

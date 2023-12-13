@@ -4,7 +4,8 @@ import tarfile
 from binascii import hexlify
 from collections import OrderedDict
 from tempfile import TemporaryDirectory
-from typing import List, Tuple
+from typing import List
+from typing import Tuple
 
 import netstruct  # type: ignore
 import requests
@@ -13,12 +14,15 @@ from tqdm import tqdm  # type: ignore
 
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import blake2b_32
-from pytezos.jupyter import InlineDocstring, get_class_docstring
-from pytezos.protocol.diff import apply_patch, generate_unidiff_html, make_patch
+from pytezos.jupyter import InlineDocstring
+from pytezos.jupyter import get_class_docstring
+from pytezos.protocol.diff import apply_patch
+from pytezos.protocol.diff import generate_unidiff_html
+from pytezos.protocol.diff import make_patch
 
 
 def dir_to_files(path) -> List[Tuple[str, str]]:
-    files = list()
+    files = []
 
     with open(os.path.join(path, 'TEZOS_PROTOCOL')) as f:
         index = json.load(f)
@@ -42,10 +46,9 @@ def tar_to_files(path=None, raw=None) -> List[Tuple[str, str]]:
     assert path or raw
 
     fileobj = io.BytesIO(raw) if raw else None
-    with tarfile.open(name=path, fileobj=fileobj) as tar:
-        with TemporaryDirectory() as tmp_dir:
-            tar.extractall(tmp_dir)
-            files = dir_to_files(tmp_dir)
+    with tarfile.open(name=path, fileobj=fileobj) as tar, TemporaryDirectory() as tmp_dir:
+        tar.extractall(tmp_dir)
+        files = dir_to_files(tmp_dir)
 
     return files
 
@@ -76,7 +79,7 @@ def files_to_proto(files: List[Tuple[str, str]]) -> dict:
 
     proto = {
         'expected_env_version': 0,  # TODO: this is V1
-        'components': list(components.values())
+        'components': list(components.values()),
     }
     return proto
 
@@ -97,10 +100,11 @@ def files_to_tar(files: List[Tuple[str, str]], output_path=None):
 
     if fileobj:
         return fileobj.getvalue()
+    return None
 
 
 def proto_to_files(proto: dict) -> List[Tuple[str, str]]:
-    files = list()
+    files = []
     extensions = {'interface': 'mli', 'implementation': 'ml'}
 
     for component in proto.get('components', []):
@@ -132,15 +136,14 @@ def proto_to_bytes(proto: dict) -> bytes:
 
 
 class Protocol(metaclass=InlineDocstring):
-
     def __init__(self, proto):
         self._proto = proto
 
     def __repr__(self):
         res = [
-            super(Protocol, self).__repr__(),
+            super().__repr__(),
             '\nHelpers',
-            get_class_docstring(self.__class__)
+            get_class_docstring(self.__class__),
         ]
         return '\n'.join(res)
 
@@ -149,7 +152,7 @@ class Protocol(metaclass=InlineDocstring):
 
     @classmethod
     def from_uri(cls, uri):
-        """ Loads protocol implementation from various sources and converts it to the RPC-like format.
+        """Loads protocol implementation from various sources and converts it to the RPC-like format.
 
         :param uri: link/path to a tar archive or path to a folder with extracted contents
         :returns: Protocol instance
@@ -166,18 +169,18 @@ class Protocol(metaclass=InlineDocstring):
         return Protocol(files_to_proto(files))
 
     def index(self) -> dict:
-        """ Generates TEZOS_PROTOCOL file.
+        """Generates TEZOS_PROTOCOL file.
 
         :returns: dict with protocol hash and modules
         """
         data = {
             'hash': self.hash(),
-            'modules': list(map(lambda x: x['name'], self._proto.get('components', [])))
+            'modules': list(map(lambda x: x['name'], self._proto.get('components', []))),
         }
         return data
 
     def export_tar(self, output_path=None):
-        """ Creates a tarball and dumps to a file or returns bytes.
+        """Creates a tarball and dumps to a file or returns bytes.
 
         :param output_path: Path to the tarball [optional]. You can add .bz2 or .gz extension to make it compressed
         :returns: bytes if path is None or nothing
@@ -187,7 +190,7 @@ class Protocol(metaclass=InlineDocstring):
         return files_to_tar(files, output_path)
 
     def export_html(self, output_path=None):
-        """ Generates github-like side-by-side diff viewe, powered by diff2html.js
+        """Generates github-like side-by-side diff viewe, powered by diff2html.js
 
         :param output_path: will write to this file if specified
         :returns: html string if path is not specified
@@ -196,13 +199,13 @@ class Protocol(metaclass=InlineDocstring):
         return generate_unidiff_html(diffs, output_path=output_path)
 
     def diff(self, proto, context_size=3):
-        """ Calculates file diff between two protocol versions.
+        """Calculates file diff between two protocol versions.
 
         :param proto: an instance of Protocol
         :param context_size: number of context lines before and after the change
         :returns: patch in proto format
         """
-        files = list()
+        files = []
         yours = dict(iter(self))
         theirs = proto_to_files(proto())
 
@@ -211,19 +214,19 @@ class Protocol(metaclass=InlineDocstring):
                 a=yours.get(filename, ''),
                 b=their_text,
                 filename=filename,
-                context_size=context_size
+                context_size=context_size,
             )
             files.append((filename, patch))
 
         return Protocol(files_to_proto(files))
 
     def patch(self, patch):
-        """ Applies unified diff and returns full-fledged protocol.
+        """Applies unified diff and returns full-fledged protocol.
 
         :param patch: an instance of Protocol containing diff of files
         :returns: Protocol instance
         """
-        files = list()
+        files = []
         yours = dict(iter(self))
         diff = proto_to_files(patch())
 

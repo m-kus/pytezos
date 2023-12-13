@@ -1,35 +1,44 @@
-from os.path import exists, expanduser
-from typing import Any, Dict, Optional, Union
+from os.path import exists
+from os.path import expanduser
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
-from pytezos.context.impl import DEFAULT_IPFS_GATEWAY, ExecutionContext  # type: ignore
-from pytezos.crypto.encoding import is_pkh, is_public_key
-from pytezos.crypto.key import Key, is_installed
+from pytezos.context.impl import ExecutionContext
+from pytezos.crypto.encoding import is_pkh
+from pytezos.crypto.encoding import is_public_key
+from pytezos.crypto.key import Key
+from pytezos.crypto.key import is_installed
 from pytezos.jupyter import InlineDocstring
-from pytezos.rpc import RpcMultiNode, RpcNode, ShellQuery
+from pytezos.rpc import RpcMultiNode
+from pytezos.rpc import RpcNode
+from pytezos.rpc import ShellQuery
 from pytezos.rpc.errors import RpcError
 
-default_network = 'ithacanet'
-default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'  # please, use responsibly
+# NOTE: Built-in key for PyTezos client, please, use responsibly.
+default_network = 'ghostnet'
+default_key = 'edsk33N474hxzA4sKeWVM6iuGNGDpX2mGwHNxEA4UbWS8sW3Ta3NKH'
 default_key_hash = 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm'
 
-alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'  # for flextesa sandbox
+# NOTE: For flextesa sandbox
+alice_key = 'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
 alice_key_hash = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
 
-dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'  # for tezos-node in sandboxed mode
+# NOTE: For tezos-node in sandboxed mode
+dictator_key = 'edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6'
 
 nodes = {
-    'mainnet': ['https://mainnet-tezos.giganode.io/',
-                'https://api.tez.ie/',
-                'https://tezos-prod.cryptonomic-infra.tech/'],
+    'mainnet': ['https://rpc.tzkt.io/mainnet'],
     'sandbox': ['http://127.0.0.1:8732/'],
     'sandboxnet': ['http://127.0.0.1:8732/'],
     'localhost': ['http://127.0.0.1:8732/'],
-    'florencenet': ['https://testnet-tezos.giganode.io'],
-    'granadanet': ['https://rpc.tzkt.io/granadanet'],
-    'kaizen': ['https://rpc.tzkt.io/granadanet'],
-    'kaizennet': ['https://rpc.tzkt.io/granadanet'],
-    'hangzhounet': ['https://rpc.tzkt.io/hangzhou2net'],
-    'ithacanet': ['https://rpc.tzkt.io/ithacanet']
+    'ghostnet': ['https://rpc.tzkt.io/ghostnet'],
+    'jakartanet': ['https://rpc.tzkt.io/jakartanet'],
+    'kathmandunet': ['https://rpc.tzkt.io/kathmandunet'],
+    'limanet': ['https://rpc.tzkt.io/limanet'],
+    'mumbainet': ['https://rpc.tzkt.io/mumbainet'],
+    'nairobinet': ['https://rpc.tzkt.io/nairobinet'],
 }
 keys = {
     'alice': alice_key,
@@ -44,16 +53,15 @@ keys = {
 
 
 class KeyHash(Key):
-
     def __init__(self, public_key_hash):
-        super(KeyHash, self).__init__(b'\x00' * 32)
+        super().__init__(b'\x00' * 32)
         self._pkh = public_key_hash
 
     def __repr__(self):
         res = [
-            super(Key, self).__repr__(),
+            super().__repr__(),
             f'\nPublic key hash',
-            self.public_key_hash()
+            self.public_key_hash(),
         ]
         return '\n'.join(res)
 
@@ -74,15 +82,15 @@ class KeyHash(Key):
 
 
 class ContextMixin(metaclass=InlineDocstring):
-    """ Mixin for blockchain interaction, stores node connection and key object.
-    """
+    """Mixin for blockchain interaction, stores node connection and key object."""
 
     def __init__(self, context: Optional[ExecutionContext] = None):
-        super(ContextMixin, self).__init__()
+        super().__init__()
         if context is None:
             context = ExecutionContext(
                 shell=ShellQuery(RpcNode(nodes[default_network][0])),
-                key=Key.from_encoded_key(default_key) if is_installed() else KeyHash(default_key_hash))
+                key=Key.from_encoded_key(default_key) if is_installed() else KeyHash(default_key_hash),
+            )
         self.context = context
 
     @property
@@ -104,10 +112,7 @@ class ContextMixin(metaclass=InlineDocstring):
         return self.context.block_id
 
     def __repr__(self):
-        res = [
-            super(ContextMixin, self).__repr__(),
-            '\nProperties'
-        ]
+        res = [super().__repr__(), '\nProperties']
         if self.context.key is not None:
             res.append(f'.key\t\t{self.key.public_key_hash()}')
         if self.context.shell is not None:
@@ -128,7 +133,7 @@ class ContextMixin(metaclass=InlineDocstring):
         script: Optional[dict] = None,
         ipfs_gateway: Optional[str] = None,
         balance: Optional[int] = None,
-        view_results: Optional[Dict[str, Any]] = None
+        view_results: Optional[Dict[str, Any]] = None,
     ) -> ExecutionContext:
         if isinstance(shell, str):
             if shell.endswith('.pool'):
@@ -173,5 +178,5 @@ class ContextMixin(metaclass=InlineDocstring):
             mode=mode or self.context.mode,
             ipfs_gateway=ipfs_gateway,
             balance=balance or self.context.balance,
-            view_results=view_results
+            view_results=view_results,
         )

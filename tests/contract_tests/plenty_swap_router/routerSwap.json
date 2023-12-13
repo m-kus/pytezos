@@ -1,0 +1,115 @@
+{
+  "parameters": {
+    "entrypoint": "routerSwap",
+    "value": {
+      "prim": "Pair",
+      "args": [
+        [
+          {
+            "prim": "Elt",
+            "args": [
+              {
+                "int": "0"
+              },
+              {
+                "prim": "Pair",
+                "args": [
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  },
+                  {
+                    "prim": "Pair",
+                    "args": [
+                      {
+                        "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX"
+                      },
+                      {
+                        "int": "0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "100000"
+            },
+            {
+              "string": "tz1X7EJX7Q2oBjM2Hur53qmB6yCJmPxttT3h"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "storage": [
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "False"
+            },
+            {
+              "int": "171946"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            [],
+            {
+              "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "0"
+        },
+        {
+          "bytes": "01274b8130fbf7d118f5706502356c262369b3bd6e00"
+        }
+      ]
+    },
+    {
+      "bytes": "01c71a724e60088d398e7724739faa7488dfab46b100"
+    },
+    {
+      "prim": "False"
+    },
+    {
+      "prim": "None"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "171946",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

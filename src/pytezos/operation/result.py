@@ -1,6 +1,11 @@
 import functools
+import math
 import operator
-from typing import Any, Dict, Iterator, List
+from math import ceil
+from typing import Any
+from typing import Dict
+from typing import Iterator
+from typing import List
 
 from pytezos.rpc.errors import RpcError
 
@@ -59,7 +64,7 @@ class OperationResult:
         """
         return sum(
             map(
-                lambda x: int(x.get('consumed_gas', '0')),
+                lambda x: math.ceil(int(x.get('consumed_milligas', '0')) / 1000),
                 OperationResult.iter_results(operation_group),
             ),
         )
@@ -110,7 +115,8 @@ class OperationResult:
         :returns: list of errors [{"id": "", ...}]
         """
         all_errors = (
-            result.get("errors", []) if result["status"] != "applied" else [] for result in OperationResult.iter_results(operation_group)
+            result.get("errors", []) if result["status"] != "applied" else []
+            for result in OperationResult.iter_results(operation_group)
         )
         return functools.reduce(operator.iconcat, all_errors, [])
 
@@ -122,7 +128,7 @@ class OperationResult:
         OR a single content {"kind": "transaction", ...}
         :returns: list of addresses ["tz12345...", ...]
         """
-        originated_contracts = list()
+        originated_contracts = []
         for result in OperationResult.iter_results(operation_group):
             originated_contracts.extend(result.get('originated_contracts', []))
         return originated_contracts
@@ -144,7 +150,7 @@ class OperationResult:
         elif content.get('result'):
             return content['result']
         else:
-            assert False, content
+            raise AssertionError(content)
 
     @classmethod
     def from_operation_group(cls, operation_group: Dict[str, Any], **predicates) -> List['OperationResult']:
@@ -192,7 +198,7 @@ class OperationResult:
         return cls(
             parameters=content.get('parameters'),
             storage=operation_result.get('storage'),
-            lazy_diff=operation_result.get('lazy_diff', []),
+            lazy_diff=operation_result.get('lazy_storage_diff', []),
             # TODO: if it is already an internal operation, we should think... (build a tree?)
             operations=cls.get_contents(content, source=content['destination']),
         )

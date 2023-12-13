@@ -1,23 +1,23 @@
+from contextlib import suppress
 from datetime import datetime
 from itertools import count
 from typing import Iterator
 
-import bson  # type: ignore
-import pendulum
-from pendulum.parsing.exceptions import ParserError
+import simple_bson as bson  # type: ignore
+import strict_rfc3339  # type: ignore
 
-from pytezos.crypto.encoding import is_bh, is_ogh
+from pytezos.crypto.encoding import is_bh
+from pytezos.crypto.encoding import is_ogh
 from pytezos.jupyter import get_attr_docstring
 from pytezos.rpc.query import RpcQuery
 from pytezos.rpc.search import BlockSliceQuery
 
 
 def to_timestamp(v):
-    try:
-        v = pendulum.parse(v)
-    except ParserError:
-        pass
-    if isinstance(v, datetime):
+    if isinstance(v, str):
+        with suppress(strict_rfc3339.InvalidRFC3339Error):
+            v = int(strict_rfc3339.rfc3339_to_timestamp(v))
+    elif isinstance(v, datetime):
         v = int(v.timestamp())
     return v
 
@@ -48,7 +48,7 @@ class BlocksQuery(RpcQuery, path='/chains/{}/blocks'):
         )
 
     def _get_block(self, block_id) -> 'BlockQuery':
-        return super(BlocksQuery, self).__getitem__(block_id)
+        return super().__getitem__(block_id)
 
     def __getitem__(self, block_id):
         """Construct block query or get a block range.
@@ -146,6 +146,7 @@ class BlockQuery(RpcQuery, path='/chains/{}/blocks/{}'):
         pp = self.header().get('content', {}).get('protocol_parameters')
         if pp:
             return bson.loads(bytes.fromhex(pp)[4:])
+        return None
 
 
 class ContractQuery(RpcQuery, path='/chains/{}/blocks/{}/context/contracts/{}'):
@@ -198,20 +199,20 @@ class BigMapGetQuery(RpcQuery, path='/chains/{}/blocks/{}/context/contracts/{}/b
 class ContextRawBytesQuery(RpcQuery, path='/chains/{}/blocks/{}/context/raw/bytes'):
     def __init__(self, *args, **kwargs):
         kwargs.update(timeout=60)
-        super(ContextRawBytesQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __call__(self, depth=1) -> dict:  # type: ignore
         """Return the raw context.
 
         :param depth: Context is a tree structure, default depth is 1
         """
-        return super(ContextRawBytesQuery, self).__call__(depth=depth)
+        return super().__call__(depth=depth)
 
 
 class ContextRawJsonQuery(RpcQuery, path='/chains/{}/blocks/{}/context/raw/json'):
     def __init__(self, *args, **kwargs):
         kwargs.update(timeout=60)
-        super(ContextRawJsonQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ContextSeedQuery(RpcQuery, path='/chains/{}/blocks/{}/context/seed'):
@@ -261,7 +262,7 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
 
             return self[find_index()]
 
-        return super(OperationListListQuery, self).__getitem__(item)
+        return super().__getitem__(item)
 
     @property
     def endorsements(self):
@@ -339,7 +340,10 @@ class OperationListListQuery(RpcQuery, path=['/chains/{}/blocks/{}/operations'])
 
         def is_origination(op):
             def is_it(x):
-                return x['kind'] == 'origination' and contract_id in x['metadata']['operation_result']['originated_contracts']
+                return (
+                    x['kind'] == 'origination'
+                    and contract_id in x['metadata']['operation_result']['originated_contracts']
+                )
 
             return any(
                 map(

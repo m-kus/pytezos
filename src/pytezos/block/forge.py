@@ -1,6 +1,10 @@
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
 
-from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
+from pytezos.michelson.forge import forge_array
+from pytezos.michelson.forge import forge_base58
+from pytezos.michelson.forge import optimize_timestamp
 
 
 def bump_fitness(fitness: List[str]) -> List[str]:
@@ -51,7 +55,11 @@ def forge_protocol_data(protocol_data: Dict[str, Any]) -> bytes:
             res += forge_base58(protocol_data['seed_nonce_hash'])
         else:
             res += b'\x00'
-        res += b'\xFF' if protocol_data['liquidity_baking_escape_vote'] else b'\x00'
+        if protocol_data.get('liquidity_baking_toggle_vote'):
+            res += b'\x01' if protocol_data['liquidity_baking_toggle_vote'] else b'\x00'
+        else:
+            res += b'\xFF' if protocol_data['liquidity_baking_escape_vote'] else b'\x00'
+
     return res
 
 

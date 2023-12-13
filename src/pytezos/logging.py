@@ -18,8 +18,8 @@ DEFAULT_LOGGING_CONFIG = {
     'root': {
         'handlers': ['default'],
         'level': 'INFO',
-        'propagate': False
-    }
+        'propagate': False,
+    },
 }
 
 logger = logging.getLogger('pytezos')

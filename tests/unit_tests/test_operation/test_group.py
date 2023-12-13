@@ -1,7 +1,12 @@
+import json
 from contextlib import suppress
-from pytezos.client import PyTezosClient
+from os.path import dirname
+from os.path import join
 from unittest import TestCase
 from unittest.mock import patch
+
+from pytezos.client import PyTezosClient
+from pytezos.operation.result import OperationResult
 
 
 class TestOperationGroup(TestCase):
@@ -13,10 +18,10 @@ class TestOperationGroup(TestCase):
         testmap = {
             "branch_offset_sandboxed": [5, None, True, 'head~5'],
             "branch_offset_not_sandboxed": [5, None, False, 'head~5'],
-            "ttl_sandboxed": [None, 10, True, 'head~110'],
-            "ttl_not_sandboxed": [None, 10, False, 'head~110'],
+            "ttl_sandboxed": [None, 10, True, 'head~230'],
+            "ttl_not_sandboxed": [None, 10, False, 'head~230'],
             "ttl_sandboxed_default": [None, None, True, 'head~0'],
-            "ttl_not_sandboxed_default": [None, None, False, 'head~115'],
+            "ttl_not_sandboxed_default": [None, None, False, 'head~235'],
         }
 
         client = PyTezosClient()
@@ -33,3 +38,11 @@ class TestOperationGroup(TestCase):
 
                 # Assert
                 rpc_mock.assert_called_with(mock_call)
+
+    def test_operation_result(self):
+        with open(join(dirname(__file__), 'data', 'op3GZiumMFEGWNPae1GDGEG2skKEibhEgusKc7XBG7gzxbSg5SD.json')) as f:
+            data = json.loads(f.read())
+
+        res = OperationResult.from_operation_group(data)
+        self.assertEqual(1, len(res))
+        self.assertEqual(6, len(res[0].lazy_diff))

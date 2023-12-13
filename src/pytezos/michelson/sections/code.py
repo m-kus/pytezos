@@ -1,11 +1,11 @@
-from typing import List, Type
+from typing import List
+from typing import Type
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.micheline import Micheline
 
 
 class CodeSection(Micheline, prim='code', args_len=1):
-
     @staticmethod
     def match(code_expr) -> Type['CodeSection']:
         cls = Micheline.match(code_expr)

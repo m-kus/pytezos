@@ -1,16 +1,37 @@
-from typing import List, Tuple, Type, Union, cast
+from typing import List
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
+from pytezos.context.abstract import AbstractContext
 from pytezos.michelson.instructions.adt import PairInstruction
-from pytezos.michelson.instructions.base import MichelsonInstruction, Wildcard, format_stdout
+from pytezos.michelson.instructions.base import MichelsonInstruction
+from pytezos.michelson.instructions.base import Wildcard
+from pytezos.michelson.instructions.base import format_stdout
 from pytezos.michelson.instructions.stack import PushInstruction
-from pytezos.michelson.micheline import MichelineSequence, MichelsonRuntimeError
+from pytezos.michelson.micheline import MichelineSequence
+from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.stack import MichelsonStack
-from pytezos.michelson.types import BoolType, LambdaType, ListType, MapType, MichelsonType, OptionType, OrType, PairType, SetType
+from pytezos.michelson.types import BoolType
+from pytezos.michelson.types import LambdaType
+from pytezos.michelson.types import ListType
+from pytezos.michelson.types import MapType
+from pytezos.michelson.types import MichelsonType
+from pytezos.michelson.types import OptionType
+from pytezos.michelson.types import OrType
+from pytezos.michelson.types import PairType
+from pytezos.michelson.types import SetType
 
 
-def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],
-                count: int, body: Type[MichelsonInstruction], context: AbstractContext) -> MichelsonInstruction:
+def execute_dip(
+    prim: str,
+    stack: MichelsonStack,
+    stdout: List[str],
+    count: int,
+    body: Type[MichelsonInstruction],
+    context: AbstractContext,
+) -> MichelsonInstruction:
     stdout.append(format_stdout(prim, [*Wildcard.n(count)], []))
     stack.protect(count=count)
     item = body.execute(stack, stdout, context=context)
@@ -20,7 +41,6 @@ def execute_dip(prim: str, stack: MichelsonStack, stdout: List[str],
 
 
 class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
-
     def __init__(self, item: MichelsonInstruction):
         super(DipnInstruction, self).__init__()
         self.item = item
@@ -33,7 +53,6 @@ class DipnInstruction(MichelsonInstruction, prim='DIP', args_len=2):
 
 
 class DipInstruction(MichelsonInstruction, prim='DIP', args_len=1):
-
     def __init__(self, item: MichelsonInstruction):
         super(DipInstruction, self).__init__()
         self.item = item
@@ -45,7 +64,6 @@ class DipInstruction(MichelsonInstruction, prim='DIP', args_len=1):
 
 
 class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         lambda_type = LambdaType.create_type(args=cls.args[:2])
@@ -55,8 +73,26 @@ class LambdaInstruction(MichelsonInstruction, prim='LAMBDA', args_len=3):
         return cls(stack_items_added=1)
 
 
-class ExecInstruction(MichelsonInstruction, prim='EXEC'):
+class LambdaRecInstruction(MichelsonInstruction, prim='LAMBDA_REC', args_len=3):
+    depth = 0
 
+    @classmethod
+    def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
+        lambda_type = LambdaType.create_type(args=cls.args[:2])
+
+        inner = LambdaRecInstruction.create_type(args=cls.args.copy())
+        inner.depth = cls.depth + 1  # type: ignore
+        if cls.depth + 1 > 256:
+            raise MichelsonRuntimeError("Maximum recursive depth reached")
+
+        body = MichelineSequence.create_type(args=[inner, cls.args[2]])
+        res = lambda_type(body)  # type: ignore
+        stack.push(res)
+        stdout.append(format_stdout(cls.prim, [], [res]))  # type: ignore
+        return cls(stack_items_added=1)
+
+
+class ExecInstruction(MichelsonInstruction, prim='EXEC'):
     def __init__(self, item: MichelsonInstruction):
         super(ExecInstruction, self).__init__(stack_items_added=1)
         self.item = item
@@ -78,7 +114,6 @@ class ExecInstruction(MichelsonInstruction, prim='EXEC'):
 
 
 class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         left, lambda_ = cast(Tuple[MichelsonType, LambdaType], stack.pop2())
@@ -87,11 +122,13 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
         left_type, right_type = lambda_.args[0].args
         left.assert_type_equal(left_type)
 
-        new_value = MichelineSequence.create_type(args=[
-            PushInstruction.create_type(args=[left_type, left.to_literal()]),
-            PairInstruction,
-            lambda_.value
-        ])
+        new_value = MichelineSequence.create_type(
+            args=[
+                PushInstruction.create_type(args=[left_type, left.to_literal()]),
+                PairInstruction,
+                lambda_.value,
+            ]
+        )
         res = LambdaType.create_type(args=[right_type, lambda_.args[1]])(new_value)  # type: ignore
         stack.push(res)
         stdout.append(format_stdout(cls.prim, [left, lambda_], [res]))  # type: ignore
@@ -99,7 +136,6 @@ class ApplyInstruction(MichelsonInstruction, prim='APPLY'):
 
 
 class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
-
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
         a = stack.pop1()
@@ -108,7 +144,6 @@ class FailwithInstruction(MichelsonInstruction, prim='FAILWITH'):
 
 
 class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
-
     def __init__(self, item: MichelsonInstruction):
         super(IfInstruction, self).__init__()
         self.item = item
@@ -124,7 +159,6 @@ class IfInstruction(MichelsonInstruction, prim='IF', args_len=2):
 
 
 class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
-
     def __init__(self, stack_items_added: int, item: MichelsonInstruction):
         super(IfConsInstruction, self).__init__(stack_items_added)
         self.item = item
@@ -149,7 +183,6 @@ class IfConsInstruction(MichelsonInstruction, prim='IF_CONS', args_len=2):
 
 
 class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
-
     def __init__(self, item: MichelsonInstruction):
         super(IfLeftInstruction, self).__init__(stack_items_added=1)
         self.item = item
@@ -167,7 +200,6 @@ class IfLeftInstruction(MichelsonInstruction, prim='IF_LEFT', args_len=2):
 
 
 class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
-
     def __init__(self, stack_items_added: int, item: MichelsonInstruction):
         super(IfNoneInstruction, self).__init__(stack_items_added)
         self.item = item
@@ -191,7 +223,6 @@ class IfNoneInstruction(MichelsonInstruction, prim='IF_NONE', args_len=2):
 
 
 class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
-
     def __init__(self, items: List[MichelsonInstruction]):
         super(LoopInstruction, self).__init__()
         self.items = items
@@ -212,7 +243,6 @@ class LoopInstruction(MichelsonInstruction, prim='LOOP', args_len=1):
 
 
 class LoopLeftInstruction(MichelsonInstruction, prim='LOOP_LEFT', args_len=1):
-
     def __init__(self, stack_items_added: int, items: List[MichelsonInstruction]):
         super(LoopLeftInstruction, self).__init__(stack_items_added)
         self.items = items
@@ -237,14 +267,13 @@ class LoopLeftInstruction(MichelsonInstruction, prim='LOOP_LEFT', args_len=1):
 
 
 class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
-
     def __init__(self, stack_items_added: int, items: List[MichelsonInstruction]):
         super(MapInstruction, self).__init__(stack_items_added)
         self.items = items
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        stack_items_added = 0
+        stack_items_added = 0  # noqa: SIM113
         src = cast(Union[ListType, MapType], stack.pop1())
         executions = []
         items = []
@@ -275,14 +304,13 @@ class MapInstruction(MichelsonInstruction, prim='MAP', args_len=1):
 
 
 class IterInstruction(MichelsonInstruction, prim='ITER', args_len=1):
-
     def __init__(self, stack_items_added: int, items: List[MichelsonInstruction]):
         super(IterInstruction, self).__init__(stack_items_added)
         self.items = items
 
     @classmethod
     def execute(cls, stack: MichelsonStack, stdout: List[str], context: AbstractContext):
-        stack_items_added = 0
+        stack_items_added = 0  # noqa: SIM113
         src = cast(Union[ListType, MapType, SetType], stack.pop1())
         executions = []
         popped = [src]

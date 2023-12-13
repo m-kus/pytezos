@@ -1,29 +1,30 @@
-from typing import List, Optional, Tuple
+from hashlib import blake2b  # type: ignore
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from pyblake2 import blake2b  # type: ignore
-
-from pytezos.crypto.encoding import base58_decode, base58_encode
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.key import Key
 
 
 def get_originated_address(index: int, opg_hash=None):
     prefix = base58_decode(opg_hash) if opg_hash else b'\x00' * 32
     nonce = prefix + index.to_bytes(4, 'big')
-    nonce_hash = blake2b(data=nonce, digest_size=20).digest()
+    nonce_hash = blake2b(nonce, digest_size=20).digest()
     return base58_encode(nonce_hash, b'KT1').decode()
 
 
 class KeyHash(Key):
-
     def __init__(self, public_key_hash):
-        super(KeyHash, self).__init__(0)
+        super().__init__(0)
         self._pkh = public_key_hash
 
     def __repr__(self):
         res = [
-            super(Key, self).__repr__(),
+            super().__repr__(),
             f'\nPublic key hash',
-            self.public_key_hash()
+            self.public_key_hash(),
         ]
         return '\n'.join(res)
 
@@ -44,7 +45,6 @@ class KeyHash(Key):
 
 
 class AbstractContext:
-
     def reset(self):
         raise NotImplementedError
 
@@ -201,6 +201,9 @@ class AbstractContext:
     def get_dummy_address(self) -> str:
         raise NotImplementedError
 
+    def get_dummy_txr_address(self) -> str:
+        raise NotImplementedError
+
     def get_dummy_public_key(self) -> str:
         raise NotImplementedError
 
@@ -223,4 +226,7 @@ class AbstractContext:
         raise NotImplementedError
 
     def get_operations_ttl(self) -> int:
+        raise NotImplementedError
+
+    def get_min_block_time(self) -> int:
         raise NotImplementedError

@@ -1,6 +1,8 @@
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
+from pytezos.context.impl import ExecutionContext
 from pytezos.michelson.program import MichelsonProgram
 from pytezos.operation.result import OperationResult
 
@@ -9,14 +11,18 @@ class ContractCallResult(OperationResult):
     """Encapsulates the result of a contract invocation."""
 
     @classmethod
-    def from_run_operation(cls, operation_group: Dict[str, Any], context: ExecutionContext) -> List['ContractCallResult']:
+    def from_run_operation(
+        cls,
+        operation_group: Dict[str, Any],
+        context: ExecutionContext,
+    ) -> List['ContractCallResult']:
         """Get a list of results from an operation group content with metadata.
 
         :param operation_group: {..., "contents": [{..., kind: "transaction", ...}]}
         :param context: execution context
         :rtype: ContractCallResult
         """
-        results: List['OperationResult'] = list()
+        results: List['OperationResult'] = []
         for content in OperationResult.iter_contents(operation_group):
             if content['kind'] == 'transaction':
                 if content['destination'] == context.address:

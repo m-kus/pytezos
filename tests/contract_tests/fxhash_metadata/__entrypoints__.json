@@ -1,0 +1,43 @@
+{
+  "entrypoints": {
+    "set_splits": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%address"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%pct"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "set_metadata": {
+      "prim": "big_map",
+      "args": [
+        {
+          "prim": "string"
+        },
+        {
+          "prim": "bytes"
+        }
+      ]
+    },
+    "set_administrator": {
+      "prim": "address"
+    },
+    "default": {
+      "prim": "unit"
+    }
+  }
+}

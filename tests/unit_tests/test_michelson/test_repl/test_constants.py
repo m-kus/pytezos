@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from pytezos.contract.interface import ContractInterface, ExecutionContext
+from pytezos.contract.interface import ContractInterface
+from pytezos.contract.interface import ExecutionContext
 
 source = """
 parameter (constant "exprvKFFbc7SnPjkPZgyhaHewQhmrouNjNae3DpsQ8KuADn9i2WuJ8") ;
@@ -12,7 +13,6 @@ code { DROP;
 
 
 class GlobalConstantsTestCase(TestCase):
-
     def test_resolve_code(self):
         context = ExecutionContext()
         context.register_global_constant({'prim': 'int'})

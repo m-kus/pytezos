@@ -1,19 +1,24 @@
 from decimal import Decimal
 from pprint import pformat
-from typing import Any, Dict, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
 from deprecation import deprecated  # type: ignore
 
-from pytezos.context.impl import ExecutionContext  # type: ignore
-from pytezos.context.mixin import ContextMixin  # type: ignore
+from pytezos.context.impl import ExecutionContext
+from pytezos.context.mixin import ContextMixin
 from pytezos.contract.result import ContractCallResult
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.format import micheline_to_michelson
 from pytezos.michelson.repl import Interpreter
 from pytezos.michelson.sections.storage import StorageSection
-from pytezos.operation import DEFAULT_BURN_RESERVE, DEFAULT_GAS_RESERVE
-from pytezos.operation.content import format_mutez, format_tez
+from pytezos.operation import DEFAULT_BURN_RESERVE
+from pytezos.operation import DEFAULT_GAS_RESERVE
+from pytezos.operation.content import format_mutez
+from pytezos.operation.content import format_tez
 from pytezos.operation.group import OperationGroup
 
 
@@ -81,7 +86,12 @@ class ContractCall(ContextMixin):
         :param ttl: Number of blocks to wait in the mempool before removal (default is 5 for public network, 60 for sandbox)
         :return: OperationGroup with hash filled
         """
-        return self.as_transaction().send(gas_reserve=gas_reserve, burn_reserve=burn_reserve, min_confirmations=min_confirmations, ttl=ttl)
+        return self.as_transaction().send(
+            gas_reserve=gas_reserve,
+            burn_reserve=burn_reserve,
+            min_confirmations=min_confirmations,
+            ttl=ttl,
+        )
 
     def send_async(
         self,
@@ -261,12 +271,17 @@ class ContractCall(ContextMixin):
             return self.run_code(storage=storage, source=source, sender=sender, gas_limit=gas_limit)
         return self.run_operation()
 
-    def callback_view(self):
+    def callback_view(self, storage=None):
         """Get return value of an on-chain callback method.
 
+        :param storage: initial storage as Python object,
+                        if None then the current one will be taken (if context attached), otherwise empty (dummy)
         :returns: Decoded parameters of a callback
         """
-        if self.address:
+        if storage:
+            storage_ty = StorageSection.match(self.context.storage_expr)
+            initial_storage = storage_ty.from_python_object(storage).to_micheline_value(lazy_diff=True)
+        elif self.address:
             initial_storage = self.shell.blocks[self.context.block_id].context.contracts[self.address].storage()
         else:
             storage_ty = StorageSection.match(self.context.storage_expr)

@@ -1,0 +1,662 @@
+{
+  "parameters": {
+    "entrypoint": "close_auction",
+    "value": {
+      "prim": "Unit"
+    }
+  },
+  "storage": [
+    [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000f2cc25a5d1b28be77ff0a44e2a3ffeca46777f18"
+          },
+          {
+            "prim": "Pair",
+            "args": [
+              [
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "1"
+                    },
+                    {
+                      "int": "415"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "2"
+                    },
+                    {
+                      "int": "401"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "3"
+                    },
+                    {
+                      "int": "406"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "4"
+                    },
+                    {
+                      "int": "413"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "5"
+                    },
+                    {
+                      "int": "417"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "6"
+                    },
+                    {
+                      "int": "411"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "7"
+                    },
+                    {
+                      "int": "405"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "8"
+                    },
+                    {
+                      "int": "410"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "9"
+                    },
+                    {
+                      "int": "409"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "10"
+                    },
+                    {
+                      "int": "403"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "11"
+                    },
+                    {
+                      "int": "404"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "12"
+                    },
+                    {
+                      "int": "418"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "13"
+                    },
+                    {
+                      "int": "414"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "14"
+                    },
+                    {
+                      "int": "402"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "15"
+                    },
+                    {
+                      "int": "400"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "16"
+                    },
+                    {
+                      "int": "416"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "17"
+                    },
+                    {
+                      "int": "419"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "18"
+                    },
+                    {
+                      "int": "412"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "19"
+                    },
+                    {
+                      "int": "407"
+                    }
+                  ]
+                },
+                {
+                  "prim": "Elt",
+                  "args": [
+                    {
+                      "int": "20"
+                    },
+                    {
+                      "int": "408"
+                    }
+                  ]
+                }
+              ],
+              {
+                "int": "175093"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          [
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "000017ead727e0dbcf423e4490a2feedb31cba1230ce"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "6"
+                    },
+                    {
+                      "int": "60000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "00002592280450fcb3c22b6b0c134cf47ac843df7f75"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "18"
+                    },
+                    {
+                      "int": "95000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "000027766277bad32de106191afd8e814de2c5a24898"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "9"
+                    },
+                    {
+                      "int": "60000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "00003f147e3eec2dbfdd3f205056228fae21d98ef4bf"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "16"
+                    },
+                    {
+                      "int": "90000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "000075077af7def6f36b8ef4355d8ff61d2771f53dec"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "15"
+                    },
+                    {
+                      "int": "90000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "00008540adfed218b0ad433b60bf8f48a5f220df19d7"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "10"
+                    },
+                    {
+                      "int": "70000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "00009580b88dacc77c3ad0b8401701c1eb24b4d8bf83"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "19"
+                    },
+                    {
+                      "int": "100000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000b34af244a12a6b5da78020be3d8554638314c275"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "11"
+                    },
+                    {
+                      "int": "65000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000b3b9e537683e30067e9d821429d2c16d9b8f938e"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "5"
+                    },
+                    {
+                      "int": "60000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000b845078b52d9e273fe62012f4da12dbb50bb97ce"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "20"
+                    },
+                    {
+                      "int": "120000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000ba09824aceb0591ece8b56129bef19ac7969103d"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "12"
+                    },
+                    {
+                      "int": "70000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000c4e93b0dee8886fc3d6d99ac591264077910f1ca"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "17"
+                    },
+                    {
+                      "int": "95000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000c91f257e2d3fb769ea36e7f599bbce277148eec8"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "8"
+                    },
+                    {
+                      "int": "65000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000dc40277d69bfad04deeb38ad1b09a56f77f75255"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "7"
+                    },
+                    {
+                      "int": "60000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000dc970fa85be81a19cdf63ea87562872a8720bd04"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "3"
+                    },
+                    {
+                      "int": "60000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000de9041ab2bc3889cfd9fdb03062604c754fd0fbc"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "13"
+                    },
+                    {
+                      "int": "75000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0000f668b2d2c728ab42cf933c44054fe2f747845530"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "14"
+                    },
+                    {
+                      "int": "75000000"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "prim": "Elt",
+              "args": [
+                {
+                  "bytes": "0001f4cdb6898b37e78aad07f1302d1bc35ea1bdef61"
+                },
+                {
+                  "prim": "Pair",
+                  "args": [
+                    {
+                      "int": "4"
+                    },
+                    {
+                      "int": "60000000"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          {
+            "int": "60000000"
+          }
+        ]
+      },
+      {
+        "int": "1653235500"
+      },
+      {
+        "bytes": "01c6c3bcbb1555c3cc5ed9e174efdd20984a2edde000"
+      }
+    ],
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "20"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "175094"
+            },
+            {
+              "int": "5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "5000000"
+        },
+        {
+          "int": "0"
+        }
+      ]
+    },
+    {
+      "int": "120000000"
+    },
+    {
+      "int": "1653231600"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "175094",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "175093",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

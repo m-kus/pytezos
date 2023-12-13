@@ -1,19 +1,27 @@
 import itertools
 from pprint import pformat
-from typing import Any, Dict, List, Optional
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
-import bson  # type: ignore
+import simple_bson as bson  # type: ignore
 
-from pytezos.block.forge import bump_fitness, forge_block_header, forge_protocol_data
+from pytezos.block.forge import bump_fitness
+from pytezos.block.forge import forge_block_header
+from pytezos.block.forge import forge_protocol_data
 from pytezos.context.impl import ExecutionContext
 from pytezos.context.mixin import ContextMixin
 from pytezos.crypto.encoding import base58_encode
 from pytezos.crypto.hash import block_payload_hash
 from pytezos.crypto.key import blake2b_32
 from pytezos.jupyter import get_class_docstring
-from pytezos.michelson.forge import forge_array, forge_base58, optimize_timestamp
+from pytezos.michelson.forge import forge_array
+from pytezos.michelson.forge import forge_base58
+from pytezos.michelson.forge import optimize_timestamp
 from pytezos.rpc.kind import validation_passes
-from pytezos.sandbox.parameters import protocol_version, sandbox_params
+from pytezos.sandbox.parameters import protocol_version
+from pytezos.sandbox.parameters import sandbox_params
 
 
 class BlockHeader(ContextMixin):
@@ -54,7 +62,12 @@ class BlockHeader(ContextMixin):
         return '\n'.join(res)
 
     @classmethod
-    def activate_protocol(cls, protocol_hash: str, parameters: Dict[str, Any], context: ExecutionContext) -> 'BlockHeader':
+    def activate_protocol(
+        cls,
+        protocol_hash: str,
+        parameters: Dict[str, Any],
+        context: ExecutionContext,
+    ) -> 'BlockHeader':
         """Create call to bake genesis block with specified parameters
 
         :param protocol_hash: protocol hash (ex. PsFLorenaUUuikDWvMDr6fGBRG8kt3e3D3fHoXK1j1BFRxeSH4i)
@@ -94,10 +107,11 @@ class BlockHeader(ContextMixin):
         # NOTE: Real values will be set during fill
         protocol_data = {
             "proof_of_work_nonce": "0000000000000000",
-            "liquidity_baking_escape_vote": False,
             "payload_hash": "vh1g87ZG6scSYxKhspAUzprQVuLAyoa5qMBKcUfjgnQGnFb3dJcG",  # dummy payload (zeroes)
             "payload_round": 0,
+            "liquidity_baking_toggle_vote": "off",
         }
+
         return BlockHeader(
             context=context,
             operations=operations,
@@ -135,7 +149,7 @@ class BlockHeader(ContextMixin):
             **self.protocol_data,
         }
 
-        if level % int(sandbox_params['blocks_per_commitment']) == 0:  # type: ignore
+        if level % int(sandbox_params['blocks_per_commitment']) == 0:
             protocol_data['seed_nonce_hash'] = base58_encode(b'\x00' * 32, b'nce').decode()
 
         operations = [

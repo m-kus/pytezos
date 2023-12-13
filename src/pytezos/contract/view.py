@@ -1,19 +1,24 @@
 from pprint import pformat
-from typing import Any, Dict, List, Optional
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 from pytezos.context.impl import ExecutionContext
-from pytezos.context.mixin import ContextMixin  # type: ignore
-from pytezos.contract.call import ContractCallResult, skip_nones
+from pytezos.context.mixin import ContextMixin
+from pytezos.contract.call import ContractCallResult
+from pytezos.contract.call import skip_nones
 from pytezos.jupyter import get_class_docstring
 from pytezos.logging import logger
 from pytezos.michelson.micheline import MichelsonRuntimeError
 from pytezos.michelson.repl import Interpreter
-from pytezos.michelson.types.base import MichelsonType, generate_pydoc
+from pytezos.michelson.types.base import MichelsonType
+from pytezos.michelson.types.base import generate_pydoc
 
 
 def format_view_script(param_ty_expr, storage_ty_expr, return_ty_expr, code_expr):
-    return dict(
-        code=[
+    return {
+        'code': [
             {
                 'prim': 'parameter',
                 'args': [
@@ -53,7 +58,7 @@ def format_view_script(param_ty_expr, storage_ty_expr, return_ty_expr, code_expr
                 ],
             },
         ]
-    )
+    }
 
 
 def format_view_params(param_expr, storage_expr):
@@ -133,7 +138,13 @@ class ContractViewCall(ContextMixin):
     """Proxy class encapsulating a contract call: contract type scheme, contract address, parameters, and amount"""
 
     def __init__(
-        self, context: ExecutionContext, param_expr: dict, param_ty_expr: dict, return_ty_expr: dict, code_expr: list, name: str
+        self,
+        context: ExecutionContext,
+        param_expr: dict,
+        param_ty_expr: dict,
+        return_ty_expr: dict,
+        code_expr: list,
+        name: str,
     ) -> None:
         super().__init__(context=context)
         self.name = name
@@ -141,6 +152,15 @@ class ContractViewCall(ContextMixin):
         self.param_ty_expr = param_ty_expr
         self.return_ty_expr = return_ty_expr
         self.code_expr = code_expr
+
+    def __repr__(self) -> str:
+        res = [
+            super().__repr__(),
+            f'.name\t{self.name}',
+            '\nHelpers',
+            get_class_docstring(self.__class__),
+        ]
+        return '\n'.join(res)
 
     def _encode_storage(self, storage=None):
         try:
@@ -219,13 +239,44 @@ class ContractViewCall(ContextMixin):
         res = self.shell.blocks[self.block_id].helpers.scripts.run_code.post(query)
         return ContractCallResult.from_run_code(res, parameters=parameters, context=self.context)
 
+    def run_view(self, source=None, sender=None, chain_id=None, gas_limit=None, level=None, now=None) -> Any:
+        """Execute using special RPC endpoint for on-chain views.
+
+        :param source: patch SOURCE
+        :param sender: patch SENDER
+        :param chain_id: patch CHAIN_ID
+        :param gas_limit: restrict max consumed gas
+        :param level: patch LEVEL
+        :param now: patch NOW
+        :returns: decoded view result
+        """
+        query = skip_nones(
+            contract=self.address,
+            view=self.name,
+            input=self.param_expr,
+            source=sender,
+            payer=source,
+            chain_id=chain_id or self.context.get_chain_id(),
+            unparsing_mode="Readable",
+            unlimited_gas=gas_limit is None,
+            gas=str(gas_limit) if gas_limit is not None else None,
+            level=str(level) if level is not None else None,
+            now=str(now) if now is not None else None,
+        )
+        res = self.shell.blocks[self.block_id].helpers.scripts.run_script_view.post(query)
+        py_obj = MichelsonType.match(self.return_ty_expr).from_micheline_value(res['data']).to_python_object()
+        return py_obj
+
     def storage_view(self, storage=None):
         """Get return value of an off-chain view.
 
         :param storage: override current contract storage (as Python object)
         :returns: Decoded return value
         """
-        parameters = format_view_params(param_expr=self.param_expr, storage_expr=self._get_storage(storage))
+        parameters = format_view_params(
+            param_expr=self.param_expr,
+            storage_expr=self._get_storage(storage),
+        )
         script = format_view_script(
             param_ty_expr=self.param_ty_expr,
             storage_ty_expr=self.context.storage_expr,
@@ -244,7 +295,7 @@ class ContractViewCall(ContextMixin):
         return storage  # type: ignore
 
     def onchain_view(self, storage=None, balance=None, view_results: Optional[Dict[str, Any]] = None):
-        """Get return value of an on-chain view.
+        """Get return value of an on-chain view (not supporting external view calls).
 
         :param storage: override current contract storage (as Python object)
         :param balance: patch BALANCE
@@ -257,7 +308,10 @@ class ContractViewCall(ContextMixin):
             storage=self._get_storage(storage),
             context=self._spawn_context(
                 balance=balance,
-                script={**self.context.script, 'storage': self._encode_storage(storage)},  # type: ignore
+                script={
+                    **self.context.script,  # type: ignore
+                    'storage': self._encode_storage(storage),
+                },
                 view_results=view_results,
             ),
         )

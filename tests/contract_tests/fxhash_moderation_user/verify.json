@@ -1,0 +1,130 @@
+{
+  "parameters": {
+    "entrypoint": "verify",
+    "value": {
+      "string": "tz1iS5hTzLvjaH7Q3zRLukUBbHi7GfGz2wKv"
+    }
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "149804"
+                },
+                {
+                  "bytes": "0000db88fc895c577ac6d6109167dcef060810d2c2f0"
+                }
+              ]
+            },
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "int": "149805"
+                },
+                {
+                  "prim": "False"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "149806"
+            },
+            {
+              "int": "149807"
+            }
+          ]
+        },
+        {
+          "int": "6"
+        },
+        {
+          "int": "149808"
+        }
+      ],
+      {
+        "int": "149809"
+      }
+    ]
+  },
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "149809",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149808",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "expruJfjCAW63gewpf1j6LcBxVVgnZTHpG552bgMVpSgmimdwicekW",
+            "key": {
+              "bytes": "0000fa086927165bf1c85cb051db431f83f8801a27fb"
+            },
+            "value": {
+              "prim": "Pair",
+              "args": [
+                {
+                  "prim": "None"
+                },
+                {
+                  "int": "10"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149807",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149806",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149805",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    },
+    {
+      "kind": "big_map",
+      "id": "149804",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

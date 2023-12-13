@@ -1,0 +1,72 @@
+{
+  "parameters": {
+    "entrypoint": "DeleteExchange",
+    "value": {
+      "string": "KT18uPBmydfFqNkCeKR9EVBhJi2RpUZSg1RG"
+    }
+  },
+  "storage": [
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "prim": "False"
+            },
+            {
+              "int": "171946"
+            }
+          ]
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            [],
+            {
+              "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "int": "0"
+        },
+        {
+          "bytes": "01274b8130fbf7d118f5706502356c262369b3bd6e00"
+        }
+      ]
+    },
+    {
+      "bytes": "01c71a724e60088d398e7724739faa7488dfab46b100"
+    },
+    {
+      "prim": "False"
+    },
+    {
+      "prim": "None"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "171946",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "exprtoTtDGhexhi229M4JFK5AM1nQmEYYgNFE1SLEPwTPQM2cSMFUB",
+            "key": {
+              "bytes": "01038538dd0bd2b2e2a12d580751edd21b6514db6e00"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

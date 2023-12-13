@@ -1,0 +1,205 @@
+{
+  "entrypoints": {
+    "routerSwap": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "map",
+          "args": [
+            {
+              "prim": "nat"
+            },
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "pair",
+                  "args": [
+                    {
+                      "prim": "address",
+                      "annots": [
+                        "%exchangeAddress"
+                      ]
+                    },
+                    {
+                      "prim": "nat",
+                      "annots": [
+                        "%minimumOutput"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%requiredTokenAddress"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%requiredTokenId"
+                  ]
+                }
+              ]
+            }
+          ],
+          "annots": [
+            "%Route"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%SwapAmount"
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%recipient"
+          ]
+        }
+      ]
+    },
+    "faTwoCallBack": {
+      "prim": "list",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "pair",
+              "args": [
+                {
+                  "prim": "address",
+                  "annots": [
+                    "%owner"
+                  ]
+                },
+                {
+                  "prim": "nat",
+                  "annots": [
+                    "%token_id"
+                  ]
+                }
+              ],
+              "annots": [
+                "%request"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%balance"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "faOneCallBack": {
+      "prim": "nat"
+    },
+    "approveExchangeToken": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "nat",
+              "annots": [
+                "%amount"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%exchangeAddress"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "address",
+          "annots": [
+            "%tokenAddress"
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%tokenId"
+          ]
+        }
+      ]
+    },
+    "DeleteExchange": {
+      "prim": "address"
+    },
+    "ChangeState": {
+      "prim": "unit"
+    },
+    "ChangeAdmin": {
+      "prim": "address"
+    },
+    "AddExchange": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "address",
+              "annots": [
+                "%exchangeAddress"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%token1Address"
+              ]
+            },
+            {
+              "prim": "nat",
+              "annots": [
+                "%token1Id"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "pair",
+          "args": [
+            {
+              "prim": "bool",
+              "annots": [
+                "%token1Type"
+              ]
+            },
+            {
+              "prim": "address",
+              "annots": [
+                "%token2Address"
+              ]
+            }
+          ]
+        },
+        {
+          "prim": "nat",
+          "annots": [
+            "%token2Id"
+          ]
+        },
+        {
+          "prim": "bool",
+          "annots": [
+            "%token2Type"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -132,11 +132,11 @@ prim_tags = {
     'bls12_381_g2': b'\x81',
     'bls12_381_fr': b'\x82',
     'sapling_state': b'\x83',
-    'sapling_transaction': b'\x84',
+    'sapling_transaction_deprecated': b'\x84',
     'SAPLING_EMPTY_STATE': b'\x85',
     'SAPLING_VERIFY_UPDATE': b'\x86',
     'ticket': b'\x87',
-    'TICKET': b'\x88',
+    'TICKET_DEPRECATED': b'\x88',
     'READ_TICKET': b'\x89',
     'SPLIT_TICKET': b'\x8A',
     'JOIN_TICKETS': b'\x8B',
@@ -150,6 +150,19 @@ prim_tags = {
     'constant': b'\x92',
     # ITHACA
     'SUB_MUTEZ': b'\x93',
+    # JAKARTA
+    'tx_rollup_l2_address': b'\x94',
+    'MIN_BLOCK_TIME': b'\x95',
+    'sapling_transaction': b'\x96',
+    # KATHMANDU
+    'EMIT': b'\x97',
+    # LIMA
+    'Lambda_rec': b'\x98',
+    'LAMBDA_REC': b'\x99',
+    'TICKET': b'\x9A',
+    # MUMBAI
+    'BYTES': b'\x9B',
+    'NAT': b'\x9C',
     # FIXME: Dummy values for TZT, refactor macros
     'Stack_elt': b'\xEE',
     'Big_map': b'\xEE',

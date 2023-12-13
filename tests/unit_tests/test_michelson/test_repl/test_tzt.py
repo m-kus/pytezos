@@ -1,7 +1,7 @@
 import logging
+from os import listdir
 from os.path import dirname
 from os.path import join
-from os import listdir
 from unittest.case import TestCase
 
 from pytezos.logging import logger

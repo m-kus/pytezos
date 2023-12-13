@@ -1,5 +1,9 @@
 from decimal import Decimal
-from typing import Any, Dict, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 from pytezos.jupyter import inline_doc
 
@@ -13,7 +17,7 @@ def format_mutez(value: Optional[Union[int, Decimal]]) -> str:
     if value is None:
         value = 0
     elif isinstance(value, Decimal):
-        value = int(value * 10 ** 6)
+        value = int(value * 10**6)
     elif isinstance(value, float):
         raise ValueError('Please use decimal instead of float')
     return str(value)
@@ -25,7 +29,7 @@ def format_tez(value: Optional[Union[int, Decimal]]) -> Decimal:
     :param value: can be None (==0), Decimal (treated as tez), int (treated as mutez)
     :rtype: Decimal
     """
-    tez = Decimal(format_mutez(value)) / 10 ** 6
+    tez = Decimal(format_mutez(value)) / 10**6
     return tez.quantize(Decimal('0.000001'))
 
 
@@ -369,6 +373,117 @@ class ContentMixin:
             {
                 'kind': 'register_global_constant',
                 'value': value,
+                'source': source,
+                'fee': format_mutez(fee),
+                'counter': str(counter),
+                'gas_limit': str(gas_limit),
+                'storage_limit': str(storage_limit),
+            }
+        )
+
+    @inline_doc
+    def transfer_ticket(
+        self,
+        ticket_contents: Any,
+        ticket_ty: Any,
+        ticket_ticketer: str,
+        ticket_amount: int,
+        destination: str,
+        entrypoint='default',
+        source='',
+        counter=0,
+        fee=0,
+        gas_limit=0,
+        storage_limit=0,
+    ):
+        """Transfer ticket to another implicit account or to a smart rollup
+
+        :param ticket_contents: Micheline expression (value)
+        :param ticket_ty: Micheline expression (type)
+        :param ticket_ticketer: Ticketer address
+        :param ticket_amount: Amount
+        :param destination: Implicit or originated address (smart rollups not supported)
+        :param entrypoint: Smart contract entrypoint (leave "default" for implicit accounts)
+        :param source: Address from which funds will be delegated, leave None to use signatory address
+        :param counter: Current account counter, leave None for autocomplete
+        :param fee: Leave None for autocomplete
+        :param gas_limit: Leave None for autocomplete
+        :param storage_limit: Leave None for autocomplete
+        :returns: dict or OperationGroup
+        """
+        return self.operation(
+            {
+                'kind': 'transfer_ticket',
+                'ticket_contents': ticket_contents,
+                'ticket_ty': ticket_ty,
+                'ticket_ticketer': ticket_ticketer,
+                'ticket_amount': str(ticket_amount),
+                'destination': destination,
+                'entrypoint': entrypoint,
+                'source': source,
+                'fee': format_mutez(fee),
+                'counter': str(counter),
+                'gas_limit': str(gas_limit),
+                'storage_limit': str(storage_limit),
+            }
+        )
+
+    @inline_doc
+    def smart_rollup_add_messages(
+        self, message: List[bytes], source='', counter=0, fee=0, gas_limit=0, storage_limit=0
+    ):
+        """Send external message to the global rollup inbox
+
+        :param message: Array of byte strings 2KB max each
+        :param source: Address from which funds will be delegated, leave None to use signatory address
+        :param counter: Current account counter, leave None for autocomplete
+        :param fee: Leave None for autocomplete
+        :param gas_limit: Leave None for autocomplete
+        :param storage_limit: Leave None for autocomplete
+        :returns: dict or OperationGroup
+        """
+        return self.operation(
+            {
+                'kind': 'smart_rollup_add_messages',
+                'message': [m.hex() for m in message],
+                'source': source,
+                'fee': format_mutez(fee),
+                'counter': str(counter),
+                'gas_limit': str(gas_limit),
+                'storage_limit': str(storage_limit),
+            }
+        )
+
+    @inline_doc
+    def smart_rollup_execute_outbox_message(
+        self,
+        rollup: str,
+        cemented_commitment: str,
+        output_proof: bytes,
+        source='',
+        counter=0,
+        fee=0,
+        gas_limit=0,
+        storage_limit=0,
+    ):
+        """Execute outbox message on L1
+
+        :param rollup: Rollup address, base58 encoded (sr1)
+        :param cemented_commitment: Commitment hash, base58 encoded (src1)
+        :param output_proof: Byte string
+        :param source: Address from which funds will be delegated, leave None to use signatory address
+        :param counter: Current account counter, leave None for autocomplete
+        :param fee: Leave None for autocomplete
+        :param gas_limit: Leave None for autocomplete
+        :param storage_limit: Leave None for autocomplete
+        :returns: dict or OperationGroup
+        """
+        return self.operation(
+            {
+                'kind': 'smart_rollup_execute_outbox_message',
+                'rollup': rollup,
+                'cemented_commitment': cemented_commitment,
+                'output_proof': output_proof.hex(),
                 'source': source,
                 'fee': format_mutez(fee),
                 'counter': str(counter),

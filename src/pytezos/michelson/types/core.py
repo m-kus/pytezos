@@ -1,12 +1,15 @@
 from typing import Type
 
-from pytezos.context.abstract import AbstractContext  # type: ignore
-from pytezos.michelson.micheline import Micheline, MichelineLiteral, blind_unpack, parse_micheline_literal, parse_micheline_value
+from pytezos.context.abstract import AbstractContext
+from pytezos.michelson.micheline import Micheline
+from pytezos.michelson.micheline import MichelineLiteral
+from pytezos.michelson.micheline import blind_unpack
+from pytezos.michelson.micheline import parse_micheline_literal
+from pytezos.michelson.micheline import parse_micheline_value
 from pytezos.michelson.types.base import MichelsonType
 
 
-class unit(object):
-
+class unit:
     def __repr__(self):
         return 'Unit'
 
@@ -33,7 +36,6 @@ class UnitLiteral(Micheline, prim='Unit'):
 
 
 class StringType(MichelsonType, prim='string'):
-
     def __init__(self, value: str = ''):
         super(StringType, self).__init__()
         self.value = value
@@ -90,11 +92,10 @@ class StringType(MichelsonType, prim='string'):
         assert isinstance(item, slice), f'expected start:end, got {item}'
         assert len(self.value) > 0, f'string is empty'
         assert item.stop <= len(self.value), f'out of bounds {item.stop} <= {len(self.value)}'
-        return StringType(self.value[item.start:item.stop])
+        return StringType(self.value[item.start : item.stop])
 
 
 class IntType(MichelsonType, prim='int'):
-
     def __init__(self, value: int = 0):
         super(IntType, self).__init__()
         self.value = value
@@ -145,7 +146,6 @@ class IntType(MichelsonType, prim='int'):
 
 
 class NatType(IntType, prim='nat'):
-
     @classmethod
     def from_value(cls, value: int) -> 'NatType':
         assert value >= 0, f'expected natural number, got {value}'
@@ -163,7 +163,6 @@ class NatType(IntType, prim='nat'):
 
 
 class BytesType(MichelsonType, prim='bytes'):
-
     def __init__(self, value: bytes = b''):
         super(BytesType, self).__init__()
         self.value = value
@@ -210,7 +209,7 @@ class BytesType(MichelsonType, prim='bytes'):
                 py_obj = py_obj[2:]
             value = bytes.fromhex(py_obj)
         else:
-            assert False, f'unexpected value type {py_obj}'
+            raise AssertionError(f'unexpected value type {py_obj}')
         return cls(value)
 
     def to_literal(self) -> Type[Micheline]:
@@ -227,11 +226,10 @@ class BytesType(MichelsonType, prim='bytes'):
     def __getitem__(self, item):
         assert isinstance(item, slice), f'expected start:stop, got {item}'
         assert item.stop <= len(self.value), f'index out of bounds'
-        return BytesType(self.value[item.start:item.stop])
+        return BytesType(self.value[item.start : item.stop])
 
 
 class BoolType(MichelsonType, prim='bool'):
-
     def __init__(self, value: bool):
         super(BoolType, self).__init__()
         self.value = value
@@ -263,10 +261,13 @@ class BoolType(MichelsonType, prim='bool'):
 
     @classmethod
     def from_micheline_value(cls, val_expr) -> 'BoolType':
-        value = parse_micheline_value(val_expr, {
-            ('False', 0): lambda x: False,
-            ('True', 0): lambda x: True
-        })
+        value = parse_micheline_value(
+            val_expr,
+            {
+                ('False', 0): lambda x: False,
+                ('True', 0): lambda x: True,
+            },
+        )
         return cls(value)
 
     @classmethod
@@ -285,7 +286,6 @@ class BoolType(MichelsonType, prim='bool'):
 
 
 class UnitType(MichelsonType, prim='unit'):
-
     def __init__(self):
         super(UnitType, self).__init__()
 
@@ -326,7 +326,6 @@ class UnitType(MichelsonType, prim='unit'):
 
 
 class NeverType(MichelsonType, prim='never'):
-
     def __lt__(self, other: 'NeverType'):  # type: ignore
         return False
 

@@ -1,0 +1,30 @@
+{
+  "entrypoints": {
+    "update_royalties": {
+      "prim": "nat"
+    },
+    "set_pause_mint": {
+      "prim": "bool"
+    },
+    "payout_balance": {
+      "prim": "unit"
+    },
+    "mint_TYPED": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "nat",
+          "annots": [
+            "%amount"
+          ]
+        },
+        {
+          "prim": "bytes",
+          "annots": [
+            "%metadata"
+          ]
+        }
+      ]
+    }
+  }
+}

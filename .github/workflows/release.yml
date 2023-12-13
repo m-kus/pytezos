@@ -2,39 +2,94 @@ name: Release
 on:
   push:
     tags:
-      - '*.*.*'
+      - "*.*.*"
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ '3.8', '3.9', '3.10' ]
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
-    - uses: actions/checkout@master
-    - name: Set env
-      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - uses: abatilo/actions-poetry@v2.1.4
-    - name: Install dependencies
-      run: |
-        sudo apt-get update -q
-        sudo apt-get install libsodium-dev libsecp256k1-dev libgmp-dev -y
-    - name: Install project
-      run: make install
-    - name: Poetry publish
-      run: |
-        poetry config http-basic.pypi __token__ ${{secrets.PYPI_TOKEN}}
-        poetry build
-        poetry publish
-    - name: Build github release
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Configure poetry
+        run: poetry config installer.modern-installation false
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+
+      - name: Install binary dependencies
+        run: OSTYPE=$OSTYPE make install-deps
+
+      - name: Install project
+        run: make install
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+          platforms: linux/amd64,linux/arm64
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up metadata (pytezos)
+        id: meta-pytezos
+        uses: docker/metadata-action@v3
+        with:
+          images: bakingbad/pytezos
+          tags: type=pep440,pattern={{version}}
+
+      - name: Set up metadata (michelson-kernel)
+        id: meta-michelson-kernel
+        uses: docker/metadata-action@v3
+        with:
+          images: bakingbad/michelson-kernel
+          tags: type=pep440,pattern={{version}}
+
+      - name: Publish stable image (pytezos)
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: pytezos.dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-pytezos.outputs.tags }}
+          labels: ${{ steps.meta-pytezos.outputs.labels }}
+
+      - name: Publish stable image (michelson-kernel)
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: michelson-kernel.dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-michelson-kernel.outputs.tags }}
+          labels: ${{ steps.meta-michelson-kernel.outputs.labels }}
+
+      - name: Poetry publish
+        run: |
+          poetry config http-basic.pypi __token__ ${{secrets.PYPI_TOKEN}}
+          poetry build
+          poetry publish
+
+      - name: Build GitHub release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false

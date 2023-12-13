@@ -1,0 +1,65 @@
+{
+  "parameters": {
+    "entrypoint": "set_splits",
+    "value": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "string": "tz1dtzgLYUHMhP6sWeFtFsHkHqyPezBBPLsZ"
+          },
+          {
+            "int": "1000"
+          }
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "prim": "Pair",
+    "args": [
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "bytes": "0000db88fc895c577ac6d6109167dcef060810d2c2f0"
+          },
+          {
+            "bytes": "0000c846d2a132fb4a1b593c880c67bc113077fbffca"
+          }
+        ]
+      },
+      {
+        "prim": "Pair",
+        "args": [
+          {
+            "int": "149814"
+          },
+          [
+            {
+              "prim": "Pair",
+              "args": [
+                {
+                  "bytes": "0000c846d2a132fb4a1b593c880c67bc113077fbffca"
+                },
+                {
+                  "int": "1000"
+                }
+              ]
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "149814",
+      "diff": {
+        "action": "update",
+        "updates": []
+      }
+    }
+  ]
+}

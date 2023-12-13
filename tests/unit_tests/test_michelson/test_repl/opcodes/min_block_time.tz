@@ -1,0 +1,8 @@
+parameter unit;
+storage nat;
+code { 
+       DROP;
+       MIN_BLOCK_TIME;
+       NIL operation;
+       PAIR;
+};

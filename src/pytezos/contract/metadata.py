@@ -1,10 +1,15 @@
 import json
 import re
 from contextlib import suppress
-from os.path import dirname, join
-from typing import Any, Dict, List, Optional, Union
+from os.path import dirname
+from os.path import join
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
-import requests  # type: ignore
+import requests
 from attr import dataclass
 from jsonschema import validate as jsonschema_validate  # type: ignore
 
@@ -105,7 +110,8 @@ class ContractMetadata(ContextMixin):
         if self.views:
             for view in self.views:
                 michelson_storage_impl = next(
-                    (impl for impl in view.implementations if isinstance(impl, MichelsonStorageViewImplementation)), None
+                    (impl for impl in view.implementations if isinstance(impl, MichelsonStorageViewImplementation)),
+                    None,
                 )
                 if michelson_storage_impl is not None:
                     name = _to_camelcase(view.name)

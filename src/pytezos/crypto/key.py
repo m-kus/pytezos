@@ -2,15 +2,22 @@ import binascii
 import hashlib
 import json
 from getpass import getpass
+from hashlib import blake2b
 from os import environ as env
-from os.path import abspath, expanduser, join
-from typing import List, Optional, Union
+from os.path import abspath
+from os.path import expanduser
+from os.path import join
+from typing import List
+from typing import Optional
+from typing import Union
 
-from mnemonic import Mnemonic  # type: ignore
-from pyblake2 import blake2b  # type: ignore
+from mnemonic import Mnemonic
 
-from pytezos.crypto.encoding import base58_decode, base58_encode, scrub_input
-from pytezos.jupyter import InlineDocstring, get_class_docstring
+from pytezos.crypto.encoding import base58_decode
+from pytezos.crypto.encoding import base58_encode
+from pytezos.crypto.encoding import scrub_input
+from pytezos.jupyter import InlineDocstring
+from pytezos.jupyter import get_class_docstring
 
 VALID_MNEMONIC_LENGTHS = [12, 15, 18, 21, 24]
 DEFAULT_LANGUAGE = 'english'
@@ -75,8 +82,10 @@ def validate_mnemonic(mnemonic: str, language: str = DEFAULT_LANGUAGE) -> None:
     m = Mnemonic(language)
     mnemonic_words = m.normalize_string(mnemonic).split(' ')
     if len(mnemonic_words) not in VALID_MNEMONIC_LENGTHS:
-        raise ValueError('Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, '
-                         'but it is not (%d).' % len(mnemonic_words))
+        raise ValueError(
+            'Number of words must be one of the following: {VALID_MNEMONIC_LENGTHS}, '
+            'but it is not (%d).' % len(mnemonic_words)
+        )
 
     idx = map(lambda x: bin(m.wordlist.index(x))[2:].zfill(11), mnemonic_words)
     b = ''.join(idx)
@@ -149,7 +158,7 @@ class Key(metaclass=InlineDocstring):
             pk = fastecdsa.keys.get_public_key(bytes_to_int(secret_exponent), curve=fastecdsa.curve.P256)
             public_point = fastecdsa.encoding.sec1.SEC1Encoder.encode_public_key(pk)
         else:
-            assert False
+            raise AssertionError()
 
         return cls(public_point, secret_exponent, curve=curve, activation_code=activation_code)
 
@@ -200,11 +209,13 @@ class Key(metaclass=InlineDocstring):
             passphrase = get_passphrase(passphrase)
 
             salt, encrypted_sk = encoded_key[:8], encoded_key[8:]
-            encryption_key = hashlib.pbkdf2_hmac(hash_name="sha512",
-                                                 password=passphrase,
-                                                 salt=salt,
-                                                 iterations=32768,
-                                                 dklen=32)
+            encryption_key = hashlib.pbkdf2_hmac(
+                hash_name="sha512",
+                password=passphrase,
+                salt=salt,
+                iterations=32768,
+                dklen=32,
+            )
             encoded_key = pysodium.crypto_secretbox_open(
                 c=encrypted_sk,
                 nonce=b'\000' * 24,
@@ -256,7 +267,7 @@ class Key(metaclass=InlineDocstring):
         validate: bool = True,
         curve: bytes = b'ed',
         activation_code: Optional[str] = None,
-        language: str = DEFAULT_LANGUAGE
+        language: str = DEFAULT_LANGUAGE,
     ) -> 'Key':
         """Creates a key object from a bip39 mnemonic.
 
@@ -284,7 +295,7 @@ class Key(metaclass=InlineDocstring):
         elif curve == b'p2':
             secret_exponent = seed[:32]
         else:
-            assert False
+            raise AssertionError()
 
         return cls.from_secret_exponent(secret_exponent, curve=curve, activation_code=activation_code)
 
@@ -307,7 +318,7 @@ class Key(metaclass=InlineDocstring):
             mnemonic=data['mnemonic'],
             passphrase=data.get('password', ''),
             email=data.get('email', ''),
-            activation_code=data['activation_code']
+            activation_code=data['activation_code'],
         )
         if key.public_key_hash() != data['pkh']:
             raise ValueError('Failed to import')
@@ -398,7 +409,7 @@ class Key(metaclass=InlineDocstring):
 
         :returns: the public key hash for this key
         """
-        pkh = blake2b(data=self.public_point, digest_size=20).digest()
+        pkh = blake2b(self.public_point, digest_size=20).digest()
         prefix = {b'ed': b'tz1', b'sp': b'tz2', b'p2': b'tz3'}[self.curve]
         return base58_encode(pkh, prefix).decode()
 
@@ -410,9 +421,9 @@ class Key(metaclass=InlineDocstring):
         if not self.activation_code:
             raise ValueError("Activation code is undefined")
 
-        pkh = blake2b(data=self.public_point, digest_size=20).digest()
+        pkh = blake2b(self.public_point, digest_size=20).digest()
         key = bytes.fromhex(self.activation_code)
-        blinded_pkh = blake2b(data=pkh, key=key, digest_size=20).digest()
+        blinded_pkh = blake2b(pkh, key=key, digest_size=20).digest()
         return base58_encode(blinded_pkh, b'btz1').decode()
 
     def sign(self, message: Union[str, bytes], generic: bool = False):
@@ -440,7 +451,7 @@ class Key(metaclass=InlineDocstring):
             r, s = fastecdsa.ecdsa.sign(msg=encoded_message, d=bytes_to_int(self.secret_exponent), hashfunc=blake2b_32)
             signature = r.to_bytes(32, 'big') + s.to_bytes(32, 'big')
         else:
-            assert False
+            raise AssertionError()
 
         if generic:
             prefix = b'sig'

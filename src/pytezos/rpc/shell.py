@@ -1,8 +1,13 @@
 from binascii import hexlify
 from datetime import datetime
+from functools import cached_property
 from functools import lru_cache
 from time import sleep
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import List
+from typing import Optional
 
 import requests
 import simplejson as json
@@ -12,9 +17,11 @@ from pytezos.crypto.encoding import base58_decode
 from pytezos.jupyter import get_attr_docstring
 from pytezos.logging import logger
 from pytezos.rpc.kind import validation_passes
-from pytezos.rpc.protocol import BlockQuery, BlocksQuery
+from pytezos.rpc.protocol import BlockQuery
+from pytezos.rpc.protocol import BlocksQuery
 from pytezos.rpc.query import RpcQuery
-from pytezos.rpc.search import CyclesQuery, VotingPeriodsQuery
+from pytezos.rpc.search import CyclesQuery
+from pytezos.rpc.search import VotingPeriodsQuery
 
 MAX_BLOCK_TIMEOUT = 86400
 
@@ -34,8 +41,7 @@ class ShellQuery(RpcQuery, path=''):
         """Shortcut for `blocks.head`"""
         return self.blocks.head
 
-    @property  # type: ignore
-    @lru_cache(maxsize=None)
+    @cached_property
     def block(self) -> BlockQuery:
         """Cached head block, useful if you just want to explore things."""
         return self.blocks[self.head.hash()]
@@ -43,14 +49,22 @@ class ShellQuery(RpcQuery, path=''):
     @property
     def cycles(self):
         """Operate on cycles rather than blocks."""
-        return CyclesQuery(node=self.node, path=self._wild_path + '/chains/{}/blocks', params=self._params + ['main'])
+        return CyclesQuery(
+            node=self.node,
+            path=self._wild_path + '/chains/{}/blocks',
+            params=self._params + ['main'],
+        )
 
     @property
     def voting_periods(self):
         """
         Operate on voting periods rather than blocks.
         """
-        return VotingPeriodsQuery(node=self.node, path=self._wild_path + '/chains/{}/blocks', params=self._params + ['main'])
+        return VotingPeriodsQuery(
+            node=self.node,
+            path=self._wild_path + '/chains/{}/blocks',
+            params=self._params + ['main'],
+        )
 
     @property
     def contracts(self):
@@ -66,23 +80,19 @@ class ShellQuery(RpcQuery, path=''):
         self,
         current_block_hash: str,
         max_blocks: int = 1,
-        max_priority: int = 2,
         yield_current=False,
         time_between_blocks: Optional[int] = None,
         block_timeout: Optional[int] = None,
     ) -> Generator[str, None, None]:
-        """Iterates over future blocks (waits and yields block hash)
+        """Iterates over future blocks (waits and yields block hash), handles reorgs
 
         :param current_block_hash: hash of the current block (head)
         :param max_blocks: number of blocks to iterate (not including the current one)
-        :param max_priority: wait for blocks with lower priority (increased timeout)
         :param yield_current: yield current block hash at the very beginning
         :param time_between_blocks: override protocol constant
         :param block_timeout: set block timeout (by default Pytezos will wait for a long time)
         :return: block hashes
         """
-        prev_block_hash: Optional[str] = None
-
         if time_between_blocks is None:
             constants = self.blocks[current_block_hash].context.constants()
             time_between_blocks = int(constants.get('minimal_block_delay', 0))
@@ -93,12 +103,12 @@ class ShellQuery(RpcQuery, path=''):
         if yield_current:
             yield current_block_hash
 
-        for _ in range(max_blocks):
-            header = self.blocks[current_block_hash].header()
-            if prev_block_hash and prev_block_hash != header['predecessor']:
-                raise StopIteration('Reorg detected, expected predecessor %s instead of %s', prev_block_hash, header['predecessor'])
+        current_header = self.blocks[current_block_hash].header()
+        max_level = current_header['level'] + max_blocks
 
-            prev_block_dt = datetime.strptime(header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+        while current_header['level'] < max_level:
+            logger.info('Current level: %d (max %d)', current_header['level'], max_level)
+            prev_block_dt = datetime.strptime(current_header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
             elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
             sleep_sec = 1 if elapsed_sec > time_between_blocks else (time_between_blocks - elapsed_sec + 1)
 
@@ -118,8 +128,8 @@ class ShellQuery(RpcQuery, path=''):
             if current_block_hash != next_block_hash:
                 assert next_block_hash
                 yield next_block_hash
-                prev_block_hash = current_block_hash
                 current_block_hash = next_block_hash
+                current_header = self.blocks[current_block_hash].header()
             else:
                 raise TimeoutError('Reached timeout (%d sec) while waiting for the next block', block_timeout)
 
@@ -143,15 +153,15 @@ class ShellQuery(RpcQuery, path=''):
         :return: list of operation contents with metadata
         """
 
-        confirmations = dict()
+        confirmations = {}
         pending = set(opg_hashes)
-        operations = list()
+        operations = []
         block_hash = current_block_hash
 
         if block_hash is None:
             block_hash = self.head.hash()
 
-        for block_hash in self.wait_blocks(
+        for block_hash in self.wait_blocks(  # noqa: B020
             current_block_hash=block_hash,
             max_blocks=ttl,
             yield_current=True,
@@ -168,29 +178,38 @@ class ShellQuery(RpcQuery, path=''):
                             logger.info('Operation %s has left mempool', opg_hash)
                             pending.remove(opg_hash)
 
-            if len(pending) < len(opg_hashes):
-                included = self.blocks[block_hash].operation_hashes()
-                for i, vp in enumerate(included):
-                    for j, opg_hash in enumerate(vp):
-                        if opg_hash in opg_hashes and opg_hash not in confirmations:
-                            logger.info('Operation %s has been included to block %s', opg_hash, block_hash)
-                            confirmations[opg_hash] = 0  # initialize
-                            operations.append(self.blocks[block_hash].operations[i][j]())
+            included = self.blocks[block_hash].operation_hashes()
+            for i, vp in enumerate(included):
+                for j, opg_hash in enumerate(vp):
+                    if opg_hash in opg_hashes and opg_hash not in confirmations:
+                        logger.info('Operation %s has been included to block %s', opg_hash, block_hash)
+                        if opg_hash in pending:  # can be still in the particular node's mempool (not yet removed)
+                            pending.remove(opg_hash)
+                        confirmations[opg_hash] = 0  # initialize
+                        operations.append(self.blocks[block_hash].operations[i][j]())
 
             for opg_hash in confirmations:
                 confirmations[opg_hash] += 1
-                logger.info('Operation %s has %d/%d confirmations', opg_hash, confirmations[opg_hash], min_confirmations)
+                logger.info(
+                    'Operation %s has %d/%d confirmations', opg_hash, confirmations[opg_hash], min_confirmations
+                )
 
             if len(operations) == len(opg_hashes):
                 break
 
         if len(operations) < len(opg_hashes):
-            raise StopIteration('Only %d of %d operations were included, stopping', len(operations), len(opg_hashes))
+            raise StopIteration('Only %d of %d operations were included, stopping' % (len(operations), len(opg_hashes)))
 
-        for _ in self.wait_blocks(block_hash, max_blocks=min_confirmations - 1, time_between_blocks=time_between_blocks):
+        for _ in self.wait_blocks(
+            block_hash,
+            max_blocks=min_confirmations - 1,
+            time_between_blocks=time_between_blocks,
+        ):
             for opg_hash in opg_hashes:
                 confirmations[opg_hash] += 1
-                logger.info('Operation %s has %d/%d confirmations', opg_hash, confirmations[opg_hash], min_confirmations)
+                logger.info(
+                    'Operation %s has %d/%d confirmations', opg_hash, confirmations[opg_hash], min_confirmations
+                )
 
         return operations
 
@@ -308,7 +327,7 @@ class PendingOperationsQuery(RpcQuery, path='/chains/{}/mempool/pending_operatio
 
     def flatten(self) -> List[Dict[str, Any]]:
         operations_dict = self()
-        operations_list = list()
+        operations_list = []
         for status, operations in operations_dict.items():
             for operation in operations:
                 if isinstance(operation, dict):
@@ -346,11 +365,11 @@ class DescribeQuery(RpcQuery, path='/describe'):
         :param recurse: Show information for child elements, default is True.
             In some cases doesn't work without this flag.
         """
-        return super(DescribeQuery, self).__call__(recurse=recurse)
+        return super().__call__(recurse=recurse)
 
     def __repr__(self):
         res = [
-            super(DescribeQuery, self).__repr__(),
+            super().__repr__(),
             f'(){get_attr_docstring(DescribeQuery, "__call__")}',
             'Can be followed by any path:\n.chains\n.network.connections\netc\n',
         ]
@@ -482,7 +501,7 @@ class MonitorQuery(
 
     def __repr__(self):
         res = [
-            super(MonitorQuery, self).__repr__(),
+            super().__repr__(),
             'NOTE: Returned object is a generator.',
         ]
         return '\n'.join(res)
@@ -490,7 +509,7 @@ class MonitorQuery(
 
 class ConnectionQuery(RpcQuery, path='/network/connections/{}'):
     def delete(self, wait=False):
-        return self._delete(params=dict(wait=wait))
+        return self._delete(params={'wait': wait})
 
 
 class NetworkItems(RpcQuery, path=['/network/peers', '/network/points']):

@@ -1,0 +1,58 @@
+{
+  "parameters": {
+    "entrypoint": "unstake",
+    "value": {
+      "int": "2000000"
+    }
+  },
+  "storage": [
+    {
+      "prim": "Pair",
+      "args": [
+        {
+          "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+        },
+        {
+          "prim": "Pair",
+          "args": [
+            {
+              "int": "171752"
+            },
+            {
+              "prim": "False"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "bytes": "01b15d0a9d43b0767f855d4d1c7d987aa1c53cf53900"
+    },
+    {
+      "bytes": "013463d7aff77ae4d127b2740650998919b2b5535700"
+    },
+    {
+      "bytes": "01a8a8b68decacdd4823e6789f2fdf0bd22eb35f5c00"
+    }
+  ],
+  "lazy_storage_diff": [
+    {
+      "kind": "big_map",
+      "id": "171752",
+      "diff": {
+        "action": "update",
+        "updates": [
+          {
+            "key_hash": "exprusD1aaK29BSUxSPdayTGEr2sz4v1dj4zA5puo9neqJYZDPFVnN",
+            "key": {
+              "bytes": "000020608fc3038e6b2391bab4694186807dd1c6afec"
+            },
+            "value": {
+              "int": "0"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

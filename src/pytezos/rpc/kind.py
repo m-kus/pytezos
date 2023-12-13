@@ -14,6 +14,9 @@ validation_passes = {
     'origination': 3,
     'delegation': 3,
     'register_global_constant': 3,
+    'transfer_ticket': 3,
+    'smart_rollup_add_messages': 3,
+    'smart_rollup_execute_outbox_message': 3,
 }
 operation_tags = {
     'endorsement': 0,
@@ -30,4 +33,7 @@ operation_tags = {
     'origination': 109,
     'delegation': 110,
     'register_global_constant': 111,
+    'transfer_ticket': 158,
+    'smart_rollup_add_messages': 201,
+    'smart_rollup_execute_outbox_message': 206,
 }

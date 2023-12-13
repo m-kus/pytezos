@@ -1,9 +1,12 @@
 from unittest import TestCase
-from parameterized import parameterized
 
+from parameterized import parameterized  # type: ignore
+
+from pytezos.michelson.forge import forge_micheline
+from pytezos.michelson.forge import forge_script_expr
+from pytezos.michelson.forge import unforge_micheline
 from pytezos.michelson.micheline import blind_unpack
 from pytezos.michelson.types.base import MichelsonType
-from pytezos.michelson.forge import forge_script_expr, forge_micheline, unforge_micheline
 from pytezos.operation.forge import forge_operation_group
 
 unknown_data = [
@@ -68,28 +71,32 @@ unknown_data = [
     '0507070100000004636f6465010000001463616c6c53657452656465656d41646472657373',
     '05020000014203210316051f02000000020317050d036e072f0200000029034f07430368010000001a55706172616d417267756d656e74556e7061636b4661696c6564034203270200000000034203210316051f02000000020317051f02000000af0321074303690a0000000b0501000000056f776e65720329072f02000000210743036801000000165553746f72653a206e6f206669656c64206f776e657203270200000000050d036e072f020000002907430368010000001e5553746f72653a206661696c656420746f20756e7061636b206f776e657203270200000000034803190325072c0200000000020000001f034f07430368010000001053656e64657249734e6f744f776e657203420327030c0346074303690a0000001305010000000d72656465656d416464726573730350053d036d034203210316051f020000000203170342',
     '0507070100000004636f6465010000001563616c6c5472616e736665724f776e657273686970',
-    '05020000013f03210316051f02000000020317050d036e072f0200000029034f07430368010000001a55706172616d417267756d656e74556e7061636b4661696c6564034203270200000000034203210316051f02000000020317051f02000000af0321074303690a0000000b0501000000056f776e65720329072f02000000210743036801000000165553746f72653a206e6f206669656c64206f776e657203270200000000050d036e072f020000002907430368010000001e5553746f72653a206661696c656420746f20756e7061636b206f776e657203270200000000034803190325072c0200000000020000001f034f07430368010000001053656e64657249734e6f744f776e6572034203270346030c0346074303690a0000000e0501000000086e65774f776e65720350053d036d034203210316051f020000000203170342']
+    '05020000013f03210316051f02000000020317050d036e072f0200000029034f07430368010000001a55706172616d417267756d656e74556e7061636b4661696c6564034203270200000000034203210316051f02000000020317051f02000000af0321074303690a0000000b0501000000056f776e65720329072f02000000210743036801000000165553746f72653a206e6f206669656c64206f776e657203270200000000050d036e072f020000002907430368010000001e5553746f72653a206661696c656420746f20756e7061636b206f776e657203270200000000034803190325072c0200000000020000001f034f07430368010000001053656e64657249734e6f744f776e6572034203270346030c0346074303690a0000000e0501000000086e65774f776e65720350053d036d034203210316051f020000000203170342',
+]
 
 
 class TestPacking(TestCase):
-
-    @parameterized.expand([
-        ({"bytes": "000018896fcfc6690baefa9aedc6d759f9bf05727e8c"},
-         {"prim": "address"},
-         "expru2YV8AanTTUSV4K21P7X4DzbuWQFVk7NewDuP1A5uamffiiFA3"),
-        ({"string": "tz1MsmYzmqxHs9trE1qQugZxxcLPqAXdQaX9"},
-         {"prim": "address"},
-         "expru2YV8AanTTUSV4K21P7X4DzbuWQFVk7NewDuP1A5uamffiiFA3"),
-        ({"string": "Game one!"},
-         {"prim": "string"},
-         "exprtiRSZkLKYRess9GZ3ryb4cVQD36WLo2oysZBFxKTZ2jXqcHWGj"),
-        ({"int": "505506"},
-         {"prim": "int"},
-         "exprufzwVGdAX7zG91UpiAkR2yVxEDE75tHD5YgSBmYMUx22teZTCM"),
-        ([{"int": "1"}, {"int": "1"}, {"int": "1"}, {"int": "1"}],
-         {"prim": "pair", "args": [{"prim": "int"}, {"prim": "int"}, {"prim": "int"}, {"prim": "int"}]},
-         "expruN32WETsB2Dx1AynDmMufVr1As9qdnjRxKQ82rk2qZ4uxuKVMK")
-    ])
+    @parameterized.expand(
+        [
+            (
+                {"bytes": "000018896fcfc6690baefa9aedc6d759f9bf05727e8c"},
+                {"prim": "address"},
+                "expru2YV8AanTTUSV4K21P7X4DzbuWQFVk7NewDuP1A5uamffiiFA3",
+            ),
+            (
+                {"string": "tz1MsmYzmqxHs9trE1qQugZxxcLPqAXdQaX9"},
+                {"prim": "address"},
+                "expru2YV8AanTTUSV4K21P7X4DzbuWQFVk7NewDuP1A5uamffiiFA3",
+            ),
+            ({"string": "Game one!"}, {"prim": "string"}, "exprtiRSZkLKYRess9GZ3ryb4cVQD36WLo2oysZBFxKTZ2jXqcHWGj"),
+            ({"int": "505506"}, {"prim": "int"}, "exprufzwVGdAX7zG91UpiAkR2yVxEDE75tHD5YgSBmYMUx22teZTCM"),
+            (
+                [{"int": "1"}, {"int": "1"}, {"int": "1"}, {"int": "1"}],
+                {"prim": "pair", "args": [{"prim": "int"}, {"prim": "int"}, {"prim": "int"}, {"prim": "int"}]},
+                "expruN32WETsB2Dx1AynDmMufVr1As9qdnjRxKQ82rk2qZ4uxuKVMK",
+            ),
+        ]
+    )
     def test_get_key_hash(self, val_expr, type_expr, expected):
         ty = MichelsonType.match(type_expr)
         key = ty.from_micheline_value(val_expr).pack(legacy=True)
@@ -102,25 +109,79 @@ class TestPacking(TestCase):
         self.assertNotEqual(data, res)
 
     def test_regr_local_remote_diff(self):
-        opg = {'branch': 'BKpLvH3E3bUa5Z2nb3RkH2p6EKLfymvxUAEgtRJnu4m9UX1TWUb',
-               'contents': [{'amount': '0',
-                             'counter': '446245',
-                             'destination': 'KT1VYUxhLoSvouozCaDGL1XcswnagNfwr3yi',
-                             'fee': '104274',
-                             'gas_limit': '1040000',
-                             'kind': 'transaction',
-                             'parameters': {'entrypoint': 'default',
-                                            'value': {'prim': 'Unit'}},
-                             'source': 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm',
-                             'storage_limit': '60000'}],
-               'protocol': 'PsCARTHAGazKbHtnKfLzQg3kms52kSRpgnDY982a9oYsSXRLQEb',
-               'signature': None}
+        opg = {
+            'branch': 'BKpLvH3E3bUa5Z2nb3RkH2p6EKLfymvxUAEgtRJnu4m9UX1TWUb',
+            'contents': [
+                {
+                    'amount': '0',
+                    'counter': '446245',
+                    'destination': 'KT1VYUxhLoSvouozCaDGL1XcswnagNfwr3yi',
+                    'fee': '104274',
+                    'gas_limit': '1040000',
+                    'kind': 'transaction',
+                    'parameters': {'entrypoint': 'default', 'value': {'prim': 'Unit'}},
+                    'source': 'tz1grSQDByRpnVs7sPtaprNZRp531ZKz6Jmm',
+                    'storage_limit': '60000',
+                }
+            ],
+            'protocol': 'PsCARTHAGazKbHtnKfLzQg3kms52kSRpgnDY982a9oYsSXRLQEb',
+            'signature': None,
+        }
         local = forge_operation_group(opg).hex()
-        remote = "0dc397b7865779d87bd47d406e8b4eee84498f22ab01dff124433c7f057af5ae6c00e8b36c80efb51ec85a1456" \
-                 "2426049aa182a3ce38d2ae06a59e1b80bd3fe0d4030001e5ebf2dcc7dcc9d13c2c45cd76823dd604740c7f0000"
+        remote = (
+            "0dc397b7865779d87bd47d406e8b4eee84498f22ab01dff124433c7f057af5ae6c00e8b36c80efb51ec85a1456"
+            "2426049aa182a3ce38d2ae06a59e1b80bd3fe0d4030001e5ebf2dcc7dcc9d13c2c45cd76823dd604740c7f0000"
+        )
 
         self.assertEqual(remote, local)
 
     def test_forge_combs(self):
         expr = {'prim': 'Pair', 'args': [{'int': '1'}, {'int': '2'}, {'int': '3'}, {'int': '4'}]}
         self.assertEqual(expr, unforge_micheline(forge_micheline(expr)))
+
+    def test_prim_sequence_three_args(self):
+        packed = "0502000000f003200743036e0a00000016010cd84cb6f78f1e146e5e86b3648327edfd45618e0007430368010000000c63616c6c6261636b2d343034037706550765096500000031046e0000000625766f746572045d0000000a2563616e64696461746504590000000f25657865637574655f766f74696e670000000c25766f74655f706172616d73046e00000007256275636b657400000010256c61756e63685f63616c6c6261636b072f020000000203270200000004034c03200743036a00000521000307430359030a0743035d0a00000015002523250b271e153be6c2668954114be101d04d3d05700005054200030342034d"
+
+        data = bytes.fromhex(packed)
+        result = unforge_micheline(data[1:])
+
+        expected_result = [
+            {'prim': 'DROP'},
+            {'prim': 'PUSH', 'args': [{'prim': 'address'}, {'bytes': '010cd84cb6f78f1e146e5e86b3648327edfd45618e00'}]},
+            {'prim': 'PUSH', 'args': [{'prim': 'string'}, {'string': 'callback-404'}]},
+            {'prim': 'SELF_ADDRESS'},
+            {
+                'prim': 'CONTRACT',
+                'args': [
+                    {
+                        'prim': 'pair',
+                        'args': [
+                            {
+                                'prim': 'pair',
+                                'args': [
+                                    {'prim': 'address', 'annots': ['%voter']},
+                                    {'prim': 'key_hash', 'annots': ['%candidate']},
+                                    {'prim': 'bool', 'annots': ['%execute_voting']},
+                                ],
+                                'annots': ['%vote_params'],
+                            },
+                            {'prim': 'address', 'annots': ['%bucket']},
+                        ],
+                    }
+                ],
+                'annots': ['%launch_callback'],
+            },
+            {'prim': 'IF_NONE', 'args': [[{'prim': 'FAILWITH'}], [{'prim': 'SWAP'}, {'prim': 'DROP'}]]},
+            {'prim': 'PUSH', 'args': [{'prim': 'mutez'}, {'int': '0'}]},
+            {'prim': 'DUP', 'args': [{'int': '3'}]},
+            {'prim': 'PUSH', 'args': [{'prim': 'bool'}, {'prim': 'True'}]},
+            {'prim': 'PUSH', 'args': [{'prim': 'key_hash'}, {'bytes': '002523250b271e153be6c2668954114be101d04d3d'}]},
+            {'prim': 'DIG', 'args': [{'int': '5'}]},
+            {'prim': 'PAIR', 'args': [{'int': '3'}]},
+            {'prim': 'PAIR'},
+            {'prim': 'TRANSFER_TOKENS'},
+        ]
+
+        self.assertListEqual(result, expected_result)
+
+        self.assertListEqual(expected_result, unforge_micheline(forge_micheline(expected_result)))
