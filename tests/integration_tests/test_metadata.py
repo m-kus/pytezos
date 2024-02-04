@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+import pytest
+
 from pytezos import pytezos
 
 

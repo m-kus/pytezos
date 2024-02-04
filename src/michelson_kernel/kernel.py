@@ -3,12 +3,14 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import TextIO
 from typing import Tuple
 from typing import Type
 from typing import Union
 from typing import cast
 
 import traitlets
+from ipykernel.iostream import OutStream
 from ipykernel.kernelbase import Kernel
 from tabulate import tabulate
 
@@ -199,24 +201,14 @@ class MichelsonKernel(Kernel):
     banner = 'Michelson (Tezos VM language)'
     help_links = traitlets.List(
         [
-            'https://michelson.nomadic-labs.com/',
-            'https://tezos.gitlab.io/whitedoc/michelson.html',
+            {'Guide': 'https://michelson.nomadic-labs.com/'},
+            {'Reference': 'https://tezos.gitlab.io/whitedoc/michelson.html'},
         ]
     )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.interpreter = Interpreter()
-
-    def _stdout(self, text: str) -> None:
-        self.send_response(
-            self.iopub_socket,
-            'stream',
-            {
-                'name': 'stdout',
-                'text': text,
-            },
-        )
 
     def _find_stack_items(
         self,
@@ -336,7 +328,14 @@ class MichelsonKernel(Kernel):
         interpreter_result = self.interpreter.execute(code)
 
         if not silent and interpreter_result.stdout:
-            self._stdout('\n'.join(interpreter_result.stdout))
+            self.send_response(
+                self.iopub_socket,
+                'stream',
+                {
+                    'name': 'stdout',
+                    'text': '\n'.join(interpreter_result.stdout),
+                },
+            )
 
         if not interpreter_result.error:
             if not silent:

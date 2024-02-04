@@ -23,6 +23,8 @@ from pytezos.rpc.kind import validation_passes
 from pytezos.sandbox.parameters import protocol_version
 from pytezos.sandbox.parameters import sandbox_params
 
+bson.encoder.encoders[int] = bson.encoder.encoders[float]
+
 
 class BlockHeader(ContextMixin):
     """Representation of block creation call"""

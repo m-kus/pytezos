@@ -39,6 +39,7 @@ nodes = {
     'limanet': ['https://rpc.tzkt.io/limanet'],
     'mumbainet': ['https://rpc.tzkt.io/mumbainet'],
     'nairobinet': ['https://rpc.tzkt.io/nairobinet'],
+    'oxfordnet': ['https://rpc.tzkt.io/oxfordnet'],
 }
 keys = {
     'alice': alice_key,
