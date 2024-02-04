@@ -112,6 +112,7 @@ class BlockHeader(ContextMixin):
             "payload_hash": "vh1g87ZG6scSYxKhspAUzprQVuLAyoa5qMBKcUfjgnQGnFb3dJcG",  # dummy payload (zeroes)
             "payload_round": 0,
             "liquidity_baking_toggle_vote": "off",
+            "adaptive_issuance_vote": "off",
         }
 
         return BlockHeader(
