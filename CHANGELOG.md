@@ -5,6 +5,7 @@
 ### Added
 
 * Compatibility with Oxfordnet protocol
+* Octez binaries updated to v19.0
 
 ## [3.10.3](https://github.com/baking-bad/pytezos/compare/3.10.2...3.10.3) (2023-11-27)
 
