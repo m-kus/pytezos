@@ -17,12 +17,17 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
            'AND :: bool : bool : A => bool : A\n'
            'AND :: nat : nat : A => nat : A\n'
            'AND :: int : nat : A => nat : A\n'
+           'AND :: bytes : bytes : A => bytes : A\n'
            'Boolean and bitwise AND',
     'APPLY': 'APPLY\n'
              'APPLY :: ty1 : lambda ( pair ty1 ty2 ) ty3 : A => lambda ty2 ty3 : A\n'
              'Partially apply a tuplified function from the stack',
     'BALANCE': 'BALANCE\nBALANCE :: A => mutez : A\nPush the current amount of mutez of the executing contract',
     'BLAKE2B': 'BLAKE2B\nBLAKE2B :: bytes : A => bytes : A\nCompute a Blake2B cryptographic hash',
+    'BYTES': 'BYTES\n'
+             'BYTES :: int : A => bytes : A\n'
+             'BYTES :: nat : A => bytes : A\n'
+             'Encode an integer or a natural number to bytes',
     'CAR': 'CAR\nCAR :: pair ty1 ty2 : A => ty1 : A\nAccess the left part of a pair',
     'CAST': '',
     'CDR': 'CDR\nCDR :: pair ty1 ty2 : A => ty2 : A\nAccess the right part of a pair',
@@ -36,7 +41,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
               'CONCAT :: list string : A => string : A\n'
               'CONCAT :: bytes : bytes : A => bytes : A\n'
               'CONCAT :: list bytes : A => bytes : A\n'
-              'Concatenate a string, byte sequence, string list or byte sequence list',
+              'Concatenate strings or byte sequences',
     'CONS': 'CONS\nCONS :: ty1 : list ty1 : A => list ty1 : A\nPrepend an element to a list',
     'CONTRACT': 'CONTRACT ty\n'
                 'CONTRACT ty :: address : A => option ( contract ty ) : A\n'
@@ -49,8 +54,8 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'DIG': 'DIG n\nDIG n :: A @ ( ty1 : B ) => ty1 : ( A @ B )\nRetrieve the n\\ th element of the stack',
     'DIP': 'DIP instr\nDIP instr :: ty : B => ty : C\nRun code protecting the top of the stack',
     'DIPN': 'DIP n instr\nDIP n instr :: A @ B => A @ C\nRun code protecting the n topmost elements of the stack',
-    'DROP': 'DROP n\nDROP n :: A @ B => B\nDrop the top element of the stack',
-    'DROPN': '\nDrop the top n elements of the stack',
+    'DROP': 'DROP\nDROP :: ty : A => A\nDrop the top element of the stack',
+    'DROPN': 'DROP n\nDROP n :: A @ B => B\nDrop the top n elements of the stack',
     'DUG': 'DUG n\nDUG n :: ty1 : ( A @ B ) => A @ ( ty1 : B )\nInsert the top element at depth n',
     'DUP': 'DUP\nDUP :: ty1 : A => ty1 : ty1 : A\nDuplicate the top of the stack',
     'DUPN': 'DUP n\nDUP n :: A @ ty1 : B => ty1 : A @ ty1 : B\nDuplicate the n\\ th element of the stack',
@@ -62,6 +67,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
             'EDIV :: mutez : nat : A => option ( pair mutez mutez ) : A\n'
             'EDIV :: mutez : mutez : A => option ( pair nat mutez ) : A\n'
             'Euclidean division',
+    'EMIT': 'EMIT ty\nEMIT ty :: ty : A => operation : A\nWrite an event into the transaction receipt',
     'EMPTY_BIG_MAP': 'EMPTY_BIG_MAP kty vty\n'
                      'EMPTY_BIG_MAP kty vty :: A => big_map kty vty : A\n'
                      'Build a new, empty big_map from kty to vty',
@@ -77,9 +83,9 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
            'GET :: kty : big_map kty vty : A => option vty : A\n'
            'Access an element in a map or big_map',
     'GETN': 'GET n\n'
-            'GET ( 0 ) :: ty : A => ty : A\n'
-            "GET ( 2 * n ) :: pair ty0 .. tyN ty' : A => ty' : A\n"
-            "GET ( 2 * n + 1 ) :: pair ty0 .. tyN ty' ty'' : A => ty' : A\n"
+            'GET 0 :: ty : A => ty : A\n'
+            'GET 1 :: pair ty1 ty2 : A => ty1 : A\n'
+            'GET ( n + 2 ) :: pair ty1 ty2 : A => ty : A\n'
             'Access an element or a sub comb in a right comb',
     'GET_AND_UPDATE': 'GET_AND_UPDATE\n'
                       'GET_AND_UPDATE :: kty : option vty : map kty vty : A => option vty : map kty vty : A\n'
@@ -97,7 +103,8 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'INT': 'INT\n'
            'INT :: nat : A => int : A\n'
            'INT :: bls12_381_fr : A => int : A\n'
-           'Convert a natural number or a BLS12-381 field element to an integer',
+           'INT :: bytes : A => int : A\n'
+           'Convert a natural number, a BLS12-381 field element, or a byte sequence to an integer',
     'ISNAT': 'ISNAT\nISNAT :: int : A => option nat : A\nConvert a non-negative integer to a natural number',
     'ITER': 'ITER instr\n'
             'ITER instr :: list ty : A => A\n'
@@ -109,24 +116,34 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
                     'Join two tickets into one',
     'KECCAK': 'KECCAK\nKECCAK :: bytes : A => bytes : A\nCompute a Keccak-256 cryptographic hash',
     'LAMBDA': 'LAMBDA ty1 ty2 instr\nLAMBDA ty1 ty2 instr :: A => lambda ty1 ty2 : A\nPush a lambda onto the stack',
-    'LAMBDA_REC': '\nPush a recursive lambda onto the stack',
+    'LAMBDA_REC': 'LAMBDA_REC ty1 ty2 instr\n'
+                  'LAMBDA_REC ty1 ty2 instr :: A => lambda ty1 ty2 : A\n'
+                  'Push a recursive lambda onto the stack',
     'LE': 'LE\nLE :: int : A => bool : A\nCheck that the top of the stack is less than or equal to zero',
     'LEFT': 'LEFT ty2\nLEFT ty2 :: ty1 : A => or ty1 ty2 : A\nWrap a value in a union (left case)',
     'LEVEL': 'LEVEL\nLEVEL :: A => nat : A\nPush the current block level',
     'LOOP': 'LOOP instr\nLOOP instr :: bool : A => A\nA generic loop',
     'LOOP_LEFT': 'LOOP_LEFT instr\nLOOP_LEFT instr :: or ty1 ty2 : A => ty2 : A\nLoop with accumulator',
-    'LSL': 'LSL\nLSL :: nat : nat : A => nat : A\nLogically left shift a natural number',
-    'LSR': 'LSR\nLSR :: nat : nat : A => nat : A\nLogically right shift a natural number',
+    'LSL': 'LSL\n'
+           'LSL :: nat : nat : A => nat : A\n'
+           'LSL :: bytes : nat : A => bytes : A\n'
+           'Logically left shift of a natural number or of a byte sequence',
+    'LSR': 'LSR\n'
+           'LSR :: nat : nat : A => nat : A\n'
+           'LSR :: bytes : nat : A => bytes : A\n'
+           'Logically right shift of a natural number or of a byte sequence',
     'LT': 'LT\nLT :: int : A => bool : A\nCheck that the top of the stack is less than zero',
     'MAP': 'MAP instr\n'
            'MAP instr :: list ty : A => list ty2 : A\n'
+           'MAP instr :: option ty : A => option ty2 : A\n'
            'MAP instr :: map kty ty1 : A => map kty ty2 : A\n'
-           'Apply instr to each element of a list or map.',
+           'Apply instr to each element of a list, an option, or map.',
     'MEM': 'MEM\n'
            'MEM :: cty : set cty : A => bool : A\n'
            'MEM :: kty : map kty vty : A => bool : A\n'
            'MEM :: kty : big_map kty vty : A => bool : A\n'
            'Check for the presence of a binding for a key in a map, set or big_map',
+    'MIN_BLOCK_TIME': 'MIN_BLOCK_TIME\nMIN_BLOCK_TIME :: A => nat : A\nPush the current minimal block time in seconds.',
     'MUL': 'MUL\n'
            'MUL :: nat : nat : A => nat : A\n'
            'MUL :: nat : int : A => int : A\n'
@@ -142,6 +159,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
            'MUL :: bls12_381_fr : nat : A => bls12_381_fr : A\n'
            'MUL :: bls12_381_fr : int : A => bls12_381_fr : A\n'
            'Multiply two numerical values',
+    'NAT': 'NAT\nNAT :: bytes : A => nat : A\nConvert bytes to a natural number',
     'NEG': 'NEG\n'
            'NEG :: nat : A => int : A\n'
            'NEG :: int : A => int : A\n'
@@ -158,9 +176,17 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
            'NOT :: bool : A => bool : A\n'
            'NOT :: nat : A => int : A\n'
            'NOT :: int : A => int : A\n'
+           'NOT :: bytes : A => bytes : A\n'
            'Boolean negation and bitwise complement',
     'NOW': 'NOW\nNOW :: A => timestamp : A\nPush block timestamp',
-    'OR': 'OR\nOR :: bool : bool : A => bool : A\nOR :: nat : nat : A => nat : A\nBoolean and bitwise OR',
+    'OPEN_CHEST': 'OPEN_CHEST\n'
+                  'OPEN_CHEST :: chest_key : chest : nat : A => option bytes : A\n'
+                  'Open a timelocked chest given its key and the time',
+    'OR': 'OR\n'
+          'OR :: bool : bool : A => bool : A\n'
+          'OR :: nat : nat : A => nat : A\n'
+          'OR :: bytes : bytes : A => bytes : A\n'
+          'Boolean and bitwise OR',
     'PACK': 'PACK\nPACK :: ty : A => bytes : A\nSerialize data',
     'PAIR': "PAIR\nPAIR :: ty1 : ty2 : A => pair ty1 ty2 : A\nBuild a pair from the stack's top two elements",
     'PAIRING_CHECK': 'PAIRING_CHECK\n'
@@ -169,7 +195,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'PAIRN': 'PAIR n\n'
              'PAIR n :: ty1 : .... : tyN : A => pair ty1 .... tyN : A\n'
              'Fold n values on the top of the stack into a right comb',
-    'PUSH': 'PUSH ty x\nPUSH ty x :: A => ty1 : A\nPush a constant value of a given type onto the stack',
+    'PUSH': 'PUSH ty x\nPUSH ty x :: A => ty : A\nPush a constant value of a given type onto the stack',
     'READ_TICKET': 'READ_TICKET\n'
                    'READ_TICKET :: ticket cty : A => pair address cty nat : ticket cty : A\n'
                    'Retrieve the information stored in a ticket. Also return the ticket.',
@@ -177,10 +203,10 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'RIGHT': 'RIGHT ty1\nRIGHT ty1 :: ty2 : A => or ty1 ty2 : A\nWrap a value in a union (right case)',
     'SAPLING_EMPTY_STATE': 'SAPLING_EMPTY_STATE ms\n'
                            'SAPLING_EMPTY_STATE ms :: A => sapling_state ms : A\n'
-                           'Pushes an empty Sapling state on the stack',
+                           'Push an empty Sapling state on the stack',
     'SAPLING_VERIFY_UPDATE': 'SAPLING_VERIFY_UPDATE\n'
                              'SAPLING_VERIFY_UPDATE :: sapling_transaction ms : sapling_state ms : A => option ( pair '
-                             'int ( sapling_state ms ) ) : A\n'
+                             'bytes ( pair int ( sapling_state ms ) ) ) : A\n'
                              'Verify and apply a transaction on a Sapling state',
     'SELF': 'SELF\nSELF :: A => contract ty : A\nPush the current contract',
     'SELF_ADDRESS': 'SELF_ADDRESS\nSELF_ADDRESS :: A => address : A\nPush the address of the current contract',
@@ -215,10 +241,10 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
            'SUB :: int : int : A => int : A\n'
            'SUB :: timestamp : int : A => timestamp : A\n'
            'SUB :: timestamp : timestamp : A => int : A\n'
-           'SUB :: mutez : mutez : A => mutez : A\n'
            'Subtract two numerical values',
+    'SUB_MUTEZ': 'SUB_MUTEZ\nSUB :: mutez : mutez : A => option mutez : A\nSubtract two mutez',
     'SWAP': 'SWAP\nSWAP :: ty1 : ty2 : A => ty2 : ty1 : A\nSwap the top two elements of the stack',
-    'TICKET': 'TICKET\nTICKET :: cty : nat : A => ticket cty : A\nCreate a ticket',
+    'TICKET': 'TICKET\nTICKET :: cty : nat : A => option ( ticket cty ) : A\nCreate a ticket',
     'TOP': '',
     'TOTAL_VOTING_POWER': 'TOTAL_VOTING_POWER\n'
                           'TOTAL_VOTING_POWER :: A => nat : A\n'
@@ -236,16 +262,21 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
               'UPDATE :: cty : bool : set cty : A => set cty : A\n'
               'UPDATE :: kty : option vty : map kty vty : A => map kty vty : A\n'
               'UPDATE :: kty : option vty : big_map kty vty : A => big_map kty vty : A\n'
-              'Add or remove an element in a map, big_map or set',
+              'Add, update, or remove an element in a map, big_map or set',
     'UPDATEN': 'UPDATE n\n'
                'UPDATE 0 :: ty1 : ty2 : A => ty1 : A\n'
-               "UPDATE ( 2 * n ) :: ty' : pair ty0 .. tyN ty'' : A => pair ty0 .. tyN ty' : A\n"
-               "UPDATE ( 2 * n + 1 ) :: ty' : pair ty0 .. tyN ty'' ty''' : A => pair ty0 .. tyN ty' ty''' : A\n"
+               'UPDATE 1 :: ty : pair ty1 ty2 : A => pair ty ty2 : A\n'
+               "UPDATE ( n + 2 ) :: ty : pair ty1 ty2 : A => pair ty1 ty' : A\n"
                'Update an element or a sub comb in a right comb',
+    'VIEW': 'VIEW name return_ty\nVIEW name return_ty :: ty : address : A => option return_ty : A\nCall a view',
     'VOTING_POWER': 'VOTING_POWER\n'
                     'VOTING_POWER :: key_hash : A => nat : A\n'
                     'Return the voting power of a given contract',
-    'XOR': 'XOR\nXOR :: bool : bool : A => bool : A\nXOR :: nat : nat : A => nat : A\nBoolean and bitwise eXclusive OR',
+    'XOR': 'XOR\n'
+           'XOR :: bool : bool : A => bool : A\n'
+           'XOR :: nat : nat : A => nat : A\n'
+           'XOR :: bytes : bytes : A => bytes : A\n'
+           'Boolean and bitwise eXclusive OR',
     'address': 'address\nAddress of an untyped contract',
     'big_map': 'big_map kty vty\nA lazily deserialized map from kty to vty',
     'bls12_381_fr': 'bls12_381_fr\nAn element of the BLS12-381 scalar field F\\ :sub:r',
@@ -254,6 +285,8 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'bool': 'bool\nA boolean',
     'bytes': 'bytes\nA sequence of bytes',
     'chain_id': 'chain_id\nA chain identifier',
+    'chest': 'chest\nA timelocked chest',
+    'chest_key': 'chest_key\nA key to open a timelocked chest',
     'contract': "contract type\nAddress of a contract, where type is the contract's parameter type",
     'int': 'int\nAn arbitrary-precision integer',
     'key': 'key\nA public cryptographic key',

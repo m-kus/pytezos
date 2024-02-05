@@ -57,4 +57,4 @@ class WaitHelpersTestCase(SandboxedNodeTestCase):
             prev_hash=head_hash,
         )
         bootstrap5 = self.client.shell.contracts[sandbox_addresses['bootstrap5']]()
-        self.assertEqual('3800000004000', bootstrap5['balance'])
+        self.assertEqual('3600000004000', bootstrap5['balance'])

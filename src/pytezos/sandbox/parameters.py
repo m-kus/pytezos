@@ -90,6 +90,8 @@ sandbox_params: Dict[str, Any] = {
     'proof_of_work_threshold': str((1 << 63) - 1),
     # NOTE: Faster block time. Otherwise, fails with round_of_past_timestamp/malformed_period. Yes, it's a string.
     'minimal_block_delay': '1',
+    # NOTE: proto.018-Proxford.validate.block.not_enough_attestations
+    'consensus_threshold': 0,
 }
 
 # NOTE: https://rpc.tzkt.io/oxfordnet/chains/main/blocks/head/context/constants/parametric
