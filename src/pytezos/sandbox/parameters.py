@@ -65,6 +65,7 @@ sandbox_addresses = {
 }
 
 sandbox_params: Dict[str, Any] = {
+    # NOTE: Built-in accounts
     'bootstrap_accounts': [
         ['edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav', '4000000000000'],
         ['edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9', '4000000000000'],
@@ -79,6 +80,7 @@ sandbox_params: Dict[str, Any] = {
             '100500000000',
         ],
     ],
+    # NOTE: Shorter cycles and voting periods
     'preserved_cycles': 0,
     'blocks_per_cycle': 8,
     'blocks_per_commitment': 4,
@@ -86,6 +88,8 @@ sandbox_params: Dict[str, Any] = {
     'blocks_per_stake_snapshot': 8,
     'cycles_per_voting_period': 64,
     'proof_of_work_threshold': str((1 << 63) - 1),
+    # NOTE: Faster block time. Otherwise, fails with round_of_past_timestamp/malformed_period. Yes, it's a string.
+    'minimal_block_delay': '1',
 }
 
 # NOTE: https://rpc.tzkt.io/oxfordnet/chains/main/blocks/head/context/constants/parametric
