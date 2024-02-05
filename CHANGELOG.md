@@ -1,5 +1,7 @@
 # Changelog
 
+## [3.11.0](https://github.com/baking-bad/pytezos/compare/3.10.3...3.11.0) (2024-02-05)
+
 ### Added
 
 * Compatibility with Oxfordnet protocol
