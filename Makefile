@@ -31,8 +31,8 @@ install:           ## Install project dependencies
 	poetry install \
 	`if [ "${DEV}" = "0" ]; then echo "--no-dev"; fi`
 
-lint:              ## Lint with all tools
-	make isort black ruff mypy
+## Lint with all tools
+lint: isort black ruff mypy
 
 test:              ## Run test suite
 	# FIXME: https://github.com/pytest-dev/pytest-xdist/issues/385#issuecomment-1177147322

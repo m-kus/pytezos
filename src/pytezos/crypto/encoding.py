@@ -2,10 +2,7 @@ from typing import Union
 
 import base58
 
-
-def tb(l):
-    return b''.join(map(lambda x: x.to_bytes(1, 'big'), l))
-
+tb = bytes
 
 base58_encodings = [
     #    Encoded   |               Decoded             |
@@ -22,8 +19,9 @@ base58_encodings = [
     (b"tz4", 36, tb([6, 161, 16]), 20, "BLS-MinPk"),
     (b"KT1", 36, tb([2, 90, 121]), 20, "originated address"),
     (b"txr1", 37, tb([1, 128, 120, 31]), 20, "tx_rollup_l2_address"),
-    (b"sr1", 36, tb([6, 124, 117]), 20, "address prefix for originated smart rollup"),
-    (b"src1", 54, tb([17, 165, 134, 138]), 32, "address prefix for smart rollup commitment"),
+    (b"sr1", 36, tb([6, 124, 117]), 20, "originated smart rollup address"),
+    (b"src1", 54, tb([17, 165, 134, 138]), 32, "smart rollup commitment hash"),
+    (b"srs1", 54, tb([17, 165, 235, 240]), 32, "smart rollup state hash"),
     (b"id", 30, tb([153, 103]), 16, "cryptobox public key hash"),
     (b'expr', 54, tb([13, 44, 64, 27]), 32, u'script expression'),
     (b"edsk", 54, tb([13, 15, 58, 7]), 32, "ed25519 seed"),

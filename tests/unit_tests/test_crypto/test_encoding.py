@@ -1,5 +1,4 @@
-from unittest import TestCase
-
+import pytest
 from parameterized import parameterized  # type: ignore
 
 from pytezos.crypto.encoding import base58_decode
@@ -11,58 +10,63 @@ from pytezos.crypto.encoding import is_sig
 from pytezos.crypto.encoding import scrub_input
 
 
-class TestEncoding(TestCase):
-    @parameterized.expand(
+class TestEncoding:
+    @pytest.mark.parametrize(
+        ('base58', 'prefix'),
         [
-            (b'NetXdQprcVkpaWU', b'Net'),
-            (b'BKjWN8ALguCJ3oAjzMjZCNcFfUf1p9BfVAwYiVHs1QW3yMB9RNb', b'B'),
-            (b'oop1fbAVi2ZwEt3vpu4uKpYGbbxumyMBSWwWf9qbByeM4JYAu92', b'o'),
-            (b'LLoabcny4pVg1k6x3AktnNhwe1KSVBZh5Di45JeZPhUCmCu5Xj6ND', b'LLo'),
-            (b'PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY', b'P'),
-            (b'CoUeRwFZbV7NaAYRTz6n4ZLUkwiWcm7oKYdKCGcsEYHgVxSQxa4h', b'Co'),
-            (b'tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', b'tz1'),
-            (b'tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', b'tz2'),
-            (b'tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', b'tz3'),
-            (b'txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', b'txr1'),
-            (b'edpku976gpuAD2bXyx1XGraeKuCo1gUZ3LAJcHM12W1ecxZwoiu22R', b'edpk'),
-            (b'sppk7aMNM3xh14haqEyaxNjSt7hXanCDyoWtRcxF8wbtya859ak6yZT', b'sppk'),
-            (b'p2pk679D18uQNkdjpRxuBXL5CqcDKTKzsiXVtc9oCUT6xb82zQmgUks', b'p2pk'),
-            (b'edsk3nM41ygNfSxVU4w1uAW3G9EnTQEB5rjojeZedLTGmiGRcierVv', b'edsk'),
-            (b'spsk1zkqrmst1yg2c4xi3crWcZPqgdc9KtPtb9SAZWYHAdiQzdHy7j', b'spsk'),
-            (b'p2sk3PM77YMR99AvD3fSSxeLChMdiQ6kkEzqoPuSwQqhPsh29irGLC', b'p2sk'),
-            (b'edesk1zxaPJkhNGSzgZDDSphvPzSNrnbmqes8xzUrw1wdFxdRT7ePiQz8D2Q18fMjn6fC9ZRS2rUbg8d8snxxznE', b'edesk'),
-            (b'spesk21cruoqtYmxfq5fpkXiZZRLRw4vh7VFJauGCAgHxZf3q6Q5LTv9m9dnMxyVjna6RzWQL45q4ppGLh97xZpV', b'spesk'),
-            (b'p2esk1rqdHRPz4xQh8uP8JaWSVnGFTKxkh2utdjK5CPDTXAzzh5sXnnobLkGrXEZzGhCKFDSjv8Ggrjt7PnobRzs', b'p2esk'),
+            ('NetXdQprcVkpaWU', 'Net'),
+            ('BKjWN8ALguCJ3oAjzMjZCNcFfUf1p9BfVAwYiVHs1QW3yMB9RNb', 'B'),
+            ('oop1fbAVi2ZwEt3vpu4uKpYGbbxumyMBSWwWf9qbByeM4JYAu92', 'o'),
+            ('LLoabcny4pVg1k6x3AktnNhwe1KSVBZh5Di45JeZPhUCmCu5Xj6ND', 'LLo'),
+            ('PtCJ7pwoxe8JasnHY8YonnLYjcVHmhiARPJvqcC6VfHT5s8k8sY', 'P'),
+            ('CoUeRwFZbV7NaAYRTz6n4ZLUkwiWcm7oKYdKCGcsEYHgVxSQxa4h', 'Co'),
+            ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', 'tz1'),
+            ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', 'tz2'),
+            ('tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', 'tz3'),
+            ('txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', 'txr1'),
+            ('edpku976gpuAD2bXyx1XGraeKuCo1gUZ3LAJcHM12W1ecxZwoiu22R', 'edpk'),
+            ('sppk7aMNM3xh14haqEyaxNjSt7hXanCDyoWtRcxF8wbtya859ak6yZT', 'sppk'),
+            ('p2pk679D18uQNkdjpRxuBXL5CqcDKTKzsiXVtc9oCUT6xb82zQmgUks', 'p2pk'),
+            ('edsk3nM41ygNfSxVU4w1uAW3G9EnTQEB5rjojeZedLTGmiGRcierVv', 'edsk'),
+            ('spsk1zkqrmst1yg2c4xi3crWcZPqgdc9KtPtb9SAZWYHAdiQzdHy7j', 'spsk'),
+            ('p2sk3PM77YMR99AvD3fSSxeLChMdiQ6kkEzqoPuSwQqhPsh29irGLC', 'p2sk'),
+            ('edesk1zxaPJkhNGSzgZDDSphvPzSNrnbmqes8xzUrw1wdFxdRT7ePiQz8D2Q18fMjn6fC9ZRS2rUbg8d8snxxznE', 'edesk'),
+            ('spesk21cruoqtYmxfq5fpkXiZZRLRw4vh7VFJauGCAgHxZf3q6Q5LTv9m9dnMxyVjna6RzWQL45q4ppGLh97xZpV', 'spesk'),
+            ('p2esk1rqdHRPz4xQh8uP8JaWSVnGFTKxkh2utdjK5CPDTXAzzh5sXnnobLkGrXEZzGhCKFDSjv8Ggrjt7PnobRzs', 'p2esk'),
             (
-                b'edsigtzLBGCyadERX1QsYHKpwnxSxEYQeGLnJGsSkHEsyY8vB5GcNdnvzUZDdFevJK7YZQ2ujwVjvQZn62ahCEcy74AwtbA8HuN',
-                b'edsig',
+                'edsigtzLBGCyadERX1QsYHKpwnxSxEYQeGLnJGsSkHEsyY8vB5GcNdnvzUZDdFevJK7YZQ2ujwVjvQZn62ahCEcy74AwtbA8HuN',
+                'edsig',
             ),
             (
-                b'spsig1RriZtYADyRhyNoQMa6AiPuJJ7AUDcrxWZfgqexzgANqMv4nXs6qsXDoXcoChBgmCcn2t7Y3EkJaVRuAmNh2cDDxWTdmsz',
-                b'spsig',
+                'spsig1RriZtYADyRhyNoQMa6AiPuJJ7AUDcrxWZfgqexzgANqMv4nXs6qsXDoXcoChBgmCcn2t7Y3EkJaVRuAmNh2cDDxWTdmsz',
+                'spsig',
             ),
-            (
-                b'sigUdRdXYCXW14xqT8mFTMkX4wSmDMBmcW1Vuz1vanGWqYTmuBodueUHGPUsbxgn73AroNwpEBHwPdhXUswzmvCzquiqtcHC',
-                b'sig',
-            ),
-        ]
+            ('sigUdRdXYCXW14xqT8mFTMkX4wSmDMBmcW1Vuz1vanGWqYTmuBodueUHGPUsbxgn73AroNwpEBHwPdhXUswzmvCzquiqtcHC', 'sig'),
+            ('sr1JZsZT5u27MUQXeTh1aHqZBo8NvyxRKnyv', 'sr1'),
+            ('src13FVgJq88nGcd3xmjtPr4j3wq9VJGkGZ3LaVKZ3PUT8dKbByviq', 'src1'),
+            ('srs1257rrkFCsjuDS5enYG37uSas1J25daCaMQ2y5gPwwtoy8FqvDP', 'srs1'),
+        ],
     )
-    def test_b58_decode_encode(self, string, prefix):
-        data = base58_decode(string)
-        result = base58_encode(data, prefix)
-        self.assertEqual(string, result)
+    def test_b58_decode_encode(self, base58: str, prefix: str):
+        expected: bytes = base58.encode()
+        decoded: bytes = base58_decode(expected)
+        print(decoded.hex())
+        re_encoded = base58_encode(decoded, prefix.encode())
+        assert re_encoded == expected
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        ('input_data', 'expected'),
         [
             ('test', b'test'),
             (b'test', b'test'),
             ('0x74657374', b'test'),
-        ]
+        ],
     )
     def test_scrub_input(self, input_data, expected):
-        self.assertEqual(expected, scrub_input(input_data))
+        assert scrub_input(input_data) == expected
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        ('value', 'expected'),
         [
             ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', True),
             ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', True),
@@ -71,12 +75,13 @@ class TestEncoding(TestCase):
             ('KT1ExvG3EjTrvDcAU7EqLNb77agPa5u6KvnY', False),
             ('qwerty', False),
             ('tz1eKkWU5hGtfLUiq', False),
-        ]
+        ],
     )
     def test_is_pkh(self, value, expected):
-        self.assertEqual(expected, is_pkh(value))
+        assert is_pkh(value) == expected
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        ('value', 'expected'),
         [
             ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', False),
             ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', False),
@@ -85,12 +90,13 @@ class TestEncoding(TestCase):
             ('KT1ExvG3EjTrvDcAU7EqLNb77agPa5u6KvnY', False),
             ('qwerty', False),
             ('tz1eKkWU5hGtfLUiq', False),
-        ]
+        ],
     )
     def test_is_l2_pkh(self, value, expected):
-        self.assertEqual(expected, is_l2_pkh(value))
+        assert is_l2_pkh(value) == expected
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        ('value', 'expected'),
         [
             (
                 'edsigtzLBGCyadERX1QsYHKpwnxSxEYQeGLnJGsSkHEsyY8vB5GcNdnvzUZDdFevJK7YZQ2ujwVjvQZn62ahCEcy74AwtbA8HuN',
@@ -103,16 +109,17 @@ class TestEncoding(TestCase):
             ('sigUdRdXYCXW14xqT8mFTMkX4wSmDMBmcW1Vuz1vanGWqYTmuBodueUHGPUsbxgn73AroNwpEBHwPdhXUswzmvCzquiqtcHC', True),
             ('qwerty', False),
             ('sigUdRdXYCXW14xqT8mFTMkX4wSmDMBmcW1Vuz1vanGWqYT', False),
-        ]
+        ],
     )
     def test_is_sig(self, value, expected):
-        self.assertEqual(expected, is_sig(value))
+        assert is_sig(value) == expected
 
-    @parameterized.expand(
+    @pytest.mark.parametrize(
+        ('value', 'expected'),
         [
             ('BLrbVv8rUfkpDZZ6efByhgjyDgPUFeKAfTMq8mWPmjXb9c5m8LJ', True),
             ('qwerty', False),
-        ]
+        ],
     )
     def test_is_bh(self, value, expected):
-        self.assertEqual(expected, is_bh(value))
+        assert is_bh(value) == expected
