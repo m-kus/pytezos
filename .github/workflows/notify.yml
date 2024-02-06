@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - '*.*.0'
+    branches:
+      - tmp/push-notification
 
 jobs:
   build:
@@ -19,9 +21,9 @@ jobs:
           changelog:
             - 'CHANGELOG.md'
     - name: Set env
-      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      run: echo "RELEASE_VERSION=3.11.0" >> $GITHUB_ENV
     - name: telegram notification
-      if: steps.filter.outputs.changelog == 'true'
+      # if: steps.filter.outputs.changelog == 'true'
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_TO }}
@@ -30,7 +32,7 @@ jobs:
           Pytezos ${{ env.RELEASE_VERSION }} has been released 🎉
           More info at https://github.com/baking-bad/pytezos/releases/tag/${{ env.RELEASE_VERSION }}
     - name: slack notification
-      if: steps.filter.outputs.changelog == 'true'
+      # if: steps.filter.outputs.changelog == 'true'
       uses: Ilshidur/action-slack@master
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
