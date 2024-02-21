@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+* Fixed protocol parameters for sandboxed node
+
 ## [3.11.1](https://github.com/baking-bad/pytezos/compare/3.11.0...3.11.1) (2024-02-07)
 
 ### Added

@@ -16,6 +16,20 @@ NAIROBI = 'PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf'
 OXFORD = 'ProxfordYmVfjWnRcgjWH36fW6PArwqykTFzotUxRs6gmTcZDuH'
 LATEST = OXFORD
 
+protocol_hashes = {
+    'edo': EDO,
+    'florence': FLORENCE,
+    'granada': GRANADA,
+    'hangzhou': HANGZHOU,
+    'ithaca': ITHACA,
+    'jakarta': JAKARTA,
+    'kathmandu': KATHMANDU,
+    'lima': LIMA,
+    'mumbai': MUMBAI,
+    'nairobi': NAIROBI,
+    'oxford': OXFORD,
+}
+
 protocol_version = {
     EDO: 8,
     FLORENCE: 9,
@@ -64,6 +78,7 @@ sandbox_addresses = {
     'bootstrap1': 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
 }
 
+# https://gitlab.com/tezos/tezos/-/blob/master/src/proto_018_Proxford/lib_parameters/default_parameters.ml#L283
 sandbox_params: Dict[str, Any] = {
     # NOTE: Built-in accounts
     'bootstrap_accounts': [
@@ -81,17 +96,20 @@ sandbox_params: Dict[str, Any] = {
         ],
     ],
     # NOTE: Shorter cycles and voting periods
-    'preserved_cycles': 0,
+    'preserved_cycles': 2,
     'blocks_per_cycle': 8,
     'blocks_per_commitment': 4,
-    'nonce_revelation_threshold': 1,
-    'blocks_per_stake_snapshot': 8,
-    'cycles_per_voting_period': 64,
+    'nonce_revelation_threshold': 4,
+    'blocks_per_stake_snapshot': 4,
+    'cycles_per_voting_period': 8,
     'proof_of_work_threshold': str((1 << 63) - 1),
-    # NOTE: Faster block time. Otherwise, fails with round_of_past_timestamp/malformed_period. Yes, it's a string.
+    'vdf_difficulty': '50000',
     'minimal_block_delay': '1',
-    # NOTE: proto.018-Proxford.validate.block.not_enough_attestations
+    'delay_increment_per_round': '1',
+    'consensus_committee_size': 256,
     'consensus_threshold': 0,
+    'limit_of_delegation_over_baking': 19,
+    'max_operations_time_to_live': 8,
 }
 
 # NOTE: https://rpc.tzkt.io/oxfordnet/chains/main/blocks/head/context/constants/parametric
