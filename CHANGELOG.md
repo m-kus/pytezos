@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.11.3](https://github.com/baking-bad/pytezos/compare/3.11.2...3.11.3) (2024-02-23)
+
+### Fixed
+
+* Updated cryptographic libraries
+
 ## [3.11.2](https://github.com/baking-bad/pytezos/compare/3.11.1...3.11.2) (2024-02-22)
 
 ### Fixed
