@@ -11,7 +11,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
            'ADD :: bls12_381_g2 : bls12_381_g2 : A => bls12_381_g2 : A\n'
            'ADD :: bls12_381_fr : bls12_381_fr : A => bls12_381_fr : A\n'
            'Add two numerical values',
-    'ADDRESS': 'ADDRESS\nADDRESS :: contract ty1 : A => address : A\nPush the address of a contract',
+    'ADDRESS': 'ADDRESS\nADDRESS :: contract ty1 : A => address : A\nCast a typed address to an untyped address',
     'AMOUNT': 'AMOUNT\nAMOUNT :: A => mutez : A\nPush the amount of the current transaction',
     'AND': 'AND\n'
            'AND :: bool : bool : A => bool : A\n'
@@ -45,7 +45,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'CONS': 'CONS\nCONS :: ty1 : list ty1 : A => list ty1 : A\nPrepend an element to a list',
     'CONTRACT': 'CONTRACT ty\n'
                 'CONTRACT ty :: address : A => option ( contract ty ) : A\n'
-                'Cast an address to a typed contract',
+                'Cast an address to a typed address',
     'CREATE_ACCOUNT': '\nPush an account creation operation',
     'CREATE_CONTRACT': 'CREATE_CONTRACT { parameter ty1 ; storage ty2 ; code instr1 }\n'
                        'CREATE_CONTRACT { parameter ty1 ; storage ty2 ; code instr1 } :: option key_hash : mutez : ty2 '
@@ -99,7 +99,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'IF_NONE': 'IF_NONE instr1 instr2\nIF_NONE instr1 instr2 :: option ty1 : A => B\nInspect an optional value',
     'IMPLICIT_ACCOUNT': 'IMPLICIT_ACCOUNT\n'
                         'IMPLICIT_ACCOUNT :: key_hash : A => contract unit : A\n'
-                        'Create an implicit account',
+                        'Convert a key hash to a typed address',
     'INT': 'INT\n'
            'INT :: nat : A => int : A\n'
            'INT :: bls12_381_fr : A => int : A\n'
@@ -210,7 +210,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
                              'Verify and apply a transaction on a Sapling state',
     'SELF': 'SELF\nSELF :: A => contract ty : A\nPush the current contract',
     'SELF_ADDRESS': 'SELF_ADDRESS\nSELF_ADDRESS :: A => address : A\nPush the address of the current contract',
-    'SENDER': 'SENDER\nSENDER :: A => address : A\nPush the contract that initiated the current internal transaction',
+    'SENDER': 'SENDER\nSENDER :: A => address : A\nPush the address that directly initiated the current transaction',
     'SEQ': 'instr1 ; instr2\ninstr1 ; instr2 :: A => C\nInstruction sequence',
     'SET_DELEGATE': 'SET_DELEGATE\nSET_DELEGATE :: option key_hash : A => operation : A\nPush a delegation operation',
     'SHA256': 'SHA256\nSHA256 :: bytes : A => bytes : A\nCompute a SHA-256 cryptographic hash',
@@ -228,7 +228,9 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
              'SLICE :: nat : nat : bytes : A => option bytes : A\n'
              'Obtain a substring or subsequence of a string respectively byte sequence bytes',
     'SOME': 'SOME\nSOME :: ty1 : A => option ty1 : A\nWrap an existing optional value',
-    'SOURCE': 'SOURCE\nSOURCE :: A => address : A\nPush the contract that initiated the current transaction',
+    'SOURCE': 'SOURCE\n'
+              'SOURCE :: A => address : A\n'
+              'Push the address that directly or indirectly initiated the current transaction',
     'SPLIT_TICKET': 'SPLIT_TICKET\n'
                     'SPLIT_TICKET :: ticket cty : pair nat nat : A => option ( pair ( ticket cty ) ( ticket cty ) ) : '
                     'A\n'
@@ -248,7 +250,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'TOP': '',
     'TOTAL_VOTING_POWER': 'TOTAL_VOTING_POWER\n'
                           'TOTAL_VOTING_POWER :: A => nat : A\n'
-                          'Return the total voting power of all contracts',
+                          'Return the total voting power of all delegates',
     'TRANSFER_TOKENS': 'TRANSFER_TOKENS\n'
                        'TRANSFER_TOKENS :: ty : mutez : contract ty : A => operation : A\n'
                        'Push a transaction operation',
@@ -269,15 +271,13 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
                "UPDATE ( n + 2 ) :: ty : pair ty1 ty2 : A => pair ty1 ty' : A\n"
                'Update an element or a sub comb in a right comb',
     'VIEW': 'VIEW name return_ty\nVIEW name return_ty :: ty : address : A => option return_ty : A\nCall a view',
-    'VOTING_POWER': 'VOTING_POWER\n'
-                    'VOTING_POWER :: key_hash : A => nat : A\n'
-                    'Return the voting power of a given contract',
+    'VOTING_POWER': 'VOTING_POWER\nVOTING_POWER :: key_hash : A => nat : A\nReturn the voting power of a given account',
     'XOR': 'XOR\n'
            'XOR :: bool : bool : A => bool : A\n'
            'XOR :: nat : nat : A => nat : A\n'
            'XOR :: bytes : bytes : A => bytes : A\n'
            'Boolean and bitwise eXclusive OR',
-    'address': 'address\nAddress of an untyped contract',
+    'address': 'address\nUntyped address of a smart contract, account, or rollup',
     'big_map': 'big_map kty vty\nA lazily deserialized map from kty to vty',
     'bls12_381_fr': 'bls12_381_fr\nAn element of the BLS12-381 scalar field F\\ :sub:r',
     'bls12_381_g1': 'bls12_381_g1\nA point on the BLS12-381 curve G\\ :sub:1',
@@ -287,7 +287,7 @@ docs = {   'ABS': 'ABS\nABS :: int : A => nat : A\nObtain the absolute value of 
     'chain_id': 'chain_id\nA chain identifier',
     'chest': 'chest\nA timelocked chest',
     'chest_key': 'chest_key\nA key to open a timelocked chest',
-    'contract': "contract type\nAddress of a contract, where type is the contract's parameter type",
+    'contract': 'contract type\nAddress of a smart contract, account, or rollup, where type is the parameter type',
     'int': 'int\nAn arbitrary-precision integer',
     'key': 'key\nA public cryptographic key',
     'key_hash': 'key_hash\nA hash of a public cryptographic key',

@@ -1,5 +1,14 @@
 # Changelog
 
+### Added
+
+* Parisnet protocol support
+* Compatibility with Python 3.12
+
+### Changed
+
+* Octez binaries updated to v19.2
+
 ## [3.11.3](https://github.com/baking-bad/pytezos/compare/3.11.2...3.11.3) (2024-02-23)
 
 ### Fixed

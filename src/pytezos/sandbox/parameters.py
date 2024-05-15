@@ -14,7 +14,8 @@ LIMA = 'PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW'
 MUMBAI = 'PtMumbai2TmsJHNGRkD8v8YDbtao7BLUC3wjASn1inAKLFCjaH1'
 NAIROBI = 'PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf'
 OXFORD = 'ProxfordYmVfjWnRcgjWH36fW6PArwqykTFzotUxRs6gmTcZDuH'
-LATEST = OXFORD
+PARIS = 'PtParisBQscdCm6Cfow6ndeU6wKJyA3aV1j4D3gQBQMsTQyJCrz'
+LATEST = PARIS
 
 protocol_hashes = {
     'edo': EDO,
@@ -28,6 +29,7 @@ protocol_hashes = {
     'mumbai': MUMBAI,
     'nairobi': NAIROBI,
     'oxford': OXFORD,
+    'paris': PARIS,
 }
 
 protocol_version = {
@@ -42,6 +44,7 @@ protocol_version = {
     MUMBAI: 16,
     NAIROBI: 17,
     OXFORD: 18,
+    PARIS: 19,
 }
 
 sandbox_commitment = {
@@ -78,7 +81,7 @@ sandbox_addresses = {
     'bootstrap1': 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
 }
 
-# https://gitlab.com/tezos/tezos/-/blob/master/src/proto_018_Proxford/lib_parameters/default_parameters.ml#L283
+# https://gitlab.com/tezos/tezos/-/blob/master/src/proto_019_PtParisB/lib_parameters/default_parameters.ml#L317
 sandbox_params: Dict[str, Any] = {
     # NOTE: Built-in accounts
     'bootstrap_accounts': [
@@ -112,27 +115,27 @@ sandbox_params: Dict[str, Any] = {
     'max_operations_time_to_live': 8,
 }
 
-# NOTE: https://rpc.tzkt.io/oxfordnet/chains/main/blocks/head/context/constants/parametric
-oxford_params = {
-    "preserved_cycles": 3,
-    "blocks_per_cycle": 8192,
-    "blocks_per_commitment": 64,
-    "nonce_revelation_threshold": 512,
-    "blocks_per_stake_snapshot": 512,
+# NOTE: https://rpc.tzkt.io/parisnet/chains/main/blocks/head/context/constants/parametric
+paris_params = {
+    "consensus_rights_delay": 2,
+    "blocks_preservation_cycles": 1,
+    "delegate_parameters_activation_delay": 5,
+    "blocks_per_cycle": 12288,
+    "blocks_per_commitment": 96,
+    "nonce_revelation_threshold": 768,
     "cycles_per_voting_period": 1,
     "hard_gas_limit_per_operation": "1040000",
-    "hard_gas_limit_per_block": "2600000",
+    "hard_gas_limit_per_block": "1733333",
     "proof_of_work_threshold": "-1",
     "minimal_stake": "6000000000",
     "minimal_frozen_stake": "600000000",
     "vdf_difficulty": "10000000000",
     "origination_size": 257,
     "issuance_weights": {
-        "base_total_issued_per_minute": "85007812",
+        "base_total_issued_per_minute": "80007812",
         "baking_reward_fixed_portion_weight": 5120,
         "baking_reward_bonus_weight": 5120,
         "attesting_reward_weight": 10240,
-        "liquidity_baking_subsidy_weight": 1280,
         "seed_nonce_revelation_tip_weight": 1,
         "vdf_revelation_tip_weight": 1,
     },
@@ -141,48 +144,52 @@ oxford_params = {
     "quorum_min": 2000,
     "quorum_max": 7000,
     "min_proposal_quorum": 500,
+    "liquidity_baking_subsidy": "5000000",
     "liquidity_baking_toggle_ema_threshold": 1000000000,
-    "max_operations_time_to_live": 240,
-    "minimal_block_delay": "8",
-    "delay_increment_per_round": "3",
+    "max_operations_time_to_live": 360,
+    "minimal_block_delay": "5",
+    "delay_increment_per_round": "2",
     "consensus_committee_size": 7000,
     "consensus_threshold": 4667,
     "minimal_participation_ratio": {"numerator": 2, "denominator": 3},
     "limit_of_delegation_over_baking": 9,
-    "percentage_of_frozen_deposits_slashed_per_double_baking": 5,
-    "percentage_of_frozen_deposits_slashed_per_double_attestation": 50,
+    "percentage_of_frozen_deposits_slashed_per_double_baking": 500,
+    "percentage_of_frozen_deposits_slashed_per_double_attestation": 5000,
+    "max_slashing_per_block": 10000,
+    "max_slashing_threshold": 2334,
     "testnet_dictator": "tz1Xf8zdT3DbAX9cHw3c3CXh79rc4nK4gCe8",
     "cache_script_size": 100000000,
     "cache_stake_distribution_cycles": 8,
     "cache_sampler_state_cycles": 8,
     "dal_parametric": {
-        "feature_enable": False,
-        "number_of_slots": 256,
-        "attestation_lag": 4,
-        "attestation_threshold": 50,
-        "blocks_per_epoch": 1,
-        "redundancy_factor": 16,
-        "page_size": 4096,
-        "slot_size": 1048576,
-        "number_of_shards": 2048,
+        "feature_enable": True,
+        "incentives_enable": False,
+        "number_of_slots": 32,
+        "attestation_lag": 8,
+        "attestation_threshold": 66,
+        "redundancy_factor": 8,
+        "page_size": 3967,
+        "slot_size": 126944,
+        "number_of_shards": 512,
     },
     "smart_rollup_arith_pvm_enable": False,
     "smart_rollup_origination_size": 6314,
-    "smart_rollup_challenge_window_in_blocks": 40,
+    "smart_rollup_challenge_window_in_blocks": 241920,
     "smart_rollup_stake_amount": "10000000000",
-    "smart_rollup_commitment_period_in_blocks": 20,
-    "smart_rollup_max_lookahead_in_blocks": 30000,
-    "smart_rollup_max_active_outbox_levels": 20160,
+    "smart_rollup_commitment_period_in_blocks": 180,
+    "smart_rollup_max_lookahead_in_blocks": 518400,
+    "smart_rollup_max_active_outbox_levels": 241920,
     "smart_rollup_max_outbox_messages_per_level": 100,
     "smart_rollup_number_of_sections_in_dissection": 32,
-    "smart_rollup_timeout_period_in_blocks": 500,
+    "smart_rollup_timeout_period_in_blocks": 120960,
     "smart_rollup_max_number_of_cemented_commitments": 5,
     "smart_rollup_max_number_of_parallel_games": 32,
     "smart_rollup_reveal_activation_level": {
         "raw_data": {"Blake2B": 0},
         "metadata": 0,
-        "dal_page": 2147483646,
-        "dal_parameters": 2147483646,
+        "dal_page": 8193,
+        "dal_parameters": 8193,
+        "dal_attested_slots_validity_lag": 241920,
     },
     "smart_rollup_private_enable": True,
     "smart_rollup_riscv_pvm_enable": False,
@@ -192,24 +199,31 @@ oxford_params = {
     "zk_rollup_max_ticket_payload_size": 2048,
     "global_limit_of_staking_over_baking": 5,
     "edge_of_staking_over_delegation": 2,
-    "adaptive_issuance_launch_ema_threshold": 100000000,
+    "adaptive_issuance_launch_ema_threshold": 0,
     "adaptive_rewards_params": {
-        "issuance_ratio_min": {"numerator": "1", "denominator": "2000"},
-        "issuance_ratio_max": {"numerator": "1", "denominator": "20"},
+        "issuance_ratio_final_min": {"numerator": "1", "denominator": "400"},
+        "issuance_ratio_final_max": {"numerator": "1", "denominator": "10"},
+        "issuance_ratio_initial_min": {"numerator": "9", "denominator": "200"},
+        "issuance_ratio_initial_max": {"numerator": "11", "denominator": "200"},
+        "initial_period": 10,
+        "transition_period": 50,
         "max_bonus": "50000000000000",
-        "growth_rate": {"numerator": "1", "denominator": "100"},
+        "growth_rate": {"numerator": "1", "denominator": "25"},
         "center_dz": {"numerator": "1", "denominator": "2"},
         "radius_dz": {"numerator": "1", "denominator": "50"},
     },
-    "adaptive_issuance_activation_vote_enable": False,
+    "adaptive_issuance_activation_vote_enable": True,
     "autostaking_enable": True,
+    "adaptive_issuance_force_activation": False,
+    "ns_enable": True,
+    "direct_ticket_spending_enable": False,
 }
 
 
 def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
     # https://gitlab.com/tezos/tezos/-/blob/master/src/proto_018_Proxford/lib_parameters/default_parameters.ml
     return {
-        **oxford_params,
+        **paris_params,
         # **old_params,
         **sandbox_params,
     }

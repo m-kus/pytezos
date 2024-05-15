@@ -5,6 +5,7 @@ rpc_docs = {
       "config",
       "errors",
       "fetch_protocol",
+      "health",
       "injection",
       "monitor",
       "network",
@@ -161,9 +162,17 @@ rpc_docs = {
   },
   "/config/network": {
     "props": [
+      "dal",
       "user_activated_protocol_overrides",
       "user_activated_upgrades"
     ]
+  },
+  "/config/network/dal": {
+    "GET": {
+      "descr": "Configuration for the DAL",
+      "args": [],
+      "ret": "Object"
+    }
   },
   "/config/network/user_activated_protocol_overrides": {
     "GET": {
@@ -195,6 +204,18 @@ rpc_docs = {
   "/fetch_protocol/{}": {
     "GET": {
       "descr": "Fetch a protocol from the network.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/health": {
+    "props": [
+      "ready"
+    ]
+  },
+  "/health/ready": {
+    "GET": {
+      "descr": "Returns whether or not the node is ready to answer to requests.",
       "args": [],
       "ret": "Object"
     }
@@ -257,11 +278,12 @@ rpc_docs = {
   "/monitor": {
     "props": [
       "active_chains",
+      "applied_blocks",
       "bootstrapped",
       "commit_hash",
       "heads",
       "protocols",
-      "valid_blocks"
+      "validated_blocks"
     ]
   },
   "/monitor/active_chains": {
@@ -269,6 +291,26 @@ rpc_docs = {
       "descr": "Monitor every chain creation and destruction. Currently active chains will be given as first elements",
       "args": [],
       "ret": "Array"
+    }
+  },
+  "/monitor/applied_blocks": {
+    "GET": {
+      "descr": "Monitor all blocks that are successfully applied and stored by the node, disregarding whether they were selected as the new head or not.",
+      "args": [
+        {
+          "name": "protocol",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "next_protocol",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "chain",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/monitor/bootstrapped": {
@@ -293,8 +335,12 @@ rpc_docs = {
   },
   "/monitor/heads/{}": {
     "GET": {
-      "descr": "Monitor all blocks that are successfully validated by the node and selected as the new head of the given chain.",
+      "descr": "Monitor all blocks that are successfully validated and applied by the node and selected as the new head of the given chain.",
       "args": [
+        {
+          "name": "protocol",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
         {
           "name": "next_protocol",
           "descr": "\u00af\\_(\u30c4)_/\u00af"
@@ -310,9 +356,9 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/monitor/valid_blocks": {
+  "/monitor/validated_blocks": {
     "GET": {
-      "descr": "Monitor all blocks that are successfully validated by the node, disregarding whether they were selected as the new head or not.",
+      "descr": "Monitor all blocks that were successfully validated by the node but are not applied nor stored yet, disregarding whether they are going to be selected as the new head or not.",
       "args": [
         {
           "name": "protocol",
@@ -338,9 +384,7 @@ rpc_docs = {
       "peers",
       "points",
       "self",
-      "stat",
-      "version",
-      "versions"
+      "stat"
     ]
   },
   "/network/connections": {
@@ -378,17 +422,9 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "clear",
       "ips",
       "peers"
     ]
-  },
-  "/network/greylist/clear": {
-    "GET": {
-      "descr": "DEPRECATED: Clear all greylists tables. This will unban all addresses and peers automatically greylisted by the system. Use DELETE `/network/greylist` instead",
-      "args": [],
-      "ret": "Object"
-    }
   },
   "/network/greylist/ips": {
     "GET": {
@@ -439,20 +475,9 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "ban",
       "banned",
-      "log",
-      "trust",
-      "unban",
-      "untrust"
+      "log"
     ]
-  },
-  "/network/peers/{}/ban": {
-    "GET": {
-      "descr": "DEPRECATED: Blacklist the given peer and remove it from the whitelist if present. Use PATCH `network/peers/<peer_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
   },
   "/network/peers/{}/banned": {
     "GET": {
@@ -471,27 +496,6 @@ rpc_docs = {
         }
       ],
       "ret": "Array"
-    }
-  },
-  "/network/peers/{}/trust": {
-    "GET": {
-      "descr": "DEPRECATED: Whitelist a given peer permanently and remove it from the blacklist if present. The peer cannot be blocked (but its host IP still can). Use PATCH `network/peers/<peer_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/network/peers/{}/unban": {
-    "GET": {
-      "descr": "DEPRECATED: Remove the given peer from the blacklist. Use PATCH `network/peers/<peer_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/network/peers/{}/untrust": {
-    "GET": {
-      "descr": "DEPRECATED: Remove a given peer from the whitelist. Use PATCH `network/peers/<peer_id>` instead.",
-      "args": [],
-      "ret": "Object"
     }
   },
   "/network/points": {
@@ -532,20 +536,9 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "ban",
       "banned",
-      "log",
-      "trust",
-      "unban",
-      "untrust"
+      "log"
     ]
-  },
-  "/network/points/{}/ban": {
-    "GET": {
-      "descr": "DEPRECATED: Blacklist the given address and remove it from the whitelist if present. Use PATCH `/network/point/<point_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
   },
   "/network/points/{}/banned": {
     "GET": {
@@ -566,27 +559,6 @@ rpc_docs = {
       "ret": "Array"
     }
   },
-  "/network/points/{}/trust": {
-    "GET": {
-      "descr": "DEPRECATED: Trust a given address permanently and remove it from the blacklist if present. Connections from this address can still be closed on authentication if the peer is greylisted. Use PATCH`/network/point/<point_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/network/points/{}/unban": {
-    "GET": {
-      "descr": "DEPRECATED: Remove an address from the blacklist. Use PATCH `/network/point/<point_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/network/points/{}/untrust": {
-    "GET": {
-      "descr": "DEPRECATED: Remove an address from the whitelist. Use PATCH `/network/point/<point_id>` instead.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
   "/network/self": {
     "GET": {
       "descr": "Return the node's peer id",
@@ -599,20 +571,6 @@ rpc_docs = {
       "descr": "Global network bandwidth statistics in B/s.",
       "args": [],
       "ret": "Object"
-    }
-  },
-  "/network/version": {
-    "GET": {
-      "descr": "DEPRECATED: use `version` instead.",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/network/versions": {
-    "GET": {
-      "descr": "DEPRECATED: use `version` instead.",
-      "args": [],
-      "ret": "Array"
     }
   },
   "/private": {
@@ -809,14 +767,14 @@ rpc_docs = {
   },
   "/chains/{}/mempool/ban_operation": {
     "POST": {
-      "descr": "Remove an operation from the mempool if present, reverting its effect if it was applied. Add it to the set of banned operations to prevent it from being fetched/processed/injected in the future. Note: If the baker has already received the operation, then it's necessary to restart it to flush the operation from it.",
+      "descr": "Remove an operation from the mempool if present. Also add it to the set of banned operations to prevent it from being fetched/processed/injected in the future. Note: If the baker has already received the operation, then it's necessary to restart it to flush the operation from it.",
       "args": [],
       "ret": "Object"
     }
   },
   "/chains/{}/mempool/filter": {
     "GET": {
-      "descr": "Get the configuration of the mempool filter. The minimal_fees are in mutez. Each field minimal_nanotez_per_xxx is a rational number given as a numerator and a denominator, e.g. \"minimal_nanotez_per_gas_unit\": [ \"100\", \"1\" ].",
+      "descr": "Get the configuration of the mempool's filter and bounds. Values of the form [ \"21\", \"20\" ] are rational numbers given as a numerator and a denominator, e.g. 21/20 = 1.05. The minimal_fees (in mutez), minimal_nanotez_per_gas_unit, and minimal_nanotez_per_byte are requirements that a manager operation must meet to be considered by the mempool. replace_by_fee_factor is how much better a manager operation must be to replace a previous valid operation **from the same manager** (both its fee and its fee/gas ratio must exceed the old operation's by at least this factor). max_operations and max_total_bytes are the bounds on respectively the number of valid operations in the mempool and the sum of their sizes in bytes.",
       "args": [
         {
           "name": "include_default",
@@ -826,7 +784,7 @@ rpc_docs = {
       "ret": "Object"
     },
     "POST": {
-      "descr": "Set the configuration of the mempool filter. **If any of the fields is absent from the input JSON, then it is set to the default value for this field (i.e. its value in the default configuration), even if it previously had a different value.** If the input JSON does not describe a valid configuration, then the configuration is left unchanged. Also return the new configuration (which may differ from the input if it had omitted fields or was invalid). You may call [./octez-client rpc get '/chains/main/mempool/filter?include_default=true'] to see an example of JSON describing a valid configuration.",
+      "descr": "Set the configuration of the mempool's filter and bounds. **If any of the fields is absent from the input JSON, then it is set to the default value for this field (i.e. its value in the default configuration), even if it previously had a different value.** If the input JSON does not describe a valid configuration, then the configuration is left unchanged. This RPC also returns the new configuration of the mempool (which may differ from the input if the latter omits fields or is invalid). You may call [octez-client rpc get '/chains/main/mempool/filter?include_default=true'] to see an example of JSON describing a valid configuration. See the description of that RPC for details on each configurable value.",
       "args": [],
       "ret": "Object"
     }
@@ -836,8 +794,12 @@ rpc_docs = {
       "descr": "Monitor the mempool operations.",
       "args": [
         {
-          "name": "applied",
-          "descr": "Include applied operations (set by default)"
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "validated",
+          "descr": "Include validated operations (set by default)"
         },
         {
           "name": "refused",
@@ -854,9 +816,13 @@ rpc_docs = {
         {
           "name": "branch_delayed",
           "descr": "Include branch delayed operations (set by default)"
+        },
+        {
+          "name": "validation_pass",
+          "descr": "Include operations filtered by validation pass (all by default)"
         }
       ],
-      "ret": "Array"
+      "ret": "Object"
     }
   },
   "/chains/{}/mempool/pending_operations": {
@@ -868,8 +834,8 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         },
         {
-          "name": "applied",
-          "descr": "Include applied operations (true by default)"
+          "name": "validated",
+          "descr": "Include validated operations (true by default)"
         },
         {
           "name": "refused",
@@ -886,6 +852,10 @@ rpc_docs = {
         {
           "name": "branch_delayed",
           "descr": "Include branch delayed operations (true by default)"
+        },
+        {
+          "name": "validation_pass",
+          "descr": "Include operations filtered by validation pass (all by default)"
         }
       ],
       "ret": "Object"
@@ -922,6 +892,10 @@ rpc_docs = {
       "descr": "All the information about a block. The associated metadata may not be present depending on the history mode and block's distance from the head.",
       "args": [
         {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
           "name": "force_metadata",
           "descr": "DEPRECATED: Forces to recompute the operations metadata if it was considered as too large."
         },
@@ -945,29 +919,40 @@ rpc_docs = {
       "operations",
       "operations_metadata_hash",
       "protocols",
+      "resulting_context_hash",
       "votes"
     ]
   },
   "/chains/{}/blocks/{}/context": {
     "props": [
+      "adaptive_issuance_launch_cycle",
       "big_maps",
       "cache",
       "constants",
       "contracts",
       "dal",
       "delegates",
+      "denunciations",
+      "issuance",
       "liquidity_baking",
       "merkle_tree",
       "merkle_tree_v2",
       "nonces",
       "raw",
       "sapling",
-      "sc_rollup",
       "seed",
       "seed_computation",
-      "selected_snapshot",
-      "tx_rollup"
+      "smart_rollups",
+      "total_frozen_stake",
+      "total_supply"
     ]
+  },
+  "/chains/{}/blocks/{}/context/adaptive_issuance_launch_cycle": {
+    "GET": {
+      "descr": "Returns the cycle at which the launch of the Adaptive Issuance feature is set to happen. A result of None means that the feature is not yet set to launch.",
+      "args": [],
+      "ret": "Object"
+    }
   },
   "/chains/{}/blocks/{}/context/big_maps": {
     "item": {
@@ -1101,18 +1086,34 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
+      "all_ticket_balances",
       "balance",
       "balance_and_frozen_bonds",
       "big_map_get",
       "counter",
       "delegate",
       "entrypoints",
+      "estimated_own_pending_slashed_amount",
       "frozen_bonds",
+      "full_balance",
       "manager_key",
       "script",
       "single_sapling_get_diff",
-      "storage"
+      "staked_balance",
+      "staking_numerator",
+      "storage",
+      "ticket_balance",
+      "unstake_requests",
+      "unstaked_finalizable_balance",
+      "unstaked_frozen_balance"
     ]
+  },
+  "/chains/{}/blocks/{}/context/contracts/{}/all_ticket_balances": {
+    "GET": {
+      "descr": "Access the complete list of tickets owned by the given contract by scanning the contract's storage.",
+      "args": [],
+      "ret": "Array"
+    }
   },
   "/chains/{}/blocks/{}/context/contracts/{}/balance": {
     "GET": {
@@ -1177,9 +1178,23 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/contracts/{}/estimated_own_pending_slashed_amount": {
+    "GET": {
+      "descr": "Returns the estimated own pending slashed amount (in mutez) of a given contract.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/contracts/{}/frozen_bonds": {
     "GET": {
       "descr": "Access the frozen bonds of a contract.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/contracts/{}/full_balance": {
+    "GET": {
+      "descr": "Access the full balance of a contract, including frozen bonds and stake.",
       "args": [],
       "ret": "Object"
     }
@@ -1224,6 +1239,20 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/contracts/{}/staked_balance": {
+    "GET": {
+      "descr": "Access the staked balance of a contract. Returns None if the contract is originated, or neither delegated nor a delegate.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/contracts/{}/staking_numerator": {
+    "GET": {
+      "descr": "Returns an abstract representation of the contract's total_delegated_stake.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/contracts/{}/storage": {
     "GET": {
       "descr": "Access the data of the contract.",
@@ -1257,16 +1286,74 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/dal": {
-    "props": [
-      "confirmed_slots_history"
-    ]
+  "/chains/{}/blocks/{}/context/contracts/{}/ticket_balance": {
+    "POST": {
+      "descr": "Access the contract's balance of ticket with specified ticketer, content type, and content.",
+      "args": [],
+      "ret": "String"
+    }
   },
-  "/chains/{}/blocks/{}/context/dal/confirmed_slots_history": {
+  "/chains/{}/blocks/{}/context/contracts/{}/unstake_requests": {
     "GET": {
-      "descr": "Returns the value of the DAL confirmed slots history skip list if DAL is enabled, or [None] otherwise.",
+      "descr": "Access the unstake requests of the contract. The requests that appear in the finalizable field can be finalized, which means that the contract can transfer these (no longer frozen) funds to their spendable balance with a [finalize_unstake] operation call. Returns None if there is no unstake request pending.",
       "args": [],
       "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/contracts/{}/unstaked_finalizable_balance": {
+    "GET": {
+      "descr": "Access the balance of a contract that was requested for an unstake operation, and is no longer frozen, which means it will appear in the spendable balance of the contract after any stake/unstake/finalize_unstake operation. Returns None if the contract is originated.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/contracts/{}/unstaked_frozen_balance": {
+    "GET": {
+      "descr": "Access the balance of a contract that was requested for an unstake operation, but is still frozen for the duration of the slashing period. Returns None if the contract is originated.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/dal": {
+    "props": [
+      "commitments_history",
+      "published_slot_headers",
+      "shards"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/dal/commitments_history": {
+    "GET": {
+      "descr": "Returns the (currently last) DAL skip list cell if DAL is enabled, or [None] otherwise.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/dal/published_slot_headers": {
+    "GET": {
+      "descr": "Get the published slots headers for the given level",
+      "args": [
+        {
+          "name": "level",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/dal/shards": {
+    "GET": {
+      "descr": "Get the shards assignment for a given level (the default is the current level) and given delegates (the default is all delegates)",
+      "args": [
+        {
+          "name": "level",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "delegates",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
     }
   },
   "/chains/{}/blocks/{}/context/delegates": {
@@ -1304,20 +1391,39 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
+      "active_staking_parameters",
       "consensus_key",
+      "current_baking_power",
       "current_frozen_deposits",
+      "current_voting_power",
       "deactivated",
       "delegated_balance",
       "delegated_contracts",
+      "denunciations",
+      "estimated_shared_pending_slashed_amount",
       "frozen_deposits",
       "frozen_deposits_limit",
       "full_balance",
       "grace_period",
+      "is_forbidden",
+      "min_delegated_in_current_cycle",
       "participation",
+      "pending_staking_parameters",
+      "stakers",
       "staking_balance",
+      "staking_denominator",
+      "total_delegated_stake",
+      "unstaked_frozen_deposits",
       "voting_info",
       "voting_power"
     ]
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/active_staking_parameters": {
+    "GET": {
+      "descr": "Returns the currently active staking parameters for the given delegate.",
+      "args": [],
+      "ret": "Object"
+    }
   },
   "/chains/{}/blocks/{}/context/delegates/{}/consensus_key": {
     "GET": {
@@ -1326,11 +1432,25 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/delegates/{}/current_baking_power": {
+    "GET": {
+      "descr": "The baking power of a delegate, as computed from its current stake. This value is not used for computing baking rights but only reflects the baking power that the delegate would have if the cycle ended at the current block.",
+      "args": [],
+      "ret": "String"
+    }
+  },
   "/chains/{}/blocks/{}/context/delegates/{}/current_frozen_deposits": {
     "GET": {
-      "descr": "Returns the current amount of the frozen deposits (in mutez).",
+      "descr": "Returns the current amount of the frozen deposits (in mutez). That is the frozen deposits at beginning of cycle plus rewards minus unstaked and slashing. It doesn't count unstaked frozen deposits.",
       "args": [],
       "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/current_voting_power": {
+    "GET": {
+      "descr": "The voting power of a given delegate, as computed from its current stake.",
+      "args": [],
+      "ret": "String"
     }
   },
   "/chains/{}/blocks/{}/context/delegates/{}/deactivated": {
@@ -1354,9 +1474,23 @@ rpc_docs = {
       "ret": "Array"
     }
   },
+  "/chains/{}/blocks/{}/context/delegates/{}/denunciations": {
+    "GET": {
+      "descr": "Returns the pending denunciations for the given delegate.",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/estimated_shared_pending_slashed_amount": {
+    "GET": {
+      "descr": "Returns the estimated shared pending slashed amount (in mutez) of a given delegate.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/delegates/{}/frozen_deposits": {
     "GET": {
-      "descr": "Returns the initial amount (that is, at the beginning of a cycle) of the frozen deposits (in mutez). This amount is the same as the current amount of the frozen deposits, unless the delegate has been punished.",
+      "descr": "Returns the amount (in mutez) frozen as a deposit at the time the staking rights for the current cycle where computed.",
       "args": [],
       "ret": "Object"
     }
@@ -1382,11 +1516,39 @@ rpc_docs = {
       "ret": "Integer"
     }
   },
-  "/chains/{}/blocks/{}/context/delegates/{}/participation": {
+  "/chains/{}/blocks/{}/context/delegates/{}/is_forbidden": {
     "GET": {
-      "descr": "Returns cycle and level participation information. In particular this indicates, in the field 'expected_cycle_activity', the number of slots the delegate is expected to have in the cycle based on its active stake. The field 'minimal_cycle_activity' indicates the minimal endorsing slots in the cycle required to get endorsing rewards. It is computed based on 'expected_cycle_activity. The fields 'missed_slots' and 'missed_levels' indicate the number of missed endorsing slots and missed levels (for endorsing) in the cycle so far. 'missed_slots' indicates the number of missed endorsing slots in the cycle so far. The field 'remaining_allowed_missed_slots' indicates the remaining amount of endorsing slots that can be missed in the cycle before forfeiting the rewards. Finally, 'expected_endorsing_rewards' indicates the endorsing rewards that will be distributed at the end of the cycle if activity at that point will be greater than the minimal required; if the activity is already known to be below the required minimum, then the rewards are zero.",
+      "descr": "Returns true if the delegate is forbidden to participate in consensus.",
+      "args": [],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/min_delegated_in_current_cycle": {
+    "GET": {
+      "descr": "Returns the minimum of delegated tez (in mutez) over the current cycle and the block level where this value was last updated (* Level is `None` when decoding values from protocol O).",
       "args": [],
       "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/participation": {
+    "GET": {
+      "descr": "Returns cycle and level participation information. In particular this indicates, in the field 'expected_cycle_activity', the number of slots the delegate is expected to have in the cycle based on its active stake. The field 'minimal_cycle_activity' indicates the minimal attesting slots in the cycle required to get attesting rewards. It is computed based on 'expected_cycle_activity. The fields 'missed_slots' and 'missed_levels' indicate the number of missed attesting slots and missed levels (for attesting) in the cycle so far. 'missed_slots' indicates the number of missed attesting slots in the cycle so far. The field 'remaining_allowed_missed_slots' indicates the remaining amount of attesting slots that can be missed in the cycle before forfeiting the rewards. Finally, 'expected_attesting_rewards' indicates the attesting rewards that will be distributed at the end of the cycle if activity at that point will be greater than the minimal required; if the activity is already known to be below the required minimum, then the rewards are zero.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/pending_staking_parameters": {
+    "GET": {
+      "descr": "Returns the pending values for the given delegate's staking parameters.",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/stakers": {
+    "GET": {
+      "descr": "Returns the list of accounts that stake to a given delegate together with their share of the frozen deposits.",
+      "args": [],
+      "ret": "Array"
     }
   },
   "/chains/{}/blocks/{}/context/delegates/{}/staking_balance": {
@@ -1394,6 +1556,27 @@ rpc_docs = {
       "descr": "Returns the total amount of tokens (in mutez) delegated to a given delegate. This includes the balances of all the contracts that delegate to it, but also the balance of the delegate itself, its frozen deposits, and its frozen bonds.",
       "args": [],
       "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/staking_denominator": {
+    "GET": {
+      "descr": "Returns an abstract representation of the total delegated stake.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/total_delegated_stake": {
+    "GET": {
+      "descr": "Returns the sum (in mutez) of all tokens staked by the delegators of a given delegate. This excludes the delegate's own staked tokens.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/delegates/{}/unstaked_frozen_deposits": {
+    "GET": {
+      "descr": "Returns, for each cycle, the sum of unstaked-but-frozen deposits for this cycle. Cycles go from the last unslashable cycle to the current cycle.",
+      "args": [],
+      "ret": "Array"
     }
   },
   "/chains/{}/blocks/{}/context/delegates/{}/voting_info": {
@@ -1408,6 +1591,57 @@ rpc_docs = {
       "descr": "The voting power in the vote listings for a given delegate.",
       "args": [],
       "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/denunciations": {
+    "GET": {
+      "descr": "Returns the denunciations for misbehavior in the current cycle.",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/issuance": {
+    "props": [
+      "current_yearly_rate",
+      "current_yearly_rate_details",
+      "current_yearly_rate_exact",
+      "expected_issuance",
+      "issuance_per_minute"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/issuance/current_yearly_rate": {
+    "GET": {
+      "descr": "Returns the current expected maximum yearly issuance rate (in %)",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/issuance/current_yearly_rate_details": {
+    "GET": {
+      "descr": "Returns the static and dynamic parts of the current expected maximum yearly issuance rate.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/issuance/current_yearly_rate_exact": {
+    "GET": {
+      "descr": "Returns the current expected maximum yearly issuance rate (exact quotient)",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/issuance/expected_issuance": {
+    "GET": {
+      "descr": "Returns the expected issued tez for the provided block and the next 'consensus_rights_delay' cycles",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/issuance/issuance_per_minute": {
+    "GET": {
+      "descr": "Returns the current expected maximum issuance per minute (in mutez)",
+      "args": [],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/liquidity_baking": {
@@ -1504,189 +1738,6 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/sc_rollup": {
-    "GET": {
-      "descr": "List of all originated smart contract rollups",
-      "args": [],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "Sc_rollup_hash",
-      "descr": "Sc_rollup_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}": {
-    "props": [
-      "boot_sector",
-      "can_be_cemented",
-      "commitment",
-      "conflicts",
-      "dal_slot_subscriptions",
-      "game",
-      "genesis_info",
-      "inbox",
-      "initial_pvm_state_hash",
-      "kind",
-      "last_cemented_commitment_hash_with_level",
-      "staker",
-      "timeout",
-      "timeout_reached"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/boot_sector": {
-    "GET": {
-      "descr": "Boot sector of smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/can_be_cemented": {
-    "GET": {
-      "descr": "Returns true if and only if the provided commitment can be cemented.",
-      "args": [
-        {
-          "name": "commitment",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Boolean"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/commitment": {
-    "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/commitment/{}": {
-    "GET": {
-      "descr": "Commitment for a smart contract rollup from its hash",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/conflicts": {
-    "GET": {
-      "descr": "List of stakers in conflict with the given staker",
-      "args": [
-        {
-          "name": "staker",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/dal_slot_subscriptions": {
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/dal_slot_subscriptions/{}": {
-    "GET": {
-      "descr": "List of slot indices to which a rollup is subscribed to at a given level",
-      "args": [],
-      "ret": "Array"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/game": {
-    "GET": {
-      "descr": "Ongoing refufation game for a given staker",
-      "args": [
-        {
-          "name": "staker",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/genesis_info": {
-    "GET": {
-      "descr": "Genesis information (level and commitment hash) for a smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/inbox": {
-    "GET": {
-      "descr": "Inbox for a smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/initial_pvm_state_hash": {
-    "GET": {
-      "descr": "Initial PVM state hash of smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/kind": {
-    "GET": {
-      "descr": "Kind of smart-contract rollup",
-      "args": [],
-      "ret": "String"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/last_cemented_commitment_hash_with_level": {
-    "GET": {
-      "descr": "Level and hash of the last cemented commitment for a smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/staker": {
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/staker/{}": {
-    "props": [
-      "staked_on_commitment"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/staker/{}/staked_on_commitment": {
-    "GET": {
-      "descr": "The hash of the commitment on which the operator has staked on for a smart-contract rollup",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/timeout": {
-    "GET": {
-      "descr": "Returns the timeout of players.",
-      "args": [
-        {
-          "name": "staker1",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "staker2",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/sc_rollup/{}/timeout_reached": {
-    "GET": {
-      "descr": "Returns whether the timeout creates a result for the game.",
-      "args": [
-        {
-          "name": "staker1",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "staker2",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
   "/chains/{}/blocks/{}/context/seed": {
     "POST": {
       "descr": "Seed of the cycle to which the block belongs.",
@@ -1701,88 +1752,237 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/selected_snapshot": {
-    "GET": {
-      "descr": "Returns the index of the selected snapshot for the current cycle or for the specific `cycle` passed as argument, if any.",
-      "args": [
-        {
-          "name": "cycle",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup": {
-    "item": {
-      "name": "tx_rollup_id",
-      "descr": "A tx rollup identifier encoded in b58check."
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}": {
+  "/chains/{}/blocks/{}/context/smart_rollups": {
     "props": [
-      "commitment",
-      "has_bond",
-      "inbox",
-      "pending_bonded_commitments",
-      "state"
+      "all",
+      "smart_rollup"
     ]
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/commitment": {
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/commitment/{}": {
+  "/chains/{}/blocks/{}/context/smart_rollups/all": {
     "GET": {
-      "descr": "Return the commitment for a level, if any",
+      "descr": "List of all originated smart rollups",
+      "args": [],
+      "ret": "Array"
+    },
+    "props": [
+      "inbox"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/all/inbox": {
+    "GET": {
+      "descr": "Inbox for the smart rollups",
       "args": [],
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/has_bond": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup": {
     "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+      "name": "smart_rollup_address",
+      "descr": "smart_rollup_address (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/has_bond/{}": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}": {
+    "props": [
+      "commitment",
+      "genesis_info",
+      "inbox_level",
+      "kind",
+      "last_cemented_commitment_hash_with_level",
+      "last_whitelist_update",
+      "staker",
+      "staker1",
+      "stakers",
+      "ticket_balance",
+      "whitelist"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/commitment": {
+    "item": {
+      "name": "smart_rollup_commitment_hash",
+      "descr": "smart_rollup_commitment_hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/commitment/{}": {
     "GET": {
-      "descr": "Returns true if the public key hash already deposited a bond  for the given rollup",
+      "descr": "Commitment for a smart rollup from its hash",
+      "args": [],
+      "ret": "Object"
+    },
+    "props": [
+      "can_be_cemented",
+      "stakers_indexes"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/commitment/{}/can_be_cemented": {
+    "GET": {
+      "descr": "Returns true if and only if the provided commitment can be cemented.",
       "args": [],
       "ret": "Boolean"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/inbox": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/commitment/{}/stakers_indexes": {
+    "GET": {
+      "descr": "List of stakers indexes staking on a given commitment",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/genesis_info": {
+    "GET": {
+      "descr": "Genesis information (level and commitment hash) for a smart rollup",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/inbox_level": {
     "item": {
       "name": "block_level",
       "descr": "A level integer"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/inbox/{}": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/inbox_level/{}": {
+    "props": [
+      "commitments"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/inbox_level/{}/commitments": {
     "GET": {
-      "descr": "Get the inbox of a transaction rollup",
+      "descr": "List of commitments associated to a rollup for a given inbox level",
       "args": [],
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/pending_bonded_commitments": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/kind": {
+    "GET": {
+      "descr": "Kind of smart rollup",
+      "args": [],
+      "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/last_cemented_commitment_hash_with_level": {
+    "GET": {
+      "descr": "Level and hash of the last cemented commitment for a smart rollup",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/last_whitelist_update": {
+    "GET": {
+      "descr": "Last whitelist update for private smart rollups. If the output is None then the rollup is public.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker": {
     "item": {
       "name": "pkh",
       "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/pending_bonded_commitments/{}": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker/{}": {
+    "props": [
+      "conflicts",
+      "games",
+      "index",
+      "staked_on_commitment"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker/{}/conflicts": {
     "GET": {
-      "descr": "Get the number of pending bonded commitments for a pkh on a rollup",
+      "descr": "List of stakers in conflict with the given staker",
       "args": [],
-      "ret": "Integer"
+      "ret": "Array"
     }
   },
-  "/chains/{}/blocks/{}/context/tx_rollup/{}/state": {
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker/{}/games": {
     "GET": {
-      "descr": "Access the state of a rollup.",
+      "descr": "Ongoing refutation games for a given staker",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker/{}/index": {
+    "GET": {
+      "descr": "Staker index associated to a public key hash for a given rollup",
+      "args": [],
+      "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker/{}/staked_on_commitment": {
+    "GET": {
+      "descr": "The newest commitment on which the operator has staked on for a smart rollup. Note that is can return a commitment that is before the last cemented one.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker1": {
+    "item": {
+      "name": "staker1_pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker1/{}": {
+    "props": [
+      "staker2"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker1/{}/staker2": {
+    "item": {
+      "name": "staker2_pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker1/{}/staker2/{}": {
+    "props": [
+      "timeout",
+      "timeout_reached"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker1/{}/staker2/{}/timeout": {
+    "GET": {
+      "descr": "Returns the timeout of players.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/staker1/{}/staker2/{}/timeout_reached": {
+    "GET": {
+      "descr": "Returns whether the timeout creates a result for the game.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/stakers": {
+    "GET": {
+      "descr": "List of active stakers' public key hashes of a rollup",
+      "args": [],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/ticket_balance": {
+    "POST": {
+      "descr": "Access the smart rollup's balance of ticket with specified ticketer, content type, and content.",
+      "args": [],
+      "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/smart_rollups/smart_rollup/{}/whitelist": {
+    "GET": {
+      "descr": "Whitelist for private smart rollups. If the output is None then the rollup is public.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/total_frozen_stake": {
+    "GET": {
+      "descr": "Returns the total stake (in mutez) frozen on the chain",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/total_supply": {
+    "GET": {
+      "descr": "Returns the total supply (in mutez) available on the chain",
       "args": [],
       "ret": "Object"
     }
@@ -1839,10 +2039,10 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers": {
     "props": [
+      "attestation_rights",
       "baking_rights",
       "complete",
       "current_level",
-      "endorsing_rights",
       "forge",
       "forge_block_header",
       "levels_in_current_cycle",
@@ -1852,6 +2052,30 @@ rpc_docs = {
       "scripts",
       "validators"
     ]
+  },
+  "/chains/{}/blocks/{}/helpers/attestation_rights": {
+    "GET": {
+      "descr": "Retrieves the delegates allowed to attest a block.\nBy default, it gives the attestation power for delegates that have at least one attestation slot for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the attestation rights have to be returned. Parameter `delegate` can be used to restrict the results to the given delegates.\nParameter `consensus_key` can be used to restrict the results to the given consensus_keys. \nReturns the smallest attestation slots and the attestation power. Also returns the minimal timestamp that corresponds to attestation at the given level. The timestamps are omitted for levels in the past, and are only estimates for levels higher that the next block's, based on the hypothesis that all predecessor blocks were baked at the first round.",
+      "args": [
+        {
+          "name": "level",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "cycle",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "delegate",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
+          "name": "consensus_key",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
   },
   "/chains/{}/blocks/{}/helpers/baking_rights": {
     "GET": {
@@ -1910,35 +2134,10 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/helpers/endorsing_rights": {
-    "GET": {
-      "descr": "Retrieves the delegates allowed to endorse a block.\nBy default, it gives the endorsing power for delegates that have at least one endorsing slot for the next block.\nParameters `level` and `cycle` can be used to specify the (valid) level(s) in the past or future at which the endorsing rights have to be returned. Parameter `delegate` can be used to restrict the results to the given delegates.\nParameter `consensus_key` can be used to restrict the results to the given consensus_keys. \nReturns the smallest endorsing slots and the endorsing power. Also returns the minimal timestamp that corresponds to endorsing at the given level. The timestamps are omitted for levels in the past, and are only estimates for levels higher that the next block's, based on the hypothesis that all predecessor blocks were baked at the first round.",
-      "args": [
-        {
-          "name": "level",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "cycle",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "delegate",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        },
-        {
-          "name": "consensus_key",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    }
-  },
   "/chains/{}/blocks/{}/helpers/forge": {
     "props": [
       "operations",
-      "protocol_data",
-      "tx_rollup"
+      "protocol_data"
     ]
   },
   "/chains/{}/blocks/{}/helpers/forge/operations": {
@@ -1951,81 +2150,6 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/forge/protocol_data": {
     "POST": {
       "descr": "Forge the protocol-specific part of a block header",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup": {
-    "props": [
-      "commitment",
-      "inbox",
-      "withdraw"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment": {
-    "props": [
-      "merkle_tree_hash",
-      "merkle_tree_path",
-      "message_result_hash"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment/merkle_tree_hash": {
-    "POST": {
-      "descr": "Compute the merkle tree hash of a commitment",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment/merkle_tree_path": {
-    "POST": {
-      "descr": "Compute a path of a message result hash in the commitment merkle tree",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/commitment/message_result_hash": {
-    "POST": {
-      "descr": "Compute the message result hash",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox": {
-    "props": [
-      "merkle_tree_hash",
-      "merkle_tree_path",
-      "message_hash"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox/merkle_tree_hash": {
-    "POST": {
-      "descr": "Compute the merkle tree hash of an inbox",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox/merkle_tree_path": {
-    "POST": {
-      "descr": "Compute a path of an inbox message in a merkle tree",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/inbox/message_hash": {
-    "POST": {
-      "descr": "Compute the hash of a message",
-      "args": [],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/withdraw": {
-    "props": [
-      "withdraw_list_hash"
-    ]
-  },
-  "/chains/{}/blocks/{}/helpers/forge/tx_rollup/withdraw/withdraw_list_hash": {
-    "POST": {
-      "descr": "Compute the hash of a withdraw list",
       "args": [],
       "ret": "Object"
     }
@@ -2065,8 +2189,13 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/parse/operations": {
     "POST": {
       "descr": "Parse operations",
-      "args": [],
-      "ret": "Array"
+      "args": [
+        {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/helpers/preapply": {
@@ -2094,8 +2223,13 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/preapply/operations": {
     "POST": {
       "descr": "Simulate the application of the operations with the context of the given block and return the result of each operation application.",
-      "args": [],
-      "ret": "Array"
+      "args": [
+        {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/helpers/round": {
@@ -2111,9 +2245,11 @@ rpc_docs = {
       "entrypoints",
       "normalize_data",
       "normalize_script",
+      "normalize_stack",
       "normalize_type",
       "pack_data",
       "run_code",
+      "run_instruction",
       "run_operation",
       "run_script_view",
       "run_view",
@@ -2152,6 +2288,13 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/helpers/scripts/normalize_stack": {
+    "POST": {
+      "descr": "Normalize a Michelson stack using the requested unparsing mode",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/helpers/scripts/normalize_type": {
     "POST": {
       "descr": "Normalizes some Michelson type by expanding `pair a b c` as `pair a (pair b c)",
@@ -2168,7 +2311,14 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers/scripts/run_code": {
     "POST": {
-      "descr": "Run a piece of code in the current context",
+      "descr": "Run a Michelson script in the current context",
+      "args": [],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/helpers/scripts/run_instruction": {
+    "POST": {
+      "descr": "Run a single Michelson instruction",
       "args": [],
       "ret": "Object"
     }
@@ -2176,7 +2326,12 @@ rpc_docs = {
   "/chains/{}/blocks/{}/helpers/scripts/run_operation": {
     "POST": {
       "descr": "Run an operation with the context of the given block and without signature checks. Return the operation application result, including the consumed gas. This RPC does not support consensus operations.",
-      "args": [],
+      "args": [
+        {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
       "ret": "Object"
     }
   },
@@ -2206,6 +2361,10 @@ rpc_docs = {
       "descr": "Simulate running an operation at some future moment (based on the number of blocks given in the `latency` argument), and return the operation application result. The result is the same as run_operation except for the consumed gas, which depends on the contents of the cache at that future moment. This RPC estimates future gas consumption by trying to predict the state of the cache using some heuristics.",
       "args": [
         {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
           "name": "successor_level",
           "descr": "If true, the simulation is done on the successor level of the current context."
         }
@@ -2215,7 +2374,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers/scripts/trace_code": {
     "POST": {
-      "descr": "Run a piece of code in the current context, keeping a trace",
+      "descr": "Run a Michelson script in the current context, keeping a trace",
       "args": [],
       "ret": "Object"
     }
@@ -2236,7 +2395,7 @@ rpc_docs = {
   },
   "/chains/{}/blocks/{}/helpers/validators": {
     "GET": {
-      "descr": "Retrieves the level, the endorsement slots and the public key hash of each delegate allowed to endorse a block.\nBy default, it provides this information for the next level.\nParameter `level` can be used to specify the (valid) level(s) in the past or future at which the endorsement rights have to be returned. Parameter `delegate` can be used to restrict the results results to the given delegates. Parameter `consensus_key` can be used to restrict the results to the given consensus_keys.\n",
+      "descr": "Retrieves the level, the attestation slots and the public key hash of each delegate allowed to attest a block.\nBy default, it provides this information for the next level.\nParameter `level` can be used to specify the (valid) level(s) in the past or future at which the attestation rights have to be returned. Parameter `delegate` can be used to restrict the results results to the given delegates. Parameter `consensus_key` can be used to restrict the results to the given consensus_keys.\n",
       "args": [
         {
           "name": "level",
@@ -2264,7 +2423,12 @@ rpc_docs = {
   "/chains/{}/blocks/{}/metadata": {
     "GET": {
       "descr": "All the metadata associated to the block.",
-      "args": [],
+      "args": [
+        {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
       "ret": "Object"
     }
   },
@@ -2338,6 +2502,10 @@ rpc_docs = {
       "descr": "All the operations included in the block.",
       "args": [
         {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
           "name": "force_metadata",
           "descr": "DEPRECATED: Forces to recompute the operations metadata if it was considered as too large."
         },
@@ -2346,7 +2514,7 @@ rpc_docs = {
           "descr": "Specifies whether or not if the operations metadata should be returned. To get the metadata, even if it is needed to recompute them, use \"always\". To avoid getting the metadata, use \"never\". By default, the metadata will be returned depending on the node's metadata size limit policy."
         }
       ],
-      "ret": "Array"
+      "ret": "Object"
     },
     "item": {
       "name": "list_offset",
@@ -2358,6 +2526,10 @@ rpc_docs = {
       "descr": "All the operations included in `n-th` validation pass of the block.",
       "args": [
         {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
+        {
           "name": "force_metadata",
           "descr": "DEPRECATED: Forces to recompute the operations metadata if it was considered as too large."
         },
@@ -2366,7 +2538,7 @@ rpc_docs = {
           "descr": "Specifies whether or not if the operations metadata should be returned. To get the metadata, even if it is needed to recompute them, use \"always\". To avoid getting the metadata, use \"never\". By default, the metadata will be returned depending on the node's metadata size limit policy."
         }
       ],
-      "ret": "Array"
+      "ret": "Object"
     },
     "item": {
       "name": "operation_offset",
@@ -2377,6 +2549,10 @@ rpc_docs = {
     "GET": {
       "descr": "The `m-th` operation in the `n-th` validation pass of the block.",
       "args": [
+        {
+          "name": "version",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        },
         {
           "name": "force_metadata",
           "descr": "DEPRECATED: Forces to recompute the operations metadata if it was considered as too large."
@@ -2403,6 +2579,13 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/resulting_context_hash": {
+    "GET": {
+      "descr": "Context hash resulting of the block application.",
+      "args": [],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/votes": {
     "props": [
       "ballot_list",
@@ -2411,6 +2594,7 @@ rpc_docs = {
       "current_proposal",
       "current_quorum",
       "listings",
+      "proposal_count",
       "proposals",
       "successor_period",
       "total_voting_power"
@@ -2458,6 +2642,19 @@ rpc_docs = {
       "ret": "Array"
     }
   },
+  "/chains/{}/blocks/{}/votes/proposal_count": {
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/votes/proposal_count/{}": {
+    "GET": {
+      "descr": "Number of votes casted during the current period.",
+      "args": [],
+      "ret": "Integer"
+    }
+  },
   "/chains/{}/blocks/{}/votes/proposals": {
     "GET": {
       "descr": "List of proposals with number of supporters.",
@@ -2491,7 +2688,10 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "active_delegate_with_one_roll",
+      "active_delegates_with_minimal_stake",
+      "adaptive_issuance_ema",
+      "adaptive_issuance_launch_cycle",
+      "attestation_branch",
       "big_maps",
       "block_round",
       "commitments",
@@ -2500,44 +2700,28 @@ rpc_docs = {
       "cycle",
       "dal",
       "delegates",
-      "endorsement_branch",
+      "denunciations",
       "first_level_of_protocol",
+      "forbidden_delegates",
       "global_constant",
       "grand_parent_branch",
-      "last_snapshot",
       "liquidity_baking_cpmm_address",
       "liquidity_baking_escape_ema",
       "pending_migration_balance_updates",
       "pending_migration_operation_results",
       "ramp_up",
       "sapling",
-      "sc_rollup",
       "seed_status",
+      "slashed_deposits",
+      "smart_rollup",
       "staking_balance",
       "ticket_balance",
-      "tx_rollup",
       "vdf_challenge",
       "votes",
       "zk_rollup"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "current",
-      "snapshot"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/current": {
+  "/chains/{}/blocks/{}/context/raw/json/active_delegates_with_minimal_stake": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2553,7 +2737,31 @@ rpc_docs = {
       "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/current/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/active_delegates_with_minimal_stake/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/adaptive_issuance_ema": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/adaptive_issuance_launch_cycle": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2565,39 +2773,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/snapshot": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "int",
-      "descr": "\u00af\\_(\u30c4)_/\u00af"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/snapshot/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/active_delegate_with_one_roll/snapshot/{}/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/attestation_branch": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -2816,7 +2992,8 @@ rpc_docs = {
     },
     "props": [
       "global_counter",
-      "index"
+      "index",
+      "total_supply"
     ]
   },
   "/chains/{}/blocks/{}/context/raw/json/contracts/global_counter": {
@@ -2867,14 +3044,18 @@ rpc_docs = {
       "delegate",
       "delegate_desactivation",
       "delegated",
-      "frozen_deposits",
       "frozen_deposits_limit",
+      "frozen_deposits_pseudotokens",
       "inactive_delegate",
       "manager",
-      "missed_endorsements",
+      "missed_attestations",
       "paid_bytes",
+      "staking_parameters",
+      "staking_pseudotokens",
       "storage",
       "total_frozen_bonds",
+      "unstake_requests",
+      "unstaked_frozen_deposits",
       "used_bytes"
     ]
   },
@@ -2957,39 +3138,10 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "active",
-      "pendings"
+      "active"
     ]
   },
   "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/consensus_key/active": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/consensus_key/pendings": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "block_cycle",
-      "descr": "A cycle integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/consensus_key/pendings/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3065,7 +3217,7 @@ rpc_docs = {
       "ret": "Boolean"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_deposits": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_deposits_limit": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3077,7 +3229,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_deposits_limit": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/frozen_deposits_pseudotokens": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3113,7 +3265,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/missed_endorsements": {
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/missed_attestations": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3135,6 +3287,45 @@ rpc_docs = {
         }
       ],
       "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/staking_parameters": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    },
+    "props": [
+      "active"
+    ]
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/staking_parameters/active": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/staking_pseudotokens": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/storage": {
@@ -3161,6 +3352,30 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/unstake_requests": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/unstaked_frozen_deposits": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
   "/chains/{}/blocks/{}/context/raw/json/contracts/index/{}/used_bytes": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
@@ -3171,6 +3386,18 @@ rpc_docs = {
         }
       ],
       "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/contracts/total_supply": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/cycle": {
@@ -3201,15 +3428,103 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
+      "already_denounced",
       "delegate_sampler_state",
+      "issuance_bonus",
+      "issuance_coeff",
       "nonces",
+      "pending_consensus_keys",
+      "pending_staking_parameters",
       "random_seed",
       "selected_stake_distribution",
-      "slashed_deposits",
       "total_active_stake"
     ]
   },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/already_denounced": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_level",
+      "descr": "A level integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/already_denounced/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_round",
+      "descr": "A round integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/already_denounced/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/already_denounced/{}/{}/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/raw/json/cycle/{}/delegate_sampler_state": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/issuance_bonus": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/issuance_coeff": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3249,6 +3564,62 @@ rpc_docs = {
       "ret": "Object"
     }
   },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/pending_consensus_keys": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "contract_id",
+      "descr": "A contract identifier encoded in b58check."
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/pending_consensus_keys/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/pending_staking_parameters": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "contract_id",
+      "descr": "A contract identifier encoded in b58check."
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/pending_staking_parameters/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
   "/chains/{}/blocks/{}/context/raw/json/cycle/{}/random_seed": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
@@ -3271,50 +3642,6 @@ rpc_docs = {
         }
       ],
       "ret": "Array"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/slashed_deposits": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/slashed_deposits/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/cycle/{}/slashed_deposits/{}/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/cycle/{}/total_active_stake": {
@@ -3342,7 +3669,7 @@ rpc_docs = {
     },
     "props": [
       "level",
-      "slots_history"
+      "slot_headers_history"
     ]
   },
   "/chains/{}/blocks/{}/context/raw/json/dal/level": {
@@ -3373,10 +3700,10 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "slots"
+      "slot_headers"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/dal/level/{}/slots": {
+  "/chains/{}/blocks/{}/context/raw/json/dal/level/{}/slot_headers": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3388,7 +3715,7 @@ rpc_docs = {
       "ret": "Array"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/dal/slots_history": {
+  "/chains/{}/blocks/{}/context/raw/json/dal/slot_headers_history": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3428,7 +3755,7 @@ rpc_docs = {
       "ret": "Boolean"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/endorsement_branch": {
+  "/chains/{}/blocks/{}/context/raw/json/denunciations": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3437,7 +3764,23 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/denunciations/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/first_level_of_protocol": {
@@ -3450,6 +3793,18 @@ rpc_docs = {
         }
       ],
       "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/forbidden_delegates": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/global_constant": {
@@ -3490,18 +3845,6 @@ rpc_docs = {
         }
       ],
       "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/last_snapshot": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/liquidity_baking_cpmm_address": {
@@ -3876,7 +4219,47 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup": {
+  "/chains/{}/blocks/{}/context/raw/json/seed_status": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Boolean"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/slashed_deposits": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/slashed_deposits/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3888,10 +4271,23 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
+      "inbox",
       "index"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/inbox": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3903,11 +4299,11 @@ rpc_docs = {
       "ret": "Array"
     },
     "item": {
-      "name": "sc_rollup_address",
-      "descr": "A smart contract rollup address."
+      "name": "smart_rollup_address",
+      "descr": "smart_rollup_address (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3919,37 +4315,30 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "boot_sector",
       "commitment_added",
-      "commitment_stake_count",
+      "commitment_first_publication_level",
+      "commitment_index",
       "commitments",
-      "dal",
+      "commitments_per_inbox_level",
+      "commitments_stakers",
       "game",
       "game_timeout",
       "genesis_info",
-      "inbox",
       "kind",
       "last_cemented_commitment",
+      "last_whitelist_update",
       "level_index",
-      "opponent",
       "parameters_type",
-      "staker_count",
-      "stakers"
+      "refutation_game_info",
+      "staker_index",
+      "staker_index_counter",
+      "stakers",
+      "whitelist",
+      "whitelist_paid_bytes",
+      "whitelist_use_bytes"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/boot_sector": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_added": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitment_added": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3961,11 +4350,11 @@ rpc_docs = {
       "ret": "Array"
     },
     "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
+      "name": "smart_rollup_commitment_hash",
+      "descr": "smart_rollup_commitment_hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_added/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitment_added/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -3977,78 +4366,7 @@ rpc_docs = {
       "ret": "Integer"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_stake_count": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitment_stake_count/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitments": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "commitment_hash",
-      "descr": "commitment_hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/commitments/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/dal": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "level"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/dal/level": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitment_first_publication_level": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4064,7 +4382,131 @@ rpc_docs = {
       "descr": "A level integer"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/dal/level/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitment_first_publication_level/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitment_index": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitments": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "smart_rollup_commitment_hash",
+      "descr": "smart_rollup_commitment_hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitments/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitments_per_inbox_level": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "block_level",
+      "descr": "A level integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitments_per_inbox_level/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitments_stakers": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "smart_rollup_commitment_hash",
+      "descr": "smart_rollup_commitment_hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/commitments_stakers/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/game": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/game/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4076,10 +4518,10 @@ rpc_docs = {
       "ret": "Object"
     },
     "props": [
-      "slot_subscriptions"
+      "opponents"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/dal/level/{}/slot_subscriptions": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/game/{}/opponents": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4088,10 +4530,26 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "String"
+      "ret": "Array"
+    },
+    "item": {
+      "name": "pkh",
+      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/game": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/game/{}/opponents/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/game_timeout": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4104,10 +4562,10 @@ rpc_docs = {
     },
     "item": {
       "name": "game_index",
-      "descr": "A pair of stakers that index a smart contract rollup refutation game."
+      "descr": "A pair of stakers that index a smart rollup refutation game."
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/game/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/game_timeout/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4119,23 +4577,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/game_timeout": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "game_index",
-      "descr": "A pair of stakers that index a smart contract rollup refutation game."
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/game_timeout/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/genesis_info": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4147,31 +4589,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/genesis_info": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/inbox": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/kind": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/kind": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4183,7 +4601,7 @@ rpc_docs = {
       "ret": "String"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/last_cemented_commitment": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/last_cemented_commitment": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4195,7 +4613,19 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/level_index": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/last_whitelist_update": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/level_index": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4211,7 +4641,7 @@ rpc_docs = {
       "descr": "The level index for applied outbox message records"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/level_index/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/level_index/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4226,7 +4656,7 @@ rpc_docs = {
       "applied_outbox_messages"
     ]
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/level_index/{}/applied_outbox_messages": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/level_index/{}/applied_outbox_messages": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4238,7 +4668,47 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/opponent": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/parameters_type": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/refutation_game_info": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "game_index",
+      "descr": "A pair of stakers that index a smart rollup refutation game."
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/refutation_game_info/{}": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Object"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/staker_index": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4254,7 +4724,7 @@ rpc_docs = {
       "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/opponent/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/staker_index/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4263,10 +4733,10 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
+      "ret": "String"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/parameters_type": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/staker_index_counter": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4275,10 +4745,26 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
+      "ret": "String"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/staker_count": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/stakers": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Array"
+    },
+    "item": {
+      "name": "z",
+      "descr": "\u00af\\_(\u30c4)_/\u00af"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/stakers/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4290,7 +4776,7 @@ rpc_docs = {
       "ret": "Integer"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/stakers": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/whitelist": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4306,7 +4792,7 @@ rpc_docs = {
       "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/sc_rollup/index/{}/stakers/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/whitelist/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4318,7 +4804,7 @@ rpc_docs = {
       "ret": "Object"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/seed_status": {
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/whitelist_paid_bytes": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4327,7 +4813,19 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Boolean"
+      "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/index/{}/whitelist_use_bytes": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "String"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/staking_balance": {
@@ -4339,22 +4837,6 @@ rpc_docs = {
           "descr": "\u00af\\_(\u30c4)_/\u00af"
         }
       ],
-      "ret": "Object"
-    },
-    "props": [
-      "current",
-      "snapshot"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/current": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
       "ret": "Array"
     },
     "item": {
@@ -4362,51 +4844,7 @@ rpc_docs = {
       "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
     }
   },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/current/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/snapshot": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "int",
-      "descr": "\u00af\\_(\u30c4)_/\u00af"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/snapshot/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/staking_balance/snapshot/{}/{}": {
+  "/chains/{}/blocks/{}/context/raw/json/staking_balance/{}": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [
@@ -4476,163 +4914,6 @@ rpc_docs = {
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/ticket_balance/used_bytes": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "String"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "tx_rollup_id",
-      "descr": "A tx rollup identifier encoded in b58check."
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "bond",
-      "state",
-      "tx_level"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/bond": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "pkh",
-      "descr": "A Secp256k1 of a Ed25519 public key hash (Base58Check-encoded)"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/bond/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "commitment"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/bond/{}/commitment": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/state": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Array"
-    },
-    "item": {
-      "name": "block_level",
-      "descr": "A level integer"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    },
-    "props": [
-      "commitment",
-      "inbox",
-      "withdrawals"
-    ]
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}/commitment": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}/inbox": {
-    "GET": {
-      "descr": "\u00af\\_(\u30c4)_/\u00af",
-      "args": [
-        {
-          "name": "depth",
-          "descr": "\u00af\\_(\u30c4)_/\u00af"
-        }
-      ],
-      "ret": "Object"
-    }
-  },
-  "/chains/{}/blocks/{}/context/raw/json/tx_rollup/{}/tx_level/{}/withdrawals": {
     "GET": {
       "descr": "\u00af\\_(\u30c4)_/\u00af",
       "args": [

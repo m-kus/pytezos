@@ -1,4 +1,4 @@
-FROM python:3.11-alpine3.17 AS compile-image
+FROM python:3.12-alpine3.17 AS compile-image
 RUN apk add --update --no-cache \
 	build-base \
 	libtool \
@@ -31,7 +31,7 @@ COPY pyproject.toml requirements.slim.txt README.md /opt/pytezos/
 
 RUN /usr/local/bin/pip install --prefix /opt/pytezos --no-cache-dir --disable-pip-version-check --no-deps -r /opt/pytezos/requirements.slim.txt -e .
 
-FROM python:3.11-alpine3.17 AS build-image
+FROM python:3.12-alpine3.17 AS build-image
 RUN apk add --update --no-cache \
 	binutils \
 	gmp-dev \
@@ -41,7 +41,7 @@ RUN apk add --update --no-cache \
 RUN adduser -D pytezos
 USER pytezos
 ENV PATH="/opt/pytezos/bin:$PATH"
-ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.11/site-packages:$PYTHONPATH"
+ENV PYTHONPATH="/home/pytezos:/home/pytezos/src:/opt/pytezos/src:/opt/pytezos/lib/python3.12/site-packages:$PYTHONPATH"
 WORKDIR /home/pytezos/
 ENTRYPOINT ["python"]
 

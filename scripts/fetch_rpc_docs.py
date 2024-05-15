@@ -1,8 +1,12 @@
 import json
+import sys
 from collections import defaultdict
+from os import environ as env
 from os.path import dirname
 from os.path import join
 from typing import Dict
+
+from click import secho
 
 from pytezos import pytezos
 
@@ -52,6 +56,12 @@ def parse_describe_output(data, root='/'):
 
 
 if __name__ == '__main__':
+    url = env.get('DOCS_RPC_URL', None)
+    if not url:
+        secho('WARNING: Skipping RPC docs generation, DOCS_RPC_URL is not set', err=True, fg='red')
+        sys.exit(0)
+
+    pytezos = pytezos.using(url)
     shell_docs = parse_describe_output(pytezos.shell.describe(recurse=True))
     chain_docs = parse_describe_output(
         pytezos.shell.describe.chains.main.mempool(recurse=True),
