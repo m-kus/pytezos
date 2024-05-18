@@ -81,7 +81,6 @@ sandbox_addresses = {
     'bootstrap1': 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
 }
 
-# https://gitlab.com/tezos/tezos/-/blob/master/src/proto_019_PtParisB/lib_parameters/default_parameters.ml#L317
 sandbox_params: Dict[str, Any] = {
     # NOTE: Built-in accounts
     'bootstrap_accounts': [
@@ -98,12 +97,14 @@ sandbox_params: Dict[str, Any] = {
             '100500000000',
         ],
     ],
-    # NOTE: Shorter cycles and voting periods
-    'preserved_cycles': 2,
+    # NOTE: Shorter cycles, voting periods and other parameters
+    # NOTE: From https://gitlab.com/tezos/tezos/-/blob/master/src/proto_019_PtParisB/lib_parameters/default_parameters.ml#L317
+    'blocks_preservation_cycles': 1,
+    'consensus_rights_delay': 2,
+    'delegate_parameters_activation_delay': 2,
     'blocks_per_cycle': 8,
     'blocks_per_commitment': 4,
     'nonce_revelation_threshold': 4,
-    'blocks_per_stake_snapshot': 4,
     'cycles_per_voting_period': 8,
     'proof_of_work_threshold': str((1 << 63) - 1),
     'vdf_difficulty': '50000',
