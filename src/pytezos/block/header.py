@@ -100,7 +100,7 @@ class BlockHeader(ContextMixin):
         pending_operations = context.shell.mempool.pending_operations()  # type: ignore
         operations: List[List[Dict[str, Any]]] = [[], [], [], []]
 
-        for opg in pending_operations['applied']:
+        for opg in pending_operations['validated']:
             validation_pass = validation_passes[opg['contents'][0]['kind']]
             if validation_pass == 3 and sum(map(lambda x: int(x['fee']), opg['contents'])) < min_fee:
                 continue

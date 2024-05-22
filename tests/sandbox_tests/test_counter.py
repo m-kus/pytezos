@@ -1,5 +1,7 @@
 import logging
 
+from pytest import skip
+
 from pytezos.rpc.errors import RpcError
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses
@@ -8,6 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class TransactionCounterTestCase(SandboxedNodeTestCase):
+    @skip('Not applicable in Parisnet?')
     def test_1_send_multiple_transactions_non_batched(self) -> None:
         client = self.client
         # Only one manager operation per manager per block allowed
