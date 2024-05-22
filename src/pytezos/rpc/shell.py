@@ -108,7 +108,7 @@ class ShellQuery(RpcQuery, path=''):
 
         while current_header['level'] < max_level:
             logger.info('Current level: %d (max %d)', current_header['level'], max_level)
-            prev_block_dt = datetime.strptime(current_header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
+            prev_block_dt = datetime.strptime(current_header['timestamp'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=UTC)
             elapsed_sec = (datetime.now(UTC) - prev_block_dt).seconds
             sleep_sec = 1 if elapsed_sec > time_between_blocks else (time_between_blocks - elapsed_sec + 1)
 
