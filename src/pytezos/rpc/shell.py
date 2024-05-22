@@ -1,5 +1,5 @@
 from binascii import hexlify
-from datetime import datetime
+from datetime import UTC, datetime
 from functools import cached_property
 from functools import lru_cache
 from time import sleep
@@ -109,7 +109,7 @@ class ShellQuery(RpcQuery, path=''):
         while current_header['level'] < max_level:
             logger.info('Current level: %d (max %d)', current_header['level'], max_level)
             prev_block_dt = datetime.strptime(current_header['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
-            elapsed_sec = (datetime.utcnow() - prev_block_dt).seconds
+            elapsed_sec = (datetime.now(UTC) - prev_block_dt).seconds
             sleep_sec = 1 if elapsed_sec > time_between_blocks else (time_between_blocks - elapsed_sec + 1)
 
             logger.info('Sleep %d seconds until block %s is superseded', sleep_sec, current_block_hash)

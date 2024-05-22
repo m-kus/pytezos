@@ -1,6 +1,5 @@
 import logging
-
-from pytest import skip
+from unittest import skip
 
 from pytezos.rpc.errors import RpcError
 from pytezos.sandbox.node import SandboxedNodeTestCase
