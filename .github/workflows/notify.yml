@@ -1,11 +1,8 @@
 name: Notify
 on:
   push:
-    # FIXME: Temporary
-    # tags:
-    #   - '*.*.0'
-    branches:
-      - ci/release-notifications
+    tags:
+      - '*.*.0'
 
 jobs:
   notify:
@@ -20,16 +17,14 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        # FIXME: Temporary
         message: |
-          Pytezos 3.12.0 has been released 🎉
-          More info at https://github.com/baking-bad/pytezos/releases/tag/3.12.0
+          Pytezos ${{ github.ref_name }} has been released 🎉
+          More info at https://github.com/baking-bad/pytezos/releases/tag/${{ github.ref_name }}
     - name: slack notification
       uses: Ilshidur/action-slack@master
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
       with:
-        # FIXME: Temporary
         args: |
-          Pytezos 3.12.0 has been released 🎉
-          More info at https://github.com/baking-bad/pytezos/releases/tag/3.12.0
+          Pytezos ${{ github.ref_name }} has been released 🎉
+          More info at https://github.com/baking-bad/pytezos/releases/tag/${{ github.ref_name }}
