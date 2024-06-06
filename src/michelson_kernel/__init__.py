@@ -1,1 +1,3 @@
-__version__ = '3.12.0'
+import importlib.metadata
+
+__version__ = importlib.metadata.version('pytezos')

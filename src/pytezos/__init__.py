@@ -10,6 +10,8 @@ Just type:
 And follow the interactive documentation.
 """
 
+import importlib.metadata
+
 from pytezos.client import PyTezosClient
 from pytezos.contract.interface import Contract
 from pytezos.contract.interface import ContractInterface
@@ -24,6 +26,6 @@ from pytezos.michelson.types.base import MichelsonType
 from pytezos.michelson.types.base import Undefined
 from pytezos.michelson.types.core import Unit
 
-__version__ = '3.12.0'
+__version__ = importlib.metadata.version('pytezos')
 
 pytezos = PyTezosClient()

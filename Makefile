@@ -77,21 +77,6 @@ image:             ## Build Docker image
 	docker buildx build . --file pytezos.dockerfile -t pytezos:${TAG} --load
 	docker buildx build . --file michelson-kernel.dockerfile -t michelson-kernel:${TAG} --load
 
-release-patch:     ## Release patch version
-	bumpversion patch
-	git push --tags
-	git push
-
-release-minor:     ## Release minor version
-	bumpversion minor
-	git push --tags
-	git push
-
-release-major:     ## Release major version
-	bumpversion major
-	git push --tags
-	git push
-
 clean:             ## Remove all files from .gitignore except for `.venv`
 	git clean -xdf --exclude=".venv"
 
