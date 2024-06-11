@@ -1,10 +1,10 @@
 # Changelog
 
-## [3.12.1](https://github.com/baking-bad/pytezos/compare/3.12.0...3.12.1) (2024-06-05)
+## [3.12.1](https://github.com/baking-bad/pytezos/compare/3.12.0...3.12.1) (2024-06-11)
 
 ### Changed
 
-* Octez binaries updated to v20.0-2
+* Octez binaries updated to v20.0-3
 
 ## [3.12.0](https://github.com/baking-bad/pytezos/compare/3.11.3...3.12.0) (2024-05-27)
 
