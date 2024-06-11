@@ -128,3 +128,6 @@ kernel-docs:       ## Build docs for Michelson IPython kernel
 
 rpc-docs:          ## Build docs for Tezos node RPC
 	poetry run python scripts/fetch_rpc_docs.py
+
+before_release:    ## Prepare for a new release after updating version in pyproject.toml
+	make update all

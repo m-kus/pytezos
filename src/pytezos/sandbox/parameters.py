@@ -117,7 +117,7 @@ sandbox_params: Dict[str, Any] = {
 }
 
 # NOTE: https://rpc.tzkt.io/parisnet/chains/main/blocks/head/context/constants/parametric
-paris_params = {
+protocol_params = {
     "consensus_rights_delay": 2,
     "blocks_preservation_cycles": 1,
     "delegate_parameters_activation_delay": 5,
@@ -224,7 +224,7 @@ paris_params = {
 def get_protocol_parameters(protocol_hash: str) -> Dict[str, Any]:
     # https://gitlab.com/tezos/tezos/-/blob/master/src/proto_018_Proxford/lib_parameters/default_parameters.ml
     return {
-        **paris_params,
+        **protocol_params,
         # **old_params,
         **sandbox_params,
     }
