@@ -53,7 +53,8 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
+          # FIXME: temporary
+          # cache: 'poetry'
 
       - name: Install binary dependencies
         run: OSTYPE=$OSTYPE make install-deps
