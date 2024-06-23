@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* Octez binaries updated to v20.1-1
+
+### Fixed
+
+* Fixed Python 3.8 compatibility
+
 ## [3.12.1](https://github.com/baking-bad/pytezos/compare/3.12.0...3.12.1) (2024-06-11)
 
 ### Changed
