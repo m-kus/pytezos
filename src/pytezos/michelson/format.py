@@ -1,6 +1,6 @@
 import json
-from datetime import UTC
 from datetime import datetime
+from datetime import timezone
 
 from pytezos.logging import logger
 
@@ -12,7 +12,7 @@ def format_timestamp(timestamp: int) -> str:
 
     :param timestamp: Unix timestamp (seconds)
     """
-    dt = datetime.fromtimestamp(timestamp, UTC)
+    dt = datetime.fromtimestamp(timestamp, timezone.utc)
     return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
