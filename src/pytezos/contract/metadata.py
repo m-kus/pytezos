@@ -179,13 +179,13 @@ class ContractMetadata(ContextMixin):
     def from_ipfs(cls, multihash: str, context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
         """Fetch metadata from IPFS network by multihash"""
         context = context or ExecutionContext()
-        metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}').json()
+        metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}', timeout=60).json()
         return cls.from_json(metadata_json, context)
 
     @classmethod
     def from_url(cls, url: str, context: Optional[ExecutionContext] = None) -> 'ContractMetadata':
         """Fetch metadata from HTTP(S) URL"""
-        metadata_json = requests.get(url).json()
+        metadata_json = requests.get(url, timeout=60).json()
         return cls.from_json(metadata_json, context)
 
     @classmethod

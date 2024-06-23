@@ -15,6 +15,7 @@ def create_deployment(repo_slug, oauth_token, environment, ref='master'):
             'environment': environment,
             'required_contexts': [],
         },  # bypass checking
+        timeout=60,
     ).json()
 
 
@@ -31,4 +32,5 @@ def create_deployment_status(repo_slug, oauth_token, deployment_id, state, envir
             'environment': environment,
             'environment_url': environment_url,
         },
+        timeout=60,
     ).json()

@@ -26,7 +26,7 @@ RPC_API = 'https://mainnet-tezos.giganode.io'
 
 def _get(url: str, params: Optional[Dict[str, Any]] = None):
     logger.info(f'GET {url}?{"&".join(f"{k}={v}" for k, v in (params or {}).items())}')
-    return requests.get(url, params=params)
+    return requests.get(url, params=params, timeout=60)
 
 
 def write_test_data(path: str, name: str, data: Dict[str, Any]) -> None:

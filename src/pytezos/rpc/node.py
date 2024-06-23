@@ -104,6 +104,7 @@ class RpcNode:
             method=method,
             url=_urljoin(self.uri[0], path),
             headers={'content-type': 'application/json', 'user-agent': 'PyTezos', **self.headers},
+            timeout=kwargs.pop('timeout', None) or 60,
             **kwargs,
         )
         if res.status_code == 401:
@@ -125,20 +126,57 @@ class RpcNode:
         params: Optional[Dict[str, Any]] = None,
         timeout: Optional[int] = None,
     ) -> requests.Response:
-        return self.request('GET', path, params=params, timeout=timeout).json()
+        return self.request(
+            'GET',
+            path,
+            params=params,
+            timeout=timeout,
+        ).json()
 
-    def post(self, path: str, params: Optional[Dict[str, Any]] = None, json=None) -> Union[requests.Response, str]:
-        response = self.request('POST', path, params=params, json=json)
+    def post(
+        self,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        json=None,
+        timeout: Optional[int] = None,
+    ) -> Union[requests.Response, str]:
+        response = self.request(
+            'POST',
+            path,
+            params=params,
+            json=json,
+            timeout=timeout,
+        )
         try:
             return response.json()
         except JSONDecodeError:
             return response.text
 
-    def delete(self, path: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:
-        return self.request('DELETE', path, params=params).json()
+    def delete(
+        self,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        timeout: Optional[int] = None,
+    ) -> requests.Response:
+        return self.request(
+            'DELETE',
+            path,
+            params=params,
+            timeout=timeout,
+        ).json()
 
-    def put(self, path: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:
-        return self.request('PUT', path, params=params).json()
+    def put(
+        self,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        timeout: Optional[int] = None,
+    ) -> requests.Response:
+        return self.request(
+            'PUT',
+            path,
+            params=params,
+            timeout=timeout,
+        ).json()
 
 
 class RpcMultiNode(RpcNode):

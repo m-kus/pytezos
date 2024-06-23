@@ -130,13 +130,13 @@ class ContractTokenMetadata(ContextMixin):
     def from_ipfs(cls, multihash: str, context: Optional[ExecutionContext] = None) -> 'ContractTokenMetadata':
         """Fetch token metadata from IPFS network by multihash"""
         context = context or ExecutionContext()
-        token_metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}').json()
+        token_metadata_json = requests.get(f'{context.ipfs_gateway}/{multihash}', timeout=60).json()
         return cls.from_json(token_metadata_json, context)
 
     @classmethod
     def from_url(cls, url: str, context: Optional[ExecutionContext] = None) -> 'ContractTokenMetadata':
         """Fetch token metadata from HTTP(S) URL"""
-        token_metadata_json = requests.get(url).json()
+        token_metadata_json = requests.get(url, timeout=60).json()
         return cls.from_json(token_metadata_json, context)
 
     @classmethod

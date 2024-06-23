@@ -24,9 +24,9 @@ def format_entry(title, concl, descr):
 
 
 def generate():
-    meta_src = requests.get(meta_url).text
+    meta_src = requests.get(meta_url, timeout=10).text
     meta = yaml.load(meta_src, Loader=yaml.SafeLoader)
-    sema = requests.get(sema_url).json()
+    sema = requests.get(sema_url, timeout=60).json()
     docs = extra.copy()
 
     for section in ['instructions', 'types']:

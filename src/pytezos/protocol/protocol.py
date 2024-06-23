@@ -54,7 +54,7 @@ def tar_to_files(path=None, raw=None) -> List[Tuple[str, str]]:
 
 
 def url_to_files(url) -> List[Tuple[str, str]]:
-    res = requests.get(url, stream=True)
+    res = requests.get(url, stream=True, timeout=60)
     raw = b''
 
     for data in tqdm(res.iter_content()):
