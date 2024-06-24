@@ -24,9 +24,6 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
-      - name: Configure poetry
-        run: poetry config installer.modern-installation false
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
