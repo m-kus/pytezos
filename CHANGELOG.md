@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [3.13.0](https://github.com/baking-bad/pytezos/compare/3.12.1...3.13.0) (2024-06-24)
+
+### Added
+
+* ParisCnet protocol support 
 
 ### Changed
 

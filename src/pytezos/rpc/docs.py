@@ -4272,7 +4272,9 @@ rpc_docs = {
     },
     "props": [
       "inbox",
-      "index"
+      "index",
+      "parisb2_activation_level",
+      "previous_commitment_period"
     ]
   },
   "/chains/{}/blocks/{}/context/raw/json/smart_rollup/inbox": {
@@ -4826,6 +4828,30 @@ rpc_docs = {
         }
       ],
       "ret": "String"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/parisb2_activation_level": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
+    }
+  },
+  "/chains/{}/blocks/{}/context/raw/json/smart_rollup/previous_commitment_period": {
+    "GET": {
+      "descr": "\u00af\\_(\u30c4)_/\u00af",
+      "args": [
+        {
+          "name": "depth",
+          "descr": "\u00af\\_(\u30c4)_/\u00af"
+        }
+      ],
+      "ret": "Integer"
     }
   },
   "/chains/{}/blocks/{}/context/raw/json/staking_balance": {
