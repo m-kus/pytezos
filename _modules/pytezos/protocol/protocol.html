@@ -141,7 +141,7 @@
 
 
 <div class="viewcode-block" id="url_to_files"><a class="viewcode-back" href="../../../inspect_proposals.html#pytezos.protocol.protocol.url_to_files">[docs]</a><span class="k">def</span> <span class="nf">url_to_files</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
     <span class="n">raw</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
 
     <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">iter_content</span><span class="p">()):</span>
