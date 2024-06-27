@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.13.2](https://github.com/baking-bad/pytezos/compare/3.13.1...3.13.2) (2024-06-27)
+
+### Fixed
+
+* Fixed Parisnet operation injections.
+
 ## [3.13.1](https://github.com/baking-bad/pytezos/compare/3.13.0...3.13.1) (2024-06-24)
 
 ### Fixed

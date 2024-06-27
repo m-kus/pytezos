@@ -24,11 +24,9 @@ reserved_entrypoints = {
 
 
 def has_parameters(content: Dict[str, Any]) -> bool:
-    if content.get('parameters'):
-        if content['parameters']['entrypoint'] == 'default' and content['parameters']['value'] == {'prim': 'Unit'}:
-            return False
-        return True
-    return False
+    if not content.get('parameters'):
+        return False
+    return not (content['parameters']['entrypoint'] == 'default' and content['parameters']['value'] == {'prim': 'Unit'})
 
 
 def forge_entrypoint(entrypoint) -> bytes:
