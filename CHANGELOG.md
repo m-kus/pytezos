@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.13.3](https://github.com/baking-bad/pytezos/compare/3.13.2...3.13.3) (2024-07-12)
+
+### Fixed
+
+* Fixed Python 3.12 compatibility on .deb-based systems.
+
+### Changed
+
+* `secp256k1` dependency replaced with `coincurve`.
+
 ## [3.13.2](https://github.com/baking-bad/pytezos/compare/3.13.1...3.13.2) (2024-06-27)
 
 ### Fixed

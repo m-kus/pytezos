@@ -1,17 +1,18 @@
 [tool.poetry]
 name = "pytezos"
-version = "3.13.2"
+version = "3.13.3"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = [
     "Michael Zaikin <mz@baking-bad.org>",
     "Lev Gorodetskii <pytezos@drsr.io>",
+    "Igor Sereda <sereda.igor.s@gmail.com>",
     "Arthur Breitman",
     "Roman Serikov",
 ]
 maintainers = [
-    "Michael Zaikin <mz@baking-bad.org>",
     "Lev Gorodetskii <pytezos@drsr.io>",
+    "Igor Sereda <sereda.igor.s@gmail.com>",
 ]
 readme = "README.md"
 repository = "https://github.com/baking-bad/pytezos"
