@@ -6,7 +6,7 @@ ARG NB_UID=1000
 USER root
 
 RUN apt update && \
-    apt install -y build-essential pkg-config libsodium-dev libsecp256k1-dev libgmp-dev && \
+    apt install -y build-essential pkg-config libsodium-dev libgmp-dev && \
     rm -rf /var/lib/apt/lists/*
 
 COPY . /tmp/pytezos

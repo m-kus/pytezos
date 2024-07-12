@@ -22,7 +22,7 @@ Use apt or your favourite package manager:
 
 .. code-block::
 
-   $ sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev
+   $ sudo apt install libsodium-dev libgmp-dev
 
 *MacOS*
 
@@ -31,7 +31,7 @@ Use homebrew:
 .. code-block::
 
    $ brew tap cuber/homebrew-libsecp256k1
-   $ brew install libsodium libsecp256k1 gmp
+   $ brew install libsodium gmp
 
 *Windows*
 
@@ -58,7 +58,7 @@ In Google Colab notebook:
 
 .. code-block:: python
 
-   >>> !apt install libsodium-dev libsecp256k1-dev libgmp-dev
+   >>> !apt install libsodium-dev libgmp-dev
    >>> !pip install pytezos
    [RESTART RUNTIME]
 

@@ -7,16 +7,7 @@ RUN apk add --update --no-cache \
 	python3-dev \
 	libffi-dev \
 	gmp-dev \
-	libsodium-dev \
-	libsecp256k1-dev
-
-RUN mkdir /tmp/secp256k1 \
-	&& cd /tmp \
-	&& wget https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.2.0.tar.gz -O /tmp/secp256k1.tar.gz \
-	&& tar -xzf /tmp/secp256k1.tar.gz -C /tmp/secp256k1 --strip-components=1 \
-	&& cd /tmp/secp256k1 \
-	&& ./autogen.sh \
-	&& ./configure
+	libsodium-dev
 
 RUN python -m venv --without-pip --system-site-packages /opt/pytezos \
     && mkdir -p /opt/pytezos/src/pytezos/ \
@@ -35,8 +26,7 @@ FROM python:3.12-alpine3.17 AS build-image
 RUN apk add --update --no-cache \
 	binutils \
 	gmp-dev \
-	libsodium-dev \
-	libsecp256k1-dev
+	libsodium-dev
 
 RUN adduser -D pytezos
 USER pytezos

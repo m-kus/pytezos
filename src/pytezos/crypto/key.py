@@ -58,9 +58,11 @@ try:
     import fastecdsa.encoding.sec1  # type: ignore
     import fastecdsa.keys  # type: ignore
     import pysodium  # type: ignore
+    from coincurve import ecdsa  # type: ignore
     from fastecdsa.encoding.util import bytes_to_int  # type: ignore
 except ImportError as e:
-    coincurve = CryptoExtraFallback()
+    coincurve = CryptoExtraFallback()  # type: ignore
+    ecdsa = CryptoExtraFallback()  # type: ignore
     pysodium = CryptoExtraFallback()
     fastecdsa = CryptoExtraFallback()
     bytes_to_int = CryptoExtraFallback()
@@ -152,7 +154,7 @@ class Key(metaclass=InlineDocstring):
         # Secp256k1
         elif curve == b'sp':
             sk = coincurve.PrivateKey(secret_exponent)
-            public_point = sk.public_key.format(compressed=True)
+            public_point = sk.public_key.format()
         # P256
         elif curve == b'p2':
             pk = fastecdsa.keys.get_public_key(bytes_to_int(secret_exponent), curve=fastecdsa.curve.P256)
@@ -445,8 +447,9 @@ class Key(metaclass=InlineDocstring):
         # Secp256k1
         elif self.curve == b"sp":
             pk = coincurve.PrivateKey(self.secret_exponent)
-            signature = pk.sign(encoded_message, hasher=lambda x: blake2b_32(x).digest())
-
+            signature = ecdsa.serialize_compact(
+                ecdsa.der_to_cdata(pk.sign(encoded_message, hasher=lambda x: blake2b_32(x).digest()))
+            )
         # P256
         elif self.curve == b"p2":
             r, s = fastecdsa.ecdsa.sign(msg=encoded_message, d=bytes_to_int(self.secret_exponent), hashfunc=blake2b_32)
@@ -492,7 +495,7 @@ class Key(metaclass=InlineDocstring):
         elif self.curve == b"sp":
             pk = coincurve.PublicKey(self.public_point)
             if not pk.verify(
-                signature=decoded_signature,
+                signature=ecdsa.cdata_to_der(ecdsa.deserialize_compact(decoded_signature)),
                 message=encoded_message,
                 hasher=lambda x: blake2b_32(x).digest(),
             ):

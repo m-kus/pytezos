@@ -54,13 +54,13 @@ You also need to install cryptographic packages before installing the library/bu
 #### Ubuntu, Debian and other apt-based distributions
 
 ```shell
-$ sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev pkg-config
+$ sudo apt install libsodium-dev libgmp-dev pkg-config
 ```
 
 #### Arch Linux
 
 ```shell
-$ sudo pacman -Syu --needed libsodium libsecp256k1 gmp
+$ sudo pacman -Syu --needed libsodium gmp
 ```
 
 ### MacOS
@@ -69,7 +69,7 @@ $ sudo pacman -Syu --needed libsodium libsecp256k1 gmp
 
 ```shell
 $ brew tap cuber/homebrew-libsecp256k1
-$ brew install libsodium libsecp256k1 gmp pkg-config
+$ brew install libsodium gmp pkg-config
 ```
 
 #### M1 (ARM)
@@ -107,7 +107,7 @@ $ pip install pytezos
 ### [Google Colab](https://colab.research.google.com)
 
 `````python
->>> !apt install libsodium-dev libsecp256k1-dev libgmp-dev
+>>> !apt install libsodium-dev libgmp-dev
 >>> !pip install pytezos
 `````
 
@@ -129,7 +129,7 @@ $ docker-compose up -d notebook
 Requirements:
 
 * Python 3.8 to 3.12
-* libsodium, libsecp256k1, gmp
+* libsodium, coincurve, gmp
 * make
 
 ```shell
