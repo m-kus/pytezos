@@ -130,8 +130,8 @@
 <span class="k">class</span> <span class="nc">CryptoExtraFallback</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;Please, install packages libsodium-dev, libsecp256k1-dev, and libgmp-dev, &quot;</span>
-            <span class="s2">&quot;and Python libraries pysodium, secp256k1, and fastecdsa&quot;</span>
+            <span class="s2">&quot;Please, install packages libsodium-dev, and libgmp-dev, &quot;</span>
+            <span class="s2">&quot;and Python libraries pysodium, coincurve, and fastecdsa&quot;</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -139,16 +139,18 @@
 
 
 <span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">coincurve</span>  <span class="c1"># type: ignore</span>
     <span class="kn">import</span> <span class="nn">fastecdsa.curve</span>  <span class="c1"># type: ignore</span>
     <span class="kn">import</span> <span class="nn">fastecdsa.ecdsa</span>  <span class="c1"># type: ignore</span>
     <span class="kn">import</span> <span class="nn">fastecdsa.encoding.sec1</span>  <span class="c1"># type: ignore</span>
     <span class="kn">import</span> <span class="nn">fastecdsa.keys</span>  <span class="c1"># type: ignore</span>
     <span class="kn">import</span> <span class="nn">pysodium</span>  <span class="c1"># type: ignore</span>
-    <span class="kn">import</span> <span class="nn">secp256k1</span>  <span class="c1"># type: ignore</span>
+    <span class="kn">from</span> <span class="nn">coincurve</span> <span class="kn">import</span> <span class="n">ecdsa</span>  <span class="c1"># type: ignore</span>
     <span class="kn">from</span> <span class="nn">fastecdsa.encoding.util</span> <span class="kn">import</span> <span class="n">bytes_to_int</span>  <span class="c1"># type: ignore</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">coincurve</span> <span class="o">=</span> <span class="n">CryptoExtraFallback</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+    <span class="n">ecdsa</span> <span class="o">=</span> <span class="n">CryptoExtraFallback</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
     <span class="n">pysodium</span> <span class="o">=</span> <span class="n">CryptoExtraFallback</span><span class="p">()</span>
-    <span class="n">secp256k1</span> <span class="o">=</span> <span class="n">CryptoExtraFallback</span><span class="p">()</span>
     <span class="n">fastecdsa</span> <span class="o">=</span> <span class="n">CryptoExtraFallback</span><span class="p">()</span>
     <span class="n">bytes_to_int</span> <span class="o">=</span> <span class="n">CryptoExtraFallback</span><span class="p">()</span>
     <span class="n">__crypto__</span> <span class="o">=</span> <span class="kc">False</span>
@@ -238,8 +240,8 @@
                 <span class="n">public_point</span><span class="p">,</span> <span class="n">secret_exponent</span> <span class="o">=</span> <span class="n">pysodium</span><span class="o">.</span><span class="n">crypto_sign_seed_keypair</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">secret_exponent</span><span class="p">)</span>
         <span class="c1"># Secp256k1</span>
         <span class="k">elif</span> <span class="n">curve</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;sp&#39;</span><span class="p">:</span>
-            <span class="n">sk</span> <span class="o">=</span> <span class="n">secp256k1</span><span class="o">.</span><span class="n">PrivateKey</span><span class="p">(</span><span class="n">secret_exponent</span><span class="p">)</span>
-            <span class="n">public_point</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">pubkey</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+            <span class="n">sk</span> <span class="o">=</span> <span class="n">coincurve</span><span class="o">.</span><span class="n">PrivateKey</span><span class="p">(</span><span class="n">secret_exponent</span><span class="p">)</span>
+            <span class="n">public_point</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">public_key</span><span class="o">.</span><span class="n">format</span><span class="p">()</span>
         <span class="c1"># P256</span>
         <span class="k">elif</span> <span class="n">curve</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;p2&#39;</span><span class="p">:</span>
             <span class="n">pk</span> <span class="o">=</span> <span class="n">fastecdsa</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">get_public_key</span><span class="p">(</span><span class="n">bytes_to_int</span><span class="p">(</span><span class="n">secret_exponent</span><span class="p">),</span> <span class="n">curve</span><span class="o">=</span><span class="n">fastecdsa</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">P256</span><span class="p">)</span>
@@ -531,8 +533,10 @@
             <span class="n">signature</span> <span class="o">=</span> <span class="n">pysodium</span><span class="o">.</span><span class="n">crypto_sign_detached</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secret_exponent</span><span class="p">)</span>
         <span class="c1"># Secp256k1</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">curve</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;sp&quot;</span><span class="p">:</span>
-            <span class="n">pk</span> <span class="o">=</span> <span class="n">secp256k1</span><span class="o">.</span><span class="n">PrivateKey</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret_exponent</span><span class="p">)</span>
-            <span class="n">signature</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">ecdsa_serialize_compact</span><span class="p">(</span><span class="n">pk</span><span class="o">.</span><span class="n">ecdsa_sign</span><span class="p">(</span><span class="n">encoded_message</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="n">blake2b_32</span><span class="p">))</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="n">coincurve</span><span class="o">.</span><span class="n">PrivateKey</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret_exponent</span><span class="p">)</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">ecdsa</span><span class="o">.</span><span class="n">serialize_compact</span><span class="p">(</span>
+                <span class="n">ecdsa</span><span class="o">.</span><span class="n">der_to_cdata</span><span class="p">(</span><span class="n">pk</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">encoded_message</span><span class="p">,</span> <span class="n">hasher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">blake2b_32</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()))</span>
+            <span class="p">)</span>
         <span class="c1"># P256</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">curve</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;p2&quot;</span><span class="p">:</span>
             <span class="n">r</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">fastecdsa</span><span class="o">.</span><span class="n">ecdsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">encoded_message</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">bytes_to_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret_exponent</span><span class="p">),</span> <span class="n">hashfunc</span><span class="o">=</span><span class="n">blake2b_32</span><span class="p">)</span>
@@ -576,9 +580,12 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Signature is invalid.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
         <span class="c1"># Secp256k1</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">curve</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;sp&quot;</span><span class="p">:</span>
-            <span class="n">pk</span> <span class="o">=</span> <span class="n">secp256k1</span><span class="o">.</span><span class="n">PublicKey</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_point</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">sig</span> <span class="o">=</span> <span class="n">pk</span><span class="o">.</span><span class="n">ecdsa_deserialize_compact</span><span class="p">(</span><span class="n">decoded_signature</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">pk</span><span class="o">.</span><span class="n">ecdsa_verify</span><span class="p">(</span><span class="n">encoded_message</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">digest</span><span class="o">=</span><span class="n">blake2b_32</span><span class="p">):</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="n">coincurve</span><span class="o">.</span><span class="n">PublicKey</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">public_point</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pk</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span>
+                <span class="n">signature</span><span class="o">=</span><span class="n">ecdsa</span><span class="o">.</span><span class="n">cdata_to_der</span><span class="p">(</span><span class="n">ecdsa</span><span class="o">.</span><span class="n">deserialize_compact</span><span class="p">(</span><span class="n">decoded_signature</span><span class="p">)),</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">encoded_message</span><span class="p">,</span>
+                <span class="n">hasher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">blake2b_32</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">(),</span>
+            <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Signature is invalid.&#39;</span><span class="p">)</span>
         <span class="c1"># P256</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">curve</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;p2&quot;</span><span class="p">:</span>
