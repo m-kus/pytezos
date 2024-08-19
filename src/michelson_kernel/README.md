@@ -29,7 +29,7 @@ pyenv global 3.7.9  # per system
 
 2. Ensure you have several crypto libraries installed (see [pytezos docs](https://baking-bad.github.io/pytezos/#requirements)):
 ```
-sudo apt install libsodium-dev libsecp256k1-dev libgmp-dev
+sudo apt install libsodium-dev libgmp-dev
 ```
 3. Install the PyTezos package using pip
 ```

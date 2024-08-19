@@ -20,7 +20,6 @@ install-deps:      ## Install binary dependencies
 ifneq (,$(findstring linux-gnu,$(OSTYPE)))
 	sudo apt install libsodium-dev libgmp-dev pkg-config
 else ifneq (,$(findstring darwin,$(OSTYPE)))
-	brew tap cuber/homebrew-libsecp256k1
 	brew install libsodium gmp pkg-config
 else
 	echo "Unsupported platform $(OSTYPE)"

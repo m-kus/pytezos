@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.13.4](https://github.com/baking-bad/pytezos/compare/3.13.3...3.13.4) (2024-08-19)
+
+### Fixed
+
+* Fixed testcontainers version constraint.
+
 ## [3.13.3](https://github.com/baking-bad/pytezos/compare/3.13.2...3.13.3) (2024-07-12)
 
 ### Fixed

@@ -68,16 +68,17 @@ $ sudo pacman -Syu --needed libsodium gmp
 [Homebrew](https://brew.sh/) needs to be installed.
 
 ```shell
-$ brew tap cuber/homebrew-libsecp256k1
 $ brew install libsodium gmp pkg-config
 ```
 
 #### M1 (ARM)
 
-In case `secp256k1` or `gmp` cannot find either include or lib paths, try explicitly set environment vars:
+In case `libsodium` or `gmp` cannot find either include or lib paths, try explicitly set environment vars:
 
 ```shell
-CFLAGS="-I/opt/homebrew/Cellar/gmp/6.2.1_1/include/ -L/opt/homebrew/Cellar/gmp/6.2.1_1/lib/" LIB_DIR="/opt/homebrew/Cellar/libsecp256k1/0.1/lib" INCLUDE_DIR=/opt/homebrew/Cellar/libsecp256k1/0.1/include pip3 install --user pytezos
+export CFLAGS="-I/opt/homebrew/Cellar/gmp/6.2.1_1/include/ -L/opt/homebrew/Cellar/gmp/6.2.1_1/lib/"
+export DYLD_LIBRARY_PATH=/opt/homebrew/lib/
+pip3 install --user pytezos
 ```
 
 For running tests you might also need to export `LD_LIBRARY_PATH`:
