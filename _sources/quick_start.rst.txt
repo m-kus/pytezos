@@ -30,7 +30,6 @@ Use homebrew:
 
 .. code-block::
 
-   $ brew tap cuber/homebrew-libsecp256k1
    $ brew install libsodium gmp
 
 *Windows*
