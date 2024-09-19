@@ -44,7 +44,7 @@ class CryptoExtraFallback:
     def __getattr__(self, item):
         raise ImportError(
             "Please, install packages libsodium-dev, and libgmp-dev, "
-            "and Python libraries pysodium, coincurve, and fastecdsa"
+            "and Python libraries libnacl, coincurve, and fastecdsa"
         )
 
     def __call__(self, *args, **kwargs):
@@ -57,13 +57,13 @@ try:
     import fastecdsa.ecdsa  # type: ignore
     import fastecdsa.encoding.sec1  # type: ignore
     import fastecdsa.keys  # type: ignore
-    import pysodium  # type: ignore
+    import libnacl  # type: ignore
     from coincurve import ecdsa  # type: ignore
     from fastecdsa.encoding.util import bytes_to_int  # type: ignore
 except ImportError as e:
     coincurve = CryptoExtraFallback()  # type: ignore
     ecdsa = CryptoExtraFallback()  # type: ignore
-    pysodium = CryptoExtraFallback()
+    libnacl = CryptoExtraFallback()
     fastecdsa = CryptoExtraFallback()
     bytes_to_int = CryptoExtraFallback()
     __crypto__ = False
@@ -148,9 +148,9 @@ class Key(metaclass=InlineDocstring):
         if curve == b'ed':
             # Dealing with secret exponent or seed?
             if len(secret_exponent) == 64:
-                public_point = pysodium.crypto_sign_sk_to_pk(sk=secret_exponent)
+                public_point = libnacl.crypto_sign_ed25519_sk_to_pk(sk=secret_exponent)
             else:
-                public_point, secret_exponent = pysodium.crypto_sign_seed_keypair(seed=secret_exponent)
+                public_point, secret_exponent = libnacl.crypto_sign_seed_keypair(seed=secret_exponent)
         # Secp256k1
         elif curve == b'sp':
             sk = coincurve.PrivateKey(secret_exponent)
@@ -218,7 +218,7 @@ class Key(metaclass=InlineDocstring):
                 iterations=32768,
                 dklen=32,
             )
-            encoded_key = pysodium.crypto_secretbox_open(
+            encoded_key = libnacl.crypto_secretbox_open(
                 c=encrypted_sk,
                 nonce=b'\000' * 24,
                 k=encryption_key,
@@ -291,7 +291,7 @@ class Key(metaclass=InlineDocstring):
         seed = Mnemonic.to_seed(mnemonic, passphrase=email + passphrase)
 
         if curve == b'ed':
-            _, secret_exponent = pysodium.crypto_sign_seed_keypair(seed=seed[:32])
+            _, secret_exponent = libnacl.crypto_sign_seed_keypair(seed=seed[:32])
         elif curve == b'sp':
             secret_exponent = seed[:32]
         elif curve == b'p2':
@@ -379,7 +379,7 @@ class Key(metaclass=InlineDocstring):
             raise ValueError("Secret key is undefined")
 
         if self.curve == b'ed' and ed25519_seed:
-            key = pysodium.crypto_sign_sk_to_seed(self.secret_exponent)
+            key = libnacl.crypto_sign_ed25519_sk_to_seed(self.secret_exponent)
         else:
             key = self.secret_exponent
 
@@ -390,7 +390,7 @@ class Key(metaclass=InlineDocstring):
                 passphrase = passphrase.encode()
             assert isinstance(passphrase, bytes), f'expected bytes or str, got {type(passphrase).__name__}'
 
-            salt = pysodium.randombytes(8)
+            salt = libnacl.randombytes(8)
             encryption_key = hashlib.pbkdf2_hmac(
                 hash_name="sha512",
                 password=passphrase,
@@ -398,7 +398,7 @@ class Key(metaclass=InlineDocstring):
                 iterations=32768,
                 dklen=32,
             )
-            encrypted_sk = pysodium.crypto_secretbox(msg=key, nonce=b'\000' * 24, k=encryption_key)
+            encrypted_sk = libnacl.crypto_secretbox(msg=key, nonce=b'\000' * 24, k=encryption_key)
             key = salt + encrypted_sk  # we have to combine salt and encrypted key in order to decrypt later
             prefix = self.curve + b'esk'
         else:
@@ -442,8 +442,8 @@ class Key(metaclass=InlineDocstring):
 
         # Ed25519
         if self.curve == b"ed":
-            digest = pysodium.crypto_generichash(encoded_message)
-            signature = pysodium.crypto_sign_detached(digest, self.secret_exponent)
+            digest = libnacl.crypto_generichash(encoded_message)
+            signature = libnacl.crypto_sign_detached(digest, self.secret_exponent)
         # Secp256k1
         elif self.curve == b"sp":
             pk = coincurve.PrivateKey(self.secret_exponent)
@@ -486,9 +486,9 @@ class Key(metaclass=InlineDocstring):
 
         # Ed25519
         if self.curve == b"ed":
-            digest = pysodium.crypto_generichash(encoded_message)
+            digest = libnacl.crypto_generichash(encoded_message)
             try:
-                pysodium.crypto_sign_verify_detached(decoded_signature, digest, self.public_point)
+                libnacl.crypto_sign_verify_detached(decoded_signature, digest, self.public_point)
             except ValueError as exc:
                 raise ValueError('Signature is invalid.') from exc
         # Secp256k1
