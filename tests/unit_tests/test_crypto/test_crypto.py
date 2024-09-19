@@ -157,7 +157,7 @@ class TestCrypto(TestCase):
         key = Key.from_encoded_key(sk, passphrase=passphrase)
         self.assertEqual(pk, key.public_key())
 
-        with patch('pytezos.crypto.key.pysodium.randombytes', return_value=salt):
+        with patch('pytezos.crypto.key.libnacl.randombytes', return_value=salt):
             self.assertEqual(sk, key.secret_key(passphrase))
 
     @parameterized.expand(

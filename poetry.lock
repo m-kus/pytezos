@@ -1594,6 +1594,17 @@ files = [
 ]
 
 [[package]]
+name = "libnacl"
+version = "2.1.0"
+description = "Python bindings for libsodium based on ctypes"
+optional = false
+python-versions = ">=3.4,<4.0"
+files = [
+    {file = "libnacl-2.1.0-py3-none-any.whl", hash = "sha256:a8546b221afe8b72b6a9f298cd92a4c1f90570d7b5baa295acb1913644e230a5"},
+    {file = "libnacl-2.1.0.tar.gz", hash = "sha256:f3418da7df29e6d9b11fd7d990289d16397dc1020e4e35192e11aee826922860"},
+]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.5"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -2209,16 +2220,6 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
-
-[[package]]
-name = "pysodium"
-version = "0.7.18"
-description = "python libsodium wrapper"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pysodium-0.7.18.tar.gz", hash = "sha256:781ada024456ac74c411193b82d94018c85c94130ea01a22dbec48b8ff458b07"},
-]
 
 [[package]]
 name = "pytest"
@@ -3584,4 +3585,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.13"
-content-hash = "8c202be4ef653aad9b925a835fa344dd67075166e2d8af2a610c6cce055c0549"
+content-hash = "36fddafcdf4caaf97c88d769e2287164ae1bc0a11c782805cb459320f1862922"
