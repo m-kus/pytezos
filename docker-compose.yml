@@ -8,6 +8,6 @@ services:
       - 8888:8888
 
   sandbox_node:
-    image: bakingbad/sandboxed-node:v8.2-2
+    image: bakingbad/sandboxed-node:v20.3-1
     ports:
       - 8732:8732

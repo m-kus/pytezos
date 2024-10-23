@@ -23,6 +23,7 @@ class TestEncoding:
             ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', 'tz1'),
             ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', 'tz2'),
             ('tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', 'tz3'),
+            ('tz4F76GBmuLgXvUjLb2gfeBeM6fBf6EsuD1T', 'tz4'),
             ('txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', 'txr1'),
             ('edpku976gpuAD2bXyx1XGraeKuCo1gUZ3LAJcHM12W1ecxZwoiu22R', 'edpk'),
             ('sppk7aMNM3xh14haqEyaxNjSt7hXanCDyoWtRcxF8wbtya859ak6yZT', 'sppk'),
@@ -45,6 +46,13 @@ class TestEncoding:
             ('sr1JZsZT5u27MUQXeTh1aHqZBo8NvyxRKnyv', 'sr1'),
             ('src13FVgJq88nGcd3xmjtPr4j3wq9VJGkGZ3LaVKZ3PUT8dKbByviq', 'src1'),
             ('srs1257rrkFCsjuDS5enYG37uSas1J25daCaMQ2y5gPwwtoy8FqvDP', 'srs1'),
+            ('BLsk1ijYmTDL6hfUvrFCqgwbetg6FTpHLbzPDKLAfP9tB9Cej8dME5', 'BLsk'),
+            ('BLpk1q8T9TqRSNTacJU1WvTVtj62LZ8WZtGzZ3tQoQANzoXHwAPtxpJCY79TfoNu2m9N6RbFfh7s', 'BLpk'),
+            (
+                'BLsigB2azuvvpWDifK3xCMGDXUcF17V1R7NGfKQsUVrzm7718uvbjtrXpS3KMq5CSJiAWAS9Rjj79Zak3TskGGwDGfHnm52rvdb9rpJxtyXK39FNadwGX4EGtqXVDge9eDRjSm8bVNxJE6',
+                'BLsig',
+            ),
+            ('BLesk1a3e2vNGbbPV5rFRHZZCHvZEvvtGP5Puer4yRfRVLR8E1xVyk5owiUeudZcaa31mGDmvbr9LH6ZPTUdi66z', 'BLesk'),
         ],
     )
     def test_b58_decode_encode(self, base58: str, prefix: str):
@@ -60,6 +68,7 @@ class TestEncoding:
             ('test', b'test'),
             (b'test', b'test'),
             ('0x74657374', b'test'),
+            ('74657374', b'test'),
         ],
     )
     def test_scrub_input(self, input_data, expected):
@@ -71,6 +80,7 @@ class TestEncoding:
             ('tz1eKkWU5hGtfLUiqNpucHrXymm83z3DG9Sq', True),
             ('tz28YZoayJjVz2bRgGeVjxE8NonMiJ3r2Wdu', True),
             ('tz3agP9LGe2cXmKQyYn6T68BHKjjktDbbSWX', True),
+            ('tz4F76GBmuLgXvUjLb2gfeBeM6fBf6EsuD1T', True),
             ('txr1YNMEtkj5Vkqsbdmt7xaxBTMRZjzS96UAi', False),
             ('KT1ExvG3EjTrvDcAU7EqLNb77agPa5u6KvnY', False),
             ('qwerty', False),
@@ -106,6 +116,11 @@ class TestEncoding:
                 'spsig1RriZtYADyRhyNoQMa6AiPuJJ7AUDcrxWZfgqexzgANqMv4nXs6qsXDoXcoChBgmCcn2t7Y3EkJaVRuAmNh2cDDxWTdmsz',
                 True,
             ),
+            (
+                'BLsigB2azuvvpWDifK3xCMGDXUcF17V1R7NGfKQsUVrzm7718uvbjtrXpS3KMq5CSJiAWAS9Rjj79Zak3TskGGwDGfHnm52rvdb9rpJxtyXK39FNadwGX4EGtqXVDge9eDRjSm8bVNxJE6',
+                True,
+            ),
+            ('BLsigB2azuvvpWDifK3xCMGDXUcF17V1R7NGfKQsUVrzm7718uvbjtrXpS3KMq5CSJiAWAS9Rjj79Zak3TskGGwDGfHnm52r', False),
             ('sigUdRdXYCXW14xqT8mFTMkX4wSmDMBmcW1Vuz1vanGWqYTmuBodueUHGPUsbxgn73AroNwpEBHwPdhXUswzmvCzquiqtcHC', True),
             ('qwerty', False),
             ('sigUdRdXYCXW14xqT8mFTMkX4wSmDMBmcW1Vuz1vanGWqYT', False),

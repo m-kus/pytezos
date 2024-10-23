@@ -51,18 +51,29 @@ class TestCrypto(TestCase):
                 'p2pk66yEDuRC5RLHpVj8hvAS5fr8HnU2YsLvFNdwQoW3jH8WUynMwGG',
                 'tz3Q2KTKWw3xqiowvfX4N7gyyAfCz8hTvcnk',
             ),
+            (
+                'BLsk1ijYmTDL6hfUvrFCqgwbetg6FTpHLbzPDKLAfP9tB9Cej8dME5',
+                'BLpk1q8T9TqRSNTacJU1WvTVtj62LZ8WZtGzZ3tQoQANzoXHwAPtxpJCY79TfoNu2m9N6RbFfh7s',
+                'tz4F76GBmuLgXvUjLb2gfeBeM6fBf6EsuD1T',
+            ),
+            (
+                'BLsk1X2dnEkx4KemkR5Q5j1agrstAfZxX1pXUVDLUCzg6bQfTXkv5u',
+                'BLpk1mN7zNwSvC7KLkhJwUuWm4riPqtpCXDqT662Ffob3Vo3LcmCTfnkzo5LGFKG24L9xG3d1SeW',
+                'tz4MQK3m8tqP7RrvZixbyGjY4BGRXp52XMVW',
+            ),
         ]
     )
     def test_derive_key_data(self, sk, pk, pkh):
         public_key = Key.from_encoded_key(pk)
-        self.assertFalse(public_key.is_secret)
-        self.assertEqual(pk, public_key.public_key())
-        self.assertEqual(pkh, public_key.public_key_hash())
+        assert not public_key.is_secret
+        assert pk == public_key.public_key()
+        assert pkh == public_key.public_key_hash()
 
         secret_key = Key.from_encoded_key(sk)
-        self.assertTrue(secret_key.is_secret)
-        self.assertEqual(pk, secret_key.public_key())
-        self.assertEqual(sk, secret_key.secret_key())
+        assert secret_key.is_secret
+        assert sk == secret_key.secret_key()
+        assert pk == secret_key.public_key()
+        assert pkh == secret_key.public_key_hash()
 
     @parameterized.expand(
         [
@@ -88,6 +99,11 @@ class TestCrypto(TestCase):
                 '027a06a770ad828485977947451e23e99f5040ead0f09ef89f58be2583640edcb1e295d0cb000005085e',
                 'sigQVTY9CkYw8qL6Xa7QWestkLSdtPv6HZ4ToSMHDcRot3BwRGwZhSwXd9jJwKkDvvotTLSNWQdUqiDSfXuCNUfjbEaY2j6j',
             ),
+            (
+                'BLsk1vhAKWY755ny1N1idqkzpHM4XpTEVdhybgDk3w4Lf2oFc4B5mU',
+                b'bls12_381 verify external signature',
+                'BLsigB2azuvvpWDifK3xCMGDXUcF17V1R7NGfKQsUVrzm7718uvbjtrXpS3KMq5CSJiAWAS9Rjj79Zak3TskGGwDGfHnm52rvdb9rpJxtyXK39FNadwGX4EGtqXVDge9eDRjSm8bVNxJE6',
+            ),
         ]
     )
     def test_verify_ext_signatures(self, pk, msg, sig):
@@ -100,6 +116,7 @@ class TestCrypto(TestCase):
             ('edsk3nM41ygNfSxVU4w1uAW3G9EnTQEB5rjojeZedLTGmiGRcierVv', '0xdeadbeaf'),
             ('spsk1zkqrmst1yg2c4xi3crWcZPqgdc9KtPtb9SAZWYHAdiQzdHy7j', b'hello'),
             ('p2sk3PM77YMR99AvD3fSSxeLChMdiQ6kkEzqoPuSwQqhPsh29irGLC', b'test'),
+            ('BLsk2cZcs2umUhDAQVUxqZnEnaj5p7W7TeHh9dc6F1E3j1bnfRJtaR', b'bls12_381 sign and verify'),
         ]
     )
     def test_sign_and_verify(self, sk, msg):
@@ -119,6 +136,11 @@ class TestCrypto(TestCase):
                 'spsk1zkqrmst1yg2c4xi3crWcZPqgdc9KtPtb9SAZWYHAdiQzdHy7j',
                 b'test',
                 'spsig1RriZtYADyRhyNoQMa6AiPuJJ7AUDcrxWZfgqexzgANqMv4nXs6qsXDoXcoChBgmCcn2t7Y3EkJaVRuAmNh2cDDxWTdmsz',
+            ),
+            (
+                'BLsk2FqWKU2Zs4Tio4L6keJfmRq8ZCvTqzCp2zy9x6VhE3aJgvVXjx',
+                b'bls12_381 deterministic signatures',
+                'BLsigA1NaMLRjBFBm1zK2JCgLt8Ku4mN9bipt6TtSNaTo7tsXNB9rWgjimvsc7vb9YjfXS31yt9zzpcNnBRVkgwkVBQFphLwhrrW3hnRPz58MZDPSPFZcn59ZBcYr8JLQpmpTZABjxzVfH',
             ),
         ]
     )
@@ -151,14 +173,20 @@ class TestCrypto(TestCase):
                 b'"\xf8\x0e \x0f]hc',
                 'p2pk68Ky2h9UZZ4jUYws8mU8Cazhu4H1LdK22wD8HgDPRSvsJPBDtJ7',
             ),
+            (
+                'BLesk1a3e2vNGbbPV5rFRHZZCHvZEvvtGP5Puer4yRfRVLR8E1xVyk5owiUeudZcaa31mGDmvbr9LH6ZPTUdi66z',
+                'qqq',
+                b'q\xc1\x1e\xd4\x8f\xeby\xc8',
+                'BLpk1kuaZeC775wf3VtwYXEipCVK1jkPdu7xcroNCw1kKci7ncaTRQ1ehCCpdiye1BugTMjWx1Xx',
+            ),
         ]
     )
     def test_encrypted_keys(self, sk, passphrase, salt, pk):
         key = Key.from_encoded_key(sk, passphrase=passphrase)
-        self.assertEqual(pk, key.public_key())
+        assert pk == key.public_key()
 
         with patch('pytezos.crypto.key.pysodium.randombytes', return_value=salt):
-            self.assertEqual(sk, key.secret_key(passphrase))
+            assert sk == key.secret_key(passphrase)
 
     @parameterized.expand(
         [
