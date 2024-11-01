@@ -232,7 +232,7 @@ def unforge_contract(data: bytes) -> str:
 def forge_public_key(value: str) -> bytes:
     """Encode public key into bytes.
 
-    :param value: public key in in base58 form
+    :param value: public key in base58 form
     """
     prefix = value[:4]
     res = base58.b58decode_check(value)[4:]
@@ -243,6 +243,8 @@ def forge_public_key(value: str) -> bytes:
         return b'\x01' + res
     elif prefix == 'p2pk':
         return b'\x02' + res
+    elif prefix == 'BLpk':
+        return b'\x03' + res
 
     raise ValueError(f'Unrecognized key type: #{prefix}')
 
@@ -257,6 +259,7 @@ def unforge_public_key(data: bytes) -> str:
         b'\x00': b'edpk',
         b'\x01': b'sppk',
         b'\x02': b'p2pk',
+        b'\x03': b'BLpk',
     }
     return base58_encode(data[1:], key_prefix[data[:1]]).decode()
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytezos"
-version = "3.13.4"
+version = "3.13.5"
 description = "Python toolkit for Tezos"
 license = "MIT"
 authors = [
@@ -128,11 +128,15 @@ lint.ignore = [
     "SIM108",
     "SIM114",
 ]
-target-version = "py38"
+target-version = "py312"
 lint.extend-select = ["B", "C", "RET", "SIM"]
 
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.12"
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]

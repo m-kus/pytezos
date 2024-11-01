@@ -79,7 +79,6 @@ class CheckSignatureInstruction(MichelsonInstruction, prim='CHECK_SIGNATURE'):
         sig.assert_type_equal(SignatureType)
         msg.assert_type_equal(BytesType)
         key = Key.from_encoded_key(str(pk))
-        # TODO: verify BLS signatures
         try:
             key.verify(signature=str(sig), message=bytes(msg))
         except ValueError:
