@@ -12,7 +12,7 @@ from typing import Optional
 from eth_typing import BLSPubkey
 from eth_typing import BLSSignature
 from mnemonic import Mnemonic
-from py_ecc.bls import G2ProofOfPossession
+from py_ecc.bls import G2MessageAugmentation as G2  # noqa: N814
 
 from pytezos.crypto.encoding import base58_decode
 from pytezos.crypto.encoding import base58_encode
@@ -167,7 +167,7 @@ class Key(metaclass=InlineDocstring):
             # BLS12-381
             case b'BL':
                 sk_int = int.from_bytes(secret_exponent, byteorder='little')
-                public_point = G2ProofOfPossession.SkToPk(sk_int)
+                public_point = G2.SkToPk(sk_int)
 
             case _:
                 raise ValueError(f'Invalid or unsupported curve type: `{curve!r}`.')
@@ -477,7 +477,7 @@ class Key(metaclass=InlineDocstring):
             # BLS12-381
             case b'BL':
                 sk_int = int.from_bytes(self.secret_exponent, byteorder='little')
-                signature = G2ProofOfPossession.Sign(sk_int, encoded_message)
+                signature = G2.Sign(sk_int, encoded_message)
             case _:
                 raise ValueError(f'Invalid or unsupported curve type: `{self.curve!r}`.')
 
@@ -535,7 +535,7 @@ class Key(metaclass=InlineDocstring):
                     raise ValueError('Signature is invalid.')
             # BLS12-381
             case b'BL':
-                if not G2ProofOfPossession.Verify(
+                if not G2.Verify(
                     BLSPubkey(self.public_point),
                     encoded_message,
                     BLSSignature(decoded_signature),

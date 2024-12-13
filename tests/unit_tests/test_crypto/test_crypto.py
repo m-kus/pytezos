@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+import pytest
 from mnemonic import Mnemonic
 from parameterized import parameterized  # type: ignore
 
@@ -100,16 +101,20 @@ class TestCrypto(TestCase):
                 'sigQVTY9CkYw8qL6Xa7QWestkLSdtPv6HZ4ToSMHDcRot3BwRGwZhSwXd9jJwKkDvvotTLSNWQdUqiDSfXuCNUfjbEaY2j6j',
             ),
             (
-                'BLsk1vhAKWY755ny1N1idqkzpHM4XpTEVdhybgDk3w4Lf2oFc4B5mU',
+                'BLsk2DidLEXYjL5PvteqHgsve5LoJfZVqTQyKU9XsyXdEpoAh6k8D8',
                 b'bls12_381 verify external signature',
-                'BLsigB2azuvvpWDifK3xCMGDXUcF17V1R7NGfKQsUVrzm7718uvbjtrXpS3KMq5CSJiAWAS9Rjj79Zak3TskGGwDGfHnm52rvdb9rpJxtyXK39FNadwGX4EGtqXVDge9eDRjSm8bVNxJE6',
+                'BLsigAGt3Pao4WqsXMpw9JkXnrEyBEGSepTkKFc5gpW8cgLqYZsEiMBXFESJ8HBs9F5JSAeUyuZRyHnDquCAGWc2MEWQBktotL75oEkdaZ351U1HEzrH7LTfXCtQKivTxqgXfi7hf2xxih',
             ),
         ]
     )
     def test_verify_ext_signatures(self, pk, msg, sig):
         key = Key.from_encoded_key(pk)
         key.verify(sig, msg)
-        self.assertRaises(ValueError, key.verify, sig, b'fake')
+
+        fake_message = b'fake'
+        assert msg != fake_message
+        with pytest.raises(ValueError):
+            key.verify(sig, fake_message)
 
     @parameterized.expand(
         [
@@ -123,7 +128,11 @@ class TestCrypto(TestCase):
         key = Key.from_encoded_key(sk)
         sig = key.sign(msg)
         key.verify(sig, msg)
-        self.assertRaises(ValueError, key.verify, sig, b'fake')
+
+        fake_message = b'fake'
+        assert msg != fake_message
+        with pytest.raises(ValueError):
+            key.verify(sig, fake_message)
 
     @parameterized.expand(
         [
@@ -138,20 +147,20 @@ class TestCrypto(TestCase):
                 'spsig1RriZtYADyRhyNoQMa6AiPuJJ7AUDcrxWZfgqexzgANqMv4nXs6qsXDoXcoChBgmCcn2t7Y3EkJaVRuAmNh2cDDxWTdmsz',
             ),
             (
-                'BLsk2FqWKU2Zs4Tio4L6keJfmRq8ZCvTqzCp2zy9x6VhE3aJgvVXjx',
+                'BLsk2DidLEXYjL5PvteqHgsve5LoJfZVqTQyKU9XsyXdEpoAh6k8D8',
                 b'bls12_381 deterministic signatures',
-                'BLsigA1NaMLRjBFBm1zK2JCgLt8Ku4mN9bipt6TtSNaTo7tsXNB9rWgjimvsc7vb9YjfXS31yt9zzpcNnBRVkgwkVBQFphLwhrrW3hnRPz58MZDPSPFZcn59ZBcYr8JLQpmpTZABjxzVfH',
+                'BLsigBTk7yQU5YriqxMPQNXQqAUJKaQDz2LGZdXsBmBWVNrBvVTWXKqCq5Fgz7bJe16wvTzG7wJV23RefadzWgrNz5LZRCxpGoeGXbzABJqtnYzC1RKbQ4EatpraXtYKPFcRfdxN9maGaC',
             ),
         ]
     )
-    def test_deterministic_signatures(self, sk, msg, sig):
+    def test_deterministic_signatures(self, sk, msg, expected_signature):
         """
         See RFC6979 for explanation
         https://tools.ietf.org/html/rfc6979#section-3.2
         """
         key = Key.from_encoded_key(sk)
         signature = key.sign(msg)
-        self.assertEqual(sig, signature)
+        assert signature == expected_signature
 
     @parameterized.expand(
         [

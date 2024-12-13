@@ -4,7 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog], and this project adheres to [Semantic Versioning].
 
-## [3.13.5](https://github.com/baking-bad/pytezos/compare/3.13.0...3.13.5) (2024-10-28)
+## [3.13.6](https://github.com/baking-bad/pytezos/compare/3.13.5...3.13.6) (2024-12-13)
+
+### Fixed
+
+* Fixed `tz4` signing suite.
+
+### Changed
+
+- Octez binaries updated to v21.0-1
+
+## [3.13.5](https://github.com/baking-bad/pytezos/compare/3.13.4...3.13.5) (2024-10-28)
 
 ### Added
 
