@@ -16,7 +16,8 @@ NAIROBI = 'PtNairobiyssHuh87hEhfVBGCVrK3WnS8Z2FT4ymB5tAa4r1nQf'
 OXFORD = 'ProxfordYmVfjWnRcgjWH36fW6PArwqykTFzotUxRs6gmTcZDuH'
 PARIS = 'PtParisBxoLz5gzMmn3d9WBQNoPSZakgnkMC2VNuQ3KXfUtUQeZ'
 PARISC = 'PsParisCZo7KAh1Z1smVd9ZMZ1HHn5gkzbM94V3PLCpknFWhUAi'
-LATEST = PARISC
+QUEBEC = 'PsQuebecnLByd3JwTiGadoG4nGWi3HYiLXUjkibeFV8dCFeVMUg'
+LATEST = QUEBEC
 
 protocol_hashes = {
     'edo': EDO,
@@ -32,6 +33,7 @@ protocol_hashes = {
     'oxford': OXFORD,
     'paris': PARIS,
     'parisc': PARISC,
+    'quebec': QUEBEC,
 }
 
 protocol_version = {
@@ -48,6 +50,7 @@ protocol_version = {
     OXFORD: 18,
     PARIS: 19,
     PARISC: 20,
+    QUEBEC: 21,
 }
 
 sandbox_commitment = {
@@ -101,7 +104,7 @@ sandbox_params: Dict[str, Any] = {
         ],
     ],
     # NOTE: Shorter cycles, voting periods and other parameters
-    # NOTE: From https://gitlab.com/tezos/tezos/-/blob/master/src/proto_020_PsParisC/lib_parameters/default_parameters.ml#L317
+    # NOTE: From https://gitlab.com/tezos/tezos/-/blob/master/src/proto_021_PsQuebec/lib_parameters/default_parameters.ml#L318
     'blocks_preservation_cycles': 1,
     'consensus_rights_delay': 2,
     'delegate_parameters_activation_delay': 2,
@@ -119,18 +122,17 @@ sandbox_params: Dict[str, Any] = {
     'max_operations_time_to_live': 8,
 }
 
-# NOTE: https://rpc.tzkt.io/parisnet/chains/main/blocks/head/context/constants/parametric
-# NOTE: https://rpc.pariscnet.teztnets.com/chains/main/blocks/head/context/constants/parametric
+# NOTE: https://rpc.tzkt.io/quebecnet/chains/main/blocks/head/context/constants/parametric
 protocol_params = {
     "consensus_rights_delay": 2,
     "blocks_preservation_cycles": 1,
     "delegate_parameters_activation_delay": 3,
-    "blocks_per_cycle": 128,
-    "blocks_per_commitment": 16,
-    "nonce_revelation_threshold": 32,
+    "blocks_per_cycle": 210,
+    "blocks_per_commitment": 25,
+    "nonce_revelation_threshold": 50,
     "cycles_per_voting_period": 1,
     "hard_gas_limit_per_operation": "1040000",
-    "hard_gas_limit_per_block": "5200000",
+    "hard_gas_limit_per_block": "3328000",
     "proof_of_work_threshold": "-1",
     "minimal_stake": "6000000000",
     "minimal_frozen_stake": "600000000",
@@ -151,9 +153,9 @@ protocol_params = {
     "min_proposal_quorum": 500,
     "liquidity_baking_subsidy": "5000000",
     "liquidity_baking_toggle_ema_threshold": 100000,
-    "max_operations_time_to_live": 120,
-    "minimal_block_delay": "7",
-    "delay_increment_per_round": "7",
+    "max_operations_time_to_live": 187,
+    "minimal_block_delay": "4",
+    "delay_increment_per_round": "4",
     "consensus_committee_size": 7000,
     "consensus_threshold": 4667,
     "minimal_participation_ratio": {"numerator": 2, "denominator": 3},
@@ -162,6 +164,7 @@ protocol_params = {
     "percentage_of_frozen_deposits_slashed_per_double_attestation": 5000,
     "max_slashing_per_block": 10000,
     "max_slashing_threshold": 2334,
+    "testnet_dictator": "tz1e1TX7KghsqWUBXWmBTAAtPK3W6JTbNc82",
     "cache_script_size": 100000000,
     "cache_stake_distribution_cycles": 8,
     "cache_sampler_state_cycles": 8,
@@ -178,14 +181,14 @@ protocol_params = {
     },
     "smart_rollup_arith_pvm_enable": True,
     "smart_rollup_origination_size": 6314,
-    "smart_rollup_challenge_window_in_blocks": 40,
+    "smart_rollup_challenge_window_in_blocks": 62,
     "smart_rollup_stake_amount": "32000000",
-    "smart_rollup_commitment_period_in_blocks": 20,
-    "smart_rollup_max_lookahead_in_blocks": 30000,
-    "smart_rollup_max_active_outbox_levels": 20160,
+    "smart_rollup_commitment_period_in_blocks": 31,
+    "smart_rollup_max_lookahead_in_blocks": 46875,
+    "smart_rollup_max_active_outbox_levels": 31500,
     "smart_rollup_max_outbox_messages_per_level": 100,
     "smart_rollup_number_of_sections_in_dissection": 32,
-    "smart_rollup_timeout_period_in_blocks": 500,
+    "smart_rollup_timeout_period_in_blocks": 781,
     "smart_rollup_max_number_of_cemented_commitments": 5,
     "smart_rollup_max_number_of_parallel_games": 32,
     "smart_rollup_reveal_activation_level": {
@@ -201,8 +204,8 @@ protocol_params = {
     "zk_rollup_origination_size": 4000,
     "zk_rollup_min_pending_to_process": 10,
     "zk_rollup_max_ticket_payload_size": 2048,
-    "global_limit_of_staking_over_baking": 5,
-    "edge_of_staking_over_delegation": 2,
+    "global_limit_of_staking_over_baking": 9,
+    "edge_of_staking_over_delegation": 3,
     "adaptive_issuance_launch_ema_threshold": 0,
     "adaptive_rewards_params": {
         "issuance_ratio_final_min": {"numerator": "1", "denominator": "400"},
@@ -218,7 +221,7 @@ protocol_params = {
     },
     "adaptive_issuance_activation_vote_enable": True,
     "autostaking_enable": True,
-    "adaptive_issuance_force_activation": True,
+    "adaptive_issuance_force_activation": False,
     "ns_enable": True,
     "direct_ticket_spending_enable": False,
 }

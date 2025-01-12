@@ -64,9 +64,9 @@ try:
 except ImportError as e:
     coincurve = CryptoExtraFallback()  # type: ignore
     ecdsa = CryptoExtraFallback()  # type: ignore
-    pysodium = CryptoExtraFallback()
-    fastecdsa = CryptoExtraFallback()
-    bytes_to_int = CryptoExtraFallback()
+    pysodium = CryptoExtraFallback()  # type: ignore
+    fastecdsa = CryptoExtraFallback()  # type: ignore
+    bytes_to_int = CryptoExtraFallback()  # type: ignore
     __crypto__ = False
 else:
     __crypto__ = True
@@ -527,11 +527,11 @@ class Key(metaclass=InlineDocstring):
                     raise ValueError('Signature is invalid.')
             # P256
             case b'p2':
-                pk = fastecdsa.encoding.sec1.SEC1Encoder.decode_public_key(
+                pk = fastecdsa.encoding.sec1.SEC1Encoder.decode_public_key(  # type: ignore
                     self.public_point, curve=fastecdsa.curve.P256
                 )
                 r, s = bytes_to_int(decoded_signature[:32]), bytes_to_int(decoded_signature[32:])
-                if not fastecdsa.ecdsa.verify(sig=(r, s), msg=encoded_message, Q=pk, hashfunc=blake2b_32):
+                if not fastecdsa.ecdsa.verify(sig=(r, s), msg=encoded_message, Q=pk, hashfunc=blake2b_32):  # type: ignore
                     raise ValueError('Signature is invalid.')
             # BLS12-381
             case b'BL':
