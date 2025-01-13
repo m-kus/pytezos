@@ -8,6 +8,7 @@ from os.path import abspath
 from os.path import expanduser
 from os.path import join
 from typing import Optional
+from typing import Union
 
 from eth_typing import BLSPubkey
 from eth_typing import BLSSignature
@@ -24,7 +25,7 @@ VALID_MNEMONIC_LENGTHS = [12, 15, 18, 21, 24]
 DEFAULT_LANGUAGE = 'english'
 DEFAULT_TEZOS_DIR = '~/.tezos-client'
 
-PassphraseInput = Optional[str | bytes]
+PassphraseInput = Optional[Union[str, bytes]]
 
 
 def get_passphrase(passphrase: PassphraseInput = None, alias: Optional[str] = None) -> bytes:
@@ -189,7 +190,7 @@ class Key(metaclass=InlineDocstring):
     @classmethod
     def from_encoded_key(
         cls,
-        key: str | bytes,
+        key: Union[str, bytes],
         passphrase: PassphraseInput = None,
     ) -> 'Key':
         """Creates a key object from a base58 encoded key.
@@ -272,7 +273,7 @@ class Key(metaclass=InlineDocstring):
     @classmethod
     def from_mnemonic(
         cls,
-        mnemonic: list[str] | str,
+        mnemonic: Union[list[str], str],
         passphrase: str = '',
         email: str = '',
         validate: bool = True,
@@ -317,7 +318,7 @@ class Key(metaclass=InlineDocstring):
         return cls.from_secret_exponent(secret_exponent, curve=curve, activation_code=activation_code)
 
     @classmethod
-    def from_faucet(cls, source: str | dict) -> 'Key':
+    def from_faucet(cls, source: Union[str, dict]) -> 'Key':
         """Import key from a faucet file: https://teztnets.xyz/
 
         :param source: path to the json file
@@ -443,7 +444,7 @@ class Key(metaclass=InlineDocstring):
         blinded_pkh = blake2b(pkh, key=key, digest_size=20).digest()
         return base58_encode(blinded_pkh, b'btz1').decode()
 
-    def sign(self, message: str | bytes, generic: bool = False):
+    def sign(self, message: Union[str, bytes], generic: bool = False):
         """Sign a raw sequence of bytes.
 
         :param message: sequence of bytes, raw format or hexadecimal notation
@@ -483,7 +484,7 @@ class Key(metaclass=InlineDocstring):
 
         return base58_encode(signature, prefix).decode()
 
-    def verify(self, signature: str | bytes, message: str | bytes) -> bool:
+    def verify(self, signature: Union[str, bytes], message: Union[str, bytes]) -> bool:
         """Verify signature, raise exception if it is not valid.
 
         :param message: sequance of bytes, raw format or hexadecimal notation

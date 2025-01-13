@@ -131,6 +131,9 @@ lint.ignore = [
 target-version = "py39"
 lint.extend-select = ["B", "C", "RET", "SIM"]
 
+[tool.mypy]
+python_version = "3.9"
+
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
