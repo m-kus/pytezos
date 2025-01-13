@@ -61,7 +61,6 @@ jobs:
 
       - name: Run lint
         run: make lint
-        if: contains(matrix.python-version, '3.12')
 
       - name: Run tests
         run: OSTYPE=$OSTYPE make test-ci

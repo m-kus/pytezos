@@ -66,16 +66,15 @@ operation_tags = {
 
 
 def scrub_input(v: str | bytes) -> bytes:
-    match v:
-        case bytes():
-            return v
-        case str():
-            try:
-                return bytes.fromhex(v.removeprefix('0x'))
-            except ValueError:
-                return v.encode('ascii')
-        case _:
-            raise TypeError('A bytes-like object is required (also str), not `%s`' % type(v).__name__)
+    if isinstance(v, bytes):
+        return v
+    elif isinstance(v, str):
+        try:
+            return bytes.fromhex(v.removeprefix('0x'))
+        except ValueError:
+            return v.encode('ascii')
+    else:
+        raise TypeError('A bytes-like object is required (also str), not `%s`' % type(v).__name__)
 
 
 def base58_decode(v: bytes) -> bytes:
