@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Any
 from typing import Dict
 
@@ -53,6 +55,7 @@ protocol_version = {
     QUEBEC: 21,
 }
 
+
 sandbox_commitment = {
     "mnemonic": [
         "arctic",
@@ -87,40 +90,8 @@ sandbox_addresses = {
     'bootstrap1': 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
 }
 
-sandbox_params: Dict[str, Any] = {
-    # NOTE: Built-in accounts
-    'bootstrap_accounts': [
-        ['edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav', '4000000000000'],
-        ['edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9', '4000000000000'],
-        ['edpkuTXkJDGcFd5nh6VvMz8phXxU3Bi7h6hqgywNFi1vZTfQNnS1RV', '4000000000000'],
-        ['edpkuFrRoDSEbJYgxRtLx2ps82UdaYc1WwfS9sE11yhauZt5DgCHbU', '4000000000000'],
-        ['edpkv8EUUH68jmo3f7Um5PezmfGrRF24gnfLpH3sVNwJnV5bVCxL2n', '4000000000000'],
-    ],
-    'bootstrap_contracts': [],
-    'commitments': [
-        [
-            Key.from_faucet(sandbox_commitment).blinded_public_key_hash(),
-            '100500000000',
-        ],
-    ],
-    # NOTE: Shorter cycles, voting periods and other parameters
-    # NOTE: From https://gitlab.com/tezos/tezos/-/blob/master/src/proto_021_PsQuebec/lib_parameters/default_parameters.ml#L318
-    'blocks_preservation_cycles': 1,
-    'consensus_rights_delay': 2,
-    'delegate_parameters_activation_delay': 2,
-    'blocks_per_cycle': 8,
-    'blocks_per_commitment': 4,
-    'nonce_revelation_threshold': 4,
-    'cycles_per_voting_period': 8,
-    'proof_of_work_threshold': str((1 << 63) - 1),
-    'vdf_difficulty': '50000',
-    'minimal_block_delay': '1',
-    'delay_increment_per_round': '1',
-    'consensus_committee_size': 256,
-    'consensus_threshold': 0,
-    'limit_of_delegation_over_baking': 19,
-    'max_operations_time_to_live': 8,
-}
+# NOTE: Run `make sandbox-params` to update this file
+sandbox_params = json.loads(Path(__file__).parent.joinpath('parameters.json').read_text())
 
 # NOTE: https://rpc.tzkt.io/quebecnet/chains/main/blocks/head/context/constants/parametric
 protocol_params = {
