@@ -125,8 +125,9 @@ update-contracts:  ## Update contract tests
 kernel-docs:       ## Build docs for Michelson IPython kernel
 	poetry run python scripts/generate_kernel_docs.py
 
+# NOTE: See `pytezos.sandbox.parameters`
 sandbox-params:
-	docker create --name temp tezos/tezos && docker cp temp:/usr/local/share/tezos/alpha-parameters/sandbox-parameters.json src/pytezos/sandbox/parameters.json && docker rm temp
+	docker create --name temp tezos/tezos && docker cp temp:/usr/local/share/tezos/021-PsQuebec-parameters/ src/pytezos/sandbox/ && docker rm temp
 
 rpc-docs:          ## Build docs for Tezos node RPC
 	poetry run python scripts/fetch_rpc_docs.py
