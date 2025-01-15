@@ -4,11 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog], and this project adheres to [Semantic Versioning].
 
+## [3.14.0](https://github.com/baking-bad/pytezos/compare/3.13.6...3.14.0) - 2025-01-15
+
+### Added
+
+- Quebecnet protocol support.
+- Python 3.13 support.
+
+### Changed
+
+- Octez binaries updated to v21.1-1
+
+### Fixed
+
+- Fixed Python 3.9 compatibility
+
 ## [3.13.6](https://github.com/baking-bad/pytezos/compare/3.13.5...3.13.6) (2024-12-13)
 
 ### Fixed
 
-* Fixed `tz4` signing suite.
+- Fixed `tz4` signing suite.
 
 ### Changed
 
@@ -18,7 +33,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ### Added
 
-* Added `tz4` address support.
+- Added `tz4` address support.
 
 ### Changed
 
@@ -56,7 +71,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ### Added
 
-- ParisCnet protocol support 
+- ParisCnet protocol support.
 
 ### Changed
 
