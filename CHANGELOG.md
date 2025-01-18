@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog], and this project adheres to [Semantic Versioning].
 
-## [3.14.0](https://github.com/baking-bad/pytezos/compare/3.13.6...3.14.0) - 2025-01-15
+## [3.14.0](https://github.com/baking-bad/pytezos/compare/3.13.6...3.14.0) - 2025-01-18
 
 ### Added
 
@@ -13,11 +13,15 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ### Changed
 
-- Octez binaries updated to v21.1-1
+- Octez binaries updated to v21.2-1
 
 ### Fixed
 
 - Fixed Python 3.9 compatibility
+
+### Removed
+
+- Removed Python 3.8 support.
 
 ## [3.13.6](https://github.com/baking-bad/pytezos/compare/3.13.5...3.13.6) (2024-12-13)
 
