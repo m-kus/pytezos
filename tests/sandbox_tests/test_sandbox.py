@@ -1,9 +1,9 @@
 import pytest
 
+from pytezos.context.mixin import alice_key
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from pytezos.sandbox.parameters import sandbox_addresses
 from pytezos.sandbox.parameters import sandbox_commitment
-from pytezos.context.mixin import alice_key
 
 
 # NOTE: Node won't be wiped between tests so alphabetical order of method names matters

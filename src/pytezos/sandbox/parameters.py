@@ -89,7 +89,7 @@ sandbox_addresses = {
     'bootstrap2': 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
     'bootstrap1': 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
     # FIXME: Temporary, see test_sandbox.py
-    'alice': 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb'
+    'alice': 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
 }
 
 # NOTE: Run `make sandbox-params` to update this file
