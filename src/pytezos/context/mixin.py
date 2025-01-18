@@ -41,6 +41,7 @@ nodes = {
     'nairobinet': ['https://rpc.tzkt.io/nairobinet'],
     'oxfordnet': ['https://rpc.tzkt.io/oxfordnet'],
     'parisnet': ['https://rpc.tzkt.io/parisnet'],
+    'quebecnet': ['https://rpc.tzkt.io/quebecnet'],
 }
 keys = {
     'alice': alice_key,

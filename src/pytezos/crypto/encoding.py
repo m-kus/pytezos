@@ -1,3 +1,5 @@
+from typing import Union
+
 import base58
 
 tb = bytes
@@ -65,17 +67,16 @@ operation_tags = {
 }
 
 
-def scrub_input(v: str | bytes) -> bytes:
-    match v:
-        case bytes():
-            return v
-        case str():
-            try:
-                return bytes.fromhex(v.removeprefix('0x'))
-            except ValueError:
-                return v.encode('ascii')
-        case _:
-            raise TypeError('A bytes-like object is required (also str), not `%s`' % type(v).__name__)
+def scrub_input(v: Union[str, bytes]) -> bytes:
+    if isinstance(v, bytes):
+        return v
+    elif isinstance(v, str):
+        try:
+            return bytes.fromhex(v.removeprefix('0x'))
+        except ValueError:
+            return v.encode('ascii')
+    else:
+        raise TypeError('A bytes-like object is required (also str), not `%s`' % type(v).__name__)
 
 
 def base58_decode(v: bytes) -> bytes:
@@ -108,7 +109,7 @@ def base58_encode(v: bytes, prefix: bytes) -> bytes:
     return base58.b58encode_check(encoding[2] + v)
 
 
-def _validate(v: str | bytes, prefixes: list):
+def _validate(v: Union[str, bytes], prefixes: list):
     if isinstance(v, str):
         v = v.encode()
     v = scrub_input(v)
@@ -118,7 +119,7 @@ def _validate(v: str | bytes, prefixes: list):
         raise ValueError('Unknown prefix.')
 
 
-def validate_pkh(v: str | bytes):
+def validate_pkh(v: Union[str, bytes]):
     """Ensure parameter is a public key hash (starts with b'tz1', b'tz2', b'tz3', b'tz4')
 
     :param v: string or bytes
@@ -127,7 +128,7 @@ def validate_pkh(v: str | bytes):
     return _validate(v, prefixes=[b'tz1', b'tz2', b'tz3', b'tz4'])
 
 
-def validate_l2_pkh(v: str | bytes):
+def validate_l2_pkh(v: Union[str, bytes]):
     """Ensure parameter is a L2 public key hash (starts with b'txr1')
 
     :param v: string or bytes
@@ -136,7 +137,7 @@ def validate_l2_pkh(v: str | bytes):
     return _validate(v, prefixes=[b'txr1'])
 
 
-def validate_sig(v: str | bytes):
+def validate_sig(v: Union[str, bytes]):
     """Ensure parameter is a signature (starts with b'edsig', b'spsig', b'p2sig', b'BLsig', b'sig')
 
     :param v: string or bytes
@@ -145,7 +146,7 @@ def validate_sig(v: str | bytes):
     return _validate(v, prefixes=[b'edsig', b'spsig', b'p2sig', b'BLsig', b'sig'])
 
 
-def is_pkh(v: str | bytes) -> bool:
+def is_pkh(v: Union[str, bytes]) -> bool:
     """Check if value is a public key hash."""
     try:
         validate_pkh(v)
@@ -154,7 +155,7 @@ def is_pkh(v: str | bytes) -> bool:
     return True
 
 
-def is_l2_pkh(v: str | bytes) -> bool:
+def is_l2_pkh(v: Union[str, bytes]) -> bool:
     """Check if value is an L2 public key hash."""
     try:
         validate_l2_pkh(v)
@@ -163,7 +164,7 @@ def is_l2_pkh(v: str | bytes) -> bool:
     return True
 
 
-def is_sig(v: str | bytes) -> bool:
+def is_sig(v: Union[str, bytes]) -> bool:
     """Check if value is a signature."""
     try:
         validate_sig(v)
@@ -172,7 +173,7 @@ def is_sig(v: str | bytes) -> bool:
     return True
 
 
-def is_bh(v: str | bytes) -> bool:
+def is_bh(v: Union[str, bytes]) -> bool:
     """Check if value is a block hash."""
     try:
         _validate(v, prefixes=[b'B'])
@@ -190,7 +191,7 @@ def is_ogh(v) -> bool:
     return True
 
 
-def is_kt(v: str | bytes) -> bool:
+def is_kt(v: Union[str, bytes]) -> bool:
     """Check if value is a KT address."""
     try:
         _validate(v, prefixes=[b'KT1'])
@@ -199,7 +200,7 @@ def is_kt(v: str | bytes) -> bool:
     return True
 
 
-def is_sr(v: str | bytes) -> bool:
+def is_sr(v: Union[str, bytes]) -> bool:
     """Check if value is a smart rollup address."""
     try:
         _validate(v, prefixes=[b'sr1'])
@@ -208,7 +209,7 @@ def is_sr(v: str | bytes) -> bool:
     return True
 
 
-def is_public_key(v: str | bytes) -> bool:
+def is_public_key(v: Union[str, bytes]) -> bool:
     """Check if value is a public key."""
     try:
         _validate(
@@ -234,7 +235,7 @@ def is_public_key(v: str | bytes) -> bool:
     return True
 
 
-def is_chain_id(v: str | bytes) -> bool:
+def is_chain_id(v: Union[str, bytes]) -> bool:
     """Check if value is a chain id."""
     try:
         _validate(v, prefixes=[b'Net'])
@@ -243,7 +244,7 @@ def is_chain_id(v: str | bytes) -> bool:
     return True
 
 
-def is_address(v: str | bytes) -> bool:
+def is_address(v: Union[str, bytes]) -> bool:
     """Check if value is a tz/KT address"""
     if isinstance(v, bytes):
         v = v.decode()
@@ -251,7 +252,7 @@ def is_address(v: str | bytes) -> bool:
     return is_kt(address) or is_pkh(address) or is_sr(address)
 
 
-def is_txr_address(v: str | bytes) -> bool:
+def is_txr_address(v: Union[str, bytes]) -> bool:
     """Check if value is a txr1 address"""
     if isinstance(v, bytes):
         v = v.decode()

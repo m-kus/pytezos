@@ -13,16 +13,15 @@ from typing import List
 from typing import Optional
 
 import requests.exceptions
-from testcontainers.core.container import Container  # type: ignore
-from testcontainers.core.docker_client import DockerClient  # type: ignore
-from testcontainers.core.generic import DockerContainer  # type: ignore
+from testcontainers.core.container import DockerContainer  # type: ignore[import-untyped]
+from testcontainers.core.docker_client import DockerClient  # type: ignore[import-untyped]
 
 from pytezos.client import PyTezosClient
 from pytezos.operation.group import OperationGroup
 from pytezos.sandbox.parameters import LATEST
 from pytezos.sandbox.parameters import sandbox_addresses
 
-DOCKER_IMAGE = 'bakingbad/sandboxed-node:v21.0-1'
+DOCKER_IMAGE = 'bakingbad/sandboxed-node:v21.2-1'
 MAX_ATTEMPTS = 60
 ATTEMPT_DELAY = 0.5
 TEZOS_NODE_PORT = 8732
@@ -30,7 +29,7 @@ TEZOS_NODE_PORT = 8732
 
 def kill_existing_containers():
     docker = DockerClient()
-    running_containers: List[Container] = docker.client.containers.list(
+    running_containers: List[DockerContainer] = docker.client.containers.list(
         filters={
             'status': 'running',
             'ancestor': DOCKER_IMAGE,

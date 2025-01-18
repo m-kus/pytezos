@@ -18,24 +18,21 @@ jobs:
     strategy:
       matrix:
         include:
+          # latest
           - os: ubuntu-latest
             arch: amd64
-            python-version: '3.12'
+            python-version: '3.13'
           - os: ubuntu-latest
             arch: arm64
+            python-version: '3.13'
+          # stable
+          - os: ubuntu-latest
+            arch: amd64
             python-version: '3.12'
-          - os: ubuntu-latest
-            arch: amd64
-            python-version: '3.11'
-          - os: ubuntu-latest
-            arch: amd64
-            python-version: '3.10'
+          # oldest
           - os: ubuntu-latest
             arch: amd64
             python-version: '3.9'
-          - os: ubuntu-latest
-            arch: amd64
-            python-version: '3.8'
 
           # FIXME: docker.errors.DockerException: Error while fetching server API version
           # - os: macos-latest
@@ -64,7 +61,6 @@ jobs:
 
       - name: Run lint
         run: make lint
-        if: contains(matrix.python-version, '3.12')
 
       - name: Run tests
         run: OSTYPE=$OSTYPE make test-ci

@@ -8,6 +8,7 @@ from os.path import abspath
 from os.path import expanduser
 from os.path import join
 from typing import Optional
+from typing import Union
 
 from eth_typing import BLSPubkey
 from eth_typing import BLSSignature
@@ -24,7 +25,7 @@ VALID_MNEMONIC_LENGTHS = [12, 15, 18, 21, 24]
 DEFAULT_LANGUAGE = 'english'
 DEFAULT_TEZOS_DIR = '~/.tezos-client'
 
-PassphraseInput = Optional[str | bytes]
+PassphraseInput = Optional[Union[str, bytes]]
 
 
 def get_passphrase(passphrase: PassphraseInput = None, alias: Optional[str] = None) -> bytes:
@@ -64,9 +65,9 @@ try:
 except ImportError as e:
     coincurve = CryptoExtraFallback()  # type: ignore
     ecdsa = CryptoExtraFallback()  # type: ignore
-    pysodium = CryptoExtraFallback()
-    fastecdsa = CryptoExtraFallback()
-    bytes_to_int = CryptoExtraFallback()
+    pysodium = CryptoExtraFallback()  # type: ignore
+    fastecdsa = CryptoExtraFallback()  # type: ignore
+    bytes_to_int = CryptoExtraFallback()  # type: ignore
     __crypto__ = False
 else:
     __crypto__ = True
@@ -145,32 +146,31 @@ class Key(metaclass=InlineDocstring):
         :param curve: b'sp' for Secp256k1, b'p2' for P256/Secp256r1, b'ed' for Ed25519 (default), b'BL' for BLS12-381
         :param activation_code: secret for initializing account balance
         """
-        match curve:
-            # Ed25519
-            case b'ed':
-                # Dealing with secret exponent or seed?
-                if len(secret_exponent) == 64:
-                    public_point = pysodium.crypto_sign_sk_to_pk(sk=secret_exponent)
-                else:
-                    public_point, secret_exponent = pysodium.crypto_sign_seed_keypair(seed=secret_exponent)
+        # Ed25519
+        if curve == b'ed':
+            # Dealing with secret exponent or seed?
+            if len(secret_exponent) == 64:
+                public_point = pysodium.crypto_sign_sk_to_pk(sk=secret_exponent)
+            else:
+                public_point, secret_exponent = pysodium.crypto_sign_seed_keypair(seed=secret_exponent)
 
-            # Secp256k1
-            case b'sp':
-                sk = coincurve.PrivateKey(secret_exponent)
-                public_point = sk.public_key.format()
+        # Secp256k1
+        elif curve == b'sp':
+            sk = coincurve.PrivateKey(secret_exponent)
+            public_point = sk.public_key.format()
 
-            # P256
-            case b'p2':
-                pk = fastecdsa.keys.get_public_key(bytes_to_int(secret_exponent), curve=fastecdsa.curve.P256)
-                public_point = fastecdsa.encoding.sec1.SEC1Encoder.encode_public_key(pk)
+        # P256
+        elif curve == b'p2':
+            pk = fastecdsa.keys.get_public_key(bytes_to_int(secret_exponent), curve=fastecdsa.curve.P256)
+            public_point = fastecdsa.encoding.sec1.SEC1Encoder.encode_public_key(pk)
 
-            # BLS12-381
-            case b'BL':
-                sk_int = int.from_bytes(secret_exponent, byteorder='little')
-                public_point = G2.SkToPk(sk_int)
+        # BLS12-381
+        elif curve == b'BL':
+            sk_int = int.from_bytes(secret_exponent, byteorder='little')
+            public_point = G2.SkToPk(sk_int)
 
-            case _:
-                raise ValueError(f'Invalid or unsupported curve type: `{curve!r}`.')
+        else:
+            raise ValueError(f'Invalid or unsupported curve type: `{curve!r}`.')
 
         return cls(public_point, secret_exponent, curve=curve, activation_code=activation_code)
 
@@ -190,7 +190,7 @@ class Key(metaclass=InlineDocstring):
     @classmethod
     def from_encoded_key(
         cls,
-        key: str | bytes,
+        key: Union[str, bytes],
         passphrase: PassphraseInput = None,
     ) -> 'Key':
         """Creates a key object from a base58 encoded key.
@@ -273,7 +273,7 @@ class Key(metaclass=InlineDocstring):
     @classmethod
     def from_mnemonic(
         cls,
-        mnemonic: list[str] | str,
+        mnemonic: Union[list[str], str],
         passphrase: str = '',
         email: str = '',
         validate: bool = True,
@@ -300,26 +300,25 @@ class Key(metaclass=InlineDocstring):
 
         seed = Mnemonic.to_seed(mnemonic, passphrase=email + passphrase)
 
-        match curve:
+        if curve == b'ed':
             # Ed25519
-            case b'ed':
-                _, secret_exponent = pysodium.crypto_sign_seed_keypair(seed=seed[:32])
+            _, secret_exponent = pysodium.crypto_sign_seed_keypair(seed=seed[:32])
+        elif curve == b'sp':
             # Secp256k1
-            case b'sp':
-                secret_exponent = seed[:32]
+            secret_exponent = seed[:32]
+        elif curve == b'p2':
             # P256
-            case b'p2':
-                secret_exponent = seed[:32]
+            secret_exponent = seed[:32]
+        elif curve == b'BL':
             # BLS12-381
-            case b'BL':
-                secret_exponent = seed[:32]
-            case _:
-                raise ValueError(f'Invalid or unsupported curve type: `{curve!r}`.')
+            secret_exponent = seed[:32]
+        else:
+            raise ValueError(f'Invalid or unsupported curve type: `{curve!r}`.')
 
         return cls.from_secret_exponent(secret_exponent, curve=curve, activation_code=activation_code)
 
     @classmethod
-    def from_faucet(cls, source: str | dict) -> 'Key':
+    def from_faucet(cls, source: Union[str, dict]) -> 'Key':
         """Import key from a faucet file: https://teztnets.xyz/
 
         :param source: path to the json file
@@ -445,7 +444,7 @@ class Key(metaclass=InlineDocstring):
         blinded_pkh = blake2b(pkh, key=key, digest_size=20).digest()
         return base58_encode(blinded_pkh, b'btz1').decode()
 
-    def sign(self, message: str | bytes, generic: bool = False):
+    def sign(self, message: Union[str, bytes], generic: bool = False):
         """Sign a raw sequence of bytes.
 
         :param message: sequence of bytes, raw format or hexadecimal notation
@@ -457,29 +456,26 @@ class Key(metaclass=InlineDocstring):
         if not self.secret_exponent:
             raise ValueError('Cannot sign without a secret key.')
 
-        match self.curve:
+        if self.curve == b'ed':
             # Ed25519
-            case b'ed':
-                digest = pysodium.crypto_generichash(encoded_message)
-                signature = pysodium.crypto_sign_detached(digest, self.secret_exponent)
+            digest = pysodium.crypto_generichash(encoded_message)
+            signature = pysodium.crypto_sign_detached(digest, self.secret_exponent)
+        elif self.curve == b'sp':
             # Secp256k1
-            case b'sp':
-                pk = coincurve.PrivateKey(self.secret_exponent)
-                signature = ecdsa.serialize_compact(
-                    ecdsa.der_to_cdata(pk.sign(encoded_message, hasher=lambda x: blake2b_32(x).digest()))
-                )
+            pk = coincurve.PrivateKey(self.secret_exponent)
+            signature = ecdsa.serialize_compact(
+                ecdsa.der_to_cdata(pk.sign(encoded_message, hasher=lambda x: blake2b_32(x).digest()))
+            )
+        elif self.curve == b'p2':
             # P256
-            case b'p2':
-                r, s = fastecdsa.ecdsa.sign(
-                    msg=encoded_message, d=bytes_to_int(self.secret_exponent), hashfunc=blake2b_32
-                )
-                signature = r.to_bytes(32, 'big') + s.to_bytes(32, 'big')
+            r, s = fastecdsa.ecdsa.sign(msg=encoded_message, d=bytes_to_int(self.secret_exponent), hashfunc=blake2b_32)
+            signature = r.to_bytes(32, 'big') + s.to_bytes(32, 'big')
+        elif self.curve == b'BL':
             # BLS12-381
-            case b'BL':
-                sk_int = int.from_bytes(self.secret_exponent, byteorder='little')
-                signature = G2.Sign(sk_int, encoded_message)
-            case _:
-                raise ValueError(f'Invalid or unsupported curve type: `{self.curve!r}`.')
+            sk_int = int.from_bytes(self.secret_exponent, byteorder='little')
+            signature = G2.Sign(sk_int, encoded_message)
+        else:
+            raise ValueError(f'Invalid or unsupported curve type: `{self.curve!r}`.')
 
         if generic:
             prefix = b'sig'
@@ -488,7 +484,7 @@ class Key(metaclass=InlineDocstring):
 
         return base58_encode(signature, prefix).decode()
 
-    def verify(self, signature: str | bytes, message: str | bytes) -> bool:
+    def verify(self, signature: Union[str, bytes], message: Union[str, bytes]) -> bool:
         """Verify signature, raise exception if it is not valid.
 
         :param message: sequance of bytes, raw format or hexadecimal notation
@@ -508,40 +504,39 @@ class Key(metaclass=InlineDocstring):
 
         decoded_signature = base58_decode(encoded_signature)
 
-        match self.curve:
-            # Ed25519
-            case b'ed':
-                digest = pysodium.crypto_generichash(encoded_message)
-                try:
-                    pysodium.crypto_sign_verify_detached(decoded_signature, digest, self.public_point)
-                except ValueError as exc:
-                    raise ValueError('Signature is invalid.') from exc
-            # Secp256k1
-            case b'sp':
-                pk = coincurve.PublicKey(self.public_point)
-                if not pk.verify(
-                    signature=ecdsa.cdata_to_der(ecdsa.deserialize_compact(decoded_signature)),
-                    message=encoded_message,
-                    hasher=lambda x: blake2b_32(x).digest(),
-                ):
-                    raise ValueError('Signature is invalid.')
-            # P256
-            case b'p2':
-                pk = fastecdsa.encoding.sec1.SEC1Encoder.decode_public_key(
-                    self.public_point, curve=fastecdsa.curve.P256
-                )
-                r, s = bytes_to_int(decoded_signature[:32]), bytes_to_int(decoded_signature[32:])
-                if not fastecdsa.ecdsa.verify(sig=(r, s), msg=encoded_message, Q=pk, hashfunc=blake2b_32):
-                    raise ValueError('Signature is invalid.')
-            # BLS12-381
-            case b'BL':
-                if not G2.Verify(
-                    BLSPubkey(self.public_point),
-                    encoded_message,
-                    BLSSignature(decoded_signature),
-                ):
-                    raise ValueError('Signature is invalid.')
-            case _:
-                raise ValueError(f'Invalid or unsupported curve type: `{self.curve!r}`.')
+        # Ed25519
+        if self.curve == b'ed':
+            digest = pysodium.crypto_generichash(encoded_message)
+            try:
+                pysodium.crypto_sign_verify_detached(decoded_signature, digest, self.public_point)
+            except ValueError as exc:
+                raise ValueError('Signature is invalid.') from exc
+        # Secp256k1
+        elif self.curve == b'sp':
+            pk = coincurve.PublicKey(self.public_point)
+            if not pk.verify(
+                signature=ecdsa.cdata_to_der(ecdsa.deserialize_compact(decoded_signature)),
+                message=encoded_message,
+                hasher=lambda x: blake2b_32(x).digest(),
+            ):
+                raise ValueError('Signature is invalid.')
+        # P256
+        elif self.curve == b'p2':
+            pk = fastecdsa.encoding.sec1.SEC1Encoder.decode_public_key(  # type: ignore
+                self.public_point, curve=fastecdsa.curve.P256
+            )
+            r, s = bytes_to_int(decoded_signature[:32]), bytes_to_int(decoded_signature[32:])
+            if not fastecdsa.ecdsa.verify(sig=(r, s), msg=encoded_message, Q=pk, hashfunc=blake2b_32):  # type: ignore
+                raise ValueError('Signature is invalid.')
+        # BLS12-381
+        elif self.curve == b'BL':
+            if not G2.Verify(
+                BLSPubkey(self.public_point),
+                encoded_message,
+                BLSSignature(decoded_signature),
+            ):
+                raise ValueError('Signature is invalid.')
+        else:
+            raise ValueError(f'Invalid or unsupported curve type: `{self.curve!r}`.')
 
         return True
